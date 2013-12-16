@@ -136,11 +136,15 @@ process.event_selector = cms.PSet(
 #
 
 process.inputs = cms.PSet (
-        nEvents    = cms.int32(-1),
-            skipEvents = cms.int32(0),
-            lumisToProcess = CfgTypes.untracked(CfgTypes.VLuminosityBlockRange()),
-            fileNames  = cms.vstring("/data1/speer/tblsm/cmssw/git-transition/new-git_5_3_6/src/LJMet/Dilepton/josh2.root")
-            )
+       nEvents    = cms.int32(1000),
+           skipEvents = cms.int32(0),
+           lumisToProcess = CfgTypes.untracked(CfgTypes.VLuminosityBlockRange()),
+           fileNames  = cms.vstring(
+              ['dcache:/pnfs/cms/WAX/11/store/results/B2G/TT_CT10_TuneZ2star_8TeV-powheg-tauola/StoreResults-Summer12_DR53X-PU_S10_START53_V7A-v2_TLBSM_53x_v2-c04f3b4fa7\
+4c8266c913b71e0c74901d/TT_CT10_TuneZ2star_8TeV-powheg-tauola/USER/StoreResults-Summer12_DR53X-PU_S10_START53_V7A-v2_TLBSM_53x_v2-c04f3b4fa74c8266c913b71e0c74901d/0000/00\
+C9DE8B-4C19-E211-BFD3-003048678A7E.root']
+                   )
+       )
 
 #process.load(input_module)
 
