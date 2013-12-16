@@ -4,11 +4,20 @@ import FWCore.ParameterSet.Types as CfgTypes
 
 process = cms.Process("LJMetCom")
 
+relBase    = str('/data1/speer/tblsm/cmssw/git-transition/new-git_5_3_6/')
 ############################################################
 #
 # FWLite application options
 process.load('LJMet.Com.ljmet_cfi')
 process.ljmet.isMc = cms.bool(True)
+process.ljmet.excluded_calculators = cms.vstring(
+    'WprimeCalc',
+    'DileptonCalc',
+    'StopCalc',
+    'PdfCalc',
+    'ChargedHiggsCalc',
+    'TprimeCalc'
+    ) 
 
 # common calculator options
 process.load('LJMet.Com.commonCalc_cfi')
@@ -38,6 +47,7 @@ process.event_selector = cms.PSet(
     debug  = cms.bool(False),
 
     isMc  = cms.bool(True),
+    doLaserCalFilt  = cms.bool(False),
     
     trigger_cut  = cms.bool(True),
     dump_trigger = cms.bool(False),
@@ -107,6 +117,16 @@ process.event_selector = cms.PSet(
     met_collection           = cms.InputTag('patMETsPFlow'),
     type1corrmet_collection  = cms.InputTag('pfType1CorrectedMet'),
 
+    do53xJEC                 = cms.bool(False),
+
+    MCL1JetPar               = cms.string(relBase+'/src/LJMet/Com/data/START53_V7G_L1FastJet_AK5PFchs.txt'),
+    MCL2JetPar               = cms.string(relBase+'/src/LJMet/Com/data/START53_V7G_L2Relative_AK5PFchs.txt'),
+    MCL3JetPar               = cms.string(relBase+'/src/LJMet/Com/data/START53_V7G_L3Absolute_AK5PFchs.txt'),
+
+    DataL1JetPar             = cms.string(relBase+'/src/LJMet/Com/data/FT_53_V10_AN3_L1FastJet_AK5PFchs.txt'),
+    DataL2JetPar             = cms.string(relBase+'/src/LJMet/Com/data/FT_53_V10_AN3_L2Relative_AK5PFchs.txt'),
+    DataL3JetPar             = cms.string(relBase+'/src/LJMet/Com/data/FT_53_V10_AN3_L3Absolute_AK5PFchs.txt'),
+    DataResJetPar            = cms.string(relBase+'/src/LJMet/Com/data/FT_53_V10_AN3_L2L3Residual_AK5PFchs.txt')
     )
 
 
@@ -114,18 +134,21 @@ process.event_selector = cms.PSet(
 #
 # Input files
 #
-input_module = 'LJMet.Com.Wprime1900Right_cff'
-#input_module = 'LJMet.Com.TT_CT10_TuneZ2star_8TeV_powheg_tauola_Summer12_DR53X_PU_S10_START53_V7A_v2_TLBSM_53x_v2_sample_cff'
-process.load(input_module)
-#process.inputs.nEvents    = cms.int32(1000000)
-process.inputs.nEvents    = cms.int32(10000)
-process.inputs.skipEvents = cms.int32(0)
+
+process.inputs = cms.PSet (
+        nEvents    = cms.int32(-1),
+            skipEvents = cms.int32(0),
+            lumisToProcess = CfgTypes.untracked(CfgTypes.VLuminosityBlockRange()),
+            fileNames  = cms.vstring("/data1/speer/tblsm/cmssw/git-transition/new-git_5_3_6/src/LJMet/Dilepton/josh2.root")
+            )
+
+#process.load(input_module)
 
 
 # JSON
-JsonFile = 'data/json/Cert_190456-202016_8TeV_PromptReco_Collisions12_JSON_MuonPhys.txt'
-myList   = LumiList.LumiList(filename=JsonFile).getCMSSWString().split(',')
 if (not process.ljmet.isMc==cms.bool(True)):
+    JsonFile = 'data/json/Cert_190456-202016_8TeV_PromptReco_Collisions12_JSON_MuonPhys.txt'
+    myList   = LumiList.LumiList(filename=JsonFile).getCMSSWString().split(',')
     process.inputs.lumisToProcess.extend(myList)
         
                 
@@ -153,15 +176,15 @@ process.pvSelector.maxRho  = cms.double(2.0)
 
 # Tight muon
 process.load('LJMet.Com.pfMuonSelector_cfi') 
-process.pfMuonSelector.version          = cms.string('SPRING11')
+process.pfMuonSelector.version          = cms.string('TOPPAG12_LJETS')
 process.pfMuonSelector.Chi2             = cms.double(10.0)
 process.pfMuonSelector.NHits            = cms.int32(0)
-process.pfMuonSelector.NValMuHits       = cms.int32(1)
-process.pfMuonSelector.D0               = cms.double(0.2)
-process.pfMuonSelector.PFIso            = cms.double(0.12) # 0.12
-process.pfMuonSelector.nPixelHits       = cms.int32(1)
-process.pfMuonSelector.nMatchedStations = cms.int32(2)
-process.pfMuonSelector.nLayersWithMeasurement = cms.int32(6)
+process.pfMuonSelector.minValidMuHits       = cms.int32(1)
+process.pfMuonSelector.maxIp               = cms.double(0.2)
+process.pfMuonSelector.maxPfRelIso            = cms.double(0.12) # 0.12
+process.pfMuonSelector.minPixelHits       = cms.int32(1)
+process.pfMuonSelector.minMatchedStations = cms.int32(2)
+process.pfMuonSelector.minTrackerLayers = cms.int32(6)
 process.pfMuonSelector.cutsToIgnore     = cms.vstring('TrackerMuon')
 
 # Loose muon
