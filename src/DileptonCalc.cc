@@ -582,7 +582,7 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event,
   //
 
   //Get Top-like jets
-  edm::InputTag topJetColl = edm::InputTag("goodPatJetsCATopTagPF");
+  edm::InputTag topJetColl = edm::InputTag("goodPatJetsCATopTagPFPacked");
   edm::Handle<std::vector<pat::Jet> > topJets;
   event.getByLabel(topJetColl, topJets);
 
@@ -667,7 +667,7 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event,
   SetValue("CATopDaughterMotherIndex"      , CATopDaughterMotherIndex);
 
   //Get CA8 jets for W's
-  edm::InputTag CAWJetColl = edm::InputTag("goodPatJetsCA8PrunedPF");
+  edm::InputTag CAWJetColl = edm::InputTag("goodPatJetsCA8PrunedPFPacked");
   edm::Handle<std::vector<pat::Jet> > CAWJets;
   event.getByLabel(CAWJetColl, CAWJets);
 
