@@ -30,12 +30,10 @@ public:
     // grab parameter values
     if (mPset.exists("verbosity")){
       mVerbosity = mPset.getParameter<int>("verbosity");
-    }
-
+    } else mVerbosity = 0;
 
     // Distribution used for Summer2012 MC. 
     // https://twiki.cern.ch/twiki/bin/view/CMS/Pileup_MC_Gen_Scenarios
-        
 
     return 0;
   }
