@@ -11,7 +11,7 @@
 #include "LJMet/Com/interface/LjmetFactory.h"
 #include "LJMet/Com/interface/LjmetEventContent.h"
 
-#include "EGamma/EGammaAnalysisTools/interface/ElectronEffectiveArea.h"
+#include "EgammaAnalysis/ElectronTools/interface/ElectronEffectiveArea.h"
 #include "LJMet/Com/interface/TopElectronSelector.h"
 
 #include "AnalysisDataFormats/TopObjects/interface/CATopJetTagInfo.h"
