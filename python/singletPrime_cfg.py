@@ -68,10 +68,10 @@ process.event_selector = cms.PSet(
 
     jet_cuts                 = cms.bool(True),
     jet_minpt                = cms.double(30.0),
-    jet_maxeta               = cms.double(2.4),
-    min_jet                  = cms.int32(2),
+    jet_maxeta               = cms.double(4.7),
+    min_jet                  = cms.int32(1),
     max_jet                  = cms.int32(4000),
-    leading_jet_pt           = cms.double(50.0),
+    leading_jet_pt           = cms.double(100.0),
 
     muon_cuts                = cms.bool(True),
     tight_muon_minpt         = cms.double(26.0), # 26 GeV
@@ -92,13 +92,13 @@ process.event_selector = cms.PSet(
     trigger_consistent       = cms.bool(True),
     second_lepton_veto       = cms.bool(True),
     
-    met_cuts                 = cms.bool(True),
+    met_cuts                 = cms.bool(False),
     min_met                  = cms.double(20.0),
     
     btag_cuts                = cms.bool(True),
     btagger                  = cms.string('combinedSecondaryVertexBJetTags'),
     btag_min_discr           = cms.double(0.679),
-    btag_1                   = cms.bool(True),
+    btag_1                   = cms.bool(False),
     btag_2                   = cms.bool(False),
     btag_3                   = cms.bool(False),
 
