@@ -342,8 +342,8 @@ void WprimeEventSelector::BeginJob( std::map<std::string, edm::ParameterSet cons
     set("Second lepton veto", mbPar["second_lepton_veto"]);
      
     if (mbPar["jet_cuts"]){
-        set("One jet or more", true);
-        set("Two jets or more", true);
+        set("One jet or more", false);
+        set("Two jets or more", false);
         set("Three jets or more", false);
         set("Min jet multiplicity", miPar["min_jet"]);
         set("Max jet multiplicity", miPar["max_jet"]);
