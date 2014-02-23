@@ -608,7 +608,7 @@ bool WprimeEventSelector::operator()( edm::EventBase const & event, pat::strbits
             		reco::Vertex const & pv = pvSel_->vertices()->at(0);
             		if ( _imu->globalTrack().isNonnull() && _imu->globalTrack().isAvailable() && (*muonSel_)( *_imu, retMuon ) && _imu->pt()>mdPar["tight_muon_minpt"] &&  fabs(_imu->eta())<mdPar["tight_muon_maxeta"] && fabs(_imu->muonBestTrack()->dz(pv.position())) < 0.5 && _imu->isPFMuon()){
             		
-            			if (  deltaR(_imu->p4(),jetP4) < 0.5 ){
+            			if (  deltaR(_imu->p4(),_ijet->p4()) < 0.5 ){
             				if (mbPar["debug"]) std::cout << "Jet Overlaps with the Muon... Fail" << std::endl;
             				_pass = false;
             			}
@@ -620,7 +620,7 @@ bool WprimeEventSelector::operator()( edm::EventBase const & event, pat::strbits
                     reco::Vertex const & pv = pvSel_->vertices()->at(0);	
                 	if ( (*electronSel_)( *_iel, event, retElectron ) && _iel->ecalDrivenMomentum().pt()>mdPar["tight_electron_minpt"] && fabs(_iel->eta())<mdPar["tight_electron_maxeta"] && !_iel->isEBEEGap() && fabs(_iel->gsfTrack()->dxy(pv.position())) < 0.02){
                 	
-                		if ( deltaR(_iel->p4(),jetP4) < 0.5 ){
+                		if ( deltaR(_iel->p4(),_ijet->p4()) < 0.5 ){
             				if (mbPar["debug"]) std::cout << "Jet Overlaps with the Electron... Fail" << std::endl;
                 			_pass = false;
                 		}
