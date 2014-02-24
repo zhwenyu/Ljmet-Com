@@ -253,4 +253,6 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event,
     SetValue("CA8JetCSV"    , CA8JetCSV);
     //SetValue("CA8JetRCN"    , CA8JetRCN);
 
+  	return 0;
+
 }
