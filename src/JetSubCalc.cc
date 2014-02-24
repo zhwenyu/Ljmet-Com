@@ -48,7 +48,6 @@ int JetSubCalc::BeginJob(){
 int JetSubCalc::AnalyzeEvent(edm::EventBase const & event,
 			       BaseEventSelector * selector){
 
-  	std::vector<edm::Ptr<pat::Jet> >      const & vSelJets      = selector->GetSelectedJets();
   
     //Get Top-like jets
     edm::InputTag topJetColl = edm::InputTag("goodPatJetsCATopTagPFPacked");
