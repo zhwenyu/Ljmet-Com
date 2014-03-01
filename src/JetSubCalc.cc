@@ -21,6 +21,7 @@
 
 using std::cout;
 using std::endl;
+using fastjet;
 
 class LjmetFactory;
 
