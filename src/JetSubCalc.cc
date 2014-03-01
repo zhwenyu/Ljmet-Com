@@ -10,6 +10,12 @@
 #include "LJMet/Com/interface/BaseCalc.h"
 #include "LJMet/Com/interface/LjmetFactory.h"
 #include "LJMet/Com/interface/LjmetEventContent.h"
+#include "LJMet/Com/interface/Nsubjettiness.hh"
+#include "LJMet/Com/interface/Njettiness.hh"
+#include <fastjet/JetDefinition.hh>
+#include <fastjet/PseudoJet.hh>
+#include "DataFormats/PatCandidates/interface/Jet.h"
+
 
 #include "AnalysisDataFormats/TopObjects/interface/CATopJetTagInfo.h"
 
@@ -230,6 +236,20 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event,
 
     std::vector <double> CA8JetCSV;
     //std::vector <double> CA8JetRCN;
+    std::vector <double> CA8Tau1;
+    std::vector <double> CA8Tau2;
+    std::vector <double> CA8Tau3;
+    std::vector <double> CA8Tau4;
+    
+
+  	// ---------------------------------------------------------------------------------------------------------
+  	// Setup Nsubjettiness
+  	// ---------------------------------------------------------------------------------------------------------
+
+  	Nsubjettiness Nsubonepass1(1, Njettiness::AxesMode::onepass_kt_axes, 1.0, 0.8);
+  	Nsubjettiness Nsubonepass2(2, Njettiness::AxesMode::onepass_kt_axes, 1.0, 0.8);
+  	Nsubjettiness Nsubonepass3(3, Njettiness::AxesMode::onepass_kt_axes, 1.0, 0.8);
+  	Nsubjettiness Nsubonepass4(4, Njettiness::AxesMode::onepass_kt_axes, 1.0, 0.8);
 
     for (std::vector<pat::Jet>::const_iterator ijet = CA8Jets->begin(); ijet != CA8Jets->end(); ijet++){
 
@@ -240,7 +260,23 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event,
       CA8JetEnergy . push_back(ijet->energy());
 
       CA8JetCSV    . push_back(ijet->bDiscriminator( "combinedSecondaryVertexBJetTags"));
-      //CA8JetRCN    . push_back((ijet->chargedEmEnergy()+ijet->chargedHadronEnergy()) / (ijet->neutralEmEnergy()+ijet->neutralHadronEnergy()));    
+      //CA8JetRCN    . push_back((ijet->chargedEmEnergy()+ijet->chargedHadronEnergy()) / (ijet->neutralEmEnergy()+ijet->neutralHadronEnergy()));
+      std::vector<fastjet::PseudoJet> FJparticles;
+      for (unsigned i = 0; i < ijet->numberOfDaughters() ; i++){
+      	const reco::PFCandidate* this_constituent = dynamic_cast<const reco::PFCandidate*>(ijet->daughter(i));
+      	FJparticles.push_back( fastjet::PseudoJet( this_constituent->px(),
+             	this_constituent->py(),
+             	this_constituent->pz(),
+             	this_constituent->energy() ) );
+      }
+	  
+	  fastjet::PseudoJet combJet = fastjet::join(FJparticles);
+
+	  CA8Tau1.push_back( Nsubonepass1.result(combJet) );
+      CA8Tau2.push_back( Nsubonepass2.result(combJet) );
+      CA8Tau3.push_back( Nsubonepass3.result(combJet) );
+      CA8Tau4.push_back( Nsubonepass4.result(combJet) );
+    
     }
 
     //Four vector
@@ -251,6 +287,10 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event,
 
     SetValue("CA8JetCSV"    , CA8JetCSV);
     //SetValue("CA8JetRCN"    , CA8JetRCN);
+    SetValue("CA8Tau1" , CA8Tau1);
+    SetValue("CA8Tau2" , CA8Tau2);
+    SetValue("CA8Tau3" , CA8Tau3);
+    SetValue("CA8Tau4" , CA8Tau4);
 
   	return 0;
 
