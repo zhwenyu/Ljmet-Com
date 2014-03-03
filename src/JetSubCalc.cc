@@ -234,6 +234,7 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event,
     std::vector <double> CA8JetEta;
     std::vector <double> CA8JetPhi;
     std::vector <double> CA8JetEnergy;
+    std::vector <double> CA8JetMass;
 
     std::vector <double> CA8JetCSV;
     //std::vector <double> CA8JetRCN;
@@ -241,6 +242,7 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event,
     std::vector <double> CA8Tau2;
     std::vector <double> CA8Tau3;
     std::vector <double> CA8Tau4;
+    std::vector <double> CA8Tau21;
     
 
   	// ---------------------------------------------------------------------------------------------------------
@@ -259,6 +261,7 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event,
       CA8JetEta    . push_back(ijet->eta());
       CA8JetPhi    . push_back(ijet->phi());
       CA8JetEnergy . push_back(ijet->energy());
+      CA8JetMass   . push_back(ijet->mass());
 
       CA8JetCSV    . push_back(ijet->bDiscriminator( "combinedSecondaryVertexBJetTags"));
       //CA8JetRCN    . push_back((ijet->chargedEmEnergy()+ijet->chargedHadronEnergy()) / (ijet->neutralEmEnergy()+ijet->neutralHadronEnergy()));
@@ -277,6 +280,7 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event,
       CA8Tau2.push_back( Nsubonepass2.result(combJet) );
       CA8Tau3.push_back( Nsubonepass3.result(combJet) );
       CA8Tau4.push_back( Nsubonepass4.result(combJet) );
+      CA8Tau21.push_back( Nsubonepass2.result(combJet) / Nsubonepass1.result(combJet) );
     
     }
 
@@ -285,6 +289,7 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event,
     SetValue("CA8JetEta"    , CA8JetEta);
     SetValue("CA8JetPhi"    , CA8JetPhi);
     SetValue("CA8JetEnergy" , CA8JetEnergy);
+    SetValue("CA8JetMass"	, CA8JetMass);
 
     SetValue("CA8JetCSV"    , CA8JetCSV);
     //SetValue("CA8JetRCN"    , CA8JetRCN);
@@ -292,6 +297,7 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event,
     SetValue("CA8Tau2" , CA8Tau2);
     SetValue("CA8Tau3" , CA8Tau3);
     SetValue("CA8Tau4" , CA8Tau4);
+    SetValue("CA8Tau21", CA8Tau21);
 
   	return 0;
 
