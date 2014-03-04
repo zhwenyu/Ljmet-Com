@@ -5,7 +5,6 @@
 */
 
 
-
 #include <iostream>
 #include "LJMet/Com/interface/BaseCalc.h"
 #include "LJMet/Com/interface/LjmetFactory.h"
@@ -37,7 +36,12 @@ public:
   virtual int EndJob(){return 0;}
 
 private:
-    
+
+  edm::InputTag             CA8TopJetColl_it;
+  edm::InputTag             CA8PrunedJetColl_it;
+  edm::InputTag             CA8JetColl_it;
+  std::string               bDiscriminant;
+  std::string				CA8TopTagInfo;
 
 };
 
@@ -49,6 +53,22 @@ JetSubCalc::JetSubCalc(){
 }
 
 int JetSubCalc::BeginJob(){
+
+  if (mPset.exists("CA8TopJetColl")) CA8TopJetColl_it = mPset.getParameter<edm::InputTag>("CA8TopJetColl");
+  else                               CA8TopJetColl_it = edm::InputTag("goodPatJetsCATopTagPFPacked");
+
+  if (mPset.exists("CA8PrunedJetColl")) CA8PrunedJetColl_it = mPset.getParameter<edm::InputTag>("CA8PrunedJetColl");
+  else                                  CA8PrunedJetColl_it = edm::InputTag("goodPatJetsCA8PrunedPFPacked");
+
+  if (mPset.exists("CA8JetColl")) CA8JetColl_it = mPset.getParameter<edm::InputTag>("CA8JetColl");
+  else                            CA8JetColl_it = edm::InputTag("goodPatJetsCA8PF");
+
+  if (mPset.exists("bDiscriminant"))     bDiscriminant = mPset.getParameter<std::string>("bDiscriminant");
+  else                                   bDiscriminant = "combinedSecondaryVertexBJetTags";
+
+  if (mPset.exists("CA8TopTagInfo"))     CA8TopTagInfo = mPset.getParameter<std::string>("CA8TopTagInfo");
+  else                                   CA8TopTagInfo = "CATop";
+
   return 0;
 }
 
@@ -57,9 +77,8 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event,
 
   
     //Get Top-like jets
-    edm::InputTag topJetColl = edm::InputTag("goodPatJetsCATopTagPFPacked");
     edm::Handle<std::vector<pat::Jet> > topJets;
-    event.getByLabel(topJetColl, topJets);
+    event.getByLabel(CA8TopJetColl_it, topJets);
 
     //Four vector
     std::vector <double> CATopJetPt;
@@ -95,13 +114,13 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event,
       CATopJetPhi    . push_back(ijet->phi());
       CATopJetEnergy . push_back(ijet->energy());
 
-      CATopJetCSV    . push_back(ijet->bDiscriminator( "combinedSecondaryVertexBJetTags"));
+      CATopJetCSV    . push_back(ijet->bDiscriminator( bDiscriminant ));
       //CATopJetRCN    . push_back((ijet->chargedEmEnergy()+ijet->chargedHadronEnergy()) / (ijet->neutralEmEnergy()+ijet->neutralHadronEnergy()));    
 
       CATopJetIndex      . push_back(index);
       CATopJetnDaughters . push_back((int)ijet->numberOfDaughters());
 
-      reco::CATopJetTagInfo* jetInfo = (reco::CATopJetTagInfo*) ijet->tagInfo("CATop");
+      reco::CATopJetTagInfo* jetInfo = (reco::CATopJetTagInfo*) ijet->tagInfo( CA8TopTagInfo );
 
       CATopJetTopMass     . push_back(jetInfo->properties().topMass);
       CATopJetMinPairMass . push_back(jetInfo->properties().minMass);
@@ -142,9 +161,8 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event,
     SetValue("CATopDaughterMotherIndex"      , CATopDaughterMotherIndex);
 
     //Get CA8 jets for W's
-    edm::InputTag CAWJetColl = edm::InputTag("goodPatJetsCA8PrunedPFPacked");
     edm::Handle<std::vector<pat::Jet> > CAWJets;
-    event.getByLabel(CAWJetColl, CAWJets);
+    event.getByLabel(CA8PrunedJetColl_it, CAWJets);
 
     //Four vector
     std::vector <double> CAWJetPt;
@@ -180,7 +198,7 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event,
       CAWJetPhi    . push_back(ijet->phi());
       CAWJetEnergy . push_back(ijet->energy());        
 
-      CAWJetCSV    . push_back(ijet->bDiscriminator( "combinedSecondaryVertexBJetTags"));
+      CAWJetCSV    . push_back(ijet->bDiscriminator( bDiscriminant ));
       //CAWJetRCN    . push_back((ijet->chargedEmEnergy()+ijet->chargedHadronEnergy()) / (ijet->neutralEmEnergy()+ijet->neutralHadronEnergy()));    
 
       //Identity
@@ -225,9 +243,8 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event,
     SetValue("CAWDaughterMotherIndex" , CAWDaughterMotherIndex);
 
     //Get all CA8 jets (not just for W and Top)
-    edm::InputTag CA8JetColl = edm::InputTag("goodPatJetsCA8PF");
     edm::Handle<std::vector<pat::Jet> > CA8Jets;
-    event.getByLabel(CA8JetColl, CA8Jets);
+    event.getByLabel(CA8JetColl_it, CA8Jets);
 
     //Four vector
     std::vector <double> CA8JetPt;
@@ -263,7 +280,7 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event,
       CA8JetEnergy . push_back(ijet->energy());
       CA8JetMass   . push_back(ijet->mass());
 
-      CA8JetCSV    . push_back(ijet->bDiscriminator( "combinedSecondaryVertexBJetTags"));
+      CA8JetCSV    . push_back(ijet->bDiscriminator( bDiscriminant ));
       //CA8JetRCN    . push_back((ijet->chargedEmEnergy()+ijet->chargedHadronEnergy()) / (ijet->neutralEmEnergy()+ijet->neutralHadronEnergy()));
       std::vector<fastjet::PseudoJet> FJparticles;
       for (unsigned i = 0; i < ijet->numberOfDaughters() ; i++){
