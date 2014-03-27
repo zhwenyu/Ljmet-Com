@@ -23,6 +23,7 @@
 <use name="JetMETCorrections/Objects"/>
 <use name="JetMETCorrections/Algorithms"/>
 <use name="CondFormats/JetMETObjects"/>
+<use name="fastjet"/>
 #<use name="TopQuarkAnalysis/TopKinFitter"/>
 #<use name="TopQuarkAnalysis/TopHitFit"/>
 #<use name="TopQuarkAnalysis/PatHitFit"/>
