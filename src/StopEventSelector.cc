@@ -767,7 +767,7 @@ bool StopEventSelector::operator()( edm::EventBase const & event, pat::strbitset
 	while(1){
 
 	  // quality cuts
-	  if ( (*pfElectronSel_)(*_iel, retElectron) ){ }
+	  if ( (*pfElectronSel_)(*_iel, event, retElectron) ){ }
 	  else break;
 
 	  // electron Et cut
