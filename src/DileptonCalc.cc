@@ -15,6 +15,8 @@
 #include "LJMet/Com/interface/TopElectronSelector.h"
 
 #include "AnalysisDataFormats/TopObjects/interface/CATopJetTagInfo.h"
+#include "PhysicsTools/SelectorUtils/interface/PFElectronSelector.h"
+#include "PhysicsTools/SelectorUtils/interface/PFMuonSelector.h"
 
 using std::cout;
 using std::endl;
@@ -46,6 +48,9 @@ private:
   double rhoIso;
 
   boost::shared_ptr<TopElectronSelector>     electronSelL_, electronSelM_, electronSelT_;
+  boost::shared_ptr<PFMuonSelector>          muonSelLJ_, muonSelDil_;
+  boost::shared_ptr<PFElectronSelector>      pfElectronSelLJ_, pfElectronSelDil_;
+
   std::vector<reco::Vertex> goodPVs;
   int findMatch(const reco::GenParticleCollection & genParticles, int idToMatch, double eta, double phi);
   double mdeltaR(double eta1, double phi1, double eta2, double phi2);
@@ -113,7 +118,43 @@ int DileptonCalc::BeginJob(){
 	      << std::endl;
     std::exit(-1);
   }
+  if ( mPset.exists("mvaElectronDileptonSelectorLJ")){
+    pfElectronSelLJ_ = boost::shared_ptr<PFElectronSelector>( 
+    	new PFElectronSelector(mPset.getParameter<edm::ParameterSet>("mvaElectronDileptonSelectorLJ")) );
+  }
+  else {
+    std::cout << "DileptonCalc: L+J MVA electron selector not configured, exiting"
+	      << std::endl;
+    std::exit(-1);
+  }
+  if ( mPset.exists("mvaElectronDileptonSelectorDil")){
+    pfElectronSelDil_ = boost::shared_ptr<PFElectronSelector>( 
+    	new PFElectronSelector(mPset.getParameter<edm::ParameterSet>("mvaElectronDileptonSelectorDil")) );
+  }
+  else {
+    std::cout << "DileptonCalc: Dilepton MVA electron selector not configured, exiting"
+	      << std::endl;
+    std::exit(-1);
+  }
 
+  if ( mPset.exists("muonSelectorLJ")){
+    muonSelLJ_ = boost::shared_ptr<PFMuonSelector>( 
+    	new PFMuonSelector(mPset.getParameter<edm::ParameterSet>("muonSelectorLJ")) );
+  }
+  else {
+    std::cout << "DileptonCalc: L+J muon selector not configured, exiting"
+	      << std::endl;
+    std::exit(-1);
+  }
+  if ( mPset.exists("muonSelectorDil")){
+    muonSelDil_ = boost::shared_ptr<PFMuonSelector>( 
+    	new PFMuonSelector(mPset.getParameter<edm::ParameterSet>("muonSelectorDil")) );
+  }
+  else {
+    std::cout << "DileptonCalc: Dilepton muon selector not configured, exiting"
+	      << std::endl;
+    std::exit(-1);
+  }
 
   return 0;
 }
@@ -209,6 +250,7 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event,
   std::vector <double> elOoemoop;
   std::vector <int>    elMHits;
   std::vector <int>    elVtxFitConv;
+  std::vector <double> elMVA;
 
   //Extra info about isolation
   std::vector <double> elChIso;
@@ -241,13 +283,14 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event,
   rhoIso = std::max(*(rhoHandle.product()), 0.0);
 
   pat::strbitset retElectron  = electronSelL_->getBitTemplate();
-  bool retElectronT,retElectronM,retElectronL;
+  pat::strbitset retPFElectron  = pfElectronSelLJ_->getBitTemplate();
+  bool retElectronT,retElectronM,retElectronL, retElectronLJ, retElectronDI;
 
 
   //
   //_____Electrons______
   //
-  
+
   for (std::vector<edm::Ptr<pat::Electron> >::const_iterator iel = vSelElectrons.begin(); iel != vSelElectrons.end(); iel++){   
     //Protect against electrons without tracks (should never happen, but just in case)
     if ((*iel)->gsfTrack().isNonnull() and (*iel)->gsfTrack().isAvailable()){
@@ -260,10 +303,10 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event,
       //Isolation
       double AEff  = ElectronEffectiveArea::GetElectronEffectiveArea(ElectronEffectiveArea::kEleGammaAndNeutralHadronIso03, 
 								     (*iel)->superCluster()->eta(), ElectronEffectiveArea::kEleEAData2012);
-      double chIso = (*iel)->chargedHadronIso();
-      double nhIso = (*iel)->neutralHadronIso();
-      double phIso = (*iel)->photonIso();
-      double relIso = ( chIso + max(0.0, nhIso + phIso - rhoIso*AEff) ) / (*iel)->pt();
+      double chIso = (*iel)->userIsolation(pat::PfChargedHadronIso);
+      double nhIso = (*iel)->userIsolation(pat::PfNeutralHadronIso);
+      double phIso = (*iel)->userIsolation(pat::PfGammaIso);
+      double relIso = ( chIso + std::max(0.0, nhIso + phIso - rhoIso*AEff) ) / (*iel)->pt();
       
       elChIso  . push_back(chIso);
       elNhIso  . push_back(nhIso);
@@ -272,6 +315,7 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event,
       elRhoIso . push_back(rhoIso);
 
       elRelIso . push_back(relIso);
+      elMVA . push_back((*iel)->electronID("mvaTrigV0"));
 
       //Conversion rejection
       int nLostHits = (*iel)->gsfTrack()->trackerExpectedHitsInner().numberOfLostHits();
@@ -284,8 +328,10 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event,
       retElectronL = (*electronSelL_)(**iel, event, retElectron);
       retElectronM = (*electronSelM_)(**iel, event, retElectron);
       retElectronT = (*electronSelT_)(**iel, event, retElectron);
-      
-      elQuality.push_back((retElectronT<<2) + (retElectronM<<1) + retElectronL);
+      retElectronLJ = (*pfElectronSelLJ_)(**iel, event, retPFElectron);
+      retElectronDI = (*pfElectronSelDil_)(**iel, event, retPFElectron);
+      elQuality.push_back( (retElectronLJ<<4) + (retElectronDI<<3) +
+	(retElectronT<<2) + (retElectronM<<1) + retElectronL);
 
       //IP: for some reason this is with respect to the first vertex in the collection
       if(goodPVs.size() > 0){
@@ -373,6 +419,7 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event,
   SetValue("elOoemoop", elOoemoop);
   SetValue("elMHits", elMHits);
   SetValue("elVtxFitConv", elVtxFitConv);
+  SetValue("elMVA", elMVA);
 
   //Extra info about isolation
   SetValue("elChIso" , elChIso);
@@ -406,7 +453,8 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event,
   
   std::vector <int> muCharge;
   std::vector <int> muGlobal;
-  
+  std::vector <int> muQuality;
+
   //Four vector
   std::vector <double> muPt;
   std::vector <double> muEta;
@@ -448,6 +496,9 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event,
   vector<double> muMatchedPhi;
   vector<double> muMatchedEnergy;
 
+  pat::strbitset retMuon  = muonSelLJ_->getBitTemplate();
+  bool retMuonLJ, retMuonDI;
+
   for (std::vector<edm::Ptr<pat::Muon> >::const_iterator imu = vSelMuons.begin(); imu != vSelMuons.end(); imu++){
     //Protect against muons without tracks (should never happen, but just in case)
     if ((*imu)->globalTrack().isNonnull() and (*imu)->globalTrack().isAvailable() and 
@@ -463,10 +514,16 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event,
       muPhi    . push_back((*imu)->phi());
       muEnergy . push_back((*imu)->energy());  
       
-      muGlobal.push_back(((*imu)->isGlobalMuon()<<2)+(*imu)->isTrackerMuon());
+      int global = (((*imu)->isGlobalMuon()<<2)+(*imu)->isTrackerMuon());
+      muGlobal.push_back(global);
+      
+      retMuonLJ = (*muonSelLJ_)(**imu, retMuon);
+      retMuonDI = ((*muonSelDil_)(**imu, retMuon) &&(global>0));
+      muQuality.push_back( (retMuonLJ<<1) + retMuonDI);
+
       //Chi2
       muChi2 . push_back((*imu)->globalTrack()->normalizedChi2());
-      
+
       //Isolation
       double chIso  = (*imu)->userIsolation(pat::PfChargedHadronIso);
       double nhIso  = (*imu)->userIsolation(pat::PfNeutralHadronIso);
@@ -536,6 +593,7 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event,
   
   
   SetValue("muCharge", muCharge);
+  SetValue("muQuality", muQuality);
   SetValue("muGlobal", muGlobal);
   //Four vector
   SetValue("muPt"     , muPt);
