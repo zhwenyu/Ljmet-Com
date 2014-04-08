@@ -418,28 +418,28 @@ TLorentzVector BaseEventSelector::correctJet(const pat::Jet & jet, edm::EventBas
     if ( abs(jet.eta()) < 0.5 ) {
       factor = .052;
       if (mbPar["JERup"]) factor = 0.115;
-      if (mbPar["JERdown"]) factor = -0.011;
+      if (mbPar["JERdown"]) factor = -0.01;
     }
     else if ( abs(jet.eta()) < 1.1 && abs(jet.eta()) >= 0.5 ) {
       factor = 0.057;
       if (mbPar["JERup"]) factor = 0.114;
-      if (mbPar["JERdown"]) factor = 0.0;
+      if (mbPar["JERdown"]) factor = 0.001;
     }
     else if ( abs(jet.eta()) < 1.7 && abs(jet.eta()) >= 1.1 ) {
       factor = 0.096;
       if (mbPar["JERup"]) factor = 0.161;
-      if (mbPar["JERdown"]) factor = 0.031;
+      if (mbPar["JERdown"]) factor = 0.032;
     }
     else if ( abs(jet.eta()) < 2.3 && abs(jet.eta()) >= 1.7 ) {
       factor = 0.134;
       if (mbPar["JERup"]) factor = 0.228;
-      if (mbPar["JERdown"]) factor = 0.040;
+      if (mbPar["JERdown"]) factor = 0.042;
 
     }
     else if (abs(jet.eta()) < 5.0 && abs(jet.eta()) >=2.3 ) {
       factor = 0.288;
       if (mbPar["JERup"]) factor = 0.488;
-      if (mbPar["JERdown"]) factor = 0.088;
+      if (mbPar["JERdown"]) factor = 0.089;
     }
 
     const reco::GenJet * genJet = jet.genJet();
