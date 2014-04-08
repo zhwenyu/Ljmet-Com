@@ -36,13 +36,13 @@ BtagHardcodedConditions::BtagHardcodedConditions() {
   float ptminT[14] = {30, 40, 50, 60, 70, 80, 100, 120, 160, 210, 260, 320, 400, 500};
   for (int i=0;i<14;++i) ptRange11.push_back(ptminT[i]);
 
-  float SFb_TCHPT_temp12[16] = { 0.0725549, 0.0275189, 0.0279695, 0.028065, 0.0270752, 0.0254934, 0.0262087, 0.0230919, 0.0294829, 0.0226487, 0.0272755, 0.0303747, 0.051223, 0.0542895, 0.0589887, 0.0584216 };
-  float SFb_CSVL_temp12[16]  = { 0.0484285, 0.0126178, 0.0120027, 0.0141137, 0.0145441, 0.0131145, 0.0168479, 0.0160836, 0.0126209, 0.0136017, 0.019182, 0.0198805, 0.0386531, 0.0392831, 0.0481008, 0.0474291 };
-  float SFb_CSVM_temp12[16]  = { 0.0554504, 0.0209663, 0.0207019, 0.0230073, 0.0208719, 0.0200453, 0.0264232, 0.0240102, 0.0229375, 0.0184615, 0.0216242, 0.0248119, 0.0465748, 0.0474666, 0.0718173, 0.0717567 };
-  float SFb_CSVT_temp12[16]  = { 0.0567059, 0.0266907, 0.0263491, 0.0342831, 0.0303327, 0.024608, 0.0333786, 0.0317642, 0.031102, 0.0295603, 0.0474663, 0.0503182, 0.0580424, 0.0575776, 0.0769779, 0.0898199 };
-  float SFb_JPL_temp12[16]   = { 0.0456879, 0.0229755, 0.0229115, 0.0219184, 0.0222935, 0.0189195, 0.0237255, 0.0236069, 0.0159177, 0.0196792, 0.0168556, 0.0168882, 0.0348084, 0.0355933, 0.0476836, 0.0500367 };
-  float SFb_JPM_temp12[16]   = { 0.0584144, 0.0304763, 0.0311788, 0.0339226, 0.0343223, 0.0303401, 0.0329372, 0.0339472, 0.0368516, 0.0319189, 0.0354756, 0.0347098, 0.0408868, 0.0415471, 0.0567743, 0.0605397 };
-  float SFb_JPT_temp12[16]   = { 0.0673183, 0.0368276, 0.037958, 0.0418136, 0.0463115, 0.0409334, 0.0436405, 0.0419725, 0.0451182, 0.0394386, 0.0423327, 0.0393015, 0.0499883, 0.0509444, 0.0780023, 0.0856582 };
+  float SFb_TCHPT_temp12[16] = { 0.0623066, 0.0360776, 0.0384463, 0.0345685, 0.0313914, 0.0282376, 0.0317331, 0.0277312, 0.0243638, 0.0321875, 0.0260112, 0.030548, 0.026805, 0.042106, 0.053241, 0.050621};
+  float SFb_CSVL_temp12[16]  = {0.033408, 0.015446, 0.0146992, 0.0183964, 0.0185363, 0.0145547, 0.0176743, 0.0203609, 0.0143342, 0.0148771, 0.0157936, 0.0176496, 0.0209156, 0.0278529, 0.0346877, 0.0350101};
+  float SFb_CSVM_temp12[16]  = {0.0415694, 0.023429, 0.0261074, 0.0239251, 0.0232416, 0.0197251, 0.0217319, 0.0198108, 0.0193, 0.0276144, 0.0205839, 0.026915, 0.0312739, 0.0415054, 0.0740561, 0.0598311};
+  float SFb_CSVT_temp12[16]  = {0.0511028, 0.0306671, 0.0317498, 0.032779, 0.0291528, 0.0249308, 0.0301118, 0.032047, 0.0348072, 0.0357745, 0.0378756, 0.0412608, 0.0777516, 0.0860741, 0.0942209, 0.104106};
+  float SFb_JPL_temp12[16]   = {0.0357984, 0.017992, 0.0169184, 0.0200852, 0.0210594, 0.0180289, 0.0206386, 0.0196933, 0.0155165, 0.0230007, 0.0233707, 0.0197976, 0.029301, 0.0488732, 0.0474228, 0.0495317};
+  float SFb_JPM_temp12[16]   = {0.0479569, 0.0279306, 0.0318744, 0.0320554, 0.0316665, 0.0301609, 0.0275172, 0.0267551, 0.029527, 0.0464665, 0.0465713, 0.0448391, 0.0484107, 0.0657275, 0.0779454, 0.0800651};
+  float SFb_JPT_temp12[16]   = {0.0660802, 0.0299138, 0.032965, 0.0339404, 0.0362514, 0.032763, 0.0366435, 0.0380308, 0.0226763, 0.0411264, 0.0391758, 0.0406139, 0.0485344, 0.0604263, 0.113572, 0.113872};
   fillArray(SFb_TCHPT_error12, SFb_TCHPT_temp12,16);
   fillArray(SFb_CSVL_error12, SFb_CSVL_temp12,16);
   fillArray(SFb_CSVM_error12, SFb_CSVM_temp12,16);
@@ -52,7 +52,7 @@ BtagHardcodedConditions::BtagHardcodedConditions() {
   fillArray(SFb_JPT_error12, SFb_JPT_temp12,16);
   float ptminT12[16] = {20, 30, 40, 50, 60, 70, 80, 100, 120, 160, 210, 260, 320, 400, 500, 600};
   for (int i=0;i<16;++i) ptRange12.push_back(ptminT12[i]);
-  
+
 }
 
 
@@ -93,7 +93,7 @@ double BtagHardcodedConditions::GetBtagEfficiency(double pt, double eta,
     return 0.685;
   else if( tagger == "CSVL")
     return 0.844;
-  
+//   UPDATE????????????????????????????????????????????????????????????????????????????????????????????
 
   // tag eff, x - discriminant
   // from https://twiki.cern.ch/twiki/pub/CMS/BtagPOG/eff_b_c-ttbar_payload.txt
@@ -133,13 +133,13 @@ double BtagHardcodedConditions::GetBtagScaleFactor2012(double pt, double eta,
   else if (pt<20) pt=20;
 
   double SFb=0;
-  if( tagger=="JPL")   SFb = 0.977721*((1.+(-1.02685e-06*pt))/(1.+(-2.56586e-07*pt)));
-  else if( tagger=="JPM")   SFb = 0.87887*((1.+(0.0393348*pt))/(1.+(0.0354499*pt)));
-  else if( tagger=="JPT")    SFb = 0.802097*((1.+(0.013219*pt))/(1.+(0.0107842*pt)));
-  else if( tagger=="TCHPT")  SFb = 0.305208*((1.+(0.595166*pt))/(1.+(0.186968*pt)));
-  else if( tagger=="CSVL")  SFb = 0.981149*((1.+(-0.000713295*pt))/(1.+(-0.000703264*pt)));
-  else if( tagger=="CSVM")  SFb = 0.726981*((1.+(0.253238*pt))/(1.+(0.188389*pt)));
-  else if( tagger=="CSVT")  SFb = 0.869965*((1.+(0.0335062*pt))/(1.+(0.0304598*pt)));
+  if( tagger=="JPL")   	    SFb = 1.65936*((1.+(0.546853*pt))/(1.+(0.93234*pt)));
+  else if( tagger=="JPM")   SFb = 0.896758*((1.+(0.11259*pt))/(1.+(0.105615*pt)));
+  else if( tagger=="JPT")   SFb = 0.802128*((1.+(0.024399*pt))/(1.+(0.0215834*pt)));
+  else if( tagger=="TCHPT") SFb = 0.671344*((1.+(0.111537*pt))/(1.+(0.0796576*pt)));
+  else if( tagger=="CSVL")  SFb = 1.00572*((1.+(0.013676*pt))/(1.+(0.0143279*pt)));
+  else if( tagger=="CSVM")  SFb = (0.939158+(0.000158694*pt))+(-2.53962e-07*(pt*pt));
+  else if( tagger=="CSVT")  SFb = (0.9203+(-3.32421e-05*pt))+(-7.74664e-08*(pt*pt));
   return SFb;
 }
 
@@ -194,7 +194,7 @@ double BtagHardcodedConditions::GetBtagSFUncertainty2012(double pt, double eta,
   else if( tagger=="CSVM") err =  SFb_CSVM_error12[bin];
   else if( tagger=="CSVT") err =  SFb_CSVT_error12[bin];
 
-  if ((pt>670) || (pt<20)) err*=2.0;
+  if ((pt>800) || (pt<20)) err*=2.0;
   return err;
 }
 
@@ -254,7 +254,7 @@ double BtagHardcodedConditions::GetMistagRate(double pt, double eta,
     return (0.00974141+(5.09503e-05*pt))+(2.0641e-08*(pt*pt));
   if( tagger == "CSVM" && _absEta>=1.6 && _absEta<2.4)
     return (0.013595+(0.000104538*pt))+(-1.36087e-08*(pt*pt));
-  
+
   */
   if( tagger == "CSVT" && _absEta>=0.0 && _absEta<2.4)
     return 0.00315116*(((1+(-0.00769281*pt))+(2.58066e-05*(pt*pt)))+(-2.02149e-08*(pt*(pt*pt))));
@@ -340,10 +340,10 @@ double BtagHardcodedConditions::GetMistagScaleFactor(double pt, double eta,
 double BtagHardcodedConditions::GetMistagSFUncertDown(double pt, double eta,
 						     std::string tagger, int year){
   if (year==2012) {
-    return (pt>800?2.0:1.0) * 
+    return (pt>800?2.0:1.0) *
 	(GetMistagSF2012(pt, eta, tagger, "mean")- GetMistagSF2012(pt, eta, tagger, "min"));
   } else if (year==2011) {
-    return (pt>670?2.0:1.0) * 
+    return (pt>670?2.0:1.0) *
 	(GetMistagSF2011(pt, eta, tagger, "mean")- GetMistagSF2011(pt, eta, tagger, "min"));
   } else {
     return 0;
@@ -353,10 +353,10 @@ double BtagHardcodedConditions::GetMistagSFUncertDown(double pt, double eta,
 double BtagHardcodedConditions::GetMistagSFUncertUp(double pt, double eta,
 						     std::string tagger, int year){
   if (year==2012) {
-    return (pt>800?2.0:1.0) * 
+    return (pt>800?2.0:1.0) *
 	(GetMistagSF2012(pt, eta, tagger, "max")- GetMistagSF2012(pt, eta, tagger, "mean"));
   } else if (year==2011) {
-    return (pt>670?2.0:1.0) * 
+    return (pt>670?2.0:1.0) *
 	(GetMistagSF2011(pt, eta, tagger, "max")- GetMistagSF2011(pt, eta, tagger, "mean"));
   } else {
     return 0;
@@ -641,136 +641,96 @@ double BtagHardcodedConditions::GetMistagSF2012(double pt, double eta,
   double _absEta = abs(eta);
   double sf = -1;
 
-  if ( (tagger[tagger.length()-1]=='T') || 
-  ((tagger[tagger.length()-1]=='M') && (pt<800)) || 
-  ((tagger[tagger.length()-1]=='L') && (pt<700) ) ) {
+  if (pt<20) pt=20;
+  else if ((pt>850) && (((tagger[tagger.length()-1]=='L')&&_absEta>=1.5) ||
+	((tagger[tagger.length()-1]=='M')&&_absEta>=1.6) ) )
+	 pt=850;
+  else if (pt>1000) pt=1000;
 
-    if (pt<20) pt=20;
-    else if (pt>800) pt=800;
-
-    if( tagger=="CSVL"&& _absEta>=0.0 && _absEta<0.5) {
-      if( meanminmax == "mean" ) sf = ((1.04901+(0.00152181*pt))+(-3.43568e-06*(pt*pt)))+(2.17219e-09*(pt*(pt*pt)));
-      else if( meanminmax == "min" ) sf = ((0.973773+(0.00103049*pt))+(-2.2277e-06*(pt*pt)))+(1.37208e-09*(pt*(pt*pt)));
-      else if( meanminmax == "max" ) sf = ((1.12424+(0.00201136*pt))+(-4.64021e-06*(pt*pt)))+(2.97219e-09*(pt*(pt*pt)));
+  if( tagger=="CSVL"&& _absEta>=0.0 && _absEta<0.5) {
+    if( meanminmax == "mean" )     sf = ((1.01177+(0.0023066*pt))+(-4.56052e-06*(pt*pt)))+(2.57917e-09*(pt*(pt*pt)));
+    else if( meanminmax == "min" ) sf = ((0.977761+(0.00170704*pt))+(-3.2197e-06*(pt*pt)))+(1.78139e-09*(pt*(pt*pt)));
+    else if( meanminmax == "max" ) sf = ((1.04582+(0.00290226*pt))+(-5.89124e-06*(pt*pt)))+(3.37128e-09*(pt*(pt*pt)));
+  }
+  else if( tagger=="CSVL" && _absEta>=0.5 && _absEta<1.0) {
+    if( meanminmax == "mean" )     sf = ((0.975966+(0.00196354*pt))+(-3.83768e-06*(pt*pt)))+(2.17466e-09*(pt*(pt*pt)));
+    else if( meanminmax == "min" ) sf = ((0.945135+(0.00146006*pt))+(-2.70048e-06*(pt*pt)))+(1.4883e-09*(pt*(pt*pt)));
+    else if( meanminmax == "max" ) sf = ((1.00683+(0.00246404*pt))+(-4.96729e-06*(pt*pt)))+(2.85697e-09*(pt*(pt*pt)));
     }
-    else if( tagger=="CSVL" && _absEta>=0.5 && _absEta<1.0) {
-      if( meanminmax == "mean" ) sf = ((0.991915+(0.00172552*pt))+(-3.92652e-06*(pt*pt)))+(2.56816e-09*(pt*(pt*pt)));
-      else if( meanminmax == "min" ) sf = ((0.921518+(0.00129098*pt))+(-2.86488e-06*(pt*pt)))+(1.86022e-09*(pt*(pt*pt)));
-      else if( meanminmax == "max" ) sf = ((1.06231+(0.00215815*pt))+(-4.9844e-06*(pt*pt)))+(3.27623e-09*(pt*(pt*pt)));
-      }
-    else if( tagger=="CSVL" && _absEta>=1.0 && _absEta<1.5) {
-      if( meanminmax == "mean" ) sf = ((0.962127+(0.00192796*pt))+(-4.53385e-06*(pt*pt)))+(3.0605e-09*(pt*(pt*pt)));
-      else if( meanminmax == "min" ) sf = ((0.895419+(0.00153387*pt))+(-3.48409e-06*(pt*pt)))+(2.30899e-09*(pt*(pt*pt)));
-      else if( meanminmax == "max" ) sf = ((1.02883+(0.00231985*pt))+(-5.57924e-06*(pt*pt)))+(3.81235e-09*(pt*(pt*pt)));
-    }
-    else if( tagger=="CSVL" && _absEta>=1.5 && _absEta<2.4) {
-      if( meanminmax == "mean" ) sf = ((1.06121+(0.000332747*pt))+(-8.81201e-07*(pt*pt)))+(7.43896e-10*(pt*(pt*pt)));
-      else if( meanminmax == "min" ) sf = ((0.983607+(0.000196747*pt))+(-3.98327e-07*(pt*pt)))+(2.95764e-10*(pt*(pt*pt)));
-      else if( meanminmax == "max" ) sf = ((1.1388+(0.000468418*pt))+(-1.36341e-06*(pt*pt)))+(1.19256e-09*(pt*(pt*pt)));
-    }
-    else if( tagger=="CSVM" && _absEta>=0.0 && _absEta<0.8) {
-      if( meanminmax == "mean" ) sf = ((1.06238+(0.00198635*pt))+(-4.89082e-06*(pt*pt)))+(3.29312e-09*(pt*(pt*pt)));
-      else if( meanminmax == "min" ) sf = ((0.972746+(0.00104424*pt))+(-2.36081e-06*(pt*pt)))+(1.53438e-09*(pt*(pt*pt)));
-      else if( meanminmax == "max" ) sf = ((1.15201+(0.00292575*pt))+(-7.41497e-06*(pt*pt)))+(5.0512e-09*(pt*(pt*pt)));
-    }
-    else if( tagger=="CSVM" && _absEta>=0.8 && _absEta<1.6) {
-      if( meanminmax == "mean" ) sf = ((1.08048+(0.00110831*pt))+(-2.96189e-06*(pt*pt)))+(2.16266e-09*(pt*(pt*pt)));
-      else if( meanminmax == "min" ) sf = ((0.9836+(0.000649761*pt))+(-1.59773e-06*(pt*pt)))+(1.14324e-09*(pt*(pt*pt)));
-      else if( meanminmax == "max" ) sf = ((1.17735+(0.00156533*pt))+(-4.32257e-06*(pt*pt)))+(3.18197e-09*(pt*(pt*pt)));
-    }
-    else if( tagger=="CSVM" && _absEta>=1.6 && _absEta<2.4) {
-      if( meanminmax == "mean" ) sf = ((1.09145+(0.000687171*pt))+(-2.45054e-06*(pt*pt)))+(1.7844e-09*(pt*(pt*pt)));
-      else if( meanminmax == "min" ) sf = ((1.00616+(0.000358884*pt))+(-1.23768e-06*(pt*pt)))+(6.86678e-10*(pt*(pt*pt)));
-      else if( meanminmax == "max" ) sf = ((1.17671+(0.0010147*pt))+(-3.66269e-06*(pt*pt)))+(2.88425e-09*(pt*(pt*pt)));
-    }
-    else if( tagger=="CSVT" && _absEta>=0.0 && _absEta<2.4) {
-      if( meanminmax == "mean" ) sf = ((1.01739+(0.00283619*pt))+(-7.93013e-06*(pt*pt)))+(5.97491e-09*(pt*(pt*pt)));
-      else if( meanminmax == "min" ) sf = ((0.953587+(0.00124872*pt))+(-3.97277e-06*(pt*pt)))+(3.23466e-09*(pt*(pt*pt)));
-      else if( meanminmax == "max" ) sf = ((1.08119+(0.00441909*pt))+(-1.18764e-05*(pt*pt)))+(8.71372e-09*(pt*(pt*pt)));
-    }
-
-    else if( tagger == "JPL" && _absEta >= 0.0 && _absEta < 0.5){
-	if( meanminmax == "mean" ) sf = ((1.05617+(0.000986016*pt))+(-2.05398e-06*(pt*pt)))+(1.25408e-09*(pt*(pt*pt)));
-	else if( meanminmax == "min" ) sf = ((0.918762+(0.000749113*pt))+(-1.48511e-06*(pt*pt)))+(8.78559e-10*(pt*(pt*pt)));
-	else if( meanminmax == "max" ) sf = ((1.19358+(0.00122182*pt))+(-2.62078e-06*(pt*pt)))+(1.62951e-09*(pt*(pt*pt)));
-    }
-    else if( tagger == "JPL" && _absEta >= 0.0 && _absEta < 2.4){
-	if( meanminmax == "mean" ) sf = ((1.04356+(0.000798695*pt))+(-1.83026e-06*(pt*pt)))+(1.19459e-09*(pt*(pt*pt)));
-	else if( meanminmax == "min" ) sf = ((0.909334+(0.000638944*pt))+(-1.43578e-06*(pt*pt)))+(9.25276e-10*(pt*(pt*pt)));
-	else if( meanminmax == "max" ) sf = ((1.17779+(0.000957469*pt))+(-2.22278e-06*(pt*pt)))+(1.46383e-09*(pt*(pt*pt)));
-    }
-    else if( tagger == "JPL" && _absEta >= 0.5 && _absEta < 1.0){
-	if( meanminmax == "mean" ) sf = ((1.02884+(0.000471854*pt))+(-1.15441e-06*(pt*pt)))+(7.83716e-10*(pt*(pt*pt)));
-	else if( meanminmax == "min" ) sf = ((0.893017+(0.000369124*pt))+(-8.68577e-07*(pt*pt)))+(5.79006e-10*(pt*(pt*pt)));
-	else if( meanminmax == "max" ) sf = ((1.16466+(0.000573985*pt))+(-1.43899e-06*(pt*pt)))+(9.88387e-10*(pt*(pt*pt)));
-    }
-    else if( tagger == "JPL" && _absEta >= 1.0 && _absEta < 1.5){
-	if( meanminmax == "mean" ) sf = ((1.02463+(0.000907924*pt))+(-2.07133e-06*(pt*pt)))+(1.37083e-09*(pt*(pt*pt)));
-	else if( meanminmax == "min" ) sf = ((0.89415+(0.000712877*pt))+(-1.57703e-06*(pt*pt)))+(1.02034e-09*(pt*(pt*pt)));
-	else if( meanminmax == "max" ) sf = ((1.15511+(0.00110197*pt))+(-2.56374e-06*(pt*pt)))+(1.72152e-09*(pt*(pt*pt)));
-    }
-    else if( tagger == "JPL" && _absEta >= 1.5 && _absEta < 2.4){
-	if( meanminmax == "mean" ) sf = ((1.05387+(0.000951237*pt))+(-2.35437e-06*(pt*pt)))+(1.66123e-09*(pt*(pt*pt)));
-	else if( meanminmax == "min" ) sf = ((0.918611+(0.000781707*pt))+(-1.8923e-06*(pt*pt)))+(1.312e-09*(pt*(pt*pt)));
-	else if( meanminmax == "max" ) sf = ((1.1891+(0.00112006*pt))+(-2.81586e-06*(pt*pt)))+(2.01249e-09*(pt*(pt*pt)));
-      }
-    else if( tagger == "JPM" && _absEta >= 0.0 && _absEta < 0.8){
-      if( meanminmax == "mean" ) sf = ((0.980407+(0.00190765*pt))+(-4.49633e-06*(pt*pt)))+(3.02664e-09*(pt*(pt*pt)));
-	else if( meanminmax == "min" ) sf = ((0.813164+(0.00127951*pt))+(-2.74274e-06*(pt*pt)))+(1.78799e-09*(pt*(pt*pt)));
-	else if( meanminmax == "max" ) sf = ((1.14766+(0.00253327*pt))+(-6.24447e-06*(pt*pt)))+(4.26468e-09*(pt*(pt*pt)));
-      }
-    else if( tagger == "JPM" && _absEta >= 0.0 && _absEta < 2.4){
-      if( meanminmax == "mean" ) sf = ((0.980066+(0.00222324*pt))+(-5.51689e-06*(pt*pt)))+(3.84294e-09*(pt*(pt*pt)));
-      else if( meanminmax == "min" ) sf = ((0.827418+(0.00152453*pt))+(-3.56396e-06*(pt*pt)))+(2.44144e-09*(pt*(pt*pt)));
-	else if( meanminmax == "max" ) sf = ((1.13272+(0.00291881*pt))+(-7.46281e-06*(pt*pt)))+(5.24363e-09*(pt*(pt*pt)));
-    }
-    else if( tagger == "JPM" && _absEta >= 0.8 && _absEta < 1.6){
-      if( meanminmax == "mean" ) sf = ((1.01783+(0.00183763*pt))+(-4.64972e-06*(pt*pt)))+(3.34342e-09*(pt*(pt*pt)));
-      else if( meanminmax == "min" ) sf = ((0.860873+(0.00110031*pt))+(-2.48023e-06*(pt*pt)))+(1.73776e-09*(pt*(pt*pt)));
-      else if( meanminmax == "max" ) sf = ((1.17479+(0.00257252*pt))+(-6.81377e-06*(pt*pt)))+(4.94891e-09*(pt*(pt*pt)));
-    }
-    else if( tagger == "JPM" && _absEta >= 1.6 && _absEta < 2.4){
-      if( meanminmax == "mean" ) sf = ((0.866685+(0.00396887*pt))+(-1.11342e-05*(pt*pt)))+(8.84085e-09*(pt*(pt*pt)));
-      else if( meanminmax == "min" ) sf = ((0.740983+(0.00302736*pt))+(-8.12284e-06*(pt*pt)))+(6.281e-09*(pt*(pt*pt)));
-      else if( meanminmax == "max" ) sf = ((0.992297+(0.00490671*pt))+(-1.41403e-05*(pt*pt)))+(1.14097e-08*(pt*(pt*pt)));
-    }
-    else if( tagger == "JPT" && _absEta >= 0.0 && _absEta < 2.4){
-      if( meanminmax == "mean" ) sf = ((0.89627+(0.00328988*pt))+(-8.76392e-06*(pt*pt)))+(6.4662e-09*(pt*(pt*pt)));
-      else if( meanminmax == "min" ) sf = ((0.666092+(0.00262465*pt))+(-6.5345e-06*(pt*pt)))+(4.73926e-09*(pt*(pt*pt)));
-      else if( meanminmax == "max" ) sf = ((1.12648+(0.00394995*pt))+(-1.0981e-05*(pt*pt)))+(8.19134e-09*(pt*(pt*pt)));
-    }
-    else if( tagger == "TCHPT" && _absEta >= 0.0 && _absEta < 2.4){
-      if( meanminmax == "mean" ) sf = ((1.1676+(0.00136673*pt))+(-3.51053e-06*(pt*pt)))+(2.4966e-09*(pt*(pt*pt)));
-      else if( meanminmax == "min" ) sf = ((0.988346+(0.000914722*pt))+(-2.37077e-06*(pt*pt)))+(1.72082e-09*(pt*(pt*pt)));
-      else if( meanminmax == "max" ) sf = ((1.34691+(0.00181637*pt))+(-4.64484e-06*(pt*pt)))+(3.27122e-09*(pt*(pt*pt)));
-    }
-
-  } else {
-    if (pt>800) pt=800;
-    if( tagger=="CSVM" && _absEta>=0.0 && _absEta<2.4)
-    {
-      if( meanminmax == "mean" )     sf = ((1.07585+(0.00119553*pt))+(-3.00163e-06*(pt*pt)))+(2.10724e-09*(pt*(pt*pt)));
-      else if( meanminmax == "min" ) sf = ((0.987005+(0.000726254*pt))+(-1.73476e-06*(pt*pt)))+(1.20406e-09*(pt*(pt*pt)));
-      else if( meanminmax == "max" ) sf = ((1.1647+(0.00166318*pt))+(-4.26493e-06*(pt*pt)))+(3.01017e-09*(pt*(pt*pt)));
-    }
-    else if( tagger=="CSVL" && _absEta>=0.0 && _absEta<2.4)
-    {
-      if( meanminmax == "mean" )     sf = ((1.02804+(0.000869782*pt))+(-1.69179e-06*(pt*pt)))+(1.03241e-09*(pt*(pt*pt)));
-      else if( meanminmax == "min" ) sf = ((0.952169+(0.000693017*pt))+(-1.2994e-06*(pt*pt)))+(7.72617e-10*(pt*(pt*pt)));
-      else if( meanminmax == "max" ) sf = ((1.10391+(0.00104574*pt))+(-2.0828e-06*(pt*pt)))+(1.2924e-09*(pt*(pt*pt)));
-    }
-    else if( tagger=="JPL" && _absEta>=0.0 && _absEta<2.4)
-    {
-      if( meanminmax == "mean" )     sf = ((1.04356+(0.000798695*pt))+(-1.83026e-06*(pt*pt)))+(1.19459e-09*(pt*(pt*pt)));
-      else if( meanminmax == "min" ) sf = ((0.909334+(0.000638944*pt))+(-1.43578e-06*(pt*pt)))+(9.25276e-10*(pt*(pt*pt)));
-      else if( meanminmax == "max" ) sf = ((1.17779+(0.000957469*pt))+(-2.22278e-06*(pt*pt)))+(1.46383e-09*(pt*(pt*pt)));
-    }
-    else if( tagger=="JPM" && _absEta>=0.0 && _absEta<2.4)
-    {
-      if( meanminmax == "mean" )     sf = ((0.980066+(0.00222324*pt))+(-5.51689e-06*(pt*pt)))+(3.84294e-09*(pt*(pt*pt)));
-      else if( meanminmax == "min" ) sf = ((0.827418+(0.00152453*pt))+(-3.56396e-06*(pt*pt)))+(2.44144e-09*(pt*(pt*pt)));
-      else if( meanminmax == "max" ) sf = ((1.13272+(0.00291881*pt))+(-7.46281e-06*(pt*pt)))+(5.24363e-09*(pt*(pt*pt)));
-    }
+  else if( tagger=="CSVL" && _absEta>=1.0 && _absEta<1.5) {
+    if( meanminmax == "mean" )     sf = ((0.93821+(0.00180935*pt))+(-3.86937e-06*(pt*pt)))+(2.43222e-09*(pt*(pt*pt)));
+    else if( meanminmax == "min" ) sf = ((0.911657+(0.00142008*pt))+(-2.87569e-06*(pt*pt)))+(1.76619e-09*(pt*(pt*pt)));
+    else if( meanminmax == "max" ) sf = ((0.964787+(0.00219574*pt))+(-4.85552e-06*(pt*pt)))+(3.09457e-09*(pt*(pt*pt)));
+  }
+  else if( tagger=="CSVL" && _absEta>=1.5 && _absEta<2.4) {
+    if( meanminmax == "mean" )     sf = ((1.00022+(0.0010998*pt))+(-3.10672e-06*(pt*pt)))+(2.35006e-09*(pt*(pt*pt)));
+    else if( meanminmax == "min" ) sf = ((0.970045+(0.000862284*pt))+(-2.31714e-06*(pt*pt)))+(1.68866e-09*(pt*(pt*pt)));
+    else if( meanminmax == "max" ) sf = ((1.03039+(0.0013358*pt))+(-3.89284e-06*(pt*pt)))+(3.01155e-09*(pt*(pt*pt)));
+  }
+  else if( tagger=="CSVM" && _absEta>=0.0 && _absEta<0.8) {
+    if( meanminmax == "mean" )     sf = ((1.07541+(0.00231827*pt))+(-4.74249e-06*(pt*pt)))+(2.70862e-09*(pt*(pt*pt)));
+    else if( meanminmax == "min" ) sf = ((0.964527+(0.00149055*pt))+(-2.78338e-06*(pt*pt)))+(1.51771e-09*(pt*(pt*pt)));
+    else if( meanminmax == "max" ) sf = ((1.18638+(0.00314148*pt))+(-6.68993e-06*(pt*pt)))+(3.89288e-09*(pt*(pt*pt)));
+  }
+  else if( tagger=="CSVM" && _absEta>=0.8 && _absEta<1.6) {
+    if( meanminmax == "mean" )     sf = ((1.05613+(0.00114031*pt))+(-2.56066e-06*(pt*pt)))+(1.67792e-09*(pt*(pt*pt)));
+    else if( meanminmax == "min" ) sf = ((0.946051+(0.000759584*pt))+(-1.52491e-06*(pt*pt)))+(9.65822e-10*(pt*(pt*pt)));
+    else if( meanminmax == "max" ) sf = ((1.16624+(0.00151884*pt))+(-3.59041e-06*(pt*pt)))+(2.38681e-09*(pt*(pt*pt)));
+  }
+  else if( tagger=="CSVM" && _absEta>=1.6 && _absEta<2.4) {
+    if( meanminmax == "mean" )     sf = ((1.05625+(0.000487231*pt))+(-2.22792e-06*(pt*pt)))+(1.70262e-09*(pt*(pt*pt)));
+    else if( meanminmax == "min" ) sf = ((0.956736+(0.000280197*pt))+(-1.42739e-06*(pt*pt)))+(1.0085e-09*(pt*(pt*pt)));
+    else if( meanminmax == "max" ) sf = ((1.15575+(0.000693344*pt))+(-3.02661e-06*(pt*pt)))+(2.39752e-09*(pt*(pt*pt)));
+  }
+  else if( tagger=="CSVT" && _absEta>=0.0 && _absEta<2.4) {
+    if( meanminmax == "mean" )     sf = ((1.00462+(0.00325971*pt))+(-7.79184e-06*(pt*pt)))+(5.22506e-09*(pt*(pt*pt)));
+    else if( meanminmax == "min" ) sf = ((0.845757+(0.00186422*pt))+(-4.6133e-06*(pt*pt)))+(3.21723e-09*(pt*(pt*pt)));
+    else if( meanminmax == "max" ) sf = ((1.16361+(0.00464695*pt))+(-1.09467e-05*(pt*pt)))+(7.21896e-09*(pt*(pt*pt)));
+  }
+  else if( tagger == "JPL" && _absEta >= 0.0 && _absEta < 0.5){
+    if( meanminmax == "mean" )     sf = ((0.991991+(0.000898777*pt))+(-1.88002e-06*(pt*pt)))+(1.11276e-09*(pt*(pt*pt)));
+    else if( meanminmax == "min" ) sf = ((0.930838+(0.000687929*pt))+(-1.36976e-06*(pt*pt)))+(7.94486e-10*(pt*(pt*pt)));
+    else if( meanminmax == "max" ) sf = ((1.05319+(0.00110776*pt))+(-2.38542e-06*(pt*pt)))+(1.42826e-09*(pt*(pt*pt)));
+  }
+  else if( tagger == "JPL" && _absEta >= 0.5 && _absEta < 1.0){
+    if( meanminmax == "mean" )     sf = ((0.96633+(0.000419215*pt))+(-9.8654e-07*(pt*pt)))+(6.30396e-10*(pt*(pt*pt)));
+    else if( meanminmax == "min" ) sf = ((0.904781+(0.000324913*pt))+(-7.2229e-07*(pt*pt)))+(4.52185e-10*(pt*(pt*pt)));
+    else if( meanminmax == "max" ) sf = ((1.0279+(0.00051255*pt))+(-1.24815e-06*(pt*pt)))+(8.07098e-10*(pt*(pt*pt)));
+  }
+  else if( tagger == "JPL" && _absEta >= 1.0 && _absEta < 1.5){
+    if( meanminmax == "mean" )     sf = ((0.968008+(0.000482491*pt))+(-1.2496e-06*(pt*pt)))+(9.02736e-10*(pt*(pt*pt)));
+    else if( meanminmax == "min" ) sf = ((0.914619+(0.000330357*pt))+(-8.41216e-07*(pt*pt)))+(6.14504e-10*(pt*(pt*pt)));
+    else if( meanminmax == "max" ) sf = ((1.02142+(0.000633484*pt))+(-1.6547e-06*(pt*pt)))+(1.18921e-09*(pt*(pt*pt)));
+  }
+  else if( tagger == "JPL" && _absEta >= 1.5 && _absEta < 2.4){
+    if( meanminmax == "mean" )     sf = ((0.991448+(0.000765746*pt))+(-2.26144e-06*(pt*pt)))+(1.65233e-09*(pt*(pt*pt)));
+    else if( meanminmax == "min" ) sf = ((0.933947+(0.000668609*pt))+(-1.94474e-06*(pt*pt)))+(1.39774e-09*(pt*(pt*pt)));
+    else if( meanminmax == "max" ) sf = ((1.04894+(0.000861785*pt))+(-2.57573e-06*(pt*pt)))+(1.90702e-09*(pt*(pt*pt)));
+  }
+  else if( tagger == "JPM" && _absEta >= 0.0 && _absEta < 0.8){
+    if( meanminmax == "mean" )     sf = ((0.991457+(0.00130778*pt))+(-2.98875e-06*(pt*pt)))+(1.81499e-09*(pt*(pt*pt)));
+    else if( meanminmax == "min" ) sf = ((0.822012+(0.000908344*pt))+(-1.89516e-06*(pt*pt)))+(1.1163e-09*(pt*(pt*pt)));
+    else if( meanminmax == "max" ) sf = ((1.16098+(0.00170403*pt))+(-4.07382e-06*(pt*pt)))+(2.50873e-09*(pt*(pt*pt)));
+  }
+  else if( tagger == "JPM" && _absEta >= 0.8 && _absEta < 1.6){
+    if( meanminmax == "mean" )     sf = ((1.00576+(0.00121353*pt))+(-3.20601e-06*(pt*pt)))+(2.15905e-09*(pt*(pt*pt)));
+    else if( meanminmax == "min" ) sf = ((0.845597+(0.000734909*pt))+(-1.76311e-06*(pt*pt)))+(1.16104e-09*(pt*(pt*pt)));
+    else if( meanminmax == "max" ) sf = ((1.16598+(0.00168902*pt))+(-4.64013e-06*(pt*pt)))+(3.15214e-09*(pt*(pt*pt)));
+  }
+  else if( tagger == "JPM" && _absEta >= 1.6 && _absEta < 2.4){
+    if( meanminmax == "mean" )     sf = ((0.939038+(0.00226026*pt))+(-7.38544e-06*(pt*pt)))+(5.77162e-09*(pt*(pt*pt)));
+    else if( meanminmax == "min" ) sf = ((0.803867+(0.00165886*pt))+(-5.19532e-06*(pt*pt)))+(3.88441e-09*(pt*(pt*pt)));
+    else if( meanminmax == "max" ) sf = ((1.07417+(0.00285862*pt))+(-9.56945e-06*(pt*pt)))+(7.66167e-09*(pt*(pt*pt)));
+  }
+  else if( tagger == "JPT" && _absEta >= 0.0 && _absEta < 2.4){
+    if( meanminmax == "mean" )     sf = ((0.953235+(0.00206692*pt))+(-5.21754e-06*(pt*pt)))+(3.44893e-09*(pt*(pt*pt)));
+    else if( meanminmax == "min" ) sf = ((0.642947+(0.00180129*pt))+(-4.16373e-06*(pt*pt)))+(2.68061e-09*(pt*(pt*pt)));
+    else if( meanminmax == "max" ) sf = ((1.26372+(0.0023265*pt))+(-6.2548e-06*(pt*pt)))+(4.20761e-09*(pt*(pt*pt)));
+  }
+  else if( tagger == "TCHPT" && _absEta >= 0.0 && _absEta < 2.4){
+    if( meanminmax == "mean" )     sf = ((1.20175+(0.000858187*pt))+(-1.98726e-06*(pt*pt)))+(1.31057e-09*(pt*(pt*pt)));
+    else if( meanminmax == "min" ) sf = ((0.968557+(0.000586877*pt))+(-1.34624e-06*(pt*pt)))+(9.09724e-10*(pt*(pt*pt)));
+    else if( meanminmax == "max" ) sf = ((1.43508+(0.00112666*pt))+(-2.62078e-06*(pt*pt)))+(1.70697e-09*(pt*(pt*pt)));
   }
 
   return sf;
