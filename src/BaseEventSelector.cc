@@ -342,15 +342,15 @@ bool BaseEventSelector::isJetTagged(const pat::Jet & jet, edm::EventBase const &
     TLorentzVector lvjet = correctJet(jet, event);
 
     double _lightSf  = mBtagCond.GetMistagScaleFactor(lvjet.Et(), lvjet.Eta(), msPar["btagOP"]);
+    double _lightEff = mBtagCond.GetMistagRateMC(lvjet.Et(), lvjet.Eta(), msPar["btagOP"])*_lightSf;
     if ( mbPar["BTagUncertUp"] ) _lightSf += mBtagCond.GetMistagSFUncertUp(lvjet.Et(), lvjet.Eta(), msPar["btagOP"]);
     else if ( mbPar["BTagUncertDown"] )_lightSf -= mBtagCond.GetMistagSFUncertDown(lvjet.Et(), lvjet.Eta(), msPar["btagOP"]);
-    double _lightEff = mBtagCond.GetMistagRate(lvjet.Et(), lvjet.Eta(), msPar["btagOP"]);
 
     int _jetFlavor = abs(jet.partonFlavour());
     double _btagSf  = mBtagCond.GetBtagScaleFactor(lvjet.Et(), lvjet.Eta(), msPar["btagOP"]);
+    double _btagEff = mBtagCond.GetBtagEfficiencyMC(lvjet.Et(), lvjet.Eta(), msPar["btagOP"])*_btagSf;
     if ( mbPar["BTagUncertUp"] ) _btagSf += (mBtagCond.GetBtagSFUncertUp(lvjet.Et(), lvjet.Eta(), msPar["btagOP"])*(_jetFlavor==4?2:1));
     else if ( mbPar["BTagUncertDown"] )_btagSf -= (mBtagCond.GetBtagSFUncertDown(lvjet.Et(), lvjet.Eta(), msPar["btagOP"])*(_jetFlavor==4?2:1));
-    double _btagEff = mBtagCond.GetBtagEfficiency(lvjet.Et(), lvjet.Eta(), msPar["btagOP"]);
 
     mBtagSfUtil.SetSeed(abs(static_cast<int>(sin(jet.phi())*100000)));
 
