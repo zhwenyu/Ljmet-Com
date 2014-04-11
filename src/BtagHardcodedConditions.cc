@@ -85,29 +85,22 @@ float BtagHardcodedConditions::getDiscriminant(const std::string & op){
 }
 
 
-double BtagHardcodedConditions::GetBtagEfficiency(double pt, double eta,
+double BtagHardcodedConditions::GetBtagEfficiencyData(double pt, double eta,
 					      std::string tagger)
 {
-  //flat efficiencies from AN-12-187
+  return GetBtagEfficiencyMC(pt, eta, tagger)*GetBtagScaleFactor(pt, eta, tagger);
+}
+double BtagHardcodedConditions::GetBtagEfficiencyMC(double pt, double eta,
+					      std::string tagger)
+{
+// b-tag eff for ttbar dileptons
+//Ideally, you should get that for your process.
   if( tagger == "CSVM")
-    return 0.685;
+    return 0.378878+0.0101901*pt-0.000110449*pt*pt+
+ 	5.74075e-07*pt*pt*pt-1.47919e-09*pt*pt*pt*pt +
+ 	1.48188e-12*pt*pt*pt*pt*pt;
   else if( tagger == "CSVL")
-    return 0.844;
-//   UPDATE????????????????????????????????????????????????????????????????????????????????????????????
-
-  // tag eff, x - discriminant
-  // from https://twiki.cern.ch/twiki/pub/CMS/BtagPOG/eff_b_c-ttbar_payload.txt
-
-  float d = getDiscriminant(tagger);
-  /*if ((tagger=="CSV") || (getAlgoTag(tagger)=="CSV")){
-    return -4.46932526854*d*d*d*d+7.32781975653*d*d*d-3.78459588569*d*d+0.221027515486*d+0.970299300468;
-    } else */
-
-  if ((tagger=="JP") || (getAlgoTag(tagger)=="JP")){
-    return -1.3411375438*d*d*d*d+1.86566177901*d*d*d-0.59348240368*d*d-0.893938089125*d+1.22839928411;
-  } else if ((tagger=="TCHP") || (getAlgoTag(tagger)=="TCHP")){
-    return 9.83842428415e-06*d*d*d*d +  -0.000556835427293*d*d*d +  0.0123891144567*d*d +  -0.141658673059*d +  0.804455651041;
-  }
+    return 0.820502+ 0.000440203 *pt -2.20667e-06 *pt*pt + 1.15537e-09  *pt*pt*pt;
 
   // unknown tagger, return default
   return -100.0;
@@ -223,14 +216,20 @@ double BtagHardcodedConditions::GetBtagSFUncertDown(double pt, double eta,
 }
 
 
-double BtagHardcodedConditions::GetMistagRate(double pt, double eta,
-					      std::string tagger){
-  // 0.96 is the Correction from mistag in MC to data
-  // values are measured using the 2012 madgraph ttbar sample
+double BtagHardcodedConditions::GetMistagRateData(double pt, double eta,
+					      std::string tagger)
+{
+  return GetMistagRateMC(pt, eta, tagger)*GetMistagScaleFactor(pt, eta, tagger);
+}
+double BtagHardcodedConditions::GetMistagRateMC(double pt, double eta,
+					      std::string tagger)
+{
+// b-tag eff for ttbar dileptons
+//Ideally, you should get that for your process.
   if( tagger == "CSVM")
-    return 0.013702*0.96;
+    return 0.0136;
   else if( tagger == "CSVL")
-    return 0.143422*0.96;
+    return 0.1322;
 
 
   // mistag, x-pT
