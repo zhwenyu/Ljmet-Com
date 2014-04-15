@@ -268,7 +268,7 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event,
 		CAWDaughterMotherIndex . push_back(index);      
 		
 		pat::Jet const * subjet = dynamic_cast<pat::Jet const *>(ijet->daughter(ui));
-		subjetCSV = subjet->bDiscriminator('combinedSecondaryVertexBJetTags');
+		subjetCSV = subjet->bDiscriminator("combinedSecondaryVertexBJetTags");
 		std::cout << "This subjet has CSV of " << subjetCSV << endl;
 		
       }
