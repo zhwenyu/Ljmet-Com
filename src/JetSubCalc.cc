@@ -38,6 +38,7 @@ public:
 private:
 
   edm::InputTag             CA8TopJetColl_it;
+  edm::InputTag             CA8HEPTopJetColl_it;
   edm::InputTag             CA8PrunedJetColl_it;
   edm::InputTag             CA8JetColl_it;
   std::string               bDiscriminant;
@@ -57,6 +58,9 @@ int JetSubCalc::BeginJob(){
   if (mPset.exists("CA8TopJetColl")) CA8TopJetColl_it = mPset.getParameter<edm::InputTag>("CA8TopJetColl");
   else                               CA8TopJetColl_it = edm::InputTag("goodPatJetsCATopTagPFPacked");
 
+  if (mPset.exists("CA8HEPTopJetColl")) CA8HEPTopJetColl_it = mPset.getParameter<edm::InputTag>("CA8HEPTopJetColl");
+  else                               CA8HEPTopJetColl_it = edm::InputTag("goodPatJetsCAHEPTopTagPFPacked");
+
   if (mPset.exists("CA8PrunedJetColl")) CA8PrunedJetColl_it = mPset.getParameter<edm::InputTag>("CA8PrunedJetColl");
   else                                  CA8PrunedJetColl_it = edm::InputTag("goodPatJetsCA8PrunedPFPacked");
 
@@ -75,7 +79,41 @@ int JetSubCalc::BeginJob(){
 int JetSubCalc::AnalyzeEvent(edm::EventBase const & event,
 			       BaseEventSelector * selector){
 
-  
+    //Get HEP Top-tagged jets
+    edm::Handle<std::vector<pat::Jet> > hepTopJets;
+    event.getByLabel(CA8HEPTopJetColl_it, hepTopJets);
+
+    //Four vector
+    std::vector <double> CAHEPTopJetPt;
+    std::vector <double> CAHEPTopJetEta;
+    std::vector <double> CAHEPTopJetPhi;
+    std::vector <double> CAHEPTopJetEnergy;
+
+    std::vector <int> CAHEPTopJetIndex;
+
+    for (std::vector<pat::Jet>::const_iterator ijet = hepTopJets->begin(); ijet != hepTopJets->end(); ijet++){
+
+      int index = (int)(ijet-hepTopJets->begin());
+
+      CAHEPTopJetPt     . push_back(ijet->pt());
+      CAHEPTopJetEta    . push_back(ijet->eta());
+      CAHEPTopJetPhi    . push_back(ijet->phi());
+      CAHEPTopJetEnergy . push_back(ijet->energy());
+
+
+      CAHEPTopJetIndex      . push_back(index);
+
+    }
+
+    //Four vector
+    SetValue("CAHEPTopJetPt"     , CAHEPTopJetPt);
+    SetValue("CAHEPTopJetEta"    , CAHEPTopJetEta);
+    SetValue("CAHEPTopJetPhi"    , CAHEPTopJetPhi);
+    SetValue("CAHEPTopJetEnergy" , CAHEPTopJetEnergy);
+
+    SetValue("CATopJetIndex"      , CATopJetIndex);
+ 
+ 
     //Get Top-like jets
     edm::Handle<std::vector<pat::Jet> > topJets;
     event.getByLabel(CA8TopJetColl_it, topJets);
