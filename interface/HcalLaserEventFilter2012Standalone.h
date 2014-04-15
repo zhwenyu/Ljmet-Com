@@ -11,9 +11,9 @@ public:
   HcalLaserEventFilter2012(const std::string & eventFileName);
   ~HcalLaserEventFilter2012() {}
   
-  
-private:
   bool filter(int run, int lumiSection, int event);
+
+private:
 
   void readEventListFile(const std::string & eventFileName);
   void addEventString(const std::string & eventString);

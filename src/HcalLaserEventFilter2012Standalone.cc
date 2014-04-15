@@ -4,12 +4,13 @@ using namespace std;
 
 HcalLaserEventFilter2012::HcalLaserEventFilter2012(const std::string & eventFileName)
 {
-  verbose_=true;
+  verbose_=false;
   minRunInFile=999999; maxRunInFile=1;
+  maxrun_=-1; minrun_=-1;
   if (verbose_) cout << "HCAL laser event list from file "<<eventFileName;
   readEventListFile(eventFileName);
   std::sort(EventList_.begin(), EventList_.end());
-  if (verbose_) cout<<" A total of "<<EventList_.size()<<" listed HCAL laser events found in given run range";
+  if (verbose_) cout<<" A total of "<<EventList_.size()<<" listed HCAL laser events found in given run range\n";
   minrun_=minRunInFile;
   maxrun_=maxRunInFile;
 }
