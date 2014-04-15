@@ -269,13 +269,13 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event,
 		
 		pat::Jet const * subjet = dynamic_cast<pat::Jet const *>(ijet->daughter(ui));
 		subjetCSV = subjet->bDiscriminator(bDiscriminant);
-		if (subjetCSV > 0.244 && CAWDaughterPt > 20){
+		if (subjetCSV > 0.244 && ijet->daughter(ui)->pt() > 20){
 			CAWCSVLSubJets++;
 		}
-		if (subjetCSV > 0.679 && CAWDaughterPt > 20){
+		if (subjetCSV > 0.679 && ijet->daughter(ui)->pt() > 20){
 			CAWCSVLSubJets++;
 		}
-		if (subjetCSV > 0.898 && CAWDaughterPt > 20){
+		if (subjetCSV > 0.898 && ijet->daughter(ui)->pt() > 20){
 			CAWCSVLSubJets++;
 		}		
       }
