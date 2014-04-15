@@ -232,16 +232,16 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event,
 
     std::vector <int> CAWDaughterMotherIndex;
 
-//     std::vector <double> CA8SubJetB0;
-//     std::vector <double> CA8SubJetB1;
-//     std::vector <double> CA8SubJetB2;
-//     std::vector <double> CA8SubJetB3;
+	int CAWCSVLSubJets = 0;
+	int CAWCSVMSubJets = 0;
+	int CAWCSVTSubJets = 0;
+	
 //     
     for (std::vector<pat::Jet>::const_iterator ijet = CAWJets->begin(); ijet != CAWJets->end(); ijet++){
 
       int index = (int)(ijet-CAWJets->begin());
 
-	  float subjetCSV = -1.0;
+	  float subjetCSV = -999.0;
 
       //Four vector
       CAWJetPt     . push_back(ijet->pt());
@@ -269,8 +269,15 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event,
 		
 		pat::Jet const * subjet = dynamic_cast<pat::Jet const *>(ijet->daughter(ui));
 		subjetCSV = subjet->bDiscriminator(bDiscriminant);
-		std::cout << "This subjet has CSV of " << subjetCSV << endl;
-		
+		if (subjetCSV > 0.244 && CAWDaughterPt > 20){
+			CAWCSVLSubJets++;
+		}
+		if (subjetCSV > 0.679 && CAWDaughterPt > 20){
+			CAWCSVLSubJets++;
+		}
+		if (subjetCSV > 0.898 && CAWDaughterPt > 20){
+			CAWCSVLSubJets++;
+		}		
       }
 	}
 
@@ -298,6 +305,11 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event,
 
     SetValue("CAWDaughterMotherIndex" , CAWDaughterMotherIndex);
 
+	SetValue("CAWCSVLSubJets"      , CAWCSVLSubJets);
+	SetValue("CAWCSVMSubJets"      , CAWCSVMSubJets);
+	SetValue("CAWCSVTSubJets"      , CAWCSVTSubJets);
+	
+	
     //Get all CA8 jets (not just for W and Top)
     edm::Handle<std::vector<pat::Jet> > CA8Jets;
     event.getByLabel(CA8JetColl_it, CA8Jets);
