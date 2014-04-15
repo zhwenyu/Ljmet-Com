@@ -89,6 +89,8 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event,
     std::vector <double> CAHEPTopJetPhi;
     std::vector <double> CAHEPTopJetEnergy;
 
+    std::vector <double> CAHEPTopJetMass;
+
     std::vector <int> CAHEPTopJetIndex;
 
     for (std::vector<pat::Jet>::const_iterator ijet = hepTopJets->begin(); ijet != hepTopJets->end(); ijet++){
@@ -100,6 +102,8 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event,
       CAHEPTopJetPhi    . push_back(ijet->phi());
       CAHEPTopJetEnergy . push_back(ijet->energy());
 
+      CAHEPTopJetEnergy . push_back(ijet->mass());
+
 
       CAHEPTopJetIndex      . push_back(index);
 
@@ -110,6 +114,8 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event,
     SetValue("CAHEPTopJetEta"    , CAHEPTopJetEta);
     SetValue("CAHEPTopJetPhi"    , CAHEPTopJetPhi);
     SetValue("CAHEPTopJetEnergy" , CAHEPTopJetEnergy);
+
+    SetValue("CAHEPTopJetMass" , CAHEPTopJetMass);
 
     SetValue("CAHEPTopJetIndex"      , CAHEPTopJetIndex);
  
