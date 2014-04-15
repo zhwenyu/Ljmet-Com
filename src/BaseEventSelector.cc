@@ -342,15 +342,15 @@ bool BaseEventSelector::isJetTagged(const pat::Jet & jet, edm::EventBase const &
     TLorentzVector lvjet = correctJet(jet, event);
 
     double _lightSf  = mBtagCond.GetMistagScaleFactor(lvjet.Et(), lvjet.Eta(), msPar["btagOP"]);
+    double _lightEff = mBtagCond.GetMistagRateMC(lvjet.Et(), lvjet.Eta(), msPar["btagOP"])*_lightSf;
     if ( mbPar["BTagUncertUp"] ) _lightSf += mBtagCond.GetMistagSFUncertUp(lvjet.Et(), lvjet.Eta(), msPar["btagOP"]);
     else if ( mbPar["BTagUncertDown"] )_lightSf -= mBtagCond.GetMistagSFUncertDown(lvjet.Et(), lvjet.Eta(), msPar["btagOP"]);
-    double _lightEff = mBtagCond.GetMistagRate(lvjet.Et(), lvjet.Eta(), msPar["btagOP"]);
 
     int _jetFlavor = abs(jet.partonFlavour());
     double _btagSf  = mBtagCond.GetBtagScaleFactor(lvjet.Et(), lvjet.Eta(), msPar["btagOP"]);
+    double _btagEff = mBtagCond.GetBtagEfficiencyMC(lvjet.Et(), lvjet.Eta(), msPar["btagOP"])*_btagSf;
     if ( mbPar["BTagUncertUp"] ) _btagSf += (mBtagCond.GetBtagSFUncertUp(lvjet.Et(), lvjet.Eta(), msPar["btagOP"])*(_jetFlavor==4?2:1));
     else if ( mbPar["BTagUncertDown"] )_btagSf -= (mBtagCond.GetBtagSFUncertDown(lvjet.Et(), lvjet.Eta(), msPar["btagOP"])*(_jetFlavor==4?2:1));
-    double _btagEff = mBtagCond.GetBtagEfficiency(lvjet.Et(), lvjet.Eta(), msPar["btagOP"]);
 
     mBtagSfUtil.SetSeed(abs(static_cast<int>(sin(jet.phi())*100000)));
 
@@ -418,28 +418,28 @@ TLorentzVector BaseEventSelector::correctJet(const pat::Jet & jet, edm::EventBas
     if ( abs(jet.eta()) < 0.5 ) {
       factor = .052;
       if (mbPar["JERup"]) factor = 0.115;
-      if (mbPar["JERdown"]) factor = -0.011;
+      if (mbPar["JERdown"]) factor = -0.01;
     }
     else if ( abs(jet.eta()) < 1.1 && abs(jet.eta()) >= 0.5 ) {
       factor = 0.057;
       if (mbPar["JERup"]) factor = 0.114;
-      if (mbPar["JERdown"]) factor = 0.0;
+      if (mbPar["JERdown"]) factor = 0.001;
     }
     else if ( abs(jet.eta()) < 1.7 && abs(jet.eta()) >= 1.1 ) {
       factor = 0.096;
       if (mbPar["JERup"]) factor = 0.161;
-      if (mbPar["JERdown"]) factor = 0.031;
+      if (mbPar["JERdown"]) factor = 0.032;
     }
     else if ( abs(jet.eta()) < 2.3 && abs(jet.eta()) >= 1.7 ) {
       factor = 0.134;
       if (mbPar["JERup"]) factor = 0.228;
-      if (mbPar["JERdown"]) factor = 0.040;
+      if (mbPar["JERdown"]) factor = 0.042;
 
     }
     else if (abs(jet.eta()) < 5.0 && abs(jet.eta()) >=2.3 ) {
       factor = 0.288;
       if (mbPar["JERup"]) factor = 0.488;
-      if (mbPar["JERdown"]) factor = 0.088;
+      if (mbPar["JERdown"]) factor = 0.089;
     }
 
     const reco::GenJet * genJet = jet.genJet();

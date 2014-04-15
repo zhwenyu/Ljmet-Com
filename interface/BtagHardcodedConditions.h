@@ -38,12 +38,14 @@ class BtagHardcodedConditions{
     return op[op.length()-1];
   }
 
-  double GetBtagEfficiency(double pt, double eta, std::string tagger="CSVM");
+  double GetBtagEfficiencyMC(double pt, double eta, std::string tagger="CSVM");
+  double GetBtagEfficiencyData(double pt, double eta, std::string tagger="CSVM");
   double GetBtagScaleFactor(double pt, double eta, std::string tagger="CSVM", int year = 2012);
   double GetBtagSFUncertUp(double pt, double eta, std::string tagger="CSVM", int year = 2012);
   double GetBtagSFUncertDown(double pt, double eta, std::string tagger="CSVM", int year = 2012);
 
-  double GetMistagRate(double pt, double eta, std::string tagger="CSVM");
+  double GetMistagRateData(double pt, double eta, std::string tagger="CSVM");
+  double GetMistagRateMC(double pt, double eta, std::string tagger="CSVM");
   double GetMistagScaleFactor(double pt, double eta, std::string tagger="CSVM", int year = 2012);
   double GetMistagSFUncertUp(double pt, double eta, std::string tagger="CSVM", int year = 2012);
   double GetMistagSFUncertDown(double pt, double eta, std::string tagger="CSVM", int year = 2012);

@@ -29,6 +29,8 @@
 #include "Math/GenVector/Cartesian2D.h"
 #include "PhysicsTools/FWLite/interface/TFileService.h"
 #include "PhysicsTools/SelectorUtils/interface/strbitset.h"
+#include "LJMet/Com/interface/HcalLaserEventFilter2012Standalone.h"
+#include "LJMet/Com/interface/FileExists.h"
 
 
 
@@ -247,9 +249,22 @@ int main (int argc, char* argv[])
   // Superseded by the JSON file machinery
   std::vector<int> const & runs = ljmetParams.getParameter<std::vector<int> >("runs");
 
+  HcalLaserEventFilter2012 *hcal = 0;
   
-  
-  
+  if ( (!isMc) && (inputs.exists("useHcalLaserEventFilter")) && 
+	(inputs.getParameter<bool>("useHcalLaserEventFilter")==true) ) {
+    std::string name;
+    if (inputs.exists("hcalLaserEventFilterList")) {
+      name = inputs.getParameter<std::string>("hcalLaserEventFilterList");
+    } else {
+      char * release = getenv ("CMSSW_RELEASE_BASE");
+      name = string(release) + "/src/EventFilter/HcalRawToDigi/data/HCALLaser2012AllDatasets.txt.gz";
+    }
+    cout << "Will apply HcalLaserEventFilter with list from "<< name<<endl;
+    fexists(name,true);
+    hcal = new HcalLaserEventFilter2012(name);
+  }
+
   // This object 'event' is used both to get all information from the
   // event as well as to store histograms, etc.
   std::cout << legend << "Setting up chain event" << std::endl;
@@ -293,13 +308,16 @@ int main (int argc, char* argv[])
 
     if ( (!isMc) ){
 
-    // Check if the event is in the JSON file
+    // Check if the event is in the JSON file or in the HCAL list
     // check if the run needs to be processed
       if (! JsonContainsEvent (vJson, event) ) continue;
       else if ( runs.size() > 0 &&
 		find( runs.begin(),
 		      runs.end(),
 		      event.id().run() ) == runs.end() ) continue;
+       if (hcal!=0){
+         if (!hcal->filter (event.id().run(), event.id().luminosityBlock(), event.id().event())) continue;
+      }
     }
 
 

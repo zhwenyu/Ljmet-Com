@@ -40,17 +40,17 @@ class BTagSFUtil{
     
   void modifyBTagsWithSF( bool& isBTagged,
 			  int pdgIdPart,
-			  float Btag_SF = 0.98,
-			  float Btag_eff = 1.0,
-			  float Bmistag_SF = 1.0,
-			  float  Bmistag_eff = 1.0);
+			  float Btag_SF,
+			  float Btag_eff,
+			  float Bmistag_SF,
+			  float Bmistag_eff);
 
   void SetSeed( int seed );
 
     
  private:
   
-  bool applySF(bool& isBTagged, float Btag_SF = 0.98, float Btag_eff = 1.0);
+  bool applySF(bool& isBTagged, float Btag_SF, float Btag_eff);
   
   TRandom3 rand_;
 

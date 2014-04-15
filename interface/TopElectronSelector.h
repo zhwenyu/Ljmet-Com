@@ -287,7 +287,7 @@ class TopElectronSelector : public Selector<pat::Electron>  {
 
 
          Double_t Ooemoop = (1.0/electron.ecalEnergy() - electron.eSuperClusterOverP()/electron.ecalEnergy());
-         Double_t RelIso  = ( chIso + max(0.0, nhIso + phIso - rhoIso*AEff) )/ electron.ecalDrivenMomentum().pt();
+         Double_t RelIso  = ( chIso + std::max(0.0, nhIso + phIso - rhoIso*AEff) )/ electron.ecalDrivenMomentum().pt();
          Int_t mHits   =  electron.gsfTrack()->trackerExpectedHitsInner().numberOfHits();
          Bool_t vtxFitConv = electron.passConversionVeto();
 
