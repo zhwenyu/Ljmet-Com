@@ -111,7 +111,7 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event,
     SetValue("CAHEPTopJetPhi"    , CAHEPTopJetPhi);
     SetValue("CAHEPTopJetEnergy" , CAHEPTopJetEnergy);
 
-    SetValue("CATopJetIndex"      , CATopJetIndex);
+    SetValue("CAHEPTopJetIndex"      , CAHEPTopJetIndex);
  
  
     //Get Top-like jets
