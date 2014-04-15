@@ -305,6 +305,11 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event,
     std::vector <double> CA8Tau4;
     std::vector <double> CA8Tau21;
     
+//     std::vector <double> CA8SubJetB0;
+//     std::vector <double> CA8SubJetB1;
+//     std::vector <double> CA8SubJetB2;
+//     std::vector <double> CA8SubJetB3;
+//     
 
   	// ---------------------------------------------------------------------------------------------------------
   	// Setup Nsubjettiness
@@ -317,6 +322,7 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event,
 
     for (std::vector<pat::Jet>::const_iterator ijet = CA8Jets->begin(); ijet != CA8Jets->end(); ijet++){
 
+	  float subjetCSV = -1.0;
       //Four vector
       CA8JetPt     . push_back(ijet->pt());
       CA8JetEta    . push_back(ijet->eta());
@@ -333,6 +339,8 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event,
              	this_constituent->py(),
              	this_constituent->pz(),
              	this_constituent->energy() ) );
+		subjetCSV = this_constituent->bDiscriminator('combinedSecondaryVertexBJetTags');
+		std::out << "This subjet has CSV of " << subjetCSV << endl;
       }
 	  
 	  fastjet::PseudoJet combJet = fastjet::join(FJparticles);
