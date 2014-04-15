@@ -273,10 +273,10 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event,
 			CAWCSVLSubJets++;
 		}
 		if (subjetCSV > 0.679 && ijet->daughter(ui)->pt() > 20){
-			CAWCSVLSubJets++;
+			CAWCSVMSubJets++;
 		}
 		if (subjetCSV > 0.898 && ijet->daughter(ui)->pt() > 20){
-			CAWCSVLSubJets++;
+			CAWCSVTSubJets++;
 		}		
       }
 	}
