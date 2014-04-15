@@ -102,7 +102,7 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event,
       CAHEPTopJetPhi    . push_back(ijet->phi());
       CAHEPTopJetEnergy . push_back(ijet->energy());
 
-      CAHEPTopJetEnergy . push_back(ijet->mass());
+      CAHEPTopJetMass . push_back(ijet->mass());
 
 
       CAHEPTopJetIndex      . push_back(index);
