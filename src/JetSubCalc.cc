@@ -92,6 +92,20 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event,
     std::vector <double> CAHEPTopJetMass;
 
     std::vector <int> CAHEPTopJetIndex;
+    std::vector <double> CAHEPTopJetCSV;
+    std::vector <int> CAHEPTopJetnDaughters;
+
+    //Daughter four vector and index
+    std::vector <double> CAHEPTopDaughterPt;
+    std::vector <double> CAHEPTopDaughterEta;
+    std::vector <double> CAHEPTopDaughterPhi;
+    std::vector <double> CAHEPTopDaughterEnergy;
+
+    std::vector <int> CAHEPTopDaughterMotherIndex;
+
+	int CAHEPTopCSVLSubJets = 0;
+	int CAHEPTopCSVMSubJets = 0;
+	int CAHEPTopCSVTSubJets = 0;
 
     for (std::vector<pat::Jet>::const_iterator ijet = hepTopJets->begin(); ijet != hepTopJets->end(); ijet++){
 
@@ -103,10 +117,32 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event,
       CAHEPTopJetEnergy . push_back(ijet->energy());
 
       CAHEPTopJetMass . push_back(ijet->mass());
+      CAHEPTopJetCSV    . push_back(ijet->bDiscriminator( bDiscriminant ));
+      CAHEPTopJetnDaughters . push_back((int)ijet->numberOfDaughters());
 
 
       CAHEPTopJetIndex      . push_back(index);
 
+      for (size_t ui = 0; ui < ijet->numberOfDaughters(); ui++){
+		CAHEPTopDaughterPt     . push_back(ijet->daughter(ui)->pt());
+		CAHEPTopDaughterEta    . push_back(ijet->daughter(ui)->eta());
+		CAHEPTopDaughterPhi    . push_back(ijet->daughter(ui)->phi());
+		CAHEPTopDaughterEnergy . push_back(ijet->daughter(ui)->energy());        
+
+		CAHEPTopDaughterMotherIndex . push_back(index);      
+
+		pat::Jet const * subjet = dynamic_cast<pat::Jet const *>(ijet->daughter(ui));
+		subjetCSV = subjet->bDiscriminator(bDiscriminant);
+		if (subjetCSV > 0.244 && ijet->daughter(ui)->pt() > 20){
+			CAHEPTopCSVLSubJets++;
+		}
+		if (subjetCSV > 0.679 && ijet->daughter(ui)->pt() > 20){
+			CAHEPTopCSVMSubJets++;
+		}
+		if (subjetCSV > 0.898 && ijet->daughter(ui)->pt() > 20){
+			CAHEPTopCSVTSubJets++;
+		}	
+      }
     }
 
     //Four vector
@@ -116,9 +152,23 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event,
     SetValue("CAHEPTopJetEnergy" , CAHEPTopJetEnergy);
 
     SetValue("CAHEPTopJetMass" , CAHEPTopJetMass);
+    SetValue("CAHEPTopJetCSV"    , CAHEPTopJetCSV);
+    SetValue("CAHEPTopJetnDaughters" , CAHEPTopJetnDaughters);
 
     SetValue("CAHEPTopJetIndex"      , CAHEPTopJetIndex);
- 
+
+    //Daughter four vector and index
+    SetValue("CAHEPTopDaughterPt"     , CAHEPTopDaughterPt);
+    SetValue("CAHEPTopDaughterEta"    , CAHEPTopDaughterEta);
+    SetValue("CAHEPTopDaughterPhi"    , CAHEPTopDaughterPhi);
+    SetValue("CAHEPTopDaughterEnergy" , CAHEPTopDaughterEnergy);
+
+    SetValue("CAHEPTopDaughterMotherIndex"      , CAHEPTopDaughterMotherIndex);
+
+	SetValue("CAHEPTopCSVLSubJets"      , CAHEPTopCSVLSubJets);
+	SetValue("CAHEPTopCSVMSubJets"      , CAHEPTopCSVMSubJets);
+	SetValue("CAHEPTopCSVTSubJets"      , CAHEPTopCSVTSubJets);
+	 
  
     //Get Top-like jets
     edm::Handle<std::vector<pat::Jet> > topJets;
@@ -149,6 +199,10 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event,
 
     std::vector <int> CATopDaughterMotherIndex;
 
+	int CATopCSVLSubJets = 0;
+	int CATopCSVMSubJets = 0;
+	int CATopCSVTSubJets = 0;
+
     for (std::vector<pat::Jet>::const_iterator ijet = topJets->begin(); ijet != topJets->end(); ijet++){
 
       int index = (int)(ijet-topJets->begin());
@@ -176,6 +230,18 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event,
 		CATopDaughterEnergy . push_back(ijet->daughter(ui)->energy());        
 
 		CATopDaughterMotherIndex . push_back(index);      
+
+		pat::Jet const * subjet = dynamic_cast<pat::Jet const *>(ijet->daughter(ui));
+		subjetCSV = subjet->bDiscriminator(bDiscriminant);
+		if (subjetCSV > 0.244 && ijet->daughter(ui)->pt() > 20){
+			CATopCSVLSubJets++;
+		}
+		if (subjetCSV > 0.679 && ijet->daughter(ui)->pt() > 20){
+			CATopCSVMSubJets++;
+		}
+		if (subjetCSV > 0.898 && ijet->daughter(ui)->pt() > 20){
+			CATopCSVTSubJets++;
+		}
       }
     }
 
@@ -203,6 +269,10 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event,
     SetValue("CATopDaughterEnergy" , CATopDaughterEnergy);
 
     SetValue("CATopDaughterMotherIndex"      , CATopDaughterMotherIndex);
+
+	SetValue("CATopCSVLSubJets"      , CATopCSVLSubJets);
+	SetValue("CATopCSVMSubJets"      , CATopCSVMSubJets);
+	SetValue("CATopCSVTSubJets"      , CATopCSVTSubJets);
 
     //Get CA8 jets for W's
     edm::Handle<std::vector<pat::Jet> > CAWJets;
