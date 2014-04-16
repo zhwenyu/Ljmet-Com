@@ -10,6 +10,7 @@
 #include "LJMet/Com/interface/BaseEventSelector.h"
 #include "CondFormats/JetMETObjects/interface/JetCorrectorParameters.h"
 #include "CondFormats/JetMETObjects/interface/FactorizedJetCorrector.h"
+#include "LJMet/Com/interface/FileExists.h"
 
 using namespace std;
 
@@ -101,13 +102,6 @@ void BaseEventSelector::BeginJob(std::map<std::string, edm::ParameterSet const >
 		<< "DataL3JetPar, DataResJetPar" <<std::endl;
       std::cout << mLegend
 		<< "USING DEFAULT VALUES" << std::endl;
-
-
-
-
-
-
-
     }
 
   }
@@ -119,9 +113,10 @@ void BaseEventSelector::BeginJob(std::map<std::string, edm::ParameterSet const >
   bTagCut = mdPar["btag_min_discr"];
   std::cout << "b-tag check "<<msPar["btagOP"]<<" "<< msPar["btagger"]<<" "<<mdPar["btag_min_discr"]<<std::endl;
 
-  if ( mbPar["isMc"] && ( mbPar["JECup"] || mbPar["JECdown"]))
+  if ( mbPar["isMc"] && ( mbPar["JECup"] || mbPar["JECdown"])) {
+    fexists(msPar["JEC_txtfile"], true);
     jecUnc = new JetCorrectionUncertainty(*(new JetCorrectorParameters(msPar["JEC_txtfile"].c_str(), "Total")));
-    
+  }
 
   //gSystem->Load("libFWCoreFWLite.so");
   //AutoLibraryLoader::enable();
@@ -130,6 +125,9 @@ void BaseEventSelector::BeginJob(std::map<std::string, edm::ParameterSet const >
   if ( mbPar["isMc"] && ( mbPar["do53xJEC"] ) ) {
     // Create the JetCorrectorParameter objects, the order does not matter.
     // START53_V7G
+    fexists(msPar["MCL3JetPar"], true);
+    fexists(msPar["MCL2JetPar"], true);
+    fexists(msPar["MCL1JetPar"], true);
     JetCorrectorParameters *L3JetPar  = new JetCorrectorParameters(msPar["MCL3JetPar"]);
     JetCorrectorParameters *L2JetPar  = new JetCorrectorParameters(msPar["MCL2JetPar"]);
     JetCorrectorParameters *L1JetPar  = new JetCorrectorParameters(msPar["MCL1JetPar"]);
@@ -145,6 +143,10 @@ void BaseEventSelector::BeginJob(std::map<std::string, edm::ParameterSet const >
   else if ( !mbPar["isMc"] && ( mbPar["do53xJEC"] ) ) {
     // Create the JetCorrectorParameter objects, the order does not matter.
     // GR_P_V43
+    fexists(msPar["DataResJetPar"], true);
+    fexists(msPar["DataL3JetPar"], true);
+    fexists(msPar["DataL2JetPar"], true);
+    fexists(msPar["DataL1JetPar"], true);
     JetCorrectorParameters *ResJetPar = new JetCorrectorParameters(msPar["DataResJetPar"]); 
     JetCorrectorParameters *L3JetPar  = new JetCorrectorParameters(msPar["DataL3JetPar"]);
     JetCorrectorParameters *L2JetPar  = new JetCorrectorParameters(msPar["DataL2JetPar"]);
