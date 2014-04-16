@@ -462,9 +462,9 @@ int WprimeCalc::AnalyzeEvent(edm::EventBase const & event,
     //A+B+C Tight ID*ISO(dBeta<0.12)*TRIG(IsoMu24_eta2p1)
     //A+B = 5.32 C = 0.495
     if (_nSelMuons>0) {
-        if (abs(_muon_1_eta) <= 0.9 ) _weight_muon_eff = 0.994*0.993*0.976;
-        if ( 0.9 < abs(_muon_1_eta) && abs(_muon_1_eta) <= 1.2 ) _weight_muon_eff = 0.992*0.998*0.961;
-        if ( 1.2 < abs(_muon_1_eta) && abs(_muon_1_eta) <= 2.1 ) _weight_muon_eff = 0.998*1.002*0.983;
+        if (abs(_muon_1_eta) <= 0.9 ) _weight_muon_eff = 0.9925*1.0000*0.9815;
+        if ( 0.9 < abs(_muon_1_eta) && abs(_muon_1_eta) <= 1.2 ) _weight_muon_eff = 0.9928*1.0006*0.9651;
+		if ( 1.2 < abs(_muon_1_eta) && abs(_muon_1_eta) <= 2.1 ) _weight_muon_eff = 0.9960*1.0006*0.9968;
     }
     SetValue("weight_MuonEff", _weight_muon_eff);
   
@@ -472,29 +472,29 @@ int WprimeCalc::AnalyzeEvent(edm::EventBase const & event,
     // Cut based Tight ID scale factors 
     if (_nSelElectrons>0) {
         if ( abs(_electron_1_eta) <= 0.8 ) {
-            if (_electron_1_pt > 30.0 && _electron_1_pt <= 40.0 ) _weight_electron_eff = 1.003;
-            else if (_electron_1_pt > 40.0 && _electron_1_pt <= 50.0 ) _weight_electron_eff = 0.998;
-            else if (_electron_1_pt > 50.0 ) _weight_electron_eff = 0.987;
+            if (_electron_1_pt > 30.0 && _electron_1_pt <= 40.0 ) _weight_electron_eff = 0.978;
+            else if (_electron_1_pt > 40.0 && _electron_1_pt <= 50.0 ) _weight_electron_eff = 0.981;
+            else if (_electron_1_pt > 50.0 ) _weight_electron_eff = 0.982;
         } 	
         else if (0.8 < abs(_electron_1_eta) && abs(_electron_1_eta) <= 1.442 ) {	
-            if (_electron_1_pt > 30.0 && _electron_1_pt <= 40.0 ) _weight_electron_eff = 0.986;
-            else if (_electron_1_pt > 40.0 && _electron_1_pt <= 50.0 ) _weight_electron_eff = 0.990;
-            else if (_electron_1_pt > 50.0 ) _weight_electron_eff = 0.979;
+            if (_electron_1_pt > 30.0 && _electron_1_pt <= 40.0 ) _weight_electron_eff = 0.958;
+            else if (_electron_1_pt > 40.0 && _electron_1_pt <= 50.0 ) _weight_electron_eff = 0.969;
+            else if (_electron_1_pt > 50.0 ) _weight_electron_eff = 0.969;
         }
         else if ( 1.442 < abs(_electron_1_eta) && abs(_electron_1_eta) <= 1.556 ) {
-            if (_electron_1_pt > 30.0 && _electron_1_pt <= 40.0 ) _weight_electron_eff = 1.013;
-            else if (_electron_1_pt > 40.0 && _electron_1_pt <= 50.0 ) _weight_electron_eff = 0.945;
-            else if (_electron_1_pt > 50.0 ) _weight_electron_eff = 0.956;
+            if (_electron_1_pt > 30.0 && _electron_1_pt <= 40.0 ) _weight_electron_eff = 0.907;
+            else if (_electron_1_pt > 40.0 && _electron_1_pt <= 50.0 ) _weight_electron_eff = 0.904;
+            else if (_electron_1_pt > 50.0 ) _weight_electron_eff = 0.926;
         }
         else if ( 1.556 < abs(_electron_1_eta) && abs(_electron_1_eta) <=  2.0 ) {
-            if (_electron_1_pt > 30.0 && _electron_1_pt <= 40.0 ) _weight_electron_eff = 1.000;
-            else if (_electron_1_pt > 40.0 && _electron_1_pt <= 50.0 ) _weight_electron_eff = 1.005;
-            else if (_electron_1_pt > 50.0 ) _weight_electron_eff = 0.999;
+            if (_electron_1_pt > 30.0 && _electron_1_pt <= 40.0 ) _weight_electron_eff = 0.909;
+	    	else if (_electron_1_pt > 40.0 && _electron_1_pt <= 50.0 ) _weight_electron_eff = 0.942;
+            else if (_electron_1_pt > 50.0 ) _weight_electron_eff = 0.957;
         }
         else if ( 2.0 < abs(_electron_1_eta) && abs(_electron_1_eta) < 2.5 ) {
-            if (_electron_1_pt > 30.0 && _electron_1_pt <= 40.0 ) _weight_electron_eff = 1.091;
-            else if (_electron_1_pt > 40.0 && _electron_1_pt <= 50.0 ) _weight_electron_eff = 1.055;
-            else if (_electron_1_pt > 50.0 ) _weight_electron_eff = 1.035;
+            if (_electron_1_pt > 30.0 && _electron_1_pt <= 40.0 ) _weight_electron_eff = 0.987;
+            else if (_electron_1_pt > 40.0 && _electron_1_pt <= 50.0 ) _weight_electron_eff = 0.991;
+            else if (_electron_1_pt > 50.0 ) _weight_electron_eff = 0.999;
         }
     }
     SetValue("weight_ElectronEff", _weight_electron_eff);
