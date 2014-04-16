@@ -55,6 +55,7 @@ private:
   int findMatch(const reco::GenParticleCollection & genParticles, int idToMatch, double eta, double phi);
   double mdeltaR(double eta1, double phi1, double eta2, double phi2);
   void fillMotherInfo(const reco::Candidate *mother, int i, vector <int> & momid, vector <int> & momstatus, vector<double> & mompt, vector<double> & mometa, vector<double> & momphi, vector<double> & momenergy);
+  int dataEE, dataEM, dataMM;
 };
 
 
@@ -156,6 +157,17 @@ int DileptonCalc::BeginJob(){
     std::exit(-1);
   }
 
+  dataEE = 0;
+  dataEM = 0;
+  dataMM = 0;
+  if      (dataType == "EE" or dataType == "ElEl") dataEE = 1; 
+  else if (dataType == "EM" or dataType == "ElMu") dataEM = 1;
+  else if (dataType == "MM" or dataType == "MuMu") dataMM = 1;
+  else if (dataType == "All" or dataType == "ALL") {
+    dataEE = 1; dataEM = 1; dataMM = 1;
+  }
+  cout << "Data type: "<< dataType<<" "<<dataEE << dataEM << dataMM <<endl;
+
   return 0;
 }
 
@@ -178,17 +190,7 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event,
   // _____ Primary dataset (from python cfg) _____________________
   //
   //
-  int dataEE = 0;
-  int dataEM = 0;
-  int dataMM = 0;
   
-  if      (dataType == "EE" or dataType == "ElEl") dataEE = 1; 
-  else if (dataType == "EM" or dataType == "ElMu") dataEM = 1;
-  else if (dataType == "MM" or dataType == "MuMu") dataMM = 1;
-  else if (dataType == "All" or dataType == "ALL") {
-    dataEE = 1; dataEM = 1; dataMM = 1;
-  }
-
   SetValue("dataEE", dataEE);
   SetValue("dataEM", dataEM);
   SetValue("dataMM", dataMM);
