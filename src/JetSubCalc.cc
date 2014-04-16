@@ -111,6 +111,8 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event,
 
       int index = (int)(ijet-hepTopJets->begin());
 
+	  float subjetCSV = -999.0;
+
       CAHEPTopJetPt     . push_back(ijet->pt());
       CAHEPTopJetEta    . push_back(ijet->eta());
       CAHEPTopJetPhi    . push_back(ijet->phi());
@@ -206,6 +208,8 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event,
     for (std::vector<pat::Jet>::const_iterator ijet = topJets->begin(); ijet != topJets->end(); ijet++){
 
       int index = (int)(ijet-topJets->begin());
+
+	  float subjetCSV = -999.0;
 
       CATopJetPt     . push_back(ijet->pt());
       CATopJetEta    . push_back(ijet->eta());
