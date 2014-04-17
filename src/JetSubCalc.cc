@@ -112,7 +112,7 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event,
       int index = (int)(ijet-hepTopJets->begin());
 
 	  float subjetCSV = -999.0;
-	  int CVSL = 0;
+	  int CSVL = 0;
 	  int CSVM = 0;
 	  int CSVT = 0;
 
@@ -216,7 +216,7 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event,
       int index = (int)(ijet-topJets->begin());
 
 	  float subjetCSV = -999.0;
-	  int CVSL = 0;
+	  int CSVL = 0;
 	  int CSVM = 0;
 	  int CSVT = 0;
 
@@ -328,7 +328,7 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event,
       int index = (int)(ijet-CAWJets->begin());
 
 	  float subjetCSV = -999.0;
-	  int CVSL = 0;
+	  int CSVL = 0;
 	  int CSVM = 0;
 	  int CSVT = 0;
 
