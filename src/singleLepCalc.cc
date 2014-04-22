@@ -271,7 +271,7 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event,
  		jet_eta.push_back(vCorrBtagJets[i].first.Phi());
  		jet_tag.push_back(int(vCorrBtagJets[i].second));
  		
- 		if( vCorrBtagJets[i] ){
+ 		if( vCorrBtagJets[i].second ){
  			nbtags++;
  			bjet_pt.push_back(vCorrBtagJets[i].first.Pt());
  			bjet_phi.push_back(vCorrBtagJets[i].first.Eta());
