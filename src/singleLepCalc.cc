@@ -59,7 +59,7 @@ private:
 };
 
 
-static int reg = LjmetFactory::GetInstance()->Register(new WprimeCalc(), "WprimeCalc");
+static int reg = LjmetFactory::GetInstance()->Register(new singleLepCalc(), "singleLepCalc");
 
 
 singleLepCalc::singleLepCalc(){
@@ -264,7 +264,7 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event,
     int nbtags = 0;
     
     
- 	for(i=0; i<_nCorrBtagJets; i++){
+ 	for(int i=0; i<_nCorrBtagJets; i++){
  	
  		jet_pt.push_back(vCorrBtagJets[i].Pt());
  		jet_phi.push_back(vCorrBtagJets[i].eta());
@@ -292,7 +292,7 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event,
 	int nBjets = 0;
 	int nCjets = 0;
 	
- 	for(i=0; i<_nSelJets; i++){
+ 	for(int i=0; i<_nSelJets; i++){
 		jet_flavor.push_back( abs(vSelJets[i]->partonFlavour()) );
 		if( abs(vSelJets[i]->partonFlavour())==5 ) nBjets++;
 		if( abs(vSelJets[i]->partonFlavour())==4 ) nCjets++;
