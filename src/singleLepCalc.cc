@@ -4,7 +4,6 @@
   Author: Joshua Swanson, 2014
 */
 
-
 #include <iostream>
 #include "LJMet/Com/interface/BaseCalc.h"
 #include "LJMet/Com/interface/LjmetFactory.h"
@@ -15,7 +14,6 @@
 #include "DataFormats/Math/interface/deltaR.h"
 
 class LjmetFactory;
-
 
 class singleLepCalc : public BaseCalc{
   
@@ -386,7 +384,8 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event,
         }
     }
     SetValue("weight_ElectronEff_53x", _weight_electron_eff_53x);
-  
+
+// Generator information  
     double _genTopMass = -1.0;
     double _genTopPt = -1.0;
     double _genDrLeptonTopBjet = -9999.0;
