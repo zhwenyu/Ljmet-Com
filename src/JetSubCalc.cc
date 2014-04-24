@@ -103,15 +103,18 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event,
 
     std::vector <int> CAHEPTopDaughterMotherIndex;
 
-	int CAHEPTopCSVLSubJets = 0;
-	int CAHEPTopCSVMSubJets = 0;
-	int CAHEPTopCSVTSubJets = 0;
+	std::vector <int> CAHEPTopCSVLSubJets;
+	std::vector <int> CAHEPTopCSVMSubJets;
+	std::vector <int> CAHEPTopCSVTSubJets;
 
     for (std::vector<pat::Jet>::const_iterator ijet = hepTopJets->begin(); ijet != hepTopJets->end(); ijet++){
 
       int index = (int)(ijet-hepTopJets->begin());
 
 	  float subjetCSV = -999.0;
+	  int CSVL = 0;
+	  int CSVM = 0;
+	  int CSVT = 0;
 
       CAHEPTopJetPt     . push_back(ijet->pt());
       CAHEPTopJetEta    . push_back(ijet->eta());
@@ -136,15 +139,18 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event,
 		pat::Jet const * subjet = dynamic_cast<pat::Jet const *>(ijet->daughter(ui));
 		subjetCSV = subjet->bDiscriminator(bDiscriminant);
 		if (subjetCSV > 0.244 && ijet->daughter(ui)->pt() > 20){
-			CAHEPTopCSVLSubJets++;
+			CSVL++;
 		}
 		if (subjetCSV > 0.679 && ijet->daughter(ui)->pt() > 20){
-			CAHEPTopCSVMSubJets++;
+			CSVM++;
 		}
 		if (subjetCSV > 0.898 && ijet->daughter(ui)->pt() > 20){
-			CAHEPTopCSVTSubJets++;
+			CSVT++;
 		}	
       }
+      CAHEPTopCSVLSubJets	. push_back(CSVL);
+      CAHEPTopCSVMSubJets	. push_back(CSVM);
+      CAHEPTopCSVTSubJets	. push_back(CSVT);     
     }
 
     //Four vector
@@ -201,15 +207,18 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event,
 
     std::vector <int> CATopDaughterMotherIndex;
 
-	int CATopCSVLSubJets = 0;
-	int CATopCSVMSubJets = 0;
-	int CATopCSVTSubJets = 0;
+	std::vector <int> CATopCSVLSubJets;
+	std::vector <int> CATopCSVMSubJets;
+	std::vector <int> CATopCSVTSubJets;
 
     for (std::vector<pat::Jet>::const_iterator ijet = topJets->begin(); ijet != topJets->end(); ijet++){
 
       int index = (int)(ijet-topJets->begin());
 
 	  float subjetCSV = -999.0;
+	  int CSVL = 0;
+	  int CSVM = 0;
+	  int CSVT = 0;
 
       CATopJetPt     . push_back(ijet->pt());
       CATopJetEta    . push_back(ijet->eta());
@@ -238,15 +247,18 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event,
 		pat::Jet const * subjet = dynamic_cast<pat::Jet const *>(ijet->daughter(ui));
 		subjetCSV = subjet->bDiscriminator(bDiscriminant);
 		if (subjetCSV > 0.244 && ijet->daughter(ui)->pt() > 20){
-			CATopCSVLSubJets++;
+			CSVL++;
 		}
 		if (subjetCSV > 0.679 && ijet->daughter(ui)->pt() > 20){
-			CATopCSVMSubJets++;
+			CSVM++;
 		}
 		if (subjetCSV > 0.898 && ijet->daughter(ui)->pt() > 20){
-			CATopCSVTSubJets++;
+			CSVT++;
 		}
       }
+      CATopCSVLSubJets	. push_back(CSVL);
+      CATopCSVMSubJets	. push_back(CSVM);
+      CATopCSVTSubJets	. push_back(CSVT);
     }
 
     //Four vector
@@ -306,9 +318,9 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event,
 
     std::vector <int> CAWDaughterMotherIndex;
 
-	int CAWCSVLSubJets = 0;
-	int CAWCSVMSubJets = 0;
-	int CAWCSVTSubJets = 0;
+	std::vector <int> CAWCSVLSubJets;
+	std::vector <int> CAWCSVMSubJets;
+	std::vector <int> CAWCSVTSubJets;
 	
 //     
     for (std::vector<pat::Jet>::const_iterator ijet = CAWJets->begin(); ijet != CAWJets->end(); ijet++){
@@ -316,6 +328,9 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event,
       int index = (int)(ijet-CAWJets->begin());
 
 	  float subjetCSV = -999.0;
+	  int CSVL = 0;
+	  int CSVM = 0;
+	  int CSVT = 0;
 
       //Four vector
       CAWJetPt     . push_back(ijet->pt());
@@ -344,15 +359,18 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event,
 		pat::Jet const * subjet = dynamic_cast<pat::Jet const *>(ijet->daughter(ui));
 		subjetCSV = subjet->bDiscriminator(bDiscriminant);
 		if (subjetCSV > 0.244 && ijet->daughter(ui)->pt() > 20){
-			CAWCSVLSubJets++;
+			CSVL++;
 		}
 		if (subjetCSV > 0.679 && ijet->daughter(ui)->pt() > 20){
-			CAWCSVMSubJets++;
+			CSVM++;
 		}
 		if (subjetCSV > 0.898 && ijet->daughter(ui)->pt() > 20){
-			CAWCSVTSubJets++;
+			CSVT++;
 		}		
       }
+      CAWCSVLSubJets	. push_back(CSVL);
+      CAWCSVMSubJets	. push_back(CSVM);
+      CAWCSVTSubJets	. push_back(CSVT);
 	}
 
     //Four vector

@@ -1,9 +1,8 @@
 /*
-  Calculator for the Wprime to tb analysis
+  Calculator for a generic single lepton analysis
 
-  Author: David Sperka, 2012
+  Author: Joshua Swanson, 2014
 */
-
 
 #include <iostream>
 #include "LJMet/Com/interface/BaseCalc.h"
@@ -16,13 +15,12 @@
 
 class LjmetFactory;
 
-
-class WprimeCalc : public BaseCalc{
+class singleLepCalc : public BaseCalc{
   
 public:
   
-    WprimeCalc();
-    virtual ~WprimeCalc(){}
+    singleLepCalc();
+    virtual ~singleLepCalc(){}
 
     virtual int BeginJob(){
 
@@ -40,8 +38,6 @@ public:
 
         if (mPset.exists("isWJets")) isWJets_ = mPset.getParameter<bool>("isWJets");
         else                         isWJets_ = false;
-
-
 
         return 0;
     }
@@ -61,15 +57,13 @@ private:
 };
 
 
-
-static int reg = LjmetFactory::GetInstance()->Register(new WprimeCalc(), "WprimeCalc");
-
+static int reg = LjmetFactory::GetInstance()->Register(new singleLepCalc(), "singleLepCalc");
 
 
-WprimeCalc::WprimeCalc(){
+singleLepCalc::singleLepCalc(){
 }
 
-int WprimeCalc::AnalyzeEvent(edm::EventBase const & event,
+int singleLepCalc::AnalyzeEvent(edm::EventBase const & event,
                              BaseEventSelector * selector){
     //
     // compute event variables here
@@ -90,7 +84,6 @@ int WprimeCalc::AnalyzeEvent(edm::EventBase const & event,
     edm::Ptr<reco::PFMET>                       const & pType1CorrMet = selector->GetType1CorrMet();
     TLorentzVector                              const & corrMET = selector->GetCorrectedMet();
     std::vector<edm::Ptr<reco::Vertex> >        const & vSelPVs = selector->GetSelectedPVs();
-
 
     //
     //_____Event kinematics _____________________
@@ -258,194 +251,56 @@ int WprimeCalc::AnalyzeEvent(edm::EventBase const & event,
     SetValue("corr_met", _corr_met);
     SetValue("corr_met_phi", _corr_met_phi);
 
-    Double_t _jet_0_pt = -9999.0, _jet_0_eta = -9999.0, _jet_0_phi = -9999.0;
-    Double_t _jet_1_pt = -9999.0, _jet_1_eta = -9999.0, _jet_1_phi = -9999.0;
-    Double_t _jet_2_pt = -9999.0, _jet_2_eta = -9999.0, _jet_2_phi = -9999.0;
-    Double_t _jet_3_pt = -9999.0, _jet_3_eta = -9999.0, _jet_3_phi = -9999.0;
-    Double_t _jet_4_pt = -9999.0, _jet_4_eta = -9999.0, _jet_4_phi = -9999.0;
-    Double_t _jet_5_pt = -9999.0, _jet_5_eta = -9999.0, _jet_5_phi = -9999.0;
-    Double_t _jet_6_pt = -9999.0, _jet_6_eta = -9999.0, _jet_6_phi = -9999.0;
-    Double_t _jet_7_pt = -9999.0, _jet_7_eta = -9999.0, _jet_7_phi = -9999.0;
-    Double_t _jet_8_pt = -9999.0, _jet_8_eta = -9999.0, _jet_8_phi = -9999.0;
-    Double_t _jet_9_pt = -9999.0, _jet_9_eta = -9999.0, _jet_9_phi = -9999.0;
+// Store Jet Vectors for the selected jets and the bjets
+    vector<Double_t> jet_pt;
+    vector<Double_t> jet_eta;
+    vector<Double_t> jet_phi;
+    vector<int> jet_tag;
+    vector<Double_t> bjet_pt;
+    vector<Double_t> bjet_eta;
+    vector<Double_t> bjet_phi;
+    int nbtags = 0;
+    
+    
+ 	for(int i=0; i<_nCorrBtagJets; i++){
+ 	
+ 		jet_pt.push_back(vCorrBtagJets[i].first.Pt());
+ 		jet_phi.push_back(vCorrBtagJets[i].first.Eta());
+ 		jet_eta.push_back(vCorrBtagJets[i].first.Phi());
+ 		jet_tag.push_back(int(vCorrBtagJets[i].second));
+ 		
+ 		if( vCorrBtagJets[i].second ){
+ 			nbtags++;
+ 			bjet_pt.push_back(vCorrBtagJets[i].first.Pt());
+ 			bjet_phi.push_back(vCorrBtagJets[i].first.Eta());
+ 			bjet_eta.push_back(vCorrBtagJets[i].first.Phi()); 			
+ 		} 	
+ 	}  
+ 	
+ 	SetValue("jet_pt", jet_pt);
+ 	SetValue("jet_eta", jet_eta);
+ 	SetValue("jet_phi", jet_phi);
+ 	SetValue("jet_tag", jet_tag);
+ 	SetValue("bjet_pt", bjet_pt);
+ 	SetValue("bjet_eta", bjet_eta);
+ 	SetValue("bjet_phi", bjet_phi); 
 
-    bool _jet_0_tag = false;
-    bool _jet_1_tag = false;
-    bool _jet_2_tag = false;
-    bool _jet_3_tag = false;
-    bool _jet_4_tag = false;
-    bool _jet_5_tag = false;
-    bool _jet_6_tag = false;
-    bool _jet_7_tag = false;
-    bool _jet_8_tag = false;
-    bool _jet_9_tag = false;
 
-    if (_nCorrBtagJets>0) {
-        _jet_0_pt = vCorrBtagJets[0].first.Pt();
-        _jet_0_eta = vCorrBtagJets[0].first.Eta();
-        _jet_0_phi = vCorrBtagJets[0].first.Phi();
-        _jet_0_tag = vCorrBtagJets[0].second;
-    }
-    if (_nCorrBtagJets>1) {
-        _jet_1_pt = vCorrBtagJets[1].first.Pt();
-        _jet_1_eta = vCorrBtagJets[1].first.Eta();
-        _jet_1_phi = vCorrBtagJets[1].first.Phi();
-        _jet_1_tag = vCorrBtagJets[1].second;
-    }
-    if (_nCorrBtagJets>2) {
-        _jet_2_pt = vCorrBtagJets[2].first.Pt();
-        _jet_2_eta = vCorrBtagJets[2].first.Eta();
-        _jet_2_phi = vCorrBtagJets[2].first.Phi();
-        _jet_2_tag = vCorrBtagJets[2].second;
-    }
-    if (_nCorrBtagJets>3) {
-        _jet_3_pt = vCorrBtagJets[3].first.Pt();
-        _jet_3_eta = vCorrBtagJets[3].first.Eta();
-        _jet_3_phi = vCorrBtagJets[3].first.Phi();
-        _jet_3_tag = vCorrBtagJets[3].second;
-    }
-    if (_nCorrBtagJets>4) {
-        _jet_4_pt = vCorrBtagJets[4].first.Pt();
-        _jet_4_eta = vCorrBtagJets[4].first.Eta();
-        _jet_4_phi = vCorrBtagJets[4].first.Phi();
-        _jet_4_tag = vCorrBtagJets[4].second;
-    }
-    if (_nCorrBtagJets>5) {
-        _jet_5_pt = vCorrBtagJets[5].first.Pt();
-        _jet_5_eta = vCorrBtagJets[5].first.Eta();
-        _jet_5_phi = vCorrBtagJets[5].first.Phi();
-        _jet_5_tag = vCorrBtagJets[5].second;
-    }
-    if (_nCorrBtagJets>6) {
-        _jet_6_pt = vCorrBtagJets[6].first.Pt();
-        _jet_6_eta = vCorrBtagJets[6].first.Eta();
-        _jet_6_phi = vCorrBtagJets[6].first.Phi();
-        _jet_6_tag = vCorrBtagJets[6].second;
-    }
-    if (_nCorrBtagJets>7) {
-        _jet_7_pt = vCorrBtagJets[7].first.Pt();
-        _jet_7_eta = vCorrBtagJets[7].first.Eta();
-        _jet_7_phi = vCorrBtagJets[7].first.Phi();
-        _jet_7_tag = vCorrBtagJets[7].second;
-    }
-    if (_nCorrBtagJets>8) {
-        _jet_8_pt = vCorrBtagJets[8].first.Pt();
-        _jet_8_eta = vCorrBtagJets[8].first.Eta();
-        _jet_8_phi = vCorrBtagJets[8].first.Phi();
-        _jet_8_tag = vCorrBtagJets[8].second;
-    }
-    if (_nCorrBtagJets>9) {
-        _jet_9_pt = vCorrBtagJets[9].first.Pt();
-        _jet_9_eta = vCorrBtagJets[9].first.Eta();
-        _jet_9_phi = vCorrBtagJets[9].first.Phi();
-        _jet_9_tag = vCorrBtagJets[9].second;
-    }
-
-    SetValue("jet_0_pt", _jet_0_pt);
-    SetValue("jet_1_pt", _jet_1_pt);
-    SetValue("jet_2_pt", _jet_2_pt);
-    SetValue("jet_3_pt", _jet_3_pt);
-    SetValue("jet_4_pt", _jet_4_pt);
-    SetValue("jet_5_pt", _jet_5_pt);
-    SetValue("jet_6_pt", _jet_6_pt);
-    SetValue("jet_7_pt", _jet_7_pt);
-    SetValue("jet_8_pt", _jet_8_pt);
-    SetValue("jet_9_pt", _jet_9_pt);
-
-    SetValue("jet_0_eta", _jet_0_eta);
-    SetValue("jet_1_eta", _jet_1_eta);
-    SetValue("jet_2_eta", _jet_2_eta);
-    SetValue("jet_3_eta", _jet_3_eta);
-    SetValue("jet_4_eta", _jet_4_eta);
-    SetValue("jet_5_eta", _jet_5_eta);
-    SetValue("jet_6_eta", _jet_6_eta);
-    SetValue("jet_7_eta", _jet_7_eta);
-    SetValue("jet_8_eta", _jet_8_eta);
-    SetValue("jet_9_eta", _jet_9_eta);
-
-    SetValue("jet_0_phi", _jet_0_phi);
-    SetValue("jet_1_phi", _jet_1_phi);
-    SetValue("jet_2_phi", _jet_2_phi);
-    SetValue("jet_3_phi", _jet_3_phi);
-    SetValue("jet_4_phi", _jet_4_phi);
-    SetValue("jet_5_phi", _jet_5_phi);
-    SetValue("jet_6_phi", _jet_6_phi);
-    SetValue("jet_7_phi", _jet_7_phi);
-    SetValue("jet_8_phi", _jet_8_phi);
-    SetValue("jet_9_phi", _jet_9_phi);
-
-    SetValue("jet_0_tag", _jet_0_tag);
-    SetValue("jet_1_tag", _jet_1_tag);
-    SetValue("jet_2_tag", _jet_2_tag);
-    SetValue("jet_3_tag", _jet_3_tag);
-    SetValue("jet_4_tag", _jet_4_tag);
-    SetValue("jet_5_tag", _jet_5_tag);
-    SetValue("jet_6_tag", _jet_6_tag);
-    SetValue("jet_7_tag", _jet_7_tag);
-    SetValue("jet_8_tag", _jet_8_tag);
-    SetValue("jet_9_tag", _jet_9_tag);
-
-    SetValue("n_btags", (_jet_0_tag+_jet_1_tag+_jet_2_tag+_jet_3_tag+_jet_4_tag+_jet_5_tag+_jet_6_tag+_jet_7_tag+_jet_8_tag+_jet_9_tag));
-
-    int _jet_0_flavor = -999;
-    int _jet_1_flavor = -999;
-    int _jet_2_flavor = -999;
-    int _jet_3_flavor = -999;
-    int _jet_4_flavor = -999;
-    int _jet_5_flavor = -999;
-    int _jet_6_flavor = -999;
-    int _jet_7_flavor = -999;
-    int _jet_8_flavor = -999;
-    int _jet_9_flavor = -999;
-
-    if (_nSelJets>0) _jet_0_flavor = abs(vSelJets[0]->partonFlavour());
-    if (_nSelJets>1) _jet_1_flavor = abs(vSelJets[1]->partonFlavour());
-    if (_nSelJets>2) _jet_2_flavor = abs(vSelJets[2]->partonFlavour());
-    if (_nSelJets>3) _jet_3_flavor = abs(vSelJets[3]->partonFlavour());
-    if (_nSelJets>4) _jet_4_flavor = abs(vSelJets[4]->partonFlavour());
-    if (_nSelJets>5) _jet_5_flavor = abs(vSelJets[5]->partonFlavour());
-    if (_nSelJets>6) _jet_6_flavor = abs(vSelJets[6]->partonFlavour());
-    if (_nSelJets>7) _jet_7_flavor = abs(vSelJets[7]->partonFlavour());
-    if (_nSelJets>8) _jet_8_flavor = abs(vSelJets[8]->partonFlavour());
-    if (_nSelJets>9) _jet_9_flavor = abs(vSelJets[9]->partonFlavour());
-
-    SetValue("jet_0_flavor", _jet_0_flavor);
-    SetValue("jet_1_flavor", _jet_1_flavor);
-    SetValue("jet_2_flavor", _jet_2_flavor);
-    SetValue("jet_3_flavor", _jet_3_flavor);
-    SetValue("jet_4_flavor", _jet_4_flavor);
-    SetValue("jet_5_flavor", _jet_5_flavor);
-    SetValue("jet_6_flavor", _jet_6_flavor);
-    SetValue("jet_7_flavor", _jet_7_flavor);
-    SetValue("jet_8_flavor", _jet_8_flavor);
-    SetValue("jet_9_flavor", _jet_9_flavor);
-
-    int nBjets = 0;
-    int nCjets = 0;
-
-    if (_jet_0_flavor == 5) nBjets += 1;
-    else if (_jet_0_flavor == 4) nCjets +=1;
-    if (_jet_1_flavor == 5) nBjets += 1;
-    else if (_jet_1_flavor == 4) nCjets +=1;
-    if (_jet_2_flavor == 5) nBjets += 1;
-    else if (_jet_2_flavor == 4) nCjets +=1;
-    if (_jet_3_flavor == 5) nBjets += 1;
-    else if (_jet_3_flavor == 4) nCjets +=1;
-    if (_jet_4_flavor == 5) nBjets += 1;
-    else if (_jet_4_flavor == 4) nCjets +=1;
-    if (_jet_5_flavor == 5) nBjets += 1;
-    else if (_jet_5_flavor == 4) nCjets +=1;
-    if (_jet_6_flavor == 5) nBjets += 1;
-    else if (_jet_6_flavor == 4) nCjets +=1;
-    if (_jet_7_flavor == 5) nBjets += 1;
-    else if (_jet_7_flavor == 4) nCjets +=1;
-    if (_jet_8_flavor == 5) nBjets += 1;
-    else if (_jet_8_flavor == 4) nCjets +=1;
-    if (_jet_9_flavor == 5) nBjets += 1;
-    else if (_jet_9_flavor == 4) nCjets +=1;
+	vector<int> jet_flavor;
+	int nBjets = 0;
+	int nCjets = 0;
+	
+ 	for(int i=0; i<_nSelJets; i++){
+		jet_flavor.push_back( abs(vSelJets[i]->partonFlavour()) );
+		if( abs(vSelJets[i]->partonFlavour())==5 ) nBjets++;
+		if( abs(vSelJets[i]->partonFlavour())==4 ) nCjets++;
+	}
 
     SetValue("n_Bjets", nBjets);
     SetValue("n_Cjets", nCjets);
+    SetValue("jet_flavor", jet_flavor);
+
+//Event weights
 
     double _weight_WJets = 1.0;
     if (isWJets_) {
@@ -529,14 +384,11 @@ int WprimeCalc::AnalyzeEvent(edm::EventBase const & event,
         }
     }
     SetValue("weight_ElectronEff_53x", _weight_electron_eff_53x);
-  
+
+// Generator information  
     double _genTopMass = -1.0;
     double _genTopPt = -1.0;
     double _genDrLeptonTopBjet = -9999.0;
-    double _genWprimeMass = -1.0;
-    double _genWprimeBjetPt = -1.0;
-    double _genWprimeBjetEta = -1.0;
-    double _genWprimeBjetPhi = -1.0;
     double _genTopBjetPt = -1.0;
     double _genTopBjetEta = -1.0;
     double _genTopBjetPhi = -1.0;
@@ -568,7 +420,6 @@ int WprimeCalc::AnalyzeEvent(edm::EventBase const & event,
        
       math::XYZTLorentzVector lv_genTop;
       math::XYZTLorentzVector lv_genOtherTop;
-      math::XYZTLorentzVector lv_genWprime;
 
       if (qLep > 0) { 
 	lv_genTop = lv_genLep + lv_genNu + lv_genB;
@@ -579,16 +430,10 @@ int WprimeCalc::AnalyzeEvent(edm::EventBase const & event,
 	lv_genOtherTop = lv_genLep + lv_genNu + lv_genB;
       }
 
-      lv_genWprime = lv_genLep + lv_genNu + lv_genB + lv_genBbar;
     
-      std::cout<<"genTopMass = "<<lv_genTop.M()<<" genOtherTopMass = " <<lv_genOtherTop.M()<<" genWprimeMass = "<<lv_genWprime.M()<<std::endl;
 
       _genTopMass = lv_genTop.M();
       _genTopPt = lv_genTop.Pt();
-      _genWprimeMass = lv_genWprime.M();
-      _genWprimeBjetPt = (qLep>0?lv_genBbar.Pt():lv_genB.Pt());
-      _genWprimeBjetEta = (qLep>0?lv_genBbar.Eta():lv_genB.Eta());
-      _genWprimeBjetPhi = (qLep>0?lv_genBbar.Phi():lv_genB.Phi());
       _genTopBjetPt = (qLep<0?lv_genBbar.Pt():lv_genB.Pt());
       _genTopBjetEta = (qLep<0?lv_genBbar.Eta():lv_genB.Eta());
       _genTopBjetPhi = (qLep<0?lv_genBbar.Phi():lv_genB.Phi());
@@ -615,10 +460,6 @@ int WprimeCalc::AnalyzeEvent(edm::EventBase const & event,
     SetValue("genTopMass", _genTopMass);
     SetValue("genTopPt", _genTopPt);
     SetValue("genDrLeptonTopBjet", _genDrLeptonTopBjet);
-    SetValue("genWprimeMass", _genWprimeMass);
-    SetValue("genWprimeBjetPt", _genWprimeBjetPt);
-    SetValue("genWprimeBjetEta", _genWprimeBjetEta);
-    SetValue("genWprimeBjetPhi", _genWprimeBjetPhi);
     SetValue("genTopBjetPt", _genTopBjetPt);
     SetValue("genTopBjetEta", _genTopBjetEta);
     SetValue("genTopBjetPhi", _genTopBjetPhi);
