@@ -284,6 +284,7 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event,
  	SetValue("bjet_pt", bjet_pt);
  	SetValue("bjet_eta", bjet_eta);
  	SetValue("bjet_phi", bjet_phi); 
+ 	SetValue("n_btags", nbtags);
 
 
 	vector<int> jet_flavor;
