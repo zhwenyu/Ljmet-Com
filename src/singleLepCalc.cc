@@ -265,15 +265,15 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event,
  	for(int i=0; i<_nCorrBtagJets; i++){
  	
  		jet_pt.push_back(vCorrBtagJets[i].first.Pt());
- 		jet_phi.push_back(vCorrBtagJets[i].first.Eta());
- 		jet_eta.push_back(vCorrBtagJets[i].first.Phi());
+ 		jet_eta.push_back(vCorrBtagJets[i].first.Eta());
+ 		jet_phi.push_back(vCorrBtagJets[i].first.Phi());
  		jet_tag.push_back(int(vCorrBtagJets[i].second));
  		
  		if( vCorrBtagJets[i].second ){
  			nbtags++;
  			bjet_pt.push_back(vCorrBtagJets[i].first.Pt());
- 			bjet_phi.push_back(vCorrBtagJets[i].first.Eta());
- 			bjet_eta.push_back(vCorrBtagJets[i].first.Phi()); 			
+ 			bjet_eta.push_back(vCorrBtagJets[i].first.Eta());
+ 			bjet_phi.push_back(vCorrBtagJets[i].first.Phi()); 			
  		} 	
  	}  
  	
