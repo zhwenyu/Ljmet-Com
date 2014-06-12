@@ -117,11 +117,11 @@ void BaseEventSelector::BeginJob(std::map<std::string, edm::ParameterSet const >
   std::cout << "b-tag check "<<msPar["btagOP"]<<" "<< msPar["btagger"]<<" "<<mdPar["btag_min_discr"]<<std::endl;
 
   if ( mbPar["isMc"] && ( mbPar["JECup"] || mbPar["JECdown"])) {
-    fexists(msPar["JEC_txtfile"], true);
-    jecUnc = new JetCorrectionUncertainty(*(new JetCorrectorParameters(msPar["JEC_txtfile"].c_str(), msPar["JEC_source"])));
     std::cout << mLegend << "Applying 53X jet energy corrections Uncertainty:\n";
     std::cout << mLegend << "   Source : "<< msPar["JEC_source"]<<std::endl;
     std::cout << mLegend << "   File   : "<< msPar["JEC_txtfile"]<<std::endl;
+    fexists(msPar["JEC_txtfile"], true);
+    jecUnc = new JetCorrectionUncertainty(*(new JetCorrectorParameters(msPar["JEC_txtfile"].c_str(), msPar["JEC_source"])));
   }
 
   //gSystem->Load("libFWCoreFWLite.so");
