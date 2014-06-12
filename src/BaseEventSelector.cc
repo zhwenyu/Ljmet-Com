@@ -50,6 +50,9 @@ void BaseEventSelector::BeginJob(std::map<std::string, edm::ParameterSet const >
       msPar["JEC_txtfile"]  = "";
       _missing_config = true;
     }
+    if (par[_key].exists("JEC_source")) msPar["JEC_source"] = par[_key].getParameter<std::string> ("JEC_source");
+    else                                msPar["JEC_source"]     = "Total";
+
     if (par[_key].exists("do53xJEC"))    mbPar["do53xJEC"]    = par[_key].getParameter<bool>        ("do53xJEC");
     else                                 mbPar["do53xJEC"]    = false;
 
@@ -115,7 +118,10 @@ void BaseEventSelector::BeginJob(std::map<std::string, edm::ParameterSet const >
 
   if ( mbPar["isMc"] && ( mbPar["JECup"] || mbPar["JECdown"])) {
     fexists(msPar["JEC_txtfile"], true);
-    jecUnc = new JetCorrectionUncertainty(*(new JetCorrectorParameters(msPar["JEC_txtfile"].c_str(), "Total")));
+    jecUnc = new JetCorrectionUncertainty(*(new JetCorrectorParameters(msPar["JEC_txtfile"].c_str(), msPar["JEC_source"])));
+    std::cout << mLegend << "Applying 53X jet energy corrections Uncertainty:\n";
+    std::cout << mLegend << "   Source : "<< msPar["JEC_source"]<<std::endl;
+    std::cout << mLegend << "   File   : "<< msPar["JEC_txtfile"]<<std::endl;
   }
 
   //gSystem->Load("libFWCoreFWLite.so");
