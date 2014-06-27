@@ -128,7 +128,7 @@ int CATopoCalc::AnalyzeEvent(edm::EventBase const & event,
                       vCorrBtagJets,
                       corrMET,
                       CAWP4,
-                      muonchannel, // isMuon                   
+                      muonchannel // isMuon                   
                       );
     return 0;
 }
