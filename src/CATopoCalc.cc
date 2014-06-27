@@ -180,11 +180,11 @@ int CATopoCalc::FillBranches( std::vector<edm::Ptr<pat::Muon> > const & vSelMuon
 
 			double CAtoAKJetDR = deltaR((*jet).first,vCAWJets[0]);		
 			if( CAtoAKJetDR > 0.8 ){		
-				if((*jet).second)	bjets.push_back(*jet);
-				else	jets.push_back(*jet);	
+				if((*jet).second)	bjets.push_back((*jet).first);
+				else	jets.push_back((*jet).first);	
 			}
 		}
-		double tPrimeMass = -10.;
+		Double_t tPrimeMass = -10.;
 		if( bjets.size() > 0 && vCAWJets.size() > 0 ){
 			tPrimeMass = ( tlv_met + tlv_lepton + vCAWJets[0] + bjets[0] ).M;
 		}
