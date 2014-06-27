@@ -139,7 +139,7 @@ int CATopoCalc::FillBranches( std::vector<edm::Ptr<pat::Muon> > const & vSelMuon
                                          std::vector<std::pair<TLorentzVector,bool>> const & vCorrBtagJets, 
                                          TLorentzVector const & corrMET,
                                          std::vector<TLorentzVector> const & vCAWJets,
-                                         bool isMuon,                                                    
+                                         bool isMuon                                                    
                                          ){
 
 	TLorentzVector tlv_lepton;
