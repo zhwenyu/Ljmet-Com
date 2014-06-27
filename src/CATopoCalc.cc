@@ -188,6 +188,7 @@ int CATopoCalc::FillBranches( std::vector<edm::Ptr<pat::Muon> > const & vSelMuon
 			tPrimeMass = double(( tlv_met + tlv_lepton + vCAWJets[0] + bjets[0] ).M());
 		}
 		SetValue("tPrimeMass", tPrimeMass);
+		break;
 
 	}
 	
