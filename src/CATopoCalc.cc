@@ -141,55 +141,58 @@ int CATopoCalc::FillBranches( std::vector<edm::Ptr<pat::Muon> > const & vSelMuon
                                          std::vector<TLorentzVector> const & vCAWJets,
                                          bool isMuon                                                    
                                          ){
+    while(1){
 
-	TLorentzVector tlv_lepton;
+		TLorentzVector tlv_lepton;
 
-	if ( vSelMuons.size() == 0 && vSelElectrons.size() == 0) break;
-	if ( vSelMuons.size() > 0 && vSelElectrons.size() > 0) {
-		tlv_lepton.SetPxPyPzE( vSelMuons[0]->px(),
-							   vSelMuons[0]->py(),
-							   vSelMuons[0]->pz(),
-							   vSelMuons[0]->energy() );
-	}
-	if ( vSelMuons.size() > 0 ) {
-		tlv_lepton.SetPxPyPzE( vSelMuons[0]->px(),
-							   vSelMuons[0]->py(),
-							   vSelMuons[0]->pz(),
-							   vSelMuons[0]->energy() ); 
-	}
-	if ( vSelElectrons.size() > 0 ) {
-		tlv_lepton.SetPxPyPzE( vSelElectrons[0]->px(),
-							   vSelElectrons[0]->py(),
-							   vSelElectrons[0]->pz(),
-							   vSelElectrons[0]->energy() );
-	}
-	
-	if ( corrMET.Pt() > 0 ){ }
-	else break;
-
-	TLorentzVector tlv_met( corrMET.Px(),
-							corrMET.Py(),
-							corrMET.Pz(),
-							corrMET.Energy() );
-
-	std::vector<TLorentzVector> jets;
-	std::vector<TLorentzVector> bjets;
-	 
-	for (vector<std::pair<TLorentzVector,bool>>::const_iterator jet = vCorrBtagJets.begin(); jet != vCorrBtagJets.end(); ++jet){		
-	
-		double CAtoAKJetDR = deltaR(jet.first(),vCAWJets[0]);		
-		if( CAtoAKJetDR > 0.8 ){		
-			if(jet.second)	bjets.push_back(jet);
-			else	jets.push_back(jet);	
+		if ( vSelMuons.size() == 0 && vSelElectrons.size() == 0) break;
+		if ( vSelMuons.size() > 0 && vSelElectrons.size() > 0) {
+			tlv_lepton.SetPxPyPzE( vSelMuons[0]->px(),
+								   vSelMuons[0]->py(),
+								   vSelMuons[0]->pz(),
+								   vSelMuons[0]->energy() );
 		}
-	}
-	double tPrimeMass = -10.;
-	if( bjets.size() > 0 && vCAWJets.size() > 0 ){
-		tPrimeMass = ( tlv_met + tlv_lepton + vCAWJets[0] + bjets[0] ).M;
-	}
-	SetValue("tPrimeMass", tPrimeMass);
+		if ( vSelMuons.size() > 0 ) {
+			tlv_lepton.SetPxPyPzE( vSelMuons[0]->px(),
+								   vSelMuons[0]->py(),
+								   vSelMuons[0]->pz(),
+								   vSelMuons[0]->energy() ); 
+		}
+		if ( vSelElectrons.size() > 0 ) {
+			tlv_lepton.SetPxPyPzE( vSelElectrons[0]->px(),
+								   vSelElectrons[0]->py(),
+								   vSelElectrons[0]->pz(),
+								   vSelElectrons[0]->energy() );
+		}
 
-	return result;
+		if ( corrMET.Pt() > 0 ){ }
+		else break;
+
+		TLorentzVector tlv_met( corrMET.Px(),
+								corrMET.Py(),
+								corrMET.Pz(),
+								corrMET.Energy() );
+
+		std::vector<TLorentzVector> jets;
+		std::vector<TLorentzVector> bjets;
+ 
+		for (vector<std::pair<TLorentzVector,bool>>::const_iterator jet = vCorrBtagJets.begin(); jet != vCorrBtagJets.end(); ++jet){		
+
+			double CAtoAKJetDR = deltaR((*jet).first,vCAWJets[0]);		
+			if( CAtoAKJetDR > 0.8 ){		
+				if((*jet).second)	bjets.push_back(*jet);
+				else	jets.push_back(*jet);	
+			}
+		}
+		double tPrimeMass = -10.;
+		if( bjets.size() > 0 && vCAWJets.size() > 0 ){
+			tPrimeMass = ( tlv_met + tlv_lepton + vCAWJets[0] + bjets[0] ).M;
+		}
+		SetValue("tPrimeMass", tPrimeMass);
+
+	}
+	
+	return 0;
 
 
 }
