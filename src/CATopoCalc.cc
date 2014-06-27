@@ -110,13 +110,15 @@ int CATopoCalc::AnalyzeEvent(edm::EventBase const & event,
     edm::Handle<std::vector<pat::Jet> > CAWJets;
     event.getByLabel(CA8PrunedJetColl_it, CAWJets);
 	std::vector<TLorentzVector>  CAWP4;
-
+	TLorentzVector CAJet;
+	
     for (std::vector<pat::Jet>::const_iterator ijet = CAWJets->begin(); ijet != CAWJets->end(); ijet++){
     
-    	TLorentzVector CAJet = SetPxPyPzE( ijet->px(),
-    									   ijet->py(),
-    									   ijet->pz(),
-    									   ijet->energy()	);
+    	
+    	CAJet.SetPxPyPzE( ijet->px(),
+    					  ijet->py(),
+    					  ijet->pz(),
+    					  ijet->energy()	);
     									  
 		CAWP4.push_back(CAJet);
 	}
