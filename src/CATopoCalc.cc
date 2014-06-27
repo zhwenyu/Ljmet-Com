@@ -112,7 +112,13 @@ int CATopoCalc::AnalyzeEvent(edm::EventBase const & event,
 	std::vector<TLorentzVector>  CAWP4;
 
     for (std::vector<pat::Jet>::const_iterator ijet = CAWJets->begin(); ijet != CAWJets->end(); ijet++){
-		CAWP4.push_back(ijet->p4());
+    
+    	TLorentzVector CAJet = SetPxPyPzE( ijet->px(),
+    									   ijet->py(),
+    									   ijet->pz(),
+    									   ijet->energy()	);
+    									  
+		CAWP4.push_back(CAJet);
 	}
 
     FillBranches(vSelMuons,
