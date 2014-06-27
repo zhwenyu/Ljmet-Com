@@ -14,7 +14,6 @@
 #include "LJMet/Com/interface/LjmetFactory.h"
 #include "SimDataFormats/PileupSummaryInfo/interface/PileupSummaryInfo.h" 
 #include "DataFormats/PatCandidates/interface/Jet.h"
-#include "DataFormats/Math/interface/deltaR.h"
 
 class LjmetFactory;
 
@@ -178,15 +177,15 @@ int CATopoCalc::FillBranches( std::vector<edm::Ptr<pat::Muon> > const & vSelMuon
  
 		for (vector<std::pair<TLorentzVector,bool>>::const_iterator jet = vCorrBtagJets.begin(); jet != vCorrBtagJets.end(); ++jet){		
 
-			double CAtoAKJetDR = deltaR((*jet).first,vCAWJets[0]);		
+			double CAtoAKJetDR = vCAWJets[0].DeltaR((*jet).first);
 			if( CAtoAKJetDR > 0.8 ){		
 				if((*jet).second)	bjets.push_back((*jet).first);
 				else	jets.push_back((*jet).first);	
 			}
 		}
-		Double_t tPrimeMass = -10.;
+		double tPrimeMass = -10.;
 		if( bjets.size() > 0 && vCAWJets.size() > 0 ){
-			tPrimeMass = ( tlv_met + tlv_lepton + vCAWJets[0] + bjets[0] ).M;
+			tPrimeMass = double(( tlv_met + tlv_lepton + vCAWJets[0] + bjets[0] ).M());
 		}
 		SetValue("tPrimeMass", tPrimeMass);
 
