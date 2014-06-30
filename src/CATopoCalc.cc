@@ -190,7 +190,7 @@ int CATopoCalc::FillBranches( std::vector<edm::Ptr<pat::Muon> > const & vSelMuon
 		if( bjets.size() > 0 && vCAWJets.size() > 0 ){
 			tPrimeMass = double(( tlv_met + tlv_lepton + vCAWJets[0] + bjets[0] ).M());
 
-			for (int i = 0; i < bjets.size(); ++i){
+			for (unsigned int i = 0; i < bjets.size(); ++i){
 				dR = vCAWJets[0].DeltaR(bjets[i]);
 				if( dR < minDRCAtoB ){
 					minDRCAtoB = dR;
