@@ -178,7 +178,7 @@ int CATopoCalc::FillBranches( std::vector<edm::Ptr<pat::Muon> > const & vSelMuon
 		for (vector<std::pair<TLorentzVector,bool>>::const_iterator jet = vCorrBtagJets.begin(); jet != vCorrBtagJets.end(); ++jet){		
 
 			double CAtoAKJetDR = vCAWJets[0].DeltaR((*jet).first);
-			if( CAtoAKJetDR > 0.8 ){		
+			if( CAtoAKJetDR > 0.65 ){		
 				if((*jet).second)	bjets.push_back((*jet).first);
 				else	jets.push_back((*jet).first);	
 			}
@@ -186,6 +186,16 @@ int CATopoCalc::FillBranches( std::vector<edm::Ptr<pat::Muon> > const & vSelMuon
 		double tPrimeMass = -10.;
 		if( bjets.size() > 0 && vCAWJets.size() > 0 ){
 			tPrimeMass = double(( tlv_met + tlv_lepton + vCAWJets[0] + bjets[0] ).M());
+		}
+		double minDRCAtoB = 10.;
+		double CAMindrBMass = -10.;
+		double dR = 10.;
+		for (int i = 0; i < bjets.size(); ++i){
+			dR = vCAWJets[0].DeltaR(bjets[i]);
+			if( dR < minDRCAtoB ){
+				minDRCAtoB = dR;
+				CAMindrBMass = double((vCAWJets[0] + bjets[i]).M());
+			}
 		}
 		SetValue("tPrimeMass", tPrimeMass);
 		break;
