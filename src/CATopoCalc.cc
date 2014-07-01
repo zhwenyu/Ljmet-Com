@@ -72,13 +72,9 @@ int CATopoCalc::AnalyzeEvent(edm::EventBase const & event,
     //
     // _____ Get objects from the selector _____________________
     //
-    std::vector<edm::Ptr<pat::Jet> >      const & vSelJets = selector->GetSelectedJets();
-    std::vector<edm::Ptr<pat::Jet> >      const & vSelBtagJets = selector->GetSelectedBtagJets();
     std::vector<std::pair<TLorentzVector,bool>> const & vCorrBtagJets = selector->GetCorrJetsWithBTags();
-    std::vector<edm::Ptr<pat::Jet> >      const & vAllJets = selector->GetAllJets();
     std::vector<edm::Ptr<pat::Muon> >     const & vSelMuons = selector->GetSelectedMuons();
     std::vector<edm::Ptr<pat::Electron> > const & vSelElectrons = selector->GetSelectedElectrons();
-    edm::Ptr<pat::MET>                    const & pMet = selector->GetMet();
     TLorentzVector                        const & corrMET = selector->GetCorrectedMet();
   
 
