@@ -187,10 +187,21 @@ int CATopoCalc::FillBranches( std::vector<edm::Ptr<pat::Muon> > const & vSelMuon
 		double minDRCAtoB = 10.;
 		double CAMindrBMass = -10.;
 		double dR = 10.;
+		TLorentzVector bestTop;
+		double topMass = -10;
+		double massDiff = 1000;
 		if( bjets.size() > 0 && vCAWJets.size() > 0 ){
+
 			tPrimeMass = double(( tlv_met + tlv_lepton + vCAWJets[0] + bjets[0] ).M());
 
 			for (unsigned int i = 0; i < bjets.size(); ++i){
+			
+				topMass = double((tlv_met + tlv_lepton + bjets[i]).M());			
+				if( fabs(topMass - 192.2) < massDiff ){
+					massDiff = fabs(topMass - 192.2);
+					bestTop = tlv_met + tlv_lepton + bjets[i];
+				}
+
 				dR = vCAWJets[0].DeltaR(bjets[i]);
 				if( dR < minDRCAtoB ){
 					minDRCAtoB = dR;
@@ -201,6 +212,8 @@ int CATopoCalc::FillBranches( std::vector<edm::Ptr<pat::Muon> > const & vSelMuon
 		}
 
 		SetValue("tPrimeMass", tPrimeMass);
+		SetValue("tPrimeMassBestTop", double((bestTop + vCAWJets[0]).M()) );
+		SetValue("bestToplnub", topMass);
 		SetValue("minDRCAtoB", minDRCAtoB);
 		SetValue("CAMindrBMass", CAMindrBMass);
 		break;
