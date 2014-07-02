@@ -183,6 +183,7 @@ int CATopoCalc::FillBranches( std::vector<edm::Ptr<pat::Muon> > const & vSelMuon
 				}
 			}
 		}
+
 		//Calculate topological variables with resulting collections
 		double tPrimeMass = -10.;
 		double minDRCAtoB = 10.;
@@ -198,6 +199,7 @@ int CATopoCalc::FillBranches( std::vector<edm::Ptr<pat::Muon> > const & vSelMuon
 			tPrimeMass = double(( tlv_met + tlv_lepton + vCAWJets[0] + bjets[0] ).M());
 
 			for (unsigned int i = 0; i < bjets.size(); ++i){
+
 				//Find the best l-nu-b top candidate
 				topMass = double((tlv_met + tlv_lepton + bjets[i]).M());			
 				if( fabs(topMass - 192.2) < massDiff ){
@@ -206,15 +208,16 @@ int CATopoCalc::FillBranches( std::vector<edm::Ptr<pat::Muon> > const & vSelMuon
 					tPrimeMassBestTop = double((bestTop + vCAWJets[0]).M());
 					bestTopMass = topMass;
 				}
+
 				//Find the bjet nearest to the CA jet but not overlapping
 				dR = vCAWJets[0].DeltaR(bjets[i]);
 				if( dR < minDRCAtoB ){
 					minDRCAtoB = dR;
 					CAMindrBMass = double((vCAWJets[0] + bjets[i]).M());
 				}
-			}
-			
+			}			
 		}
+
 		//Create branches
 		SetValue("tPrimeMass", tPrimeMass);
 		SetValue("tPrimeMassBestTop", tPrimeMassBestTop );
