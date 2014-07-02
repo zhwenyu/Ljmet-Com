@@ -138,8 +138,9 @@ int CATopoCalc::FillBranches( std::vector<edm::Ptr<pat::Muon> > const & vSelMuon
                                          ){
     while(1){
 
+		//Create lepton and met four vectors
 		TLorentzVector tlv_lepton;
-
+		
 		if ( vSelMuons.size() == 0 && vSelElectrons.size() == 0) break;
 		if ( vSelMuons.size() > 0 && vSelElectrons.size() > 0) {
 			tlv_lepton.SetPxPyPzE( vSelMuons[0]->px(),
@@ -171,6 +172,7 @@ int CATopoCalc::FillBranches( std::vector<edm::Ptr<pat::Muon> > const & vSelMuon
 		std::vector<TLorentzVector> jets;
 		std::vector<TLorentzVector> bjets;
  
+ 		//Remove jets/bjets overlapping with leading CA Jet
 		for (vector<std::pair<TLorentzVector,bool>>::const_iterator jet = vCorrBtagJets.begin(); jet != vCorrBtagJets.end(); ++jet){		
 		
 			if( vCAWJets.size() > 0 ){			
@@ -181,6 +183,7 @@ int CATopoCalc::FillBranches( std::vector<edm::Ptr<pat::Muon> > const & vSelMuon
 				}
 			}
 		}
+		//Calculate topological variables with resulting collections
 		double tPrimeMass = -10.;
 		double minDRCAtoB = 10.;
 		double CAMindrBMass = -10.;
@@ -195,7 +198,7 @@ int CATopoCalc::FillBranches( std::vector<edm::Ptr<pat::Muon> > const & vSelMuon
 			tPrimeMass = double(( tlv_met + tlv_lepton + vCAWJets[0] + bjets[0] ).M());
 
 			for (unsigned int i = 0; i < bjets.size(); ++i){
-			
+				//Find the best l-nu-b top candidate
 				topMass = double((tlv_met + tlv_lepton + bjets[i]).M());			
 				if( fabs(topMass - 192.2) < massDiff ){
 					massDiff = fabs(topMass - 192.2);
@@ -203,7 +206,7 @@ int CATopoCalc::FillBranches( std::vector<edm::Ptr<pat::Muon> > const & vSelMuon
 					tPrimeMassBestTop = double((bestTop + vCAWJets[0]).M());
 					bestTopMass = topMass;
 				}
-
+				//Find the bjet nearest to the CA jet but not overlapping
 				dR = vCAWJets[0].DeltaR(bjets[i]);
 				if( dR < minDRCAtoB ){
 					minDRCAtoB = dR;
@@ -212,7 +215,7 @@ int CATopoCalc::FillBranches( std::vector<edm::Ptr<pat::Muon> > const & vSelMuon
 			}
 			
 		}
-
+		//Create branches
 		SetValue("tPrimeMass", tPrimeMass);
 		SetValue("tPrimeMassBestTop", tPrimeMassBestTop );
 		SetValue("bestTopMasslnub", bestTopMass);
