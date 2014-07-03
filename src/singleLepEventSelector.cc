@@ -934,18 +934,18 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
             //get electrons
             event.getByLabel( mtPar["tau_collection"], mhTaus );      
 
-            for (std::vector<pat::Tau>::const_iterator _itau = mhTaus->begin(); _iel != mhTaus->end(); _itau++){
+            for (std::vector<pat::Tau>::const_iterator _itau = mhTaus->begin(); _itau != mhTaus->end(); _itau++){
 
                 while(1){
 
 					//Tau cuts hardcoded here	
-					if(_itau.tauID("byMediumCombinedIsolationDeltaBetaCorr3Hits")){}
+					if(_itau->tauID("byMediumCombinedIsolationDeltaBetaCorr3Hits")){}
 					else break;
 					
-					if(_itau.tauID("againstElectronMediumMVA3")){}
+					if(_itau->tauID("againstElectronMediumMVA3")){}
 					else break;
 					
-					if(_itau.tauID("againstMuonTight2")){}
+					if(_itau->tauID("againstMuonTight2")){}
 					else break;
 					
 					if(_itau->pt() > 20 && fabs(_itau->eta()) < 2.4 ){}
