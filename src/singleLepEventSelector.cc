@@ -27,6 +27,7 @@
 #include "DataFormats/Math/interface/deltaR.h"
 #include "DataFormats/PatCandidates/interface/Jet.h"
 #include "DataFormats/PatCandidates/interface/MET.h"
+#include "DataFormats/PatCandidates/interface/Tau.h"
 #include "DataFormats/PatCandidates/interface/TriggerObject.h"
 #include "FWCore/Common/interface/TriggerNames.h"
 //#include "PhysicsTools/SelectorUtils/interface/PFElectronSelector.h"
@@ -107,6 +108,7 @@ protected:
     edm::Handle<std::vector<pat::Jet> >         mhJets;
     edm::Handle<std::vector<pat::Muon> >        mhMuons;
     edm::Handle<std::vector<pat::Electron> >    mhElectrons;
+    edm::Handle<std::vector<pat::Tau> >			mhTaus;
     edm::Handle<std::vector<pat::MET> >         mhMet;
     edm::Handle<std::vector<reco::PFMET> >      mhType1CorrMet;
     edm::Handle<double>                         h_rho;
