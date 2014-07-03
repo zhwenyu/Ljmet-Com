@@ -61,6 +61,16 @@ void BaseEventSelector::BeginJob(std::map<std::string, edm::ParameterSet const >
     if (par[_key].exists("BTagUncertDown")) mbPar["BTagUncertDown"] = par[_key].getParameter<bool>        ("BTagUncertDown");
     else                                    mbPar["BTagUncertDown"] = false;
 
+// This is to change the BC and light SFs individually
+    if (par[_key].exists("BTagUncertBcUp"))   mbPar["BTagUncertBcUp"]   = par[_key].getParameter<bool>        ("BTagUncertBcUp");
+    else                                    mbPar["BTagUncertBcUp"]   = false;
+    if (par[_key].exists("BTagUncertBcDown")) mbPar["BTagUncertBcDown"] = par[_key].getParameter<bool>        ("BTagUncertBcDown");
+    else                                    mbPar["BTagUncertBcDown"] = false;
+    if (par[_key].exists("BTagUncertLightUp"))   mbPar["BTagUncertLightUp"]   = par[_key].getParameter<bool>        ("BTagUncertLightUp");
+    else                                    mbPar["BTagUncertLightUp"]   = false;
+    if (par[_key].exists("BTagUncertLightDown")) mbPar["BTagUncertLightDown"] = par[_key].getParameter<bool>        ("BTagUncertLightDown");
+    else                                    mbPar["BTagUncertLightDown"] = false;
+
     if (par[_key].exists("MCL1JetPar")) msPar["MCL1JetPar"] = par[_key].getParameter<std::string> ("MCL1JetPar");
     else{
       msPar["MCL1JetPar"] = "../data/START53_V7G_L1FastJet_AK5PFchs.txt";
@@ -117,7 +127,7 @@ void BaseEventSelector::BeginJob(std::map<std::string, edm::ParameterSet const >
   std::cout << "b-tag check "<<msPar["btagOP"]<<" "<< msPar["btagger"]<<" "<<mdPar["btag_min_discr"]<<std::endl;
 
   if ( mbPar["isMc"] && ( mbPar["JECup"] || mbPar["JECdown"])) {
-    std::cout << mLegend << "Applying 53X jet energy corrections Uncertainty:\n";
+    std::cout << mLegend << "Applying 53X jet energy corrections Uncertainty: "<< (mbPar["JECup"]?"Up\n":"Down\n");
     std::cout << mLegend << "   Source : "<< msPar["JEC_source"]<<std::endl;
     std::cout << mLegend << "   File   : "<< msPar["JEC_txtfile"]<<std::endl;
     fexists(msPar["JEC_txtfile"], true);
@@ -351,14 +361,14 @@ bool BaseEventSelector::isJetTagged(const pat::Jet & jet, edm::EventBase const &
 
     double _lightSf  = mBtagCond.GetMistagScaleFactor(lvjet.Et(), lvjet.Eta(), msPar["btagOP"]);
     double _lightEff = mBtagCond.GetMistagRateMC(lvjet.Et(), lvjet.Eta(), msPar["btagOP"])*_lightSf;
-    if ( mbPar["BTagUncertUp"] ) _lightSf += mBtagCond.GetMistagSFUncertUp(lvjet.Et(), lvjet.Eta(), msPar["btagOP"]);
-    else if ( mbPar["BTagUncertDown"] )_lightSf -= mBtagCond.GetMistagSFUncertDown(lvjet.Et(), lvjet.Eta(), msPar["btagOP"]);
+    if ( mbPar["BTagUncertUp"] || mbPar["BTagUncertLightUp"]) _lightSf += mBtagCond.GetMistagSFUncertUp(lvjet.Et(), lvjet.Eta(), msPar["btagOP"]);
+    else if ( mbPar["BTagUncertDown"] || mbPar["BTagUncertLightDown"])_lightSf -= mBtagCond.GetMistagSFUncertDown(lvjet.Et(), lvjet.Eta(), msPar["btagOP"]);
 
     int _jetFlavor = abs(jet.partonFlavour());
     double _btagSf  = mBtagCond.GetBtagScaleFactor(lvjet.Et(), lvjet.Eta(), msPar["btagOP"]);
     double _btagEff = mBtagCond.GetBtagEfficiencyMC(lvjet.Et(), lvjet.Eta(), msPar["btagOP"])*_btagSf;
-    if ( mbPar["BTagUncertUp"] ) _btagSf += (mBtagCond.GetBtagSFUncertUp(lvjet.Et(), lvjet.Eta(), msPar["btagOP"])*(_jetFlavor==4?2:1));
-    else if ( mbPar["BTagUncertDown"] )_btagSf -= (mBtagCond.GetBtagSFUncertDown(lvjet.Et(), lvjet.Eta(), msPar["btagOP"])*(_jetFlavor==4?2:1));
+    if ( mbPar["BTagUncertUp"] || mbPar["BTagUncertBcUp"]) _btagSf += (mBtagCond.GetBtagSFUncertUp(lvjet.Et(), lvjet.Eta(), msPar["btagOP"])*(_jetFlavor==4?2:1));
+    else if ( mbPar["BTagUncertDown"] || mbPar["BTagUncertBcDown"])_btagSf -= (mBtagCond.GetBtagSFUncertDown(lvjet.Et(), lvjet.Eta(), msPar["btagOP"])*(_jetFlavor==4?2:1));
 
     mBtagSfUtil.SetSeed(abs(static_cast<int>(sin(jet.phi())*100000)));
 
@@ -378,7 +388,6 @@ bool BaseEventSelector::isJetTagged(const pat::Jet & jet, edm::EventBase const &
 
 TLorentzVector BaseEventSelector::correctJet(const pat::Jet & jet, edm::EventBase const & event)
 {
-
   // JES and JES systematics
     pat::Jet correctedJet;
     if (mbPar["do53xJEC"])
@@ -472,7 +481,7 @@ TLorentzVector BaseEventSelector::correctJet(const pat::Jet & jet, edm::EventBas
 	  std::cout << mLegend << "WARNING! Jet/MET will remain uncorrected." << std::endl;
 	  unc = 0.0;
 	}
-          unc = 1 + unc; 
+        unc = 1 + unc; 
       }
       else { 
 	try{
@@ -484,11 +493,8 @@ TLorentzVector BaseEventSelector::correctJet(const pat::Jet & jet, edm::EventBas
 	  std::cout << mLegend << "WARNING! Jet/MET will remain uncorrected." << std::endl;
 	  unc = 0.0;
 	}
-          unc = 1 - unc; 
+        unc = 1 - unc; 
       }
-
-      if (pt*ptscale < 10.0 && mbPar["JECup"]) unc = 2.0;
-      if (pt*ptscale < 10.0 && mbPar["JECdown"]) unc = 0.01;
 
     }
   }
@@ -499,7 +505,7 @@ TLorentzVector BaseEventSelector::correctJet(const pat::Jet & jet, edm::EventBas
           // 53x Jet Energy corrections were not applied to the TLBSM 53x v2 pat-tuples
           // Therefore, we need to undo the 52x corrections and then apply the 53x ones
 
-          double pt_raw = jet.correctedJet(0).pt();
+	  double pt_raw = jet.correctedJet(0).pt();
           JetCorrector->setJetEta(jet.eta());
           JetCorrector->setJetPt(pt_raw);
           JetCorrector->setJetA(jet.jetArea());
@@ -516,18 +522,21 @@ TLorentzVector BaseEventSelector::correctJet(const pat::Jet & jet, edm::EventBas
 	  
           correctedJet.scaleEnergy(correction);
           pt = correctedJet.pt();
-
       }
   }
 
   TLorentzVector jetP4;
   jetP4.SetPtEtaPhiM(correctedJet.pt()*unc*ptscale, correctedJet.eta(),correctedJet.phi(), correctedJet.mass() );
-  //std::cout<<"jet pt: "<<jetP4.Pt()<<" eta: "<<jetP4.Eta()<<" phi: "<<jetP4.Phi()<<" energy: "<<jetP4.E()<<std::endl;
-
+//   if (correctedJet.pt()> 15.)
+//   {
+//   cout << "correction: "<< unc<<" "<<ptscale<<endl;
+//   std::cout<<"jet pt before : "<<correctedJet.pt()<<" eta: "<< correctedJet.eta()<<" phi: "<<correctedJet.phi()<<" mass: "<<correctedJet.mass()<<" energy: "<<correctedJet.energy()<<std::endl;
+//   std::cout<<"jet pt after  : "<<jetP4.Pt()<<" eta: "<<jetP4.Eta()<<" phi: "<<jetP4.Phi()<<" mass: "<<jetP4.M()<<" energy: "<<jetP4.E()<<std::endl;
+// }
 
   // sanity check - save correction of the first jet
   if (mNCorrJets==0){
-    double _orig_pt = jet.pt();
+    double _orig_pt = jet.correctedJet(0).pt();
     if (fabs(_orig_pt)<0.000000001){
       _orig_pt = 0.000000001;
     }
@@ -544,7 +553,6 @@ TLorentzVector BaseEventSelector::correctMet(const pat::MET & met, edm::EventBas
 {
   double correctedMET_px = met.px();
   double correctedMET_py = met.py();
-
     for (std::vector<edm::Ptr<pat::Jet> >::const_iterator ijet = mvAllJets.begin();
          ijet != mvAllJets.end(); ++ijet){
       TLorentzVector lv = correctJet(**ijet, event);
