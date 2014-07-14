@@ -171,6 +171,11 @@ int CATopoCalc::FillBranches( std::vector<edm::Ptr<pat::Muon> > const & vSelMuon
 
 		std::vector<TLorentzVector> jets;
 		std::vector<TLorentzVector> bjets;
+		int nJets = 0;
+		int nBJets = 0;
+        std::vector <double> bJetPt;
+        std::vector <double> bJetEta;
+        std::vector <double> bJetPhi;
  
  		//Remove jets/bjets overlapping with leading CA Jet
 		for (vector<std::pair<TLorentzVector,bool>>::const_iterator jet = vCorrBtagJets.begin(); jet != vCorrBtagJets.end(); ++jet){		
@@ -178,8 +183,18 @@ int CATopoCalc::FillBranches( std::vector<edm::Ptr<pat::Muon> > const & vSelMuon
 			if( vCAWJets.size() > 0 ){			
 				double CAtoAKJetDR = vCAWJets[0].DeltaR((*jet).first);
 				if( CAtoAKJetDR > 0.65 ){		
-					if((*jet).second)	bjets.push_back((*jet).first);
-					else	jets.push_back((*jet).first);	
+					if((*jet).second){
+						bjets.push_back((*jet).first);
+      					bJetPt.push_back((*jet).first->pt());
+      					bJetEta.push_back((*jet).first->eta());
+      					bJetPhi.push_back((*jet).first->phi());
+						
+						++nBJets;
+					}
+					else{
+						jets.push_back((*jet).first);
+						++nJets;
+					}	
 				}
 			}
 		}
@@ -224,6 +239,11 @@ int CATopoCalc::FillBranches( std::vector<edm::Ptr<pat::Muon> > const & vSelMuon
 		SetValue("bestTopMasslnub", bestTopMass);
 		SetValue("minDRCAtoB", minDRCAtoB);
 		SetValue("CAMindrBMass", CAMindrBMass);
+		SetValue("nJets", nJets);
+		SetValue("nBJets", nBJets);
+        SetValue("bJetPt"     , CAWJetPt);
+        SetValue("bJetEta"    , CAWJetEta);
+        SetValue("bJetPhi"    , CAWJetPhi);
 		break;
 
 	}
