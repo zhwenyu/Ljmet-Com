@@ -185,9 +185,9 @@ int CATopoCalc::FillBranches( std::vector<edm::Ptr<pat::Muon> > const & vSelMuon
 				if( CAtoAKJetDR > 0.65 ){		
 					if((*jet).second){
 						bjets.push_back((*jet).first);
-      					bJetPt.push_back((*jet).first.pt());
-      					bJetEta.push_back((*jet).first.eta());
-      					bJetPhi.push_back((*jet).first.phi());
+      					bJetPt.push_back((*jet).first.Pt());
+      					bJetEta.push_back((*jet).first.Eta());
+      					bJetPhi.push_back((*jet).first.Phi());
 						
 						++nBJets;
 					}
