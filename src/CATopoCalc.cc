@@ -185,9 +185,9 @@ int CATopoCalc::FillBranches( std::vector<edm::Ptr<pat::Muon> > const & vSelMuon
 				if( CAtoAKJetDR > 0.65 ){		
 					if((*jet).second){
 						bjets.push_back((*jet).first);
-      					bJetPt.push_back((*jet).first->pt());
-      					bJetEta.push_back((*jet).first->eta());
-      					bJetPhi.push_back((*jet).first->phi());
+      					bJetPt.push_back((*jet).first.pt());
+      					bJetEta.push_back((*jet).first.eta());
+      					bJetPhi.push_back((*jet).first.phi());
 						
 						++nBJets;
 					}
@@ -241,9 +241,9 @@ int CATopoCalc::FillBranches( std::vector<edm::Ptr<pat::Muon> > const & vSelMuon
 		SetValue("CAMindrBMass", CAMindrBMass);
 		SetValue("nJets", nJets);
 		SetValue("nBJets", nBJets);
-        SetValue("bJetPt"     , CAWJetPt);
-        SetValue("bJetEta"    , CAWJetEta);
-        SetValue("bJetPhi"    , CAWJetPhi);
+        SetValue("bJetPt"     , bJetPt);
+        SetValue("bJetEta"    , bJetEta);
+        SetValue("bJetPhi"    , bJetPhi);
 		break;
 
 	}
