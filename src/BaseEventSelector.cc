@@ -45,6 +45,19 @@ void BaseEventSelector::BeginJob(std::map<std::string, edm::ParameterSet const >
     else                                 mbPar["JERup"]       = false;
     if (par[_key].exists("JERdown"))     mbPar["JERdown"]     = par[_key].getParameter<bool>        ("JERdown");
     else                                 mbPar["JERdown"]     = false;
+
+    if (par[_key].exists("METup"))       mbPar["METup"]       = par[_key].getParameter<bool>        ("METup");
+    else                                 mbPar["METup"]       = false;    
+    if (par[_key].exists("METdown"))     mbPar["METdown"]     = par[_key].getParameter<bool>        ("METdown");
+    else                                 mbPar["METdown"]     = false;
+    if (mbPar["METup"] || mbPar["METdown"] ) {
+      if (par[_key].exists("METuncert"))   mdPar["METuncert"]     = par[_key].getParameter<double> ("METuncert");
+      else                                 mdPar["METuncert"]     = 0.1;
+      std::cout << mLegend << "MET uncertainty: modify unclustered energy by "
+                << (mbPar["METup"] ? "+" : "-")
+		<< mdPar["METuncert"] << std::endl;
+    }
+
     if (par[_key].exists("JEC_txtfile")) msPar["JEC_txtfile"] = par[_key].getParameter<std::string> ("JEC_txtfile");
     else{
       msPar["JEC_txtfile"]  = "";
@@ -553,14 +566,30 @@ TLorentzVector BaseEventSelector::correctMet(const pat::MET & met, edm::EventBas
 {
   double correctedMET_px = met.px();
   double correctedMET_py = met.py();
+// cout <<"MET correction "<<correctedMET_px <<" "<<correctedMET_py<<endl;
     for (std::vector<edm::Ptr<pat::Jet> >::const_iterator ijet = mvAllJets.begin();
          ijet != mvAllJets.end(); ++ijet){
       TLorentzVector lv = correctJet(**ijet, event);
       correctedMET_px +=  (**ijet).px() -lv.Px();
       correctedMET_py += 	(**ijet).py() -lv.Py();
+// cout << endl<<correctedMET_px <<" "<<correctedMET_py<<" "<<
+// (**ijet).px() <<" "<<lv.Px()<<" "<< (**ijet).py() <<" "<<lv.Py()<<" "<< (**ijet).pt() <<" "<<lv.Perp()<<endl<<endl;
     }
 
+// cout <<"MET correction "<<correctedMET_px <<" "<<correctedMET_py<<endl;
+
+// This is for the MET uncertainty
+  if (mbPar["METup"] || mbPar["METdown"] ) {
+    TVector2 uMET = unclusMET(met);
+    int sign = (mbPar["METup"] ? +1 : -1);
+    correctedMET_px += uMET.Px()*sign*mdPar["METuncert"];
+    correctedMET_py += uMET.Py()*sign*mdPar["METuncert"];
+  }
+// cout <<"MET correction "<<correctedMET_px <<" "<<correctedMET_py<<endl;
+
   correctedMET_p4.SetPxPyPzE(correctedMET_px, correctedMET_py, 0, sqrt(correctedMET_px*correctedMET_px+correctedMET_py*correctedMET_py));
+// cout << "MET before : "<<met.px()<<" "<<met.py()<<" "<<met.pt()<<endl;
+// cout << "MET after  : "<<correctedMET_p4.Px()<<" "<<correctedMET_p4.Py()<<" "<<correctedMET_p4.Perp()<<endl;
 
   // sanity check histogram
   double _orig_met = met.pt();
@@ -572,6 +601,44 @@ TLorentzVector BaseEventSelector::correctMet(const pat::MET & met, edm::EventBas
 
   return correctedMET_p4;
 }
+
+TVector2 BaseEventSelector::unclusMET(const pat::MET & met) const{
+  double missetX = met.px();
+  double missetY = met.py();
+  // cout <<"Now GetUnclusScaledMET\n";
+  // cout << "MET original   : "<< met.pt()<<  " "<< met.px()<<  " "<< met.py()<<  " "<<endl;
+  // cout << "Jets used to calculate unclustered MET\n"<<endl;
+  for (std::vector<edm::Ptr<pat::Jet> >::const_iterator ijet = mvAllJets.begin();
+       ijet != mvAllJets.end(); ++ijet){
+    if ((fabs((**ijet).eta())< 5.0) && ((**ijet).pt()>10.0)) {
+    // cout<<" jet eta,pt "<<(**ijet).eta()<<" "<<(**ijet).pt()<<" "<<(*ijet)->px()<<" "<<(*ijet)->py()<<endl;
+    missetX += (**ijet).px();
+    missetY += (**ijet).py();
+    }
+  }
+  // cout << "MET after jet  : "<<sqrt(pow(missetX,2.) + pow(missetY,2.))<<  " "<< missetX<<  " "<< missetY<<  " "<<endl;
+
+  for (std::vector<edm::Ptr<pat::Electron> >::const_iterator iel = mvAllElectrons.begin(); iel != mvAllElectrons.end(); iel++){   
+  // cout<<" e eta,pt "<<(*iel)->eta()<<" "<<(*iel)->pt()<<" "<<(*iel)->px()<<" "<<(*iel)->py()<<endl;
+    missetX += (*iel)->px();
+    missetY += (*iel)->py();
+  }
+  // cout << "MET after el   : "<<sqrt(pow(missetX,2.) + pow(missetY,2.))<<  " "<< missetX<<  " "<< missetY<<  " "<<endl;
+  for (std::vector<edm::Ptr<pat::Muon> >::const_iterator imu = mvAllMuons.begin(); imu != mvAllMuons.end(); imu++){
+    // cout<<" mu eta,pt "<<(*imu)->eta()<<" "<<(*imu)->pt()<<" "<<(*imu)->px()<<" "<<(*imu)->py()<<endl;
+    missetX += (*imu)->px();
+    missetY += (*imu)->py();
+  }
+  // cout << "MET after mu   : "<<sqrt(pow(missetX,2.) + pow(missetY,2.))<<  " "<< missetX<<  " "<< missetY<<  " "<<endl;
+//     for (unsigned int i=0; i<taus.size(); i++){
+//       cout<<" tau eta,pt "<<taus[i].p4.Eta()<<" "<<taus[i].p4.Pt()<<endl;
+//       missetX += taus[i].p4.Px();
+//       missetY += taus[i].p4.Py();
+//     }
+    return TVector2(missetX,missetY);
+
+}
+
 
 
 

@@ -142,6 +142,9 @@ class BaseEventSelector : public EventSelector {
   void BeginEvent( edm::EventBase const & event, LjmetEventContent & ec );
   void EndEvent( edm::EventBase const & event, LjmetEventContent & ec );
 
+  TVector2 unclusMET(const pat::MET & met) const;
+
+
   BTagSFUtil mBtagSfUtil;
   BtagHardcodedConditions mBtagCond;
   double bTagCut;
