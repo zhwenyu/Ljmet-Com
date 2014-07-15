@@ -371,10 +371,12 @@ bool DileptonEventSelector::operator()( edm::EventBase const & event, pat::strbi
       event.getByLabel( mtPar["muon_collection"], mhMuons );      
 
       mvSelMuons.clear();
-	
+      mvAllMuons.clear();
+
       for (std::vector<pat::Muon>::const_iterator _imu = mhMuons->begin(); _imu != mhMuons->end(); _imu++){
 	
 	bool pass = false;
+	mvAllMuons.push_back( edm::Ptr<pat::Muon>( mhMuons, _n_muons) );
 
 	//muon cuts
 	while(1){
@@ -422,11 +424,13 @@ bool DileptonEventSelector::operator()( edm::EventBase const & event, pat::strbi
       event.getByLabel( mtPar["electron_collection"], mhElectrons );
 
       mvSelElectrons.clear();
+      mvAllElectrons.clear();
 
       for ( std::vector<pat::Electron>::const_iterator _iel = mhElectrons->begin(); _iel != mhElectrons->end(); _iel++){
 
 	bool pass = false;
-	
+	mvAllElectrons.push_back( edm::Ptr<pat::Electron>( mhElectrons, _n_electrons) );
+
 	while(1){
 	  if (not _iel->gsfTrack().isNonnull() or not _iel->gsfTrack().isAvailable()) break; 
 
