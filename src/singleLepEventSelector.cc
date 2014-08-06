@@ -27,6 +27,7 @@
 #include "DataFormats/Math/interface/deltaR.h"
 #include "DataFormats/PatCandidates/interface/Jet.h"
 #include "DataFormats/PatCandidates/interface/MET.h"
+#include "DataFormats/PatCandidates/interface/Tau.h"
 #include "DataFormats/PatCandidates/interface/TriggerObject.h"
 #include "FWCore/Common/interface/TriggerNames.h"
 //#include "PhysicsTools/SelectorUtils/interface/PFElectronSelector.h"
@@ -107,6 +108,7 @@ protected:
     edm::Handle<std::vector<pat::Jet> >         mhJets;
     edm::Handle<std::vector<pat::Muon> >        mhMuons;
     edm::Handle<std::vector<pat::Electron> >    mhElectrons;
+    edm::Handle<std::vector<pat::Tau> >			mhTaus;
     edm::Handle<std::vector<pat::MET> >         mhMet;
     edm::Handle<std::vector<reco::PFMET> >      mhType1CorrMet;
     edm::Handle<double>                         h_rho;
@@ -234,7 +236,7 @@ void singleLepEventSelector::BeginJob( std::map<std::string, edm::ParameterSet c
 
         mbPar["pv_cut"]                   = par[_key].getParameter<bool>         ("pv_cut");
         mbPar["hbhe_cut"]                 = par[_key].getParameter<bool>         ("hbhe_cut");
-	mbPar["doLaserCalFilt"]           = par[_key].getParameter<bool>         ("doLaserCalFilt");
+	    mbPar["doLaserCalFilt"]           = par[_key].getParameter<bool>         ("doLaserCalFilt");
 
         mbPar["jet_cuts"]                 = par[_key].getParameter<bool>         ("jet_cuts");
         mdPar["jet_minpt"]                = par[_key].getParameter<double>       ("jet_minpt");
@@ -262,6 +264,7 @@ void singleLepEventSelector::BeginJob( std::map<std::string, edm::ParameterSet c
         miPar["max_tight_lepton"]         = par[_key].getParameter<int>          ("max_tight_lepton");
         mbPar["trigger_consistent"]       = par[_key].getParameter<bool>         ("trigger_consistent");
         mbPar["second_lepton_veto"]       = par[_key].getParameter<bool>         ("second_lepton_veto");
+        mbPar["tau_veto"]                 = par[_key].getParameter<bool>         ("tau_veto");
 
         mbPar["met_cuts"]                 = par[_key].getParameter<bool>         ("met_cuts");
         mdPar["min_met"]                  = par[_key].getParameter<double>       ("min_met");
@@ -276,6 +279,7 @@ void singleLepEventSelector::BeginJob( std::map<std::string, edm::ParameterSet c
         mtPar["jet_collection"]           = par[_key].getParameter<edm::InputTag>("jet_collection");
         mtPar["muon_collection"]          = par[_key].getParameter<edm::InputTag>("muon_collection");
         mtPar["electron_collection"]      = par[_key].getParameter<edm::InputTag>("electron_collection");
+        mtPar["tau_collection"]           = par[_key].getParameter<edm::InputTag>("tau_collection");
         mtPar["met_collection"]           = par[_key].getParameter<edm::InputTag>("met_collection");
         mtPar["type1corrmet_collection"]  = par[_key].getParameter<edm::InputTag>("type1corrmet_collection");
 
@@ -315,6 +319,7 @@ void singleLepEventSelector::BeginJob( std::map<std::string, edm::ParameterSet c
     push_back("Min tight electron");
     push_back("Trigger consistent");
     push_back("Second lepton veto");
+    push_back("Tau veto");
     push_back("One jet or more");
     push_back("Two jets or more");
     push_back("Three jets or more");
@@ -341,6 +346,7 @@ void singleLepEventSelector::BeginJob( std::map<std::string, edm::ParameterSet c
     set("Min tight electron", miPar["min_tight_electron"]);  
     set("Trigger consistent", mbPar["trigger_consistent"]);  
     set("Second lepton veto", mbPar["second_lepton_veto"]);
+	set("Tau veto", mbPar["tau_veto"]);
      
     if (mbPar["jet_cuts"]){
         set("One jet or more", false);
@@ -916,6 +922,45 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
         } // end of electron cuts
         if (mbPar["debug"]) std::cout<<"finish electron cuts..."<<std::endl;
 
+        //
+        //_____ Tau cuts __________________________________
+        //      
+        // loop over taus
+
+        int _n_taus  = 0;
+        if (mbPar["debug"]) std::cout<<"start tau cuts..."<<std::endl;
+
+        if ( mbPar["tau_veto"] ) {
+            //get electrons
+            event.getByLabel( mtPar["tau_collection"], mhTaus );      
+
+            for (std::vector<pat::Tau>::const_iterator _itau = mhTaus->begin(); _itau != mhTaus->end(); _itau++){
+
+                while(1){
+
+					//Tau cuts hardcoded here	
+					if(_itau->tauID("byMediumCombinedIsolationDeltaBetaCorr3Hits")){}
+					else break;
+					
+					if(_itau->tauID("againstElectronMediumMVA3")){}
+					else break;
+					
+					if(_itau->tauID("againstMuonTight2")){}
+					else break;
+					
+					if(_itau->pt() > 20 && fabs(_itau->eta()) < 2.4 ){}
+					else break;
+					
+					++_n_taus;
+					break;
+ 
+				}
+			}
+
+		}
+        if (mbPar["debug"]) std::cout<<"finish tau cuts..."<<std::endl;
+		
+		
 
         if (mbPar["debug"]) std::cout<<"start lepton cuts..."<<std::endl;
 
@@ -947,6 +992,10 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
 
         if( NoSecondLepton || ignoreCut("Second lepton veto") ) passCut(ret, "Second lepton veto");
         else break;
+        
+        if( _n_taus == 0 ) passCut(ret, "Tau veto");
+        else break;
+        
         if (mbPar["debug"]) std::cout<<"finish lepton cuts..."<<std::endl;
     
         //
