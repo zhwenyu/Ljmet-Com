@@ -27,9 +27,9 @@ process.CommonCalc.dummy_parameter = cms.string('Dummy parameter value')
 # Stop calculator options
 process.load('LJMet.Com.stopCalc_cfi')
 
-# Wprime calculator options
-process.load('LJMet.Com.wprimeCalc_cfi')
-process.WprimeCalc.isWJets = cms.bool(False)
+# singleLep calculator options
+process.load('LJMet.Com.singleLepCalc_cfi')
+process.singleLepCalc.isWJets = cms.bool(False)
 
 # LjetsTopoCalc options
 process.load('LJMet.Com.ljetsTopoCalcNew_cfi')
