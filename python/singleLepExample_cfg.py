@@ -125,14 +125,14 @@ process.event_selector = cms.PSet(
 
     do53xJEC                 = cms.bool(True),
 
-    MCL1JetPar               = cms.string(relBase+'/src/LJMet/singletPrime/JEC/Summer13_V4_MC_L1FastJet_AK5PFchs.txt'),
-    MCL2JetPar               = cms.string(relBase+'/src/LJMet/singletPrime/JEC/Summer13_V4_MC_L2Relative_AK5PFchs.txt'),
+    MCL1JetPar               = cms.string('CMSSW_BASE/src/LJMet/singletPrime/JEC/Summer13_V4_MC_L1FastJet_AK5PFchs.txt'),
+    MCL2JetPar               = cms.string('CMSSW_BASE/src/LJMet/singletPrime/JEC/Summer13_V4_MC_L2Relative_AK5PFchs.txt'),
     MCL3JetPar               = cms.string(relBase+'/src/LJMet/singletPrime/JEC/Summer13_V4_MC_L3Absolute_AK5PFchs.txt'),
 
-    DataL1JetPar             = cms.string(relBase+'/src/LJMet/singletPrime/JEC/Summer13_V4_DATA_L1FastJet_AK5PFchs.txt'),
-    DataL2JetPar             = cms.string(relBase+'/src/LJMet/singletPrime/JEC/Summer13_V4_DATA_L2Relative_AK5PFchs.txt'),
-    DataL3JetPar             = cms.string(relBase+'/src/LJMet/singletPrime/JEC/Summer13_V4_DATA_L3Absolute_AK5PFchs.txt'),
-    DataResJetPar            = cms.string(relBase+'/src/LJMet/singletPrime/JEC/Summer13_V4_DATA_L2L3Residual_AK5PFchs.txt')
+    DataL1JetPar             = cms.string('CMSSW_BASE/src/LJMet/singletPrime/JEC/Summer13_V4_DATA_L1FastJet_AK5PFchs.txt'),
+    DataL2JetPar             = cms.string('CMSSW_BASE/src/LJMet/singletPrime/JEC/Summer13_V4_DATA_L2Relative_AK5PFchs.txt'),
+    DataL3JetPar             = cms.string('CMSSW_BASE/src/LJMet/singletPrime/JEC/Summer13_V4_DATA_L3Absolute_AK5PFchs.txt'),
+    DataResJetPar            = cms.string('CMSSW_BASE/src/LJMet/singletPrime/JEC/Summer13_V4_DATA_L2L3Residual_AK5PFchs.txt')
     )
 
 
