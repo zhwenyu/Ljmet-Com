@@ -120,6 +120,7 @@ process.event_selector = cms.PSet(
     jet_collection           = cms.InputTag('goodPatJetsPFlow'),
     muon_collection          = cms.InputTag('selectedPatMuonsPFlow'),
     electron_collection      = cms.InputTag('selectedPatElectronsPFlow'),
+    tau_collection			 = cms.InputTag('selectedPatTausPFlow'),
     met_collection           = cms.InputTag('patMETsPFlow'),
     type1corrmet_collection  = cms.InputTag('pfType1CorrectedMet'),
 
