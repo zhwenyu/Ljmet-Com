@@ -146,9 +146,10 @@ process.inputs = cms.PSet (
            skipEvents = cms.int32(0),
            lumisToProcess = CfgTypes.untracked(CfgTypes.VLuminosityBlockRange()),
            fileNames  = cms.vstring(
-              ['dcache:/pnfs/cms/WAX/11/store/results/B2G/TT_CT10_TuneZ2star_8TeV-powheg-tauola/StoreResults-Summer12_DR53X-PU_S10_START53_V7A-v2_TLBSM_53x_v2-c04f3b4fa7\
-4c8266c913b71e0c74901d/TT_CT10_TuneZ2star_8TeV-powheg-tauola/USER/StoreResults-Summer12_DR53X-PU_S10_START53_V7A-v2_TLBSM_53x_v2-c04f3b4fa74c8266c913b71e0c74901d/0000/00\
-C9DE8B-4C19-E211-BFD3-003048678A7E.root']
+              ['file:///mnt/hadoop/store/results/B2G/TTJets_SemiLeptMGDecays_8TeV-madgraph/\
+              StoreResults-Summer12_DR53X-PU_S10_START53_V7A_ext-v1_TLBSM_53x_v3-99bd99199697666ff01397dad5652e9e/\
+              TTJets_SemiLeptMGDecays_8TeV-madgraph/USER/StoreResults-Summer12_DR53X-PU_S10_START53_V7A_ext-v1_\
+              TLBSM_53x_v3-99bd99199697666ff01397dad5652e9e/0000/00071EA3-C8E9-E211-85D1-00261894394F.root']
                    )
        )
 
@@ -157,7 +158,7 @@ C9DE8B-4C19-E211-BFD3-003048678A7E.root']
 
 # JSON
 if (not process.ljmet.isMc==cms.bool(True)):
-    JsonFile = 'data/json/Cert_190456-202016_8TeV_PromptReco_Collisions12_JSON_MuonPhys.txt'
+    JsonFile = 'CMSSW_BASE/src/LJMet/singletPrime/json/Jan222013ReReco_json.txt'
     myList   = LumiList.LumiList(filename=JsonFile).getCMSSWString().split(',')
     process.inputs.lumisToProcess.extend(myList)
         
