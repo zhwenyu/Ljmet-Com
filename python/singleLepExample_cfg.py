@@ -147,10 +147,7 @@ process.inputs = cms.PSet (
            skipEvents = cms.int32(0),
            lumisToProcess = CfgTypes.untracked(CfgTypes.VLuminosityBlockRange()),
            fileNames  = cms.vstring(
-              ['file:///mnt/hadoop/store/results/B2G/TTJets_SemiLeptMGDecays_8TeV-madgraph/\
-              StoreResults-Summer12_DR53X-PU_S10_START53_V7A_ext-v1_TLBSM_53x_v3-99bd99199697666ff01397dad5652e9e/\
-              TTJets_SemiLeptMGDecays_8TeV-madgraph/USER/StoreResults-Summer12_DR53X-PU_S10_START53_V7A_ext-v1_\
-              TLBSM_53x_v3-99bd99199697666ff01397dad5652e9e/0000/00071EA3-C8E9-E211-85D1-00261894394F.root']
+              ['file:///mnt/hadoop/store/results/B2G/TTJets_SemiLeptMGDecays_8TeV-madgraph/StoreResults-Summer12_DR53X-PU_S10_START53_V7A_ext-v1_TLBSM_53x_v3-99bd99199697666ff01397dad5652e9e/TTJets_SemiLeptMGDecays_8TeV-madgraph/USER/StoreResults-Summer12_DR53X-PU_S10_START53_V7A_ext-v1_TLBSM_53x_v3-99bd99199697666ff01397dad5652e9e/0000/00071EA3-C8E9-E211-85D1-00261894394F.root']
                    )
        )
 
