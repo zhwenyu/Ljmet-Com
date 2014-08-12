@@ -27,9 +27,9 @@ process.CommonCalc.dummy_parameter = cms.string('Dummy parameter value')
 # Stop calculator options
 process.load('LJMet.Com.stopCalc_cfi')
 
-# Wprime calculator options
-process.load('LJMet.Com.wprimeCalc_cfi')
-process.WprimeCalc.isWJets = cms.bool(False)
+# singleLep calculator options
+process.load('LJMet.Com.singleLepCalc_cfi')
+process.singleLepCalc.isWJets = cms.bool(False)
 
 # LjetsTopoCalc options
 process.load('LJMet.Com.ljetsTopoCalcNew_cfi')
@@ -114,25 +114,26 @@ process.event_selector = cms.PSet(
     JECdown                  = cms.bool(False),
     JERup                    = cms.bool(False),
     JERdown                  = cms.bool(False),
-    JEC_txtfile = cms.string(relBase+'/src/LJMet/singletPrime/JEC/Summer13_V5_DATA_UncertaintySources_AK5PF.txt'),
+    JEC_txtfile = cms.string('CMSSW_BASE/src/LJMet/singletPrime/JEC/Summer13_V5_DATA_UncertaintySources_AK5PF.txt'),
     trigger_collection       = cms.InputTag('TriggerResults::HLT'),
     pv_collection            = cms.InputTag('goodOfflinePrimaryVertices'),
     jet_collection           = cms.InputTag('goodPatJetsPFlow'),
     muon_collection          = cms.InputTag('selectedPatMuonsPFlow'),
     electron_collection      = cms.InputTag('selectedPatElectronsPFlow'),
+    tau_collection			 = cms.InputTag('selectedPatTausPFlow'),
     met_collection           = cms.InputTag('patMETsPFlow'),
     type1corrmet_collection  = cms.InputTag('pfType1CorrectedMet'),
 
-    do53xJEC                 = cms.bool(True),
+    do53xJEC                 = cms.bool(False),
 
-    MCL1JetPar               = cms.string(relBase+'/src/LJMet/singletPrime/JEC/Summer13_V4_MC_L1FastJet_AK5PFchs.txt'),
-    MCL2JetPar               = cms.string(relBase+'/src/LJMet/singletPrime/JEC/Summer13_V4_MC_L2Relative_AK5PFchs.txt'),
-    MCL3JetPar               = cms.string(relBase+'/src/LJMet/singletPrime/JEC/Summer13_V4_MC_L3Absolute_AK5PFchs.txt'),
+    MCL1JetPar               = cms.string('CMSSW_BASE/src/LJMet/singletPrime/JEC/Summer13_V4_MC_L1FastJet_AK5PFchs.txt'),
+    MCL2JetPar               = cms.string('CMSSW_BASE/src/LJMet/singletPrime/JEC/Summer13_V4_MC_L2Relative_AK5PFchs.txt'),
+    MCL3JetPar               = cms.string('CMSSW_BASE/src/LJMet/singletPrime/JEC/Summer13_V4_MC_L3Absolute_AK5PFchs.txt'),
 
-    DataL1JetPar             = cms.string(relBase+'/src/LJMet/singletPrime/JEC/Summer13_V4_DATA_L1FastJet_AK5PFchs.txt'),
-    DataL2JetPar             = cms.string(relBase+'/src/LJMet/singletPrime/JEC/Summer13_V4_DATA_L2Relative_AK5PFchs.txt'),
-    DataL3JetPar             = cms.string(relBase+'/src/LJMet/singletPrime/JEC/Summer13_V4_DATA_L3Absolute_AK5PFchs.txt'),
-    DataResJetPar            = cms.string(relBase+'/src/LJMet/singletPrime/JEC/Summer13_V4_DATA_L2L3Residual_AK5PFchs.txt')
+    DataL1JetPar             = cms.string('CMSSW_BASE/src/LJMet/singletPrime/JEC/Summer13_V4_DATA_L1FastJet_AK5PFchs.txt'),
+    DataL2JetPar             = cms.string('CMSSW_BASE/src/LJMet/singletPrime/JEC/Summer13_V4_DATA_L2Relative_AK5PFchs.txt'),
+    DataL3JetPar             = cms.string('CMSSW_BASE/src/LJMet/singletPrime/JEC/Summer13_V4_DATA_L3Absolute_AK5PFchs.txt'),
+    DataResJetPar            = cms.string('CMSSW_BASE/src/LJMet/singletPrime/JEC/Summer13_V4_DATA_L2L3Residual_AK5PFchs.txt')
     )
 
 
@@ -146,9 +147,7 @@ process.inputs = cms.PSet (
            skipEvents = cms.int32(0),
            lumisToProcess = CfgTypes.untracked(CfgTypes.VLuminosityBlockRange()),
            fileNames  = cms.vstring(
-              ['dcache:/pnfs/cms/WAX/11/store/results/B2G/TT_CT10_TuneZ2star_8TeV-powheg-tauola/StoreResults-Summer12_DR53X-PU_S10_START53_V7A-v2_TLBSM_53x_v2-c04f3b4fa7\
-4c8266c913b71e0c74901d/TT_CT10_TuneZ2star_8TeV-powheg-tauola/USER/StoreResults-Summer12_DR53X-PU_S10_START53_V7A-v2_TLBSM_53x_v2-c04f3b4fa74c8266c913b71e0c74901d/0000/00\
-C9DE8B-4C19-E211-BFD3-003048678A7E.root']
+              ['file:///mnt/hadoop/store/results/B2G/TTJets_SemiLeptMGDecays_8TeV-madgraph/StoreResults-Summer12_DR53X-PU_S10_START53_V7A_ext-v1_TLBSM_53x_v3-99bd99199697666ff01397dad5652e9e/TTJets_SemiLeptMGDecays_8TeV-madgraph/USER/StoreResults-Summer12_DR53X-PU_S10_START53_V7A_ext-v1_TLBSM_53x_v3-99bd99199697666ff01397dad5652e9e/0000/00071EA3-C8E9-E211-85D1-00261894394F.root']
                    )
        )
 
@@ -157,7 +156,7 @@ C9DE8B-4C19-E211-BFD3-003048678A7E.root']
 
 # JSON
 if (not process.ljmet.isMc==cms.bool(True)):
-    JsonFile = 'data/json/Cert_190456-202016_8TeV_PromptReco_Collisions12_JSON_MuonPhys.txt'
+    JsonFile = 'CMSSW_BASE/src/LJMet/singletPrime/json/Jan222013ReReco_json.txt'
     myList   = LumiList.LumiList(filename=JsonFile).getCMSSWString().split(',')
     process.inputs.lumisToProcess.extend(myList)
         
