@@ -26,6 +26,5 @@
 <environment>
     <bin name="ljmet" file="ljmet.cc">
         <use name="rootcore"/>
-        <use name="lhapdf"/>
     </bin>
 </environment>
