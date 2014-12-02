@@ -5,7 +5,7 @@
  Author: Gena Kukartsev, 2010,2012
  */
 
-
+#include <math.h>
 
 #include "LJMet/Com/interface/BaseEventSelector.h"
 #include "CondFormats/JetMETObjects/interface/JetCorrectorParameters.h"
@@ -15,17 +15,16 @@ using namespace std;
 
 BaseEventSelector::BaseEventSelector():
 mName(""),
-mLegend(""){
+mLegend("")
+{
 }
 
-
-
-BaseEventSelector::~BaseEventSelector(){
+BaseEventSelector::~BaseEventSelector()
+{
 }
 
-
-
-void BaseEventSelector::BeginJob(std::map<std::string, edm::ParameterSet const > par){
+void BaseEventSelector::BeginJob(std::map<std::string, edm::ParameterSet const > par)
+{
     std::string _key;
     _key = "event_selector";
     bool _missing_config = false;
@@ -244,8 +243,7 @@ double BaseEventSelector::GetPerp(TVector3 & v1, TVector3 & v2){
     double _phi1 = v1.Phi();
     double _phi2 = v2.Phi();
     double _dphi = _phi1 - _phi2;
-    double rPI = TMath::Pi();
-    if (_dphi>rPI || (_dphi>-rPI && _dphi<0)) perp = _mag;
+    if (_dphi>M_PI || (_dphi>-M_PI && _dphi<0)) perp = _mag;
     else perp = -_mag;
     
     return perp;
