@@ -54,8 +54,10 @@ class BaseCalc {
   // LJMET event content setters
   void SetHistogram(std::string name, int nbins, double low, double high);
   void SetHistValue(std::string name, double value);
+    void SetValue(std::string name, bool value);
   void SetValue(std::string name, int value);
   void SetValue(std::string name, double value);
+    void SetValue(std::string name, std::vector<bool> value);
   void SetValue(std::string name, std::vector<int> value);
   void SetValue(std::string name, std::vector<double> value);
   
