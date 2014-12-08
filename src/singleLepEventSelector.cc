@@ -69,12 +69,10 @@ public:
     // main method where the cuts are applied
     virtual bool operator()( edm::EventBase const & event, pat::strbitset & ret);
 
-    // executes after loop over events
-    virtual void EndJob(){}
-  
-
     virtual void AnalyzeEvent( edm::EventBase const & event, LjmetEventContent & ec );
-
+    
+    // executes after loop over events
+    virtual void EndJob();
 
     boost::shared_ptr<PFJetIDSelectionFunctor> const & jetSel()        const { return jetSel_;}
     boost::shared_ptr<PFMuonSelector>          const & muonSel()       const { return muonSel_;}
@@ -84,7 +82,6 @@ public:
     boost::shared_ptr<PVSelector>              const & pvSel()         const { return pvSel_;}
 
 protected:
-
     std::string legend;
     bool bFirstEntry;
 
@@ -133,17 +130,16 @@ private:
 
 static int reg = LjmetFactory::GetInstance()->Register(new singleLepEventSelector(), "singleLepSelector");
 
-
-singleLepEventSelector::singleLepEventSelector(){
+singleLepEventSelector::singleLepEventSelector()
+{
 }
 
-
-singleLepEventSelector::~singleLepEventSelector(){
+singleLepEventSelector::~singleLepEventSelector()
+{
 }
 
-
-void singleLepEventSelector::BeginJob( std::map<std::string, edm::ParameterSet const> par){
-
+void singleLepEventSelector::BeginJob( std::map<std::string, edm::ParameterSet const> par)
+{
     BaseEventSelector::BeginJob(par);
 
     std::string _key;
@@ -281,7 +277,6 @@ void singleLepEventSelector::BeginJob( std::map<std::string, edm::ParameterSet c
         mtPar["electron_collection"]      = par[_key].getParameter<edm::InputTag>("electron_collection");
         mtPar["tau_collection"]           = par[_key].getParameter<edm::InputTag>("tau_collection");
         mtPar["met_collection"]           = par[_key].getParameter<edm::InputTag>("met_collection");
-        mtPar["type1corrmet_collection"]  = par[_key].getParameter<edm::InputTag>("type1corrmet_collection");
 
         mbPar["BTagUncertUp"]             = par[_key].getParameter<bool>         ("BTagUncertUp");
         mbPar["BTagUncertDown"]           = par[_key].getParameter<bool>         ("BTagUncertDown");
@@ -406,13 +401,10 @@ void singleLepEventSelector::BeginJob( std::map<std::string, edm::ParameterSet c
       }
     }
     
-} // initialize() 
+} // end of BeginJob() 
 
-
-
-
-bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strbitset & ret){
-  
+bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strbitset & ret)
+{
     pat::strbitset retMuon           = muonSel_->getBitTemplate();
     pat::strbitset retLooseMuon      = looseMuonSel_->getBitTemplate();
     pat::strbitset retElectron       = electronSel_->getBitTemplate();
@@ -694,8 +686,6 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
         event.getByLabel( mtPar["met_collection"], mhMet );
         mpMet = edm::Ptr<pat::MET>( mhMet, 0);
 
-        event.getByLabel( mtPar["type1corrmet_collection"], mhType1CorrMet );
-        mpType1CorrMet = edm::Ptr<reco::PFMET>( mhType1CorrMet, 0);
         if ( mbPar["met_cuts"] ) {
 
             // pfMet
@@ -1031,10 +1021,8 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
 }// end of operator()
 
 
-
-
-void singleLepEventSelector::AnalyzeEvent( edm::EventBase const & event,
-                                        LjmetEventContent & ec ){
+void singleLepEventSelector::AnalyzeEvent( edm::EventBase const & event, LjmetEventContent & ec )
+{
     //
     // Compute analysis-specific quantities in the event,
     // return via event content
@@ -1046,5 +1034,8 @@ void singleLepEventSelector::AnalyzeEvent( edm::EventBase const & event,
     return;
 }
 
+void singleLepEventSelector::EndJob()
+{
+}
 
 #endif
