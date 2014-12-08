@@ -23,6 +23,7 @@
 <use name="JetMETCorrections/Objects"/>
 <use name="JetMETCorrections/Algorithms"/>
 <use name="CondFormats/JetMETObjects"/>
+<use name="lhapdf"/>
 
 <export>
     <lib name="1"/>
