@@ -1,482 +1,303 @@
 /*
-  Calculator for substructure variables
-  
-  Author: Joshua Swanson, 2014
-*/
-
+ Calculator for substructure variables
+ 
+ Author: Joshua Swanson, 2014
+ */
 
 #include <iostream>
+#include <limits>   // std::numeric_limits
+
 #include "LJMet/Com/interface/BaseCalc.h"
 #include "LJMet/Com/interface/LjmetFactory.h"
 #include "LJMet/Com/interface/LjmetEventContent.h"
-#include "LJMet/Com/interface/Nsubjettiness.hh"
-#include "LJMet/Com/interface/Njettiness.hh"
-#include <fastjet/JetDefinition.hh>
-#include <fastjet/PseudoJet.hh>
 #include "DataFormats/PatCandidates/interface/Jet.h"
-
-
+#include "DataFormats/PatCandidates/interface/PackedCandidate.h"
 #include "DataFormats/JetReco/interface/CATopJetTagInfo.h"
-
-using std::cout;
-using std::endl;
-using namespace fastjet;
 
 class LjmetFactory;
 
-class JetSubCalc : public BaseCalc{
-  
+class JetSubCalc : public BaseCalc {
+    
 public:
-  
-  JetSubCalc();
-  virtual ~JetSubCalc(){}
-  
-  virtual int BeginJob();
-  virtual int AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * selector);
-  virtual int EndJob(){return 0;}
-
+    JetSubCalc();
+    virtual ~JetSubCalc();
+    virtual int BeginJob();
+    virtual int AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * selector);
+    virtual int EndJob();
+    
 private:
-
-  edm::InputTag             CA8TopJetColl_it;
-  edm::InputTag             CA8HEPTopJetColl_it;
-  edm::InputTag             CA8PrunedJetColl_it;
-  edm::InputTag             CA8JetColl_it;
-  std::string               bDiscriminant;
-  std::string				CA8TopTagInfo;
-
+    edm::InputTag slimmedJetColl_it;
+    edm::InputTag slimmedJetsAK8Coll_it;
+    std::string bDiscriminant;
+    std::string tagInfo;
 };
-
 
 static int reg = LjmetFactory::GetInstance()->Register(new JetSubCalc(), "JetSubCalc");
 
-
-JetSubCalc::JetSubCalc(){
+JetSubCalc::JetSubCalc()
+{
 }
 
-int JetSubCalc::BeginJob(){
-
-  if (mPset.exists("CA8TopJetColl")) CA8TopJetColl_it = mPset.getParameter<edm::InputTag>("CA8TopJetColl");
-  else                               CA8TopJetColl_it = edm::InputTag("goodPatJetsCATopTagPFPacked");
-
-  if (mPset.exists("CA8HEPTopJetColl")) CA8HEPTopJetColl_it = mPset.getParameter<edm::InputTag>("CA8HEPTopJetColl");
-  else                               CA8HEPTopJetColl_it = edm::InputTag("goodPatJetsCAHEPTopTagPFPacked");
-
-  if (mPset.exists("CA8PrunedJetColl")) CA8PrunedJetColl_it = mPset.getParameter<edm::InputTag>("CA8PrunedJetColl");
-  else                                  CA8PrunedJetColl_it = edm::InputTag("goodPatJetsCA8PrunedPFPacked");
-
-  if (mPset.exists("CA8JetColl")) CA8JetColl_it = mPset.getParameter<edm::InputTag>("CA8JetColl");
-  else                            CA8JetColl_it = edm::InputTag("goodPatJetsCA8PF");
-
-  if (mPset.exists("bDiscriminant"))     bDiscriminant = mPset.getParameter<std::string>("bDiscriminant");
-  else                                   bDiscriminant = "combinedSecondaryVertexBJetTags";
-
-  if (mPset.exists("CA8TopTagInfo"))     CA8TopTagInfo = mPset.getParameter<std::string>("CA8TopTagInfo");
-  else                                   CA8TopTagInfo = "CATop";
-
-  return 0;
+JetSubCalc::~JetSubCalc()
+{
 }
 
-int JetSubCalc::AnalyzeEvent(edm::EventBase const & event,
-			       BaseEventSelector * selector){
+int JetSubCalc::BeginJob()
+{
+    if (mPset.exists("slimmedJetColl")) slimmedJetColl_it = mPset.getParameter<edm::InputTag>("slimmedJetColl");
+    else slimmedJetColl_it = edm::InputTag("slimmedJet");
+    
+    if (mPset.exists("slimmedJetsAK8Coll")) slimmedJetsAK8Coll_it = mPset.getParameter<edm::InputTag>("slimmedJetsAK8Coll");
+    else slimmedJetsAK8Coll_it = edm::InputTag("slimmedJetsAK8");
+    
+    if (mPset.exists("bDiscriminant")) bDiscriminant = mPset.getParameter<std::string>("bDiscriminant");
+    else bDiscriminant = "combinedSecondaryVertexBJetTags";
+    
+    if (mPset.exists("tagInfo")) tagInfo = mPset.getParameter<std::string>("tagInfo");
+    else tagInfo = "CATop";
+    
+    return 0;
+}
 
-    //Get HEP Top-tagged jets
-    edm::Handle<std::vector<pat::Jet> > hepTopJets;
-    event.getByLabel(CA8HEPTopJetColl_it, hepTopJets);
-
-    //Four vector
-    std::vector <double> CAHEPTopJetPt;
-    std::vector <double> CAHEPTopJetEta;
-    std::vector <double> CAHEPTopJetPhi;
-    std::vector <double> CAHEPTopJetEnergy;
-
-    std::vector <double> CAHEPTopJetMass;
-
-    std::vector <int> CAHEPTopJetIndex;
-    std::vector <double> CAHEPTopJetCSV;
-    std::vector <int> CAHEPTopJetnDaughters;
-
-    //Daughter four vector and index
-    std::vector <double> CAHEPTopDaughterPt;
-    std::vector <double> CAHEPTopDaughterEta;
-    std::vector <double> CAHEPTopDaughterPhi;
-    std::vector <double> CAHEPTopDaughterEnergy;
-
-    std::vector <int> CAHEPTopDaughterMotherIndex;
-
-	std::vector <int> CAHEPTopCSVLSubJets;
-	std::vector <int> CAHEPTopCSVMSubJets;
-	std::vector <int> CAHEPTopCSVTSubJets;
-
-    for (std::vector<pat::Jet>::const_iterator ijet = hepTopJets->begin(); ijet != hepTopJets->end(); ijet++){
-
-      int index = (int)(ijet-hepTopJets->begin());
-
-	  float subjetCSV = -999.0;
-	  int CSVL = 0;
-	  int CSVM = 0;
-	  int CSVT = 0;
-
-      CAHEPTopJetPt     . push_back(ijet->pt());
-      CAHEPTopJetEta    . push_back(ijet->eta());
-      CAHEPTopJetPhi    . push_back(ijet->phi());
-      CAHEPTopJetEnergy . push_back(ijet->energy());
-
-      CAHEPTopJetMass . push_back(ijet->mass());
-      CAHEPTopJetCSV    . push_back(ijet->bDiscriminator( bDiscriminant ));
-      CAHEPTopJetnDaughters . push_back((int)ijet->numberOfDaughters());
-
-
-      CAHEPTopJetIndex      . push_back(index);
-
-      for (size_t ui = 0; ui < ijet->numberOfDaughters(); ui++){
-		CAHEPTopDaughterPt     . push_back(ijet->daughter(ui)->pt());
-		CAHEPTopDaughterEta    . push_back(ijet->daughter(ui)->eta());
-		CAHEPTopDaughterPhi    . push_back(ijet->daughter(ui)->phi());
-		CAHEPTopDaughterEnergy . push_back(ijet->daughter(ui)->energy());        
-
-		CAHEPTopDaughterMotherIndex . push_back(index);      
-
-		pat::Jet const * subjet = dynamic_cast<pat::Jet const *>(ijet->daughter(ui));
-		subjetCSV = subjet->bDiscriminator(bDiscriminant);
-		if (subjetCSV > 0.244 && ijet->daughter(ui)->pt() > 20){
-			CSVL++;
-		}
-		if (subjetCSV > 0.679 && ijet->daughter(ui)->pt() > 20){
-			CSVM++;
-		}
-		if (subjetCSV > 0.898 && ijet->daughter(ui)->pt() > 20){
-			CSVT++;
-		}	
-      }
-      CAHEPTopCSVLSubJets	. push_back(CSVL);
-      CAHEPTopCSVMSubJets	. push_back(CSVM);
-      CAHEPTopCSVTSubJets	. push_back(CSVT);     
+int JetSubCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * selector)
+{
+    edm::Handle<std::vector<pat::Jet> > theAK8Jets;
+    event.getByLabel(slimmedJetsAK8Coll_it, theAK8Jets);
+    
+    // Four vector
+    std::vector<double> theJetAK8Pt;
+    std::vector<double> theJetAK8Eta;
+    std::vector<double> theJetAK8Phi;
+    std::vector<double> theJetAK8Energy;
+    
+    std::vector<double> theJetAK8Mass;
+    
+    std::vector<int>    theJetAK8Index;
+    std::vector<double> theJetAK8CSV;
+    std::vector<int>    theJetAK8nDaughters;
+    
+    // Daughter four vector and index
+    std::vector<double> theJetAK8DaughterPt;
+    std::vector<double> theJetAK8DaughterEta;
+    std::vector<double> theJetAK8DaughterPhi;
+    std::vector<double> theJetAK8DaughterEnergy;
+    
+    std::vector<int> theJetAK8DaughterMotherIndex;
+    
+    std::vector<int> theJetAK8CSVLSubJets;
+    std::vector<int> theJetAK8CSVMSubJets;
+    std::vector<int> theJetAK8CSVTSubJets;
+    
+    float subjetCSV;
+    int CSVL, CSVM, CSVT;
+    
+    for (std::vector<pat::Jet>::const_iterator ijet = theAK8Jets->begin(); ijet != theAK8Jets->end(); ijet++) {
+        int index = (int)(ijet-theAK8Jets->begin());
+        
+        subjetCSV = -std::numeric_limits<float>::max();
+        CSVL = 0;
+        CSVM = 0;
+        CSVT = 0;
+        
+        theJetAK8Pt.push_back(ijet->pt());
+        theJetAK8Eta.push_back(ijet->eta());
+        theJetAK8Phi.push_back(ijet->phi());
+        theJetAK8Energy.push_back(ijet->energy());
+        
+        theJetAK8Mass.push_back(ijet->mass());
+        theJetAK8CSV.push_back(ijet->bDiscriminator( bDiscriminant ));
+        theJetAK8nDaughters.push_back((int)ijet->numberOfDaughters());
+        
+        theJetAK8Index.push_back(index);
+        
+        for (size_t ui = 0; ui < ijet->numberOfDaughters(); ui++) {
+            theJetAK8DaughterPt.push_back(ijet->daughter(ui)->pt());
+            theJetAK8DaughterEta.push_back(ijet->daughter(ui)->eta());
+            theJetAK8DaughterPhi.push_back(ijet->daughter(ui)->phi());
+            theJetAK8DaughterEnergy.push_back(ijet->daughter(ui)->energy());
+            
+            theJetAK8DaughterMotherIndex.push_back(index);
+            
+            pat::PackedCandidate const * subjet = dynamic_cast<pat::PackedCandidate const *>(ijet->daughter(ui));
+//            subjetCSV = subjet->bDiscriminator(bDiscriminant);
+//            if (subjetCSV > 0.244 && ijet->daughter(ui)->pt() > 20.) {
+//                CSVL++;
+//            }
+//            if (subjetCSV > 0.679 && ijet->daughter(ui)->pt() > 20.){
+//                CSVM++;
+//            }
+//            if (subjetCSV > 0.898 && ijet->daughter(ui)->pt() > 20.){
+//                CSVT++;
+//            }
+        }
+        theJetAK8CSVLSubJets.push_back(CSVL);
+        theJetAK8CSVMSubJets.push_back(CSVM);
+        theJetAK8CSVTSubJets.push_back(CSVT);
     }
-
+    
+    // Four vector
+    SetValue("theJetAK8Pt",     theJetAK8Pt);
+    SetValue("theJetAK8Eta",    theJetAK8Eta);
+    SetValue("theJetAK8Phi",    theJetAK8Phi);
+    SetValue("theJetAK8Energy", theJetAK8Energy);
+    
+    SetValue("theJetAK8Mass",   theJetAK8Mass);
+    
+    SetValue("theJetAK8Index",      theJetAK8Index);
+    SetValue("theJetAK8CSV",        theJetAK8CSV);
+    SetValue("theJetAK8nDaughters", theJetAK8nDaughters);
+    
+    // Daughter four vector and index
+    SetValue("theJetAK8DaughterPt",     theJetAK8DaughterPt);
+    SetValue("theJetAK8DaughterEta",    theJetAK8DaughterEta);
+    SetValue("theJetAK8DaughterPhi",    theJetAK8DaughterPhi);
+    SetValue("theJetAK8DaughterEnergy", theJetAK8DaughterEnergy);
+    
+    SetValue("theJetAK8DaughterMotherIndex", theJetAK8DaughterMotherIndex);
+    
+    SetValue("theJetAK8CSVLSubJets", theJetAK8CSVLSubJets);
+    SetValue("theJetAK8CSVMSubJets", theJetAK8CSVMSubJets);
+    SetValue("theJetAK8CSVTSubJets", theJetAK8CSVTSubJets);
+    
+    edm::Handle<std::vector<pat::Jet> > theJets;
+    event.getByLabel(slimmedJetColl_it, theJets);
+    
     //Four vector
-    SetValue("CAHEPTopJetPt"     , CAHEPTopJetPt);
-    SetValue("CAHEPTopJetEta"    , CAHEPTopJetEta);
-    SetValue("CAHEPTopJetPhi"    , CAHEPTopJetPhi);
-    SetValue("CAHEPTopJetEnergy" , CAHEPTopJetEnergy);
-
-    SetValue("CAHEPTopJetMass" , CAHEPTopJetMass);
-    SetValue("CAHEPTopJetCSV"    , CAHEPTopJetCSV);
-    SetValue("CAHEPTopJetnDaughters" , CAHEPTopJetnDaughters);
-
-    SetValue("CAHEPTopJetIndex"      , CAHEPTopJetIndex);
-
-    //Daughter four vector and index
-    SetValue("CAHEPTopDaughterPt"     , CAHEPTopDaughterPt);
-    SetValue("CAHEPTopDaughterEta"    , CAHEPTopDaughterEta);
-    SetValue("CAHEPTopDaughterPhi"    , CAHEPTopDaughterPhi);
-    SetValue("CAHEPTopDaughterEnergy" , CAHEPTopDaughterEnergy);
-
-    SetValue("CAHEPTopDaughterMotherIndex"      , CAHEPTopDaughterMotherIndex);
-
-	SetValue("CAHEPTopCSVLSubJets"      , CAHEPTopCSVLSubJets);
-	SetValue("CAHEPTopCSVMSubJets"      , CAHEPTopCSVMSubJets);
-	SetValue("CAHEPTopCSVTSubJets"      , CAHEPTopCSVTSubJets);
-	 
- 
-    //Get Top-like jets
-    edm::Handle<std::vector<pat::Jet> > topJets;
-    event.getByLabel(CA8TopJetColl_it, topJets);
-
-    //Four vector
-    std::vector <double> CATopJetPt;
-    std::vector <double> CATopJetEta;
-    std::vector <double> CATopJetPhi;
-    std::vector <double> CATopJetEnergy;
-
-    std::vector <double> CATopJetCSV;
-    //std::vector <double> CATopJetRCN;
-
+    std::vector<double> theJetPt;
+    std::vector<double> theJetEta;
+    std::vector<double> theJetPhi;
+    std::vector<double> theJetEnergy;
+    
+    std::vector<double> theJetCSV;
+    //std::vector<double> theJetRCN;
+    
     //Identity
-    std::vector <int> CATopJetIndex;
-    std::vector <int> CATopJetnDaughters;
-
+    std::vector<int> theJetIndex;
+    std::vector<int> theJetnDaughters;
+    
     //Top-like properties
-    std::vector <double> CATopJetTopMass;
-    std::vector <double> CATopJetMinPairMass;
-
-    //Daughter four vector and index
-    std::vector <double> CATopDaughterPt;
-    std::vector <double> CATopDaughterEta;
-    std::vector <double> CATopDaughterPhi;
-    std::vector <double> CATopDaughterEnergy;
-
-    std::vector <int> CATopDaughterMotherIndex;
-
-	std::vector <int> CATopCSVLSubJets;
-	std::vector <int> CATopCSVMSubJets;
-	std::vector <int> CATopCSVTSubJets;
-
-    for (std::vector<pat::Jet>::const_iterator ijet = topJets->begin(); ijet != topJets->end(); ijet++){
-
-      int index = (int)(ijet-topJets->begin());
-
-	  float subjetCSV = -999.0;
-	  int CSVL = 0;
-	  int CSVM = 0;
-	  int CSVT = 0;
-
-      CATopJetPt     . push_back(ijet->pt());
-      CATopJetEta    . push_back(ijet->eta());
-      CATopJetPhi    . push_back(ijet->phi());
-      CATopJetEnergy . push_back(ijet->energy());
-
-      CATopJetCSV    . push_back(ijet->bDiscriminator( bDiscriminant ));
-      //CATopJetRCN    . push_back((ijet->chargedEmEnergy()+ijet->chargedHadronEnergy()) / (ijet->neutralEmEnergy()+ijet->neutralHadronEnergy()));    
-
-      CATopJetIndex      . push_back(index);
-      CATopJetnDaughters . push_back((int)ijet->numberOfDaughters());
-
-      reco::CATopJetTagInfo* jetInfo = (reco::CATopJetTagInfo*) ijet->tagInfo( CA8TopTagInfo );
-
-      CATopJetTopMass     . push_back(jetInfo->properties().topMass);
-      CATopJetMinPairMass . push_back(jetInfo->properties().minMass);
-
-      for (size_t ui = 0; ui < ijet->numberOfDaughters(); ui++){
-		CATopDaughterPt     . push_back(ijet->daughter(ui)->pt());
-		CATopDaughterEta    . push_back(ijet->daughter(ui)->eta());
-		CATopDaughterPhi    . push_back(ijet->daughter(ui)->phi());
-		CATopDaughterEnergy . push_back(ijet->daughter(ui)->energy());        
-
-		CATopDaughterMotherIndex . push_back(index);      
-
-		pat::Jet const * subjet = dynamic_cast<pat::Jet const *>(ijet->daughter(ui));
-		subjetCSV = subjet->bDiscriminator(bDiscriminant);
-		if (subjetCSV > 0.244 && ijet->daughter(ui)->pt() > 20){
-			CSVL++;
-		}
-		if (subjetCSV > 0.679 && ijet->daughter(ui)->pt() > 20){
-			CSVM++;
-		}
-		if (subjetCSV > 0.898 && ijet->daughter(ui)->pt() > 20){
-			CSVT++;
-		}
-      }
-      CATopCSVLSubJets	. push_back(CSVL);
-      CATopCSVMSubJets	. push_back(CSVM);
-      CATopCSVTSubJets	. push_back(CSVT);
-    }
-
-    //Four vector
-    SetValue("CATopJetPt"     , CATopJetPt);
-    SetValue("CATopJetEta"    , CATopJetEta);
-    SetValue("CATopJetPhi"    , CATopJetPhi);
-    SetValue("CATopJetEnergy" , CATopJetEnergy);
-
-    SetValue("CATopJetCSV"    , CATopJetCSV);
-    //SetValue("CATopJetRCN"    , CATopJetRCN);
-
-    //Identity
-    SetValue("CATopJetIndex"      , CATopJetIndex);
-    SetValue("CATopJetnDaughters" , CATopJetnDaughters);
-
-    //Properties
-    SetValue("CATopJetTopMass"     , CATopJetTopMass);
-    SetValue("CATopJetMinPairMass" , CATopJetMinPairMass);
-
-    //Daughter four vector and index
-    SetValue("CATopDaughterPt"     , CATopDaughterPt);
-    SetValue("CATopDaughterEta"    , CATopDaughterEta);
-    SetValue("CATopDaughterPhi"    , CATopDaughterPhi);
-    SetValue("CATopDaughterEnergy" , CATopDaughterEnergy);
-
-    SetValue("CATopDaughterMotherIndex"      , CATopDaughterMotherIndex);
-
-	SetValue("CATopCSVLSubJets"      , CATopCSVLSubJets);
-	SetValue("CATopCSVMSubJets"      , CATopCSVMSubJets);
-	SetValue("CATopCSVTSubJets"      , CATopCSVTSubJets);
-
-    //Get CA8 jets for W's
-    edm::Handle<std::vector<pat::Jet> > CAWJets;
-    event.getByLabel(CA8PrunedJetColl_it, CAWJets);
-
-    //Four vector
-    std::vector <double> CAWJetPt;
-    std::vector <double> CAWJetEta;
-    std::vector <double> CAWJetPhi;
-    std::vector <double> CAWJetEnergy;
-
-    std::vector <double> CAWJetCSV;
-    //std::vector <double> CAWJetRCN;
-
-    //Identity
-    std::vector <int> CAWJetIndex;
-    std::vector <int> CAWJetnDaughters;
-
-    //Mass
-    std::vector <double> CAWJetMass;
-
-    //Daughter four vector and index
-    std::vector <double> CAWDaughterPt;
-    std::vector <double> CAWDaughterEta;
-    std::vector <double> CAWDaughterPhi;
-    std::vector <double> CAWDaughterEnergy;
-
-    std::vector <int> CAWDaughterMotherIndex;
-
-	std::vector <int> CAWCSVLSubJets;
-	std::vector <int> CAWCSVMSubJets;
-	std::vector <int> CAWCSVTSubJets;
-	
-//     
-    for (std::vector<pat::Jet>::const_iterator ijet = CAWJets->begin(); ijet != CAWJets->end(); ijet++){
-
-      int index = (int)(ijet-CAWJets->begin());
-
-	  float subjetCSV = -999.0;
-	  int CSVL = 0;
-	  int CSVM = 0;
-	  int CSVT = 0;
-
-      //Four vector
-      CAWJetPt     . push_back(ijet->pt());
-      CAWJetEta    . push_back(ijet->eta());
-      CAWJetPhi    . push_back(ijet->phi());
-      CAWJetEnergy . push_back(ijet->energy());        
-
-      CAWJetCSV    . push_back(ijet->bDiscriminator( bDiscriminant ));
-      //CAWJetRCN    . push_back((ijet->chargedEmEnergy()+ijet->chargedHadronEnergy()) / (ijet->neutralEmEnergy()+ijet->neutralHadronEnergy()));    
-
-      //Identity
-      CAWJetIndex      . push_back(index);
-      CAWJetnDaughters . push_back((int)ijet->numberOfDaughters());
-
-      //Mass
-      CAWJetMass . push_back(ijet->mass());
-
-      for (size_t ui = 0; ui < ijet->numberOfDaughters(); ui++){
-		CAWDaughterPt     . push_back(ijet->daughter(ui)->pt());
-		CAWDaughterEta    . push_back(ijet->daughter(ui)->eta());
-		CAWDaughterPhi    . push_back(ijet->daughter(ui)->phi());
-		CAWDaughterEnergy . push_back(ijet->daughter(ui)->energy());        
-
-		CAWDaughterMotherIndex . push_back(index);      
-		
-		pat::Jet const * subjet = dynamic_cast<pat::Jet const *>(ijet->daughter(ui));
-		subjetCSV = subjet->bDiscriminator(bDiscriminant);
-		if (subjetCSV > 0.244 && ijet->daughter(ui)->pt() > 20){
-			CSVL++;
-		}
-		if (subjetCSV > 0.679 && ijet->daughter(ui)->pt() > 20){
-			CSVM++;
-		}
-		if (subjetCSV > 0.898 && ijet->daughter(ui)->pt() > 20){
-			CSVT++;
-		}		
-      }
-      CAWCSVLSubJets	. push_back(CSVL);
-      CAWCSVMSubJets	. push_back(CSVM);
-      CAWCSVTSubJets	. push_back(CSVT);
-	}
-
-    //Four vector
-    SetValue("CAWJetPt"     , CAWJetPt);
-    SetValue("CAWJetEta"    , CAWJetEta);
-    SetValue("CAWJetPhi"    , CAWJetPhi);
-    SetValue("CAWJetEnergy" , CAWJetEnergy);
-
-    SetValue("CAWJetCSV"    , CAWJetCSV);
-    //SetValue("CAWJetRCN"    , CAWJetRCN);
-
-    //Identity
-    SetValue("CAWJetIndex"      , CAWJetIndex);
-    SetValue("CAWJetnDaughters" , CAWJetnDaughters);
-
-    //Mass
-    SetValue("CAWJetMass"     , CAWJetMass);
-
-    //Daughter four vector and index
-    SetValue("CAWDaughterPt"     , CAWDaughterPt);
-    SetValue("CAWDaughterEta"    , CAWDaughterEta);
-    SetValue("CAWDaughterPhi"    , CAWDaughterPhi);
-    SetValue("CAWDaughterEnergy" , CAWDaughterEnergy);
-
-    SetValue("CAWDaughterMotherIndex" , CAWDaughterMotherIndex);
-
-	SetValue("CAWCSVLSubJets"      , CAWCSVLSubJets);
-	SetValue("CAWCSVMSubJets"      , CAWCSVMSubJets);
-	SetValue("CAWCSVTSubJets"      , CAWCSVTSubJets);
-	
-	
-    //Get all CA8 jets (not just for W and Top)
-    edm::Handle<std::vector<pat::Jet> > CA8Jets;
-    event.getByLabel(CA8JetColl_it, CA8Jets);
-
-    //Four vector
-    std::vector <double> CA8JetPt;
-    std::vector <double> CA8JetEta;
-    std::vector <double> CA8JetPhi;
-    std::vector <double> CA8JetEnergy;
-    std::vector <double> CA8JetMass;
-
-    std::vector <double> CA8JetCSV;
-    //std::vector <double> CA8JetRCN;
-    std::vector <double> CA8Tau1;
-    std::vector <double> CA8Tau2;
-    std::vector <double> CA8Tau3;
-    std::vector <double> CA8Tau4;
-    std::vector <double> CA8Tau21;
+    std::vector<double> theJetTopMass;
+    std::vector<double> theJetMinPairMass;
+    std::vector<bool> theJetIsTopTagged;
     
-
-
-  	// ---------------------------------------------------------------------------------------------------------
-  	// Setup Nsubjettiness
-  	// ---------------------------------------------------------------------------------------------------------
-
-  	Nsubjettiness Nsubonepass1(1, Njettiness::AxesMode::onepass_kt_axes, 1.0, 0.8);
-  	Nsubjettiness Nsubonepass2(2, Njettiness::AxesMode::onepass_kt_axes, 1.0, 0.8);
-  	Nsubjettiness Nsubonepass3(3, Njettiness::AxesMode::onepass_kt_axes, 1.0, 0.8);
-  	Nsubjettiness Nsubonepass4(4, Njettiness::AxesMode::onepass_kt_axes, 1.0, 0.8);
-
-    for (std::vector<pat::Jet>::const_iterator ijet = CA8Jets->begin(); ijet != CA8Jets->end(); ijet++){
-
-      //Four vector
-      CA8JetPt     . push_back(ijet->pt());
-      CA8JetEta    . push_back(ijet->eta());
-      CA8JetPhi    . push_back(ijet->phi());
-      CA8JetEnergy . push_back(ijet->energy());
-      CA8JetMass   . push_back(ijet->mass());
-
-      CA8JetCSV    . push_back(ijet->bDiscriminator( bDiscriminant ));
-      //CA8JetRCN    . push_back((ijet->chargedEmEnergy()+ijet->chargedHadronEnergy()) / (ijet->neutralEmEnergy()+ijet->neutralHadronEnergy()));
-      std::vector<fastjet::PseudoJet> FJparticles;
-      for (unsigned i = 0; i < ijet->numberOfDaughters() ; i++){
-      	const reco::PFCandidate* this_constituent = dynamic_cast<const reco::PFCandidate*>(ijet->daughter(i));
-      	FJparticles.push_back( fastjet::PseudoJet( this_constituent->px(),
-             	this_constituent->py(),
-             	this_constituent->pz(),
-             	this_constituent->energy() ) );
-      }
-	  
-	  fastjet::PseudoJet combJet = fastjet::join(FJparticles);
-
-	  CA8Tau1.push_back( Nsubonepass1.result(combJet) );
-      CA8Tau2.push_back( Nsubonepass2.result(combJet) );
-      CA8Tau3.push_back( Nsubonepass3.result(combJet) );
-      CA8Tau4.push_back( Nsubonepass4.result(combJet) );
-      CA8Tau21.push_back( Nsubonepass2.result(combJet) / Nsubonepass1.result(combJet) );
+    //Daughter four vector and index
+    std::vector<double> theJetDaughterPt;
+    std::vector<double> theJetDaughterEta;
+    std::vector<double> theJetDaughterPhi;
+    std::vector<double> theJetDaughterEnergy;
     
+    std::vector<int> theJetDaughterMotherIndex;
+    
+    std::vector<int> theJetCSVLSubJets;
+    std::vector<int> theJetCSVMSubJets;
+    std::vector<int> theJetCSVTSubJets;
+
+    bool topTagged;
+    double topMass, minMass;
+    int nSubJets;
+
+    for (std::vector<pat::Jet>::const_iterator ijet = theJets->begin(); ijet != theJets->end(); ijet++){
+        int index = (int)(ijet-theJets->begin());
+        
+        subjetCSV = -std::numeric_limits<float>::max();
+        CSVL = 0;
+        CSVM = 0;
+        CSVT = 0;
+        
+        theJetPt.push_back(ijet->pt());
+        theJetEta.push_back(ijet->eta());
+        theJetPhi.push_back(ijet->phi());
+        theJetEnergy.push_back(ijet->energy());
+        
+        theJetCSV.push_back(ijet->bDiscriminator( bDiscriminant ));
+        //theJetRCN.push_back((ijet->chargedEmEnergy()+ijet->chargedHadronEnergy()) / (ijet->neutralEmEnergy()+ijet->neutralHadronEnergy()));
+        
+        theJetIndex.push_back(index);
+        theJetnDaughters.push_back((int)ijet->numberOfDaughters());
+        
+//        reco::CATopJetTagInfo* jetInfo = (reco::CATopJetTagInfo*) ijet->tagInfo( tagInfo );
+        reco::CATopJetTagInfo const * jetInfo = dynamic_cast<reco::CATopJetTagInfo const *>( ijet->tagInfo("caTop"));
+        
+        topTagged = false;
+        topMass   = -std::numeric_limits<double>::max();
+        minMass   = -std::numeric_limits<double>::max();
+        nSubJets  = std::numeric_limits<int>::min();
+        
+        if ( jetInfo != 0 ) {
+            topMass = jetInfo->properties().topMass;
+            minMass = jetInfo->properties().minMass;
+            nSubJets = jetInfo->properties().nSubJets;
+            std::cout << topMass << '\t' << minMass << '\t' << nSubJets << std::endl;
+            
+            if ( nSubJets > 2 && minMass > 50.0 && topMass > 150.0 ) {
+                topTagged = true;
+            }
+        }
+        
+        theJetTopMass.push_back(topMass);
+        theJetMinPairMass.push_back(minMass);
+        theJetIsTopTagged.push_back(topTagged);
+        
+        for (size_t ui = 0; ui < ijet->numberOfDaughters(); ui++){
+            theJetDaughterPt . push_back(ijet->daughter(ui)->pt());
+            theJetDaughterEta . push_back(ijet->daughter(ui)->eta());
+            theJetDaughterPhi . push_back(ijet->daughter(ui)->phi());
+            theJetDaughterEnergy . push_back(ijet->daughter(ui)->energy());
+            
+            theJetDaughterMotherIndex . push_back(index);
+            pat::PackedCandidate const * subjet = dynamic_cast<pat::PackedCandidate const *>(ijet->daughter(ui));
+
+//            pat::Jet const * subjet = dynamic_cast<pat::Jet const *>(ijet->daughter(ui));
+//            subjetCSV = subjet->bDiscriminator(bDiscriminant);
+//            if (subjetCSV > 0.244 && ijet->daughter(ui)->pt() > 20.) {
+//                CSVL++;
+//            }
+//            if (subjetCSV > 0.679 && ijet->daughter(ui)->pt() > 20.) {
+//                CSVM++;
+//            }
+//            if (subjetCSV > 0.898 && ijet->daughter(ui)->pt() > 20.) {
+//                CSVT++;
+//            }
+        }
+        theJetCSVLSubJets.push_back(CSVL);
+        theJetCSVMSubJets.push_back(CSVM);
+        theJetCSVTSubJets.push_back(CSVT);
     }
+    
+    // Four vector
+    SetValue("theJetPt",     theJetPt);
+    SetValue("theJetEta",    theJetEta);
+    SetValue("theJetPhi",    theJetPhi);
+    SetValue("theJetEnergy", theJetEnergy);
+    
+    SetValue("theJetCSV",    theJetCSV);
+    //SetValue("theJetRCN",  theJetRCN);
+    
+    // Identity
+    SetValue("theJetIndex",      theJetIndex);
+    SetValue("theJetnDaughters", theJetnDaughters);
+    
+    // Properties
+    SetValue("theJetTopMass",     theJetTopMass);
+    SetValue("theJetMinPairMass", theJetMinPairMass);
+    SetValue("theJetIsTopTagged", theJetIsTopTagged);
+    
+    // Daughter four vector and index
+    SetValue("theJetDaughterPt",     theJetDaughterPt);
+    SetValue("theJetDaughterEta",    theJetDaughterEta);
+    SetValue("theJetDaughterPhi",    theJetDaughterPhi);
+    SetValue("theJetDaughterEnergy", theJetDaughterEnergy);
+    
+    SetValue("theJetDaughterMotherIndex", theJetDaughterMotherIndex);
+    
+    SetValue("theJetCSVLSubJets", theJetCSVLSubJets);
+    SetValue("theJetCSVMSubJets", theJetCSVMSubJets);
+    SetValue("theJetCSVTSubJets", theJetCSVTSubJets);
+    
+    return 0;
+}
 
-    //Four vector
-    SetValue("CA8JetPt"     , CA8JetPt);
-    SetValue("CA8JetEta"    , CA8JetEta);
-    SetValue("CA8JetPhi"    , CA8JetPhi);
-    SetValue("CA8JetEnergy" , CA8JetEnergy);
-    SetValue("CA8JetMass"	, CA8JetMass);
-
-    SetValue("CA8JetCSV"    , CA8JetCSV);
-    //SetValue("CA8JetRCN"    , CA8JetRCN);
-    SetValue("CA8Tau1" , CA8Tau1);
-    SetValue("CA8Tau2" , CA8Tau2);
-    SetValue("CA8Tau3" , CA8Tau3);
-    SetValue("CA8Tau4" , CA8Tau4);
-    SetValue("CA8Tau21", CA8Tau21);
-
-  	return 0;
-
+int JetSubCalc::EndJob()
+{
+    return 0;
 }
