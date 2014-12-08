@@ -23,14 +23,10 @@
 <use name="JetMETCorrections/Objects"/>
 <use name="JetMETCorrections/Algorithms"/>
 <use name="CondFormats/JetMETObjects"/>
-<use name="fastjet"/>
-#<use name="TopQuarkAnalysis/TopKinFitter"/>
-#<use name="TopQuarkAnalysis/TopHitFit"/>
-#<use name="TopQuarkAnalysis/PatHitFit"/>
-<use   name="lhapdf"/>
+<use name="lhapdf"/>
 
 <export>
-  <lib   name="1"/>
+    <lib name="1"/>
 </export>
-<flags   CXXFLAGS="-g -O0"/>
+<flags CXXFLAGS="-g -O0 -Wno-error=unused-variable -Wno-error=unused-but-set-variable -Wno-error=delete-non-virtual-dtor -Wno-unused-variable -Wno-delete-non-virtual-dtor -Wno-unused-but-set-variable"/>
 

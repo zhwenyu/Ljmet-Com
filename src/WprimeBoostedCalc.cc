@@ -10,6 +10,7 @@
 #include "LJMet/Com/interface/LjmetFactory.h"
 #include "LJMet/Com/interface/LjmetEventContent.h"
 #include "TLorentzVector.h"
+//#include "EGamma/EGammaAnalysisTools/interface/ElectronEffectiveArea.h"
 #include "EgammaAnalysis/ElectronTools/interface/ElectronEffectiveArea.h"
 #include "DataFormats/HLTReco/interface/TriggerEvent.h"
 #include "DataFormats/Common/interface/TriggerResults.h"
@@ -17,23 +18,27 @@
 #include "FWCore/Common/interface/TriggerNames.h"
 #include "DataFormats/Math/interface/deltaR.h"
 #include "DataFormats/VertexReco/interface/Vertex.h"
+//#include "AnalysisDataFormats/TopObjects/interface/CATopJetTagInfo.h"
+#include "DataFormats/JetReco/interface/CATopJetTagInfo.h"
 
 typedef math::XYZPoint Point;
+
+using namespace std;
 
 class LjmetFactory;
 
 
-class WprimeCalc : public BaseCalc{
+class WprimeBoostedCalc : public BaseCalc{
     
 public:
     
-    WprimeCalc();
-    virtual ~WprimeCalc(){}
+    WprimeBoostedCalc();
+    virtual ~WprimeBoostedCalc(){}
     
     virtual int BeginJob(){
         
         if (mPset.exists("triggerSummary")) triggerSummary_ = mPset.getParameter<edm::InputTag>("triggerSummary");
-        else                                triggerSummary_ = edm::InputTag("hltTriggerSummaryAOD");
+        else                                triggerSummary_ = edm::InputTag("selectedPatTrigger");
         
         if (mPset.exists("triggerCollection")) triggerCollection_ = mPset.getParameter<edm::InputTag>("triggerCollection");
         else                                triggerCollection_ = edm::InputTag("TriggerResults::HLT");
@@ -51,6 +56,8 @@ public:
         if (mPset.exists("isWJets")) isWJets_ = mPset.getParameter<bool>("isWJets");
         else                         isWJets_ = false;
         
+        if (mPset.exists("btagger")) btagger_ = mPset.getParameter<std::string>("btagger");
+        else                         btagger_ = "slimmedSecondaryVertices";
         
         
         return 0;
@@ -68,20 +75,21 @@ private:
     bool isWJets_;
     bool isTB_;
     bool isTT_;
-    
+    std::string btagger_;
+    static bool my_compare(math::XYZTLorentzVector i, math::XYZTLorentzVector j){return i.Pt() > j.Pt();}
 };
 
 
 
-//static int reg = LjmetFactory::GetInstance()->Register(new WprimeCalc(), "WprimeCalc");
+static int reg = LjmetFactory::GetInstance()->Register(new WprimeBoostedCalc(), "WprimeBoostedCalc");
 
 
 
-WprimeCalc::WprimeCalc(){
+WprimeBoostedCalc::WprimeBoostedCalc(){
 }
 
-int WprimeCalc::AnalyzeEvent(edm::EventBase const & event,
-                             BaseEventSelector * selector){
+int WprimeBoostedCalc::AnalyzeEvent(edm::EventBase const & event,
+                                    BaseEventSelector * selector){
     //
     // compute event variables here
     //
@@ -130,12 +138,12 @@ int WprimeCalc::AnalyzeEvent(edm::EventBase const & event,
     int passTrigEle27v10 = -1;
     int passTrigIsoMu24v13 = -1;
     
-    unsigned int _tElMCIndex = trigNames.triggerIndex("HLT_Ele27_WP80_v10");
+    unsigned int _tElMCIndex = trigNames.triggerIndex("HLT_Ele30_CaloIdVT_TrkIdT_PFJet150_PFJet25_v9");
     if ( _tElMCIndex<_tSize){
         passTrigEle27v10 = mhEdmTriggerResults->accept(_tElMCIndex);
     }
     
-    unsigned int _tMuMCIndex = trigNames.triggerIndex("HLT_IsoMu24_eta2p1_v13");
+    unsigned int _tMuMCIndex = trigNames.triggerIndex("HLT_Mu40_eta2p1_v12");
     if ( _tMuMCIndex<_tSize){
         passTrigIsoMu24v13 = mhEdmTriggerResults->accept(_tMuMCIndex);
     }
@@ -149,10 +157,18 @@ int WprimeCalc::AnalyzeEvent(edm::EventBase const & event,
     double _muon_1_eta = -9999.0;
     double _muon_1_RelIso = -9999.0;
     
+    double minDr_mu = 9999.0;
+    int minDr_mu_index = -1;
+    int jet_index_mu=0;
+    double _ptrel_mu = -1.0;
+    
     if (_nSelMuons>0) {
         _muon_1_pt = vSelMuons[0]->pt();
         _muon_1_phi = vSelMuons[0]->phi();
         _muon_1_eta = vSelMuons[0]->eta();
+        
+        TLorentzVector muP4;
+        muP4.SetPtEtaPhiM(_muon_1_pt, _muon_1_eta, _muon_1_phi, 0.105658367);
         
         double chIso = vSelMuons[0]->userIsolation(pat::PfChargedHadronIso);
         double nhIso = vSelMuons[0]->userIsolation(pat::PfNeutralHadronIso);
@@ -160,15 +176,36 @@ int WprimeCalc::AnalyzeEvent(edm::EventBase const & event,
         double puIso = vSelMuons[0]->userIsolation(pat::PfPUChargedHadronIso);
         _muon_1_RelIso = (chIso + std::max(0.,nhIso + gIso - 0.5*puIso))/_muon_1_pt;
         
+        for (unsigned int ijet = 0; ijet<vCorrBtagJets.size(); ijet++) {
+            double deta = vCorrBtagJets[ijet].first.Eta()-vSelMuons[0]->eta();
+            double dphi = vCorrBtagJets[ijet].first.Phi()-vSelMuons[0]->phi();
+            if ( dphi > TMath::Pi() ) dphi -= 2.*TMath::Pi();
+            if ( dphi <= -TMath::Pi() ) dphi += 2.*TMath::Pi();
+            double dR = TMath::Sqrt(deta*deta + dphi*dphi);
+            if (dR<minDr_mu) {
+                minDr_mu = dR;
+                minDr_mu_index=jet_index_mu;
+            }
+            jet_index_mu++;
+        }
+        
+        //std::cout<<"muon px,py,pz,E = "<<muP4.Px()<<", "<<muP4.Py()<<", "<<muP4.Pz()<<", "<<muP4.E()<<", "<<std::endl;
+        TVector3 p_mu(muP4.Px(),muP4.Py(),muP4.Pz());
+        TVector3 p_jet(vCorrBtagJets[minDr_mu_index].first.Px(),vCorrBtagJets[minDr_mu_index].first.Py(),vCorrBtagJets[minDr_mu_index].first.Pz());
+        
+        double sin_alpha = (p_mu.Cross(p_jet)).Mag()/p_mu.Mag()/p_jet.Mag();
+        _ptrel_mu = p_mu.Mag()*sin_alpha;
+        
     }
     
     SetValue("muon_1_pt",_muon_1_pt);
     SetValue("muon_1_phi",_muon_1_phi);
     SetValue("muon_1_eta",_muon_1_eta);
     SetValue("muon_1_RelIso",_muon_1_RelIso);
+    SetValue("muon_1_ptrel", _ptrel_mu);
+    SetValue("muon_1_minDr", minDr_mu);
     
     // Electron
-    
     edm::Handle<double> rhoHandle;
     event.getByLabel(rhoSrc_, rhoHandle);
     double rhoIso = std::max(*(rhoHandle.product()), 0.0);
@@ -191,10 +228,18 @@ int WprimeCalc::AnalyzeEvent(edm::EventBase const & event,
     
     SetValue("nPATElectrons",(int)vSelElectrons.size());
     
+    double minDr_el = 9999.0;
+    int minDr_el_index = -1;
+    int jet_index_el=0;
+    double _ptrel_el = -1.0;
+    
     if (_nSelElectrons>0) {
         _electron_1_pt = vSelElectrons[0]->ecalDrivenMomentum().pt();
         _electron_1_phi = vSelElectrons[0]->phi();
         _electron_1_eta = vSelElectrons[0]->eta();
+        
+        TLorentzVector elP4;
+        elP4.SetPtEtaPhiM(_electron_1_pt,_electron_1_eta,_electron_1_phi,0.00051099891);
         
         double AEff  = ElectronEffectiveArea::GetElectronEffectiveArea(ElectronEffectiveArea::kEleGammaAndNeutralHadronIso03, vSelElectrons[0]->superCluster()->eta(), ElectronEffectiveArea::kEleEAData2012);
         double chIso = vSelElectrons[0]->chargedHadronIso();
@@ -214,12 +259,34 @@ int WprimeCalc::AnalyzeEvent(edm::EventBase const & event,
         _electron_1_mHits   =  vSelElectrons[0]->gsfTrack()->hitPattern().numberOfHits(reco::HitPattern::MISSING_INNER_HITS);
         _electron_1_vtxFitConv = vSelElectrons[0]->passConversionVeto();
         
+        for (unsigned int ijet = 0; ijet<vCorrBtagJets.size(); ijet++) {
+            double deta = vCorrBtagJets[ijet].first.Eta()-vSelElectrons[0]->eta();
+            double dphi = vCorrBtagJets[ijet].first.Phi()-vSelElectrons[0]->phi();
+            if ( dphi > TMath::Pi() ) dphi -= 2.*TMath::Pi();
+            if ( dphi <= -TMath::Pi() ) dphi += 2.*TMath::Pi();
+            double dR = TMath::Sqrt(deta*deta + dphi*dphi);
+            if (dR<minDr_el) {
+                minDr_el = dR;
+                minDr_el_index=jet_index_el;
+            }
+            jet_index_el++;
+        }
+        
+        //std::cout<<"electron px,py,pz,E = "<<elP4.Px()<<", "<<elP4.Py()<<", "<<elP4.Pz()<<", "<<elP4.E()<<", "<<std::endl;
+        TVector3 p_el(elP4.Px(),elP4.Py(),elP4.Pz());
+        TVector3 p_jet(vCorrBtagJets[minDr_el_index].first.Px(),vCorrBtagJets[minDr_el_index].first.Py(),vCorrBtagJets[minDr_el_index].first.Pz());
+        
+        double sin_alpha = (p_el.Cross(p_jet)).Mag()/p_el.Mag()/p_jet.Mag();
+        _ptrel_el = p_el.Mag()*sin_alpha;
+        
     }
     
     SetValue("elec_1_pt", _electron_1_pt);
     SetValue("elec_1_phi", _electron_1_phi);
     SetValue("elec_1_eta", _electron_1_eta);
     SetValue("elec_1_RelIso", _electron_1_RelIso);
+    SetValue("elec_1_ptrel", _ptrel_el);
+    SetValue("elec_1_minDr", minDr_el);
     
     /*
      SetValue("elec_1_Deta", _electron_1_Deta);
@@ -258,32 +325,33 @@ int WprimeCalc::AnalyzeEvent(edm::EventBase const & event,
     SetValue("elec_2_RelIso", _electron_2_RelIso);
     
     // Trigger Matching
-    //    edm::Handle<trigger::TriggerEvent> mhEdmTriggerEvent;
-    //    event.getByLabel(triggerSummary_,mhEdmTriggerEvent);
-    //    trigger::TriggerObjectCollection allObjects = mhEdmTriggerEvent->getObjects();
+    edm::Handle<pat::TriggerObjectStandAloneCollection> mhEdmTriggerObjectColl;
+    event.getByLabel(triggerSummary_,mhEdmTriggerObjectColl);
+    
+    const edm::TriggerNames &names = event.triggerNames(*mhEdmTriggerResults);
     
     int _electron_1_hltmatched =0;
     int _electron_2_hltmatched =0;
-    /*
-     if (_nSelElectrons>0) {
-     for(int i=0; i<mhEdmTriggerEvent->sizeFilters(); i++){
-     if( mhEdmTriggerEvent->filterTag(i).label()!="hltEle27WP80TrackIsoFilter") continue;
-     trigger::Keys keys = mhEdmTriggerEvent->filterKeys(i);
-     double dR1 = 999.0;
-     double dR2 = 999.0;
-     for(size_t j=0; j<keys.size(); j++){
-     dR1=deltaR(allObjects[keys[j]].eta(),allObjects[keys[j]].phi(),_electron_1_eta,_electron_1_phi);
-     if (_nSelElectrons>1) dR2=deltaR(allObjects[keys[j]].eta(),allObjects[keys[j]].phi(),_electron_2_eta,_electron_2_phi);
-     if ( (dR1 < 0.5) || (dR2 < 0.5) ) {
-	    if (dR1 < 0.5 && dR2 < 0.5 && dR1<dR2 ) _electron_1_hltmatched = 1;
-	    else if (dR1 < 0.5 && dR2 < 0.5 && dR2<dR1 ) _electron_2_hltmatched = 1;
-	    else if (dR1 < 0.5 && dR2 >= 0.5 ) _electron_1_hltmatched =1;
-	    else if (dR2 < 0.5 && dR1 >= 0.5 ) _electron_2_hltmatched =1;
-     }
-     }
-     }
-     }
-     */
+    
+    if (_nSelElectrons>0) {
+        for(pat::TriggerObjectStandAlone obj : *mhEdmTriggerObjectColl){
+            obj.unpackPathNames(names);
+            double dR1 = 999.0;
+            double dR2 = 999.0;
+            for(unsigned h = 0; h < obj.filterLabels().size(); ++h){
+                if( obj.filterLabels()[h]!="hltEle30CaloIdVTTrkIdTDphiFilter") continue;
+                dR1=deltaR(obj.eta(),obj.phi(),_electron_1_eta,_electron_1_phi);
+                if (_nSelElectrons>1) dR2=deltaR(obj.eta(),obj.phi(),_electron_2_eta,_electron_2_phi);
+                if ( (dR1 < 0.5) || (dR2 < 0.5) ) {
+                    if (dR1 < 0.5 && dR2 < 0.5 && dR1<dR2 ) _electron_1_hltmatched = 1;
+                    else if (dR1 < 0.5 && dR2 < 0.5 && dR2<dR1 ) _electron_2_hltmatched = 1;
+                    else if (dR1 < 0.5 && dR2 >= 0.5 ) _electron_1_hltmatched =1;
+                    else if (dR2 < 0.5 && dR1 >= 0.5 ) _electron_2_hltmatched =1;
+                }
+            }
+        }
+    }
+    
     SetValue("electron_1_hltmatched",_electron_1_hltmatched);
     SetValue("electron_2_hltmatched",_electron_2_hltmatched);
     
@@ -471,6 +539,14 @@ int WprimeCalc::AnalyzeEvent(edm::EventBase const & event,
     int _jet_8_flavor = -999;
     int _jet_9_flavor = -999;
     
+    Double_t _jet_0_discrim = -999.;
+    Double_t _jet_1_discrim = -999.;
+    Double_t _jet_2_discrim = -999.;
+    Double_t _jet_3_discrim = -999.;
+    Double_t _jet_4_discrim = -999.;
+    Double_t _jet_5_discrim = -999.;
+    Double_t _jet_6_discrim = -999.;
+    
     if (_nSelJets>0) _jet_0_flavor = abs(vSelJets[0]->partonFlavour());
     if (_nSelJets>1) _jet_1_flavor = abs(vSelJets[1]->partonFlavour());
     if (_nSelJets>2) _jet_2_flavor = abs(vSelJets[2]->partonFlavour());
@@ -482,6 +558,14 @@ int WprimeCalc::AnalyzeEvent(edm::EventBase const & event,
     if (_nSelJets>8) _jet_8_flavor = abs(vSelJets[8]->partonFlavour());
     if (_nSelJets>9) _jet_9_flavor = abs(vSelJets[9]->partonFlavour());
     
+    if (_nSelJets>0) _jet_0_discrim = vSelJets[0]->bDiscriminator(btagger_);
+    if (_nSelJets>1) _jet_1_discrim = vSelJets[1]->bDiscriminator(btagger_);
+    if (_nSelJets>2) _jet_2_discrim = vSelJets[2]->bDiscriminator(btagger_);
+    if (_nSelJets>3) _jet_3_discrim = vSelJets[3]->bDiscriminator(btagger_);
+    if (_nSelJets>4) _jet_4_discrim = vSelJets[4]->bDiscriminator(btagger_);
+    if (_nSelJets>5) _jet_5_discrim = vSelJets[5]->bDiscriminator(btagger_);
+    if (_nSelJets>6) _jet_6_discrim = vSelJets[6]->bDiscriminator(btagger_);
+    
     SetValue("jet_0_flavor", _jet_0_flavor);
     SetValue("jet_1_flavor", _jet_1_flavor);
     SetValue("jet_2_flavor", _jet_2_flavor);
@@ -492,6 +576,14 @@ int WprimeCalc::AnalyzeEvent(edm::EventBase const & event,
     SetValue("jet_7_flavor", _jet_7_flavor);
     SetValue("jet_8_flavor", _jet_8_flavor);
     SetValue("jet_9_flavor", _jet_9_flavor);
+    
+    SetValue("jet_0_discrim", _jet_0_discrim);
+    SetValue("jet_1_discrim", _jet_1_discrim);
+    SetValue("jet_2_discrim", _jet_2_discrim);
+    SetValue("jet_3_discrim", _jet_3_discrim);
+    SetValue("jet_4_discrim", _jet_4_discrim);
+    SetValue("jet_5_discrim", _jet_5_discrim);
+    SetValue("jet_6_discrim", _jet_6_discrim);
     
     int nBjets = 0;
     int nCjets = 0;
@@ -519,6 +611,64 @@ int WprimeCalc::AnalyzeEvent(edm::EventBase const & event,
     
     SetValue("n_Bjets", nBjets);
     SetValue("n_Cjets", nCjets);
+    
+    /*  edm::InputTag topJetColl = edm::InputTag("goodPatJetsCATopTagPFPacked");
+     edm::Handle<std::vector<pat::Jet> > topJets;
+     event.getByLabel(topJetColl, topJets);
+     
+     //Four vector
+     std::vector <double> CATopJetPt;
+     std::vector <double> CATopJetEta;
+     std::vector <double> CATopJetPhi;
+     std::vector <double> CATopJetEnergy;
+     
+     //Check
+     std::vector <double> CATopJetTag;
+     
+     //Top-like properties
+     std::vector <double> CATopJetTopMass;
+     std::vector <double> CATopJetMinPairMass;
+     
+     for (std::vector<pat::Jet>::const_iterator ijet = topJets->begin(); ijet != topJets->end(); ijet++){
+     
+     CATopJetPt     . push_back(ijet->pt());
+     CATopJetEta    . push_back(ijet->eta());
+     CATopJetPhi    . push_back(ijet->phi());
+     CATopJetEnergy . push_back(ijet->energy());
+     
+     reco::CATopJetTagInfo* jetInfo = (reco::CATopJetTagInfo*) ijet->tagInfo("CATop");
+     
+     CATopJetTopMass     . push_back(jetInfo->properties().topMass);
+     CATopJetMinPairMass . push_back(jetInfo->properties().minMass);
+     
+     
+     //check if top jet should be tagged
+     //nDaughters>=3, 250>topMass>140, minPairMass>50
+     //should we make a pt cut? (tag efficiencies and tagger should only work for certain pt threshold/ranges)
+     if (ijet->numberOfDaughters()<3 || jetInfo->properties().topMass<140 || jetInfo->properties().topMass>250 || jetInfo->properties().minMass <50) CATopJetTag      . push_back(false);
+     else CATopJetTag . push_back(true);
+     
+     }
+     */
+    //Four vector
+    //SetValue("CATopJetPt"     , CATopJetPt);
+    SetValue("CATopJetPt"     , -1);
+    //SetValue("CATopJetEta"    , CATopJetEta);
+    SetValue("CATopJetEta"     , 9999);
+    //SetValue("CATopJetPhi"    , CATopJetPhi);
+    SetValue("CATopJetPhi"     , 9999);
+    //SetValue("CATopJetEnergy" , CATopJetEnergy);
+    SetValue("CATopJetEnergy"     , -1);
+    
+    //check
+    //SetValue("CATopJetTag"    , CATopJetTag);
+    SetValue("CATopJetTag"     , -1);
+    
+    //Properties
+    //SetValue("CATopJetTopMass"     , CATopJetTopMass);
+    SetValue("CATopJetMass"     , -1);
+    //SetValue("CATopJetMinPairMass" , CATopJetMinPairMass);
+    SetValue("CATopJetMinPairMass"     , -1);
     
     double _weight_WJets = 1.0;
     if (isWJets_) {
@@ -606,6 +756,10 @@ int WprimeCalc::AnalyzeEvent(edm::EventBase const & event,
     double _genTopMass = -1.0;
     double _genTopPt = -1.0;
     double _genDrLeptonTopBjet = -9999.0;
+    double _genDrWprimeBjetJet0 = -9999.0;
+    double _genDrWprimeBjetJet1 = -9999.0;
+    double _genDrTopBjetJet0 = -9999.0;
+    double _genDrTopBjetJet1 = -9999.0;
     double _genWprimeMass = -1.0;
     double _genWprimeBjetPt = -1.0;
     double _genWprimeBjetEta = -1.0;
@@ -613,7 +767,22 @@ int WprimeCalc::AnalyzeEvent(edm::EventBase const & event,
     double _genTopBjetPt = -1.0;
     double _genTopBjetEta = -1.0;
     double _genTopBjetPhi = -1.0;
+    double _genLeptonEta = -1.0;
+    double _genLeptonPhi = -1.0;
+    double _genLeptonPt = -1.0;
     double _genNuPz = -1.0;
+    double _genJet0Pt = -1.0;
+    double _genJet1Pt = -1.0;
+    double _genJet2Pt = -1.0;
+    double _genJet3Pt = -1.0;
+    double _genrecoDRJet0 = 9999.0;
+    double _genrecoDRJet1 = 9999.0;
+    double _genrecoDRJet2 = 9999.0;
+    double _genrecoDRJet3 = 9999.0;
+    double _genrecoPTJet0 = 9999.0;
+    double _genrecoPTJet1 = 9999.0;
+    double _genrecoPTJet2 = 9999.0;
+    double _genrecoPTJet3 = 9999.0;
     
     int _hasGenMu = -1;
     int _hasGenEl = -1;
@@ -622,20 +791,24 @@ int WprimeCalc::AnalyzeEvent(edm::EventBase const & event,
         edm::Handle<reco::GenParticleCollection> genParticles;
         edm::InputTag genParticles_it = edm::InputTag("prunedGenParticles");
         event.getByLabel(genParticles_it, genParticles);
-        edm::Handle<reco::GenParticleCollection> genParticlesPack;
-        edm::InputTag genParticlesPack_it = edm::InputTag("packedGenParticles");
-        event.getByLabel(genParticlesPack_it, genParticlesPack);
+        
+        edm::Handle<reco::GenJetCollection> genJets;
+        edm::InputTag genJets_it = edm::InputTag("slimmedGenJets");
+        event.getByLabel(genJets_it, genJets);
         
         int qLep = 0;
         math::XYZTLorentzVector lv_genLep;
         math::XYZTLorentzVector lv_genNu;
         math::XYZTLorentzVector lv_genB;
         math::XYZTLorentzVector lv_genBbar;
+        std::vector<math::XYZTLorentzVector> lv_genJets;
+        
+        //std::cout << "-----------------Event start-------------------" << std::endl;
         
         for (size_t i = 0; i < genParticles->size(); i++) {
             const reco::GenParticle & p = (*genParticles).at(i);
-            //std::cout << "PDG ID=" << p.pdgId() << ", Status=" << p.status() << ", pT=" << p.pt() << std::endl;
-            if (p.status() != 1) {
+            //std::cout << "Status = " << p.status() << "\tId = " << p.pdgId() << std::endl;
+            if (p.status() == 23 || p.status() == 33) {
                 if (fabs(p.pdgId())==11 or fabs(p.pdgId())==13) {
                     if (fabs(p.pdgId())==11) _hasGenEl = 1;
                     if (fabs(p.pdgId())==13) _hasGenMu = 1;
@@ -647,7 +820,69 @@ int WprimeCalc::AnalyzeEvent(edm::EventBase const & event,
                 if (fabs(p.pdgId())==12 or fabs(p.pdgId())==14) lv_genNu = p.p4();
                 if (p.pdgId()==5) lv_genB = p.p4();
                 if (p.pdgId()==-5) lv_genBbar = p.p4();
+                //std::cout << "genParticle Id=" << p.pdgId() << " , pT=" << p.pt() << " , eta=" << p.eta() << " , phi=" << p.phi() << std::endl;
             }
+            //      if (p.status() == 23 || p.status() == 33 || p.status() == 14 || p.status() == 15 || p.status() == 24 || p.status() == 34 || p.status() == 43 || p.status() == 51 || p.status() == 62 || p.status() == 63 || p.status() == 91) {
+            //        if (fabs(p.pdgId())<=5 || p.pdgId()==9 || p.pdgId()==21) lv_genPartons.push_back(p.p4());
+            //      }
+        }
+        for (size_t j = 0; j < genJets->size(); j++) {
+            const reco::GenJet & je = (*genJets).at(j);
+            //std::cout << "genJet Id=" << je.pdgId() << " , pT=" << je.pt() << " , eta=" << je.eta() << " , phi=" << je.phi() << std::endl;
+            lv_genJets.push_back(je.p4());
+        }
+        /*if (_nSelJets>0) std::cout << "recoJet partonFlavour=" << _jet_0_flavor << " , pT=" << _jet_0_pt << " , eta=" << _jet_0_eta << " , phi=" << _jet_0_phi << std::endl;
+         if (_nSelJets>1) std::cout << "recoJet partonFlavour=" << _jet_1_flavor << " , pT=" << _jet_1_pt << " , eta=" << _jet_1_eta << " , phi=" << _jet_1_phi << std::endl;
+         if (_nSelJets>2) std::cout << "recoJet partonFlavour=" << _jet_2_flavor << " , pT=" << _jet_2_pt << " , eta=" << _jet_2_eta << " , phi=" << _jet_2_phi << std::endl;
+         if (_nSelJets>3) std::cout << "recoJet partonFlavour=" << _jet_3_flavor << " , pT=" << _jet_3_pt << " , eta=" << _jet_3_eta << " , phi=" << _jet_3_phi << std::endl;
+         if (_nSelJets>4) std::cout << "recoJet partonFlavour=" << _jet_4_flavor << " , pT=" << _jet_4_pt << " , eta=" << _jet_4_eta << " , phi=" << _jet_4_phi << std::endl;
+         if (_nSelJets>5) std::cout << "recoJet partonFlavour=" << _jet_5_flavor << " , pT=" << _jet_5_pt << " , eta=" << _jet_5_eta << " , phi=" << _jet_5_phi << std::endl;
+         if (_nSelJets>6) std::cout << "recoJet partonFlavour=" << _jet_6_flavor << " , pT=" << _jet_6_pt << " , eta=" << _jet_6_eta << " , phi=" << _jet_6_phi << std::endl;
+         if (_nSelJets>7) std::cout << "recoJet partonFlavour=" << _jet_7_flavor << " , pT=" << _jet_7_pt << " , eta=" << _jet_7_eta << " , phi=" << _jet_7_phi << std::endl;
+         if (_nSelJets>8) std::cout << "recoJet partonFlavour=" << _jet_8_flavor << " , pT=" << _jet_8_pt << " , eta=" << _jet_8_eta << " , phi=" << _jet_8_phi << std::endl;
+         if (_nSelJets>9) std::cout << "recoJet partonFlavour=" << _jet_9_flavor << " , pT=" << _jet_9_pt << " , eta=" << _jet_9_eta << " , phi=" << _jet_9_phi << std::endl;*/
+        
+        
+        double deta = -999.0;
+        double dphi = -999.0;
+        
+        std::sort(lv_genJets.begin(), lv_genJets.end(), my_compare);
+        
+        if (_nSelJets>0 && lv_genJets.size()>0 ) {
+            _genJet0Pt=lv_genJets[0].Pt();
+            deta = lv_genJets[0].Eta()-_jet_0_eta;
+            dphi = lv_genJets[0].Phi()-_jet_0_phi;
+            if ( dphi > TMath::Pi() ) dphi -= 2.*TMath::Pi();
+            if ( dphi <= -TMath::Pi() ) dphi += 2.*TMath::Pi();
+            _genrecoDRJet0 = TMath::Sqrt(deta*deta + dphi*dphi);
+            _genrecoPTJet0 = _genJet0Pt-_jet_0_pt;
+        }
+        if (_nSelJets>1 && lv_genJets.size()>1 ) {
+            _genJet1Pt=lv_genJets[1].Pt();
+            deta = lv_genJets[1].Eta()-_jet_1_eta;
+            dphi = lv_genJets[1].Phi()-_jet_1_phi;
+            if ( dphi > TMath::Pi() ) dphi -= 2.*TMath::Pi();
+            if ( dphi <= -TMath::Pi() ) dphi += 2.*TMath::Pi();
+            _genrecoDRJet1 = TMath::Sqrt(deta*deta + dphi*dphi);
+            _genrecoPTJet1 = _genJet1Pt-_jet_1_pt;
+        }
+        if (_nSelJets>2 && lv_genJets.size()>2 ) {
+            _genJet2Pt=lv_genJets[2].Pt();
+            deta = lv_genJets[2].Eta()-_jet_0_eta;
+            dphi = lv_genJets[2].Phi()-_jet_0_phi;
+            if ( dphi > TMath::Pi() ) dphi -= 2.*TMath::Pi();
+            if ( dphi <= -TMath::Pi() ) dphi += 2.*TMath::Pi();
+            _genrecoDRJet2 = TMath::Sqrt(deta*deta + dphi*dphi);
+            _genrecoPTJet2 = _genJet2Pt-_jet_2_pt;
+        }
+        if (_nSelJets>3 && lv_genJets.size()>3 ) {
+            _genJet3Pt=lv_genJets[3].Pt();
+            deta = lv_genJets[3].Eta()-_jet_0_eta;
+            dphi = lv_genJets[3].Phi()-_jet_0_phi;
+            if ( dphi > TMath::Pi() ) dphi -= 2.*TMath::Pi();
+            if ( dphi <= -TMath::Pi() ) dphi += 2.*TMath::Pi();
+            _genrecoDRJet3 = TMath::Sqrt(deta*deta + dphi*dphi);
+            _genrecoPTJet3 = _genJet3Pt-_jet_3_pt;
         }
         
         _genNuPz = lv_genNu.Pz();
@@ -676,22 +911,56 @@ int WprimeCalc::AnalyzeEvent(edm::EventBase const & event,
         _genTopBjetPt = (qLep<0?lv_genBbar.Pt():lv_genB.Pt());
         _genTopBjetEta = (qLep<0?lv_genBbar.Eta():lv_genB.Eta());
         _genTopBjetPhi = (qLep<0?lv_genBbar.Phi():lv_genB.Phi());
-        
-        double deta = -999.0;
-        double dphi = -999.0;
+        _genLeptonEta = lv_genLep.Eta();
+        _genLeptonPhi = lv_genLep.Phi();
+        _genLeptonPt = lv_genLep.Pt();
         
         if (qLep<0) {
             deta = lv_genLep.Eta()-lv_genBbar.Eta();
             dphi = lv_genLep.Phi()-lv_genBbar.Phi();
+            //std::cout<<"lepton pt,eta,phi,E = "<<lv_genLep.Pt()<<", "<<lv_genLep.Eta()<<", "<<lv_genLep.Phi()<<", "<<lv_genLep.E()<<", "<<std::endl;
+            //std::cout<<"met pt,eta,phi,E = "<<lv_genNu.Pt()<<", "<<lv_genNu.Eta()<<", "<<lv_genNu.Phi()<<", "<<lv_genNu.E()<<", "<<std::endl;
+            //std::cout<<"bjet pt,eta,phi,E = "<<lv_genBbar.Pt()<<", "<<lv_genBbar.Eta()<<", "<<lv_genBbar.Phi()<<", "<<lv_genBbar.E()<<", "<<std::endl;
+            //std::cout<<"other bjet pt,eta,phi,E = "<<lv_genB.Pt()<<", "<<lv_genB.Eta()<<", "<<lv_genB.Phi()<<", "<<lv_genB.E()<<", "<<std::endl;
             if ( dphi > TMath::Pi() ) dphi -= 2.*TMath::Pi();
             if ( dphi <= -TMath::Pi() ) dphi += 2.*TMath::Pi();
             _genDrLeptonTopBjet = TMath::Sqrt(deta*deta + dphi*dphi);
+            //std::cout<<"gen dR = "<<_genDrLeptonTopBjet<<std::endl;
         } else {
             deta = lv_genLep.Eta()-lv_genB.Eta();
             dphi = lv_genLep.Phi()-lv_genB.Phi();
+            //std::cout<<"lepton pt,eta,phi,E = "<<lv_genLep.Pt()<<", "<<lv_genLep.Eta()<<", "<<lv_genLep.Phi()<<", "<<lv_genLep.E()<<", "<<std::endl;
+            //std::cout<<"met pt,eta,phi,E = "<<lv_genNu.Pt()<<", "<<lv_genNu.Eta()<<", "<<lv_genNu.Phi()<<", "<<lv_genNu.E()<<", "<<std::endl;
+            //std::cout<<"bjet pt,eta,phi,E = "<<lv_genB.Pt()<<", "<<lv_genB.Eta()<<", "<<lv_genB.Phi()<<", "<<lv_genB.E()<<", "<<std::endl;
+            //std::cout<<"other bjet pt,eta,phi,E = "<<lv_genBbar.Pt()<<", "<<lv_genBbar.Eta()<<", "<<lv_genBbar.Phi()<<", "<<lv_genBbar.E()<<", "<<std::endl;
             if ( dphi > TMath::Pi() ) dphi -= 2.*TMath::Pi();
             if ( dphi <= -TMath::Pi() ) dphi += 2.*TMath::Pi();
             _genDrLeptonTopBjet = TMath::Sqrt(deta*deta + dphi*dphi);
+            //std::cout<<"gen dR = "<<_genDrLeptonTopBjet<<std::endl;
+        }
+        if (_nCorrBtagJets>0) {
+            deta = _jet_0_eta-_genTopBjetEta;
+            dphi = _jet_0_phi-_genTopBjetPhi;
+            if ( dphi > TMath::Pi() ) dphi -= 2.*TMath::Pi();
+            if ( dphi <= -TMath::Pi() ) dphi += 2.*TMath::Pi();
+            _genDrTopBjetJet0 = TMath::Sqrt(deta*deta + dphi*dphi);
+            deta = _jet_0_eta-_genWprimeBjetEta;
+            dphi = _jet_0_phi-_genWprimeBjetPhi;
+            if ( dphi > TMath::Pi() ) dphi -= 2.*TMath::Pi();
+            if ( dphi <= -TMath::Pi() ) dphi += 2.*TMath::Pi();
+            _genDrWprimeBjetJet0 = TMath::Sqrt(deta*deta + dphi*dphi);
+        }
+        if (_nCorrBtagJets>1) {
+            deta = _jet_1_eta-_genTopBjetEta;
+            dphi = _jet_1_phi-_genTopBjetPhi;
+            if ( dphi > TMath::Pi() ) dphi -= 2.*TMath::Pi();
+            if ( dphi <= -TMath::Pi() ) dphi += 2.*TMath::Pi();
+            _genDrTopBjetJet1 = TMath::Sqrt(deta*deta + dphi*dphi);    
+            deta = _jet_1_eta-_genWprimeBjetEta;
+            dphi = _jet_1_phi-_genWprimeBjetPhi;
+            if ( dphi > TMath::Pi() ) dphi -= 2.*TMath::Pi();
+            if ( dphi <= -TMath::Pi() ) dphi += 2.*TMath::Pi();
+            _genDrWprimeBjetJet1 = TMath::Sqrt(deta*deta + dphi*dphi);    
         }
         
     }
@@ -710,6 +979,25 @@ int WprimeCalc::AnalyzeEvent(edm::EventBase const & event,
     SetValue("genTopBjetPt", _genTopBjetPt);
     SetValue("genTopBjetEta", _genTopBjetEta);
     SetValue("genTopBjetPhi", _genTopBjetPhi);
+    SetValue("genLeptonPt", _genLeptonPt);
+    SetValue("genLeptonEta", _genLeptonEta);
+    SetValue("genLeptonPhi", _genLeptonPhi);
+    SetValue("genDrWprimeBjetJet0", _genDrWprimeBjetJet0);
+    SetValue("genDrWprimeBjetJet1", _genDrWprimeBjetJet1);
+    SetValue("genDrTopBjetJet0", _genDrTopBjetJet0);
+    SetValue("genDrTopBjetJet1", _genDrTopBjetJet1);
+    SetValue("genJet0Pt", _genJet0Pt);
+    SetValue("genJet1Pt", _genJet1Pt);
+    SetValue("genJet2Pt", _genJet2Pt);
+    SetValue("genJet3Pt", _genJet3Pt);
+    SetValue("genrecoDRJet0", _genrecoDRJet0);
+    SetValue("genrecoDRJet1", _genrecoDRJet1);
+    SetValue("genrecoDRJet2", _genrecoDRJet2);
+    SetValue("genrecoDRJet3", _genrecoDRJet3);
+    SetValue("genrecoPTJet0", _genrecoPTJet0);
+    SetValue("genrecoPTJet1", _genrecoPTJet1);
+    SetValue("genrecoPTJet2", _genrecoPTJet2);
+    SetValue("genrecoPTJet3", _genrecoPTJet3);
     
     double _genTTMass = -1.0;
     double _genTPt = -1.0;

@@ -1,7 +1,6 @@
 import FWCore.ParameterSet.Config as cms
 
 JetSubCalc = cms.PSet(
-    dummy_parameter = cms.string('dummy'),
-    CA8PrunedJetColl = cms.InputTag("goodPatJetsCA8PrunedPFPacked"),
-    debug          = cms.bool(False)
-)
+                      debug             = cms.bool(False),
+                      AK8slimmedJetColl = cms.InputTag("slimmedJetsAK8")
+                      )

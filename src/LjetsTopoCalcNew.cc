@@ -1,8 +1,8 @@
 /*
-  Calculator for the old D0-style LJets topo variables
-
-  Author: Gena Kukartsev, 2012
-*/
+ Calculator for the old D0-style LJets topo variables
+ 
+ Author: Gena Kukartsev, 2012
+ */
 
 
 
@@ -13,43 +13,43 @@
 #include "LJMet/Com/interface/LJetsTopoVarsNew.h" // needs work on compatibility and refactoring
 #include "LJMet/Com/interface/LjmetEventContent.h"
 #include "LJMet/Com/interface/LjmetFactory.h"
-#include "SimDataFormats/PileupSummaryInfo/interface/PileupSummaryInfo.h" 
+#include "SimDataFormats/PileupSummaryInfo/interface/PileupSummaryInfo.h"
 
 class LjmetFactory;
 
 class LjetsTopoCalcNew : public BaseCalc{
-  
+    
 public:
-  
+    
     LjetsTopoCalcNew();
     virtual ~LjetsTopoCalcNew(){}
-
+    
     virtual int BeginJob(){
         if (mPset.exists("useBestTop")) bestTop_ = mPset.getParameter<bool>("useBestTop");
         else                            bestTop_ = false;
-	
+        
         if (mPset.exists("debug"))      debug_ = mPset.getParameter<bool>("debug");
         else                            debug_ = false;
-	
-	return 0;
+        
+        return 0;
     }
     virtual int AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * selector);
     virtual int EndJob(){return 0;}
-
-  
+    
+    
 private:
-
+    
     bool bestTop_;
     bool debug_;
-
+    
     int FillLjetsBranches( std::vector<edm::Ptr<pat::Muon> > const & vTightMuons,
-                           std::vector<edm::Ptr<pat::Electron> > const & vTightElectrons,
-                           std::vector<std::pair<TLorentzVector,bool> >  const & vCorrBtagJets,
-                           //edm::Ptr<pat::MET> const & pMet,
-                           TLorentzVector const & corrMET,
-                           bool isMuon,
-                           bool bestTop );
-
+                          std::vector<edm::Ptr<pat::Electron> > const & vTightElectrons,
+                          std::vector<std::pair<TLorentzVector,bool> >  const & vCorrBtagJets,
+                          //edm::Ptr<pat::MET> const & pMet,
+                          TLorentzVector const & corrMET,
+                          bool isMuon,
+                          bool bestTop );
+    
 };
 
 
@@ -59,7 +59,7 @@ static int reg = LjmetFactory::GetInstance()->Register(new LjetsTopoCalcNew(), "
 
 
 LjetsTopoCalcNew::LjetsTopoCalcNew(){
-  mLegend = "[LjetsTopoCalcNew]: ";
+    mLegend = "[LjetsTopoCalcNew]: ";
 }
 
 
@@ -68,7 +68,7 @@ int LjetsTopoCalcNew::AnalyzeEvent(edm::EventBase const & event,
     //
     // compute event variables here
     //
-
+    
     //
     // _____ Get objects from the selector _____________________
     //
@@ -80,124 +80,124 @@ int LjetsTopoCalcNew::AnalyzeEvent(edm::EventBase const & event,
     std::vector<edm::Ptr<pat::Electron> > const & vSelElectrons = selector->GetSelectedElectrons();
     edm::Ptr<pat::MET>                    const & pMet = selector->GetMet();
     TLorentzVector                        const & corrMET = selector->GetCorrectedMet();
-  
+    
     //
     //_____ Old D0-style LJetsTopoVarsNew: mu ______
     //
     // (safety checks inside)
-
+    
     bool muonchannel = false;
     bool electronchannel = false;
     if (vSelMuons.size()>0) muonchannel = true;
     if (vSelElectrons.size()>0) electronchannel = true;
-    if (muonchannel && electronchannel && debug_) 
-      std::cout << mLegend <<"WARNING: Two Leptons in the event"<<std::endl;
-
+    if (muonchannel && electronchannel && debug_)
+        std::cout << mLegend <<"WARNING: Two Leptons in the event"<<std::endl;
+    
     if (vSelMuons.size()==0 and vSelElectrons.size()==0) {
-      if (debug_) 
-	std::cout << mLegend << "No Lepton in event! "<<std::endl;
-      return 0;
+        if (debug_)
+            std::cout << mLegend << "No Lepton in event! "<<std::endl;
+        return 0;
     }
-
+    
     if (vCorrBtagJets.size()==0) {
-      if (debug_) std::cout << mLegend <<"No Corrected jets in event! "<<std::endl;
+        if (debug_) std::cout << mLegend <<"No Corrected jets in event! "<<std::endl;
         return 0;
     }
-
+    
     if (corrMET.Pt()==0) {
-      if (debug_) std::cout << mLegend <<"No Corrected MET in event! "<<std::endl;
+        if (debug_) std::cout << mLegend <<"No Corrected MET in event! "<<std::endl;
         return 0;
     }
-
-
+    
+    
     FillLjetsBranches(vSelMuons,
                       vSelElectrons,
                       vCorrBtagJets,
                       corrMET,
-                      muonchannel, // isMuon                   
+                      muonchannel, // isMuon
                       bestTop_); //bestTop for neutrino pz
-  
-
+    
+    
     return 0;
 }
 
 
 
 int LjetsTopoCalcNew::FillLjetsBranches( std::vector<edm::Ptr<pat::Muon> > const & vSelMuons,
-                                         std::vector<edm::Ptr<pat::Electron> > const & vSelElectrons,
-                                         std::vector<std::pair<TLorentzVector,bool>> const & vCorrBtagJets, 
-                                         //edm::Ptr<pat::MET> const & pMet,
-                                         TLorentzVector const & corrMET,
-                                         bool isMuon,                                                    
-                                         bool bestTop ){
+                                        std::vector<edm::Ptr<pat::Electron> > const & vSelElectrons,
+                                        std::vector<std::pair<TLorentzVector,bool>> const & vCorrBtagJets,
+                                        //edm::Ptr<pat::MET> const & pMet,
+                                        TLorentzVector const & corrMET,
+                                        bool isMuon,
+                                        bool bestTop ){
     //
     // Fills old D0-style LJetsTopoVarsNew
     // Returns 0 if success,
     //        -1 if failed (no needed objects in the event)
     //
-
+    
     int result = -1;
-
+    
     while(1){
-
+        
         TLorentzVector tlv_lepton;
-
+        
         if ( vSelMuons.size() == 0 && vSelElectrons.size() == 0) break;
         if ( vSelMuons.size() > 0 && vSelElectrons.size() > 0) {
-	  std::cout<<mLegend<<"Two Leptons, using the Muon...."<<std::endl;
+            std::cout<<mLegend<<"Two Leptons, using the Muon...."<<std::endl;
             tlv_lepton.SetPxPyPzE( vSelMuons[0]->px(),
-                                   vSelMuons[0]->py(),
-                                   vSelMuons[0]->pz(),
-                                   vSelMuons[0]->energy() );
+                                  vSelMuons[0]->py(),
+                                  vSelMuons[0]->pz(),
+                                  vSelMuons[0]->energy() );
         }
         if ( vSelMuons.size() > 0 ) {
             tlv_lepton.SetPxPyPzE( vSelMuons[0]->px(),
-                                   vSelMuons[0]->py(),
-                                   vSelMuons[0]->pz(),
-                                   vSelMuons[0]->energy() ); 
+                                  vSelMuons[0]->py(),
+                                  vSelMuons[0]->pz(),
+                                  vSelMuons[0]->energy() );
         }
         if ( vSelElectrons.size() > 0 ) {
             tlv_lepton.SetPxPyPzE( vSelElectrons[0]->px(),
-                                   vSelElectrons[0]->py(),
-                                   vSelElectrons[0]->pz(),
-                                   vSelElectrons[0]->energy() );
+                                  vSelElectrons[0]->py(),
+                                  vSelElectrons[0]->pz(),
+                                  vSelElectrons[0]->energy() );
         }
-    
+        
         // make a vector of jets
         /*
-          std::vector<TLorentzVector> tlv_jets;
-          for ( std::vector<std::pair<TLorentzVector,bool>>::const_iterator iJet = vCorrBtagJets.begin(); 
-          iJet != vCorrBtagJets.end(); 
-          ++iJet ){ 
-          //
-
-          //
-          TLorentzVector tlv_jet( (*iJet)->first.px(), 
-          (*iJet)->first.py(), 
-          (*iJet)->first.pz(), 
-          (*iJet)->first.energy() ); 
-
-          tlv_jets.push_back(tlv_jet); 
-          } 
-        */
-
+         std::vector<TLorentzVector> tlv_jets;
+         for ( std::vector<std::pair<TLorentzVector,bool>>::const_iterator iJet = vCorrBtagJets.begin();
+         iJet != vCorrBtagJets.end();
+         ++iJet ){
+         //
+         
+         //
+         TLorentzVector tlv_jet( (*iJet)->first.px(),
+         (*iJet)->first.py(),
+         (*iJet)->first.pz(),
+         (*iJet)->first.energy() );
+         
+         tlv_jets.push_back(tlv_jet);
+         }
+         */
+        
         // check if MET exists
         //if ( pMet.isNonnull() && pMet.isAvailable() ){ }
         //else break;
-
+        
         // check if corrected MET exists
         if ( corrMET.Pt() > 0 ){ }
         else break;
-
+        
         TLorentzVector tlv_met( corrMET.Px(),
-                                corrMET.Py(),
-                                corrMET.Pz(),
-                                corrMET.Energy() );
-
+                               corrMET.Py(),
+                               corrMET.Pz(),
+                               corrMET.Energy() );
+        
         // topovars calculator
         //LJetsTopoVarsNew topovars(tlv_jets, tlv_muon, tlv_met, isMuon, bestTop);
         LJetsTopoVarsNew topovars(vCorrBtagJets, tlv_lepton, tlv_met, isMuon,  bestTop);
-
+        
         // compute branches
         SetValue("aplanarity", topovars.aplanarity());
         SetValue("centrality", topovars.centrality());
@@ -229,7 +229,7 @@ int LjetsTopoCalcNew::FillLjetsBranches( std::vector<edm::Ptr<pat::Muon> > const
         SetValue("Muon_DeltaR", topovars.Muon_DeltaR());
         SetValue("Ht", topovars.getHt());
         SetValue("Htp", topovars.getHtp());
-        SetValue("Htpp", topovars.getHtpp()); 
+        SetValue("Htpp", topovars.getHtpp());
         SetValue("Ht2", topovars.getHt2());
         SetValue("Ht2p", topovars.getHt2p());
         SetValue("Ht2pp", topovars.getHt2pp());
@@ -245,7 +245,7 @@ int LjetsTopoCalcNew::FillLjetsBranches( std::vector<edm::Ptr<pat::Muon> > const
         SetValue("MtAurelio", topovars.getMtAurelio());
         SetValue("PzOverHT", topovars.getPzOverHT());
         SetValue("Mevent", topovars.getMevent());
-        SetValue("M123inv", topovars.getM123inv()); 
+        SetValue("M123inv", topovars.getM123inv());
         SetValue("Eta2Sum", topovars.getEta2Sum());
         SetValue("MwRec", topovars.getMwRec());
         SetValue("H", topovars.getH());
@@ -270,18 +270,21 @@ int LjetsTopoCalcNew::FillLjetsBranches( std::vector<edm::Ptr<pat::Muon> > const
         //SetValue("LightJet_DiscVal", topovars.LightJet_DiscVal());
         SetValue("BestTop", topovars.BestTop());
         SetValue("BestJet_Pt", topovars.BestJet_Pt());
-	SetValue("BestJet_Eta", topovars.BestJet_Eta());
-	SetValue("BestJet_Phi", topovars.BestJet_Phi());
+        SetValue("BestJet_Eta", topovars.BestJet_Eta());
+        SetValue("BestJet_Phi", topovars.BestJet_Phi());
         SetValue("BestTop_Pt", topovars.BestTop_Pt());
+        SetValue("BestTopBJet_Eta", topovars.BestTopBJet_Eta());
+        SetValue("BestTopBJet_Phi", topovars.BestTopBJet_Phi());
+        SetValue("BestTopBJet_Pt", topovars.BestTopBJet_Pt());
         SetValue("SecBestTop", topovars.SecBestTop());
         SetValue("SecBestBTagTop", topovars.SecBestBTagTop());
         SetValue("BTagTopMass", topovars.BTagTopMass());
         SetValue("BTagTop_Pt", topovars.BTagTop_Pt());
         SetValue("SecBTagTopMass", topovars.SecBTagTopMass());
         SetValue("SecBTagTop_Pt", topovars.SecBTagTop_Pt());
-        SetValue("BestJetJet2W_M", topovars.BestJetJet2W_M());    
-        SetValue("Jet1TagJet2TagW_M", topovars.Jet1TagJet2TagW_M());   
-        SetValue("Cos_BestJetLepton_BestTop", topovars.Cos_BestJetLepton_BestTop());	 
+        SetValue("BestJetJet2W_M", topovars.BestJetJet2W_M());
+        SetValue("Jet1TagJet2TagW_M", topovars.Jet1TagJet2TagW_M());
+        SetValue("Cos_BestJetLepton_BestTop", topovars.Cos_BestJetLepton_BestTop());
         SetValue("Cos_LightjetJetLepton_BestTop", topovars.Cos_LightjetJetLepton_BestTop());
         SetValue("Cos_LightjetJetLepton_BTagTop", topovars.Cos_LightjetJetLepton_BTagTop());
         SetValue("HT_AllJets_MinusBestJet", topovars.HT_AllJets_MinusBestJet());
@@ -296,11 +299,16 @@ int LjetsTopoCalcNew::FillLjetsBranches( std::vector<edm::Ptr<pat::Muon> > const
         SetValue("J1_NotBestJet_Eta", topovars.J1_NotBestJet_Eta());
         SetValue("J1_NotBestJet_Phi", topovars.J1_NotBestJet_Phi());
         SetValue("Muon_DeltaR", topovars.Muon_DeltaR());
-
+        SetValue("PzNu", topovars.pznu());
+        SetValue("PzOtherNu", topovars.pzothernu());
+        SetValue("LepTopBJet_DeltaR", topovars.LepTopBJet_DeltaR());
+        SetValue("LepTopBJet_Dphi", topovars.LepTopBJet_Dphi());
+        SetValue("LepTopBJet_Deta", topovars.LepTopBJet_Deta());
+        
         result = 0;
         break;
-
+        
     } // end of while(1)
-
+    
     return result;
 }
