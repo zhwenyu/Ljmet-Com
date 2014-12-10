@@ -53,7 +53,7 @@ private:
 };
 
 
-//static int reg = LjmetFactory::GetInstance()->Register(new DileptonCalc(), "DileptonCalc");
+static int reg = LjmetFactory::GetInstance()->Register(new DileptonCalc(), "DileptonCalc");
 
 
 DileptonCalc::DileptonCalc(){
@@ -68,7 +68,7 @@ int DileptonCalc::BeginJob(){
     else                              rhoSrc_it = edm::InputTag("fixedGridRhoAll", "", "RECO");
     
     if (mPset.exists("pvCollection")) pvCollection_it = mPset.getParameter<edm::InputTag>("pvCollection");
-    else                              pvCollection_it = edm::InputTag("goodOfflinePrimaryVertices");
+    else                              pvCollection_it = edm::InputTag("offlineSlimmedPrimaryVertices");
     
     if (mPset.exists("isMc"))         isMc = mPset.getParameter<bool>("isMc");
     else                              isMc = false;
@@ -582,7 +582,7 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event,
     //
     
     //Get Top-like jets
-    edm::InputTag topJetColl = edm::InputTag("goodPatJetsCATopTagPF");
+    edm::InputTag topJetColl = edm::InputTag("slimmedJetsAK8");
     edm::Handle<std::vector<pat::Jet> > topJets;
     event.getByLabel(topJetColl, topJets);
     
@@ -626,10 +626,10 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event,
         CATopJetIndex      . push_back(index);
         CATopJetnDaughters . push_back((int)ijet->numberOfDaughters());
         
-        reco::CATopJetTagInfo* jetInfo = (reco::CATopJetTagInfo*) ijet->tagInfo("CATop");
+        //reco::CATopJetTagInfo* jetInfo = (reco::CATopJetTagInfo*) ijet->tagInfo("CATop");
         
-        CATopJetTopMass     . push_back(jetInfo->properties().topMass);
-        CATopJetMinPairMass . push_back(jetInfo->properties().minMass);
+        //CATopJetTopMass     . push_back(jetInfo->properties().topMass);
+        //CATopJetMinPairMass . push_back(jetInfo->properties().minMass);
         
         for (size_t ui = 0; ui < ijet->numberOfDaughters(); ui++){
             CATopDaughterPt     . push_back(ijet->daughter(ui)->pt());
@@ -655,8 +655,8 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event,
     SetValue("CATopJetnDaughters" , CATopJetnDaughters);
     
     //Properties
-    SetValue("CATopJetTopMass"     , CATopJetTopMass);
-    SetValue("CATopJetMinPairMass" , CATopJetMinPairMass);
+    //    SetValue("CATopJetTopMass"     , CATopJetTopMass);
+    //    SetValue("CATopJetMinPairMass" , CATopJetMinPairMass);
     
     //Daughter four vector and index
     SetValue("CATopDaughterPt"     , CATopDaughterPt);
@@ -667,7 +667,7 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event,
     SetValue("CATopDaughterMotherIndex"      , CATopDaughterMotherIndex);
     
     //Get CA8 jets for W's
-    edm::InputTag CAWJetColl = edm::InputTag("goodPatJetsCA8PrunedPF");
+    edm::InputTag CAWJetColl = edm::InputTag("slimmedJetsAK8");
     edm::Handle<std::vector<pat::Jet> > CAWJets;
     event.getByLabel(CAWJetColl, CAWJets);
     
@@ -750,7 +750,7 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event,
     SetValue("CAWDaughterMotherIndex" , CAWDaughterMotherIndex);
     
     //Get all CA8 jets (not just for W and Top)
-    edm::InputTag CA8JetColl = edm::InputTag("goodPatJetsCA8PF");
+    edm::InputTag CA8JetColl = edm::InputTag("slimmedJetsAK8");
     edm::Handle<std::vector<pat::Jet> > CA8Jets;
     event.getByLabel(CA8JetColl, CA8Jets);
     
