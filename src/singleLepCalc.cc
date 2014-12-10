@@ -111,12 +111,12 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
     int passTrigEle27v10 = -1;
     int passTrigIsoMu24v13 = -1;
     
-    unsigned int _tElMCIndex = trigNames.triggerIndex("HLT_Ele27_WP80_v10");
+    unsigned int _tElMCIndex = trigNames.triggerIndex("HLT_Ele32_eta2p1_WP85_Gsf_v1");
     if ( _tElMCIndex<_tSize){
         passTrigEle27v10 = mhEdmTriggerResults->accept(_tElMCIndex);
     }
     
-    unsigned int _tMuMCIndex = trigNames.triggerIndex("HLT_IsoMu24_eta2p1_v13");
+    unsigned int _tMuMCIndex = trigNames.triggerIndex("HLT_IsoMu24_eta2p1_IterTrk02_v1");
     if ( _tMuMCIndex<_tSize){
         passTrigIsoMu24v13 = mhEdmTriggerResults->accept(_tMuMCIndex);
     }
@@ -128,10 +128,7 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
     double _muon_1_RelIso = -std::numeric_limits<double>::max();
     
     if (_nSelMuons>0) {
-        std::cout << _muon_1_pt << std::endl;
         _muon_1_pt = vSelMuons[0]->pt();
-        std::cout << _muon_1_pt << std::endl;
-        int test ; std::cin >> test;
         _muon_1_phi = vSelMuons[0]->phi();
         _muon_1_eta = vSelMuons[0]->eta();
         
@@ -140,7 +137,6 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
         double gIso  = vSelMuons[0]->userIsolation(pat::PfGammaIso);
         double puIso = vSelMuons[0]->userIsolation(pat::PfPUChargedHadronIso);
         _muon_1_RelIso = (chIso + std::max(0.,nhIso + gIso - 0.5*puIso))/_muon_1_pt;
-        
     }
     
     SetValue("muon_1_pt",_muon_1_pt);
