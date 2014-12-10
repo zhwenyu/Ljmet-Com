@@ -21,7 +21,7 @@ using std::endl;
 
 class LjmetFactory;
 
-class DileptonCalc : public BaseCalc{
+class DileptonCalc : public BaseCalc {
     
 public:
     
@@ -52,15 +52,14 @@ private:
     void fillMotherInfo(const reco::Candidate *mother, int i, vector <int> & momid, vector <int> & momstatus, vector<double> & mompt, vector<double> & mometa, vector<double> & momphi, vector<double> & momenergy);
 };
 
+static int reg = LjmetFactory::GetInstance()->Register(new DileptonCalc(), "DileptonCalc");
 
-//static int reg = LjmetFactory::GetInstance()->Register(new DileptonCalc(), "DileptonCalc");
-
-
-DileptonCalc::DileptonCalc(){
+DileptonCalc::DileptonCalc()
+{
 }
 
-int DileptonCalc::BeginJob(){
-    
+int DileptonCalc::BeginJob()
+{
     if (mPset.exists("dataType"))     dataType = mPset.getParameter<std::string>("dataType");
     else                              dataType = "None";
     
@@ -114,12 +113,11 @@ int DileptonCalc::BeginJob(){
         std::exit(-1);
     }
     
-    
     return 0;
 }
 
-int DileptonCalc::AnalyzeEvent(edm::EventBase const & event,
-                               BaseEventSelector * selector){
+int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * selector)
+{
     //
     // compute event variables here
     //
@@ -159,7 +157,7 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event,
     int passEM = 0;
     int passMM = 0;
     
-    if (vSelTriggers.size() == 3){
+    if (vSelTriggers.size() == 3) {
         passEE = (int)vSelTriggers.at(0);
         passEM = (int)vSelTriggers.at(1);
         passMM = (int)vSelTriggers.at(2);
@@ -611,7 +609,7 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event,
     
     std::vector <int> CATopDaughterMotherIndex;
     
-    for (std::vector<pat::Jet>::const_iterator ijet = topJets->begin(); ijet != topJets->end(); ijet++){
+    for (std::vector<pat::Jet>::const_iterator ijet = topJets->begin(); ijet != topJets->end(); ijet++) {
         
         int index = (int)(ijet-topJets->begin());
         
@@ -631,7 +629,7 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event,
         CATopJetTopMass     . push_back(jetInfo->properties().topMass);
         CATopJetMinPairMass . push_back(jetInfo->properties().minMass);
         
-        for (size_t ui = 0; ui < ijet->numberOfDaughters(); ui++){
+        for (size_t ui = 0; ui < ijet->numberOfDaughters(); ui++) {
             CATopDaughterPt     . push_back(ijet->daughter(ui)->pt());
             CATopDaughterEta    . push_back(ijet->daughter(ui)->eta());
             CATopDaughterPhi    . push_back(ijet->daughter(ui)->phi());
@@ -642,12 +640,12 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event,
     }
     
     //Four vector
-    SetValue("CATopJetPt"     , CATopJetPt);
-    SetValue("CATopJetEta"    , CATopJetEta);
-    SetValue("CATopJetPhi"    , CATopJetPhi);
-    SetValue("CATopJetEnergy" , CATopJetEnergy);
+    SetValue("CATopJetPt"    , CATopJetPt);
+    SetValue("CATopJetEta"   , CATopJetEta);
+    SetValue("CATopJetPhi"   , CATopJetPhi);
+    SetValue("CATopJetEnergy", CATopJetEnergy);
     
-    SetValue("CATopJetCSV"    , CATopJetCSV);
+    SetValue("CATopJetCSV"   , CATopJetCSV);
     //   SetValue("CATopJetRCN"    , CATopJetRCN);
     
     //Identity
@@ -917,24 +915,24 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event,
         }//End loop over gen particles
     }  //End MC-only if
     
-    //Four vector
-    SetValue("genPt"     , genPt);
-    SetValue("genEta"    , genEta);
-    SetValue("genPhi"    , genPhi);
-    SetValue("genEnergy" , genEnergy);
+    // Four vector
+    SetValue("genPt"    , genPt);
+    SetValue("genEta"   , genEta);
+    SetValue("genPhi"   , genPhi);
+    SetValue("genEnergy", genEnergy);
     
-    //Identity
-    SetValue("genID"            , genID);
-    SetValue("genIndex"         , genIndex);
-    SetValue("genStatus"        , genStatus);
-    SetValue("genMotherID"      , genMotherID);
-    SetValue("genMotherIndex"   , genMotherIndex);
+    // Identity
+    SetValue("genID"         , genID);
+    SetValue("genIndex"      , genIndex);
+    SetValue("genStatus"     , genStatus);
+    SetValue("genMotherID"   , genMotherID);
+    SetValue("genMotherIndex", genMotherIndex);
     
     return 0;
 }
 
-int DileptonCalc::findMatch(const reco::GenParticleCollection & genParticles, int idToMatch, double eta, double phi){
-    
+int DileptonCalc::findMatch(const reco::GenParticleCollection & genParticles, int idToMatch, double eta, double phi)
+{
     float dRtmp = 1000;
     float closestDR = 10000.;
     int closestGenPart = -1;
