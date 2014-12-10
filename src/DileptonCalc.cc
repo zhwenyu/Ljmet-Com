@@ -53,7 +53,7 @@ private:
 };
 
 
-//static int reg = LjmetFactory::GetInstance()->Register(new DileptonCalc(), "DileptonCalc");
+static int reg = LjmetFactory::GetInstance()->Register(new DileptonCalc(), "DileptonCalc");
 
 
 DileptonCalc::DileptonCalc(){
