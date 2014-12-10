@@ -48,13 +48,13 @@ JetSubCalc::~JetSubCalc()
 int JetSubCalc::BeginJob()
 {
     if (mPset.exists("slimmedJetColl")) slimmedJetColl_it = mPset.getParameter<edm::InputTag>("slimmedJetColl");
-    else slimmedJetColl_it = edm::InputTag("slimmedJet");
+    else slimmedJetColl_it = edm::InputTag("slimmedJets");
     
     if (mPset.exists("slimmedJetsAK8Coll")) slimmedJetsAK8Coll_it = mPset.getParameter<edm::InputTag>("slimmedJetsAK8Coll");
     else slimmedJetsAK8Coll_it = edm::InputTag("slimmedJetsAK8");
     
     if (mPset.exists("bDiscriminant")) bDiscriminant = mPset.getParameter<std::string>("bDiscriminant");
-    else bDiscriminant = "combinedSecondaryVertexBJetTags";
+    else bDiscriminant = "pfCombinedSecondaryVertexBJetTags";
     
     if (mPset.exists("tagInfo")) tagInfo = mPset.getParameter<std::string>("tagInfo");
     else tagInfo = "caTop";
