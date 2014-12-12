@@ -37,8 +37,11 @@ private:
     bool                      isMc;
     std::string               dataType;
     edm::InputTag             rhoSrc_it;
+    const edm::EDGetTokenT<double> rhoSrc_tok;  //adding tokens to make module thread safe
     edm::InputTag             pvCollection_it;
+    const edm::EDGetTokenT<std::vector<reco::Vertex> > pvCollection_tok;
     edm::InputTag             genParticles_it;
+    const edm::EDGetTokenT<reco::GenParticleCollection> genParticles_tok;
     std::vector<unsigned int> keepPDGID;
     std::vector<unsigned int> keepMomPDGID;
     bool keepFullMChistory;
@@ -66,9 +69,13 @@ int DileptonCalc::BeginJob(){
     
     if (mPset.exists("rhoSrc"))       rhoSrc_it = mPset.getParameter<edm::InputTag>("rhoSrc");
     else                              rhoSrc_it = edm::InputTag("fixedGridRhoAll", "", "RECO");
+
+    rhoSrc_tok = consumes<double>(rhoSrc_it);
     
     if (mPset.exists("pvCollection")) pvCollection_it = mPset.getParameter<edm::InputTag>("pvCollection");
     else                              pvCollection_it = edm::InputTag("offlineSlimmedPrimaryVertices");
+
+    pvCollection_tok = consumes<std::vector<reco::Vertex> > (pvCollection_it);
     
     if (mPset.exists("isMc"))         isMc = mPset.getParameter<bool>("isMc");
     else                              isMc = false;
@@ -76,6 +83,8 @@ int DileptonCalc::BeginJob(){
     if (mPset.exists("genParticles")) genParticles_it = mPset.getParameter<edm::InputTag>("genParticles");
     else                              genParticles_it = edm::InputTag("prunedGenParticles");
     
+    genParticles_tok = consumes<reco::GenParticleCollection>(genParticles_it); 
+
     if (mPset.exists("keepPDGID"))    keepPDGID = mPset.getParameter<std::vector<unsigned int> >("keepPDGID");
     else                              keepPDGID.clear();
     
@@ -175,7 +184,7 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event,
     
     //Primary vertices
     edm::Handle<std::vector<reco::Vertex> > pvHandle;
-    event.getByLabel(pvCollection_it, pvHandle);
+    event.getByToken(pvCollection_tok, pvHandle);
     goodPVs = *(pvHandle.product());
     
     SetValue("nPV", (int)goodPVs.size());
@@ -237,7 +246,7 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event,
     vector<double> elMatchedEnergy;
     
     edm::Handle<double> rhoHandle;
-    event.getByLabel(rhoSrc_it, rhoHandle);
+    event.getByToken(rhoSrc_tok, rhoHandle);
     rhoIso = std::max(*(rhoHandle.product()), 0.0);
     
     pat::strbitset retElectron  = electronSelL_->getBitTemplate();
@@ -308,7 +317,7 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event,
             if(isMc && keepFullMChistory){
                 cout << "start\n";
                 edm::Handle<reco::GenParticleCollection> genParticles;
-                event.getByLabel(genParticles_it, genParticles);
+                event.getByToken(genParticles_tok, genParticles);
                 int matchId = findMatch(*genParticles, 11, (*iel)->eta(), (*iel)->phi());
                 double closestDR = 10000.;
                 cout << "matchId "<<matchId <<endl;
@@ -496,7 +505,7 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event,
             
             if(isMc && keepFullMChistory){
                 edm::Handle<reco::GenParticleCollection> genParticles;
-                event.getByLabel(genParticles_it, genParticles);
+                event.getByToken(genParticles_tok, genParticles);
                 int matchId = findMatch(*genParticles, 13, (*imu)->eta(), (*imu)->phi());
                 double closestDR = 10000.;
                 if (matchId>=0) {
@@ -583,8 +592,9 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event,
     
     //Get Top-like jets
     edm::InputTag topJetColl = edm::InputTag("slimmedJetsAK8");
+    edm::EDGetTokenT<std::vector<pat::Jet> > topJetColl_tok = consumes<std::vector<pat::Jet> >(topJetColl);
     edm::Handle<std::vector<pat::Jet> > topJets;
-    event.getByLabel(topJetColl, topJets);
+    event.getByToken(topJetColl_tok, topJets);
     
     //Four vector
     std::vector <double> CATopJetPt;
@@ -668,8 +678,9 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event,
     
     //Get CA8 jets for W's
     edm::InputTag CAWJetColl = edm::InputTag("slimmedJetsAK8");
+    edm::EDGetTokenT<std::vector<pat::Jet> > CAWJetColl_tok = consumes<std::vector<pat::Jet> >(CAWJetColl);
     edm::Handle<std::vector<pat::Jet> > CAWJets;
-    event.getByLabel(CAWJetColl, CAWJets);
+    event.getByToken(CAWJetColl_tok, CAWJets);
     
     //Four vector
     std::vector <double> CAWJetPt;
@@ -751,8 +762,9 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event,
     
     //Get all CA8 jets (not just for W and Top)
     edm::InputTag CA8JetColl = edm::InputTag("slimmedJetsAK8");
+    edm::EDGetTokenT<std::vector<pat::Jet> > CA8JetColl_tok(consumes<std::vector<pat::Jet> >(CA8JetColl));
     edm::Handle<std::vector<pat::Jet> > CA8Jets;
-    event.getByLabel(CA8JetColl, CA8Jets);
+    event.getByToken(CA8JetColl_tok, CA8Jets);
     
     //Four vector
     std::vector <double> CA8JetPt;
@@ -861,7 +873,7 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event,
     
     if (isMc){
         edm::Handle<reco::GenParticleCollection> genParticles;
-        event.getByLabel(genParticles_it, genParticles);
+        event.getByToken(genParticles_tok, genParticles);
         
         for(size_t i = 0; i < genParticles->size(); i++){
             const reco::GenParticle & p = (*genParticles).at(i);
