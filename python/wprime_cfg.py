@@ -118,8 +118,6 @@ process.event_selector = cms.PSet(
                                   met_collection           = cms.InputTag('slimmedMETs'),
                                   type1corrmet_collection  = cms.InputTag(''),
                                   
-                                  do53xJEC                 = cms.bool(False),
-                                  
                                   MCL1JetPar               = cms.string(relBase+'/src/LJMet/Com/data/START53_V7G_L1FastJet_AK5PFchs.txt'),
                                   MCL2JetPar               = cms.string(relBase+'/src/LJMet/Com/data/START53_V7G_L2Relative_AK5PFchs.txt'),
                                   MCL3JetPar               = cms.string(relBase+'/src/LJMet/Com/data/START53_V7G_L3Absolute_AK5PFchs.txt'),

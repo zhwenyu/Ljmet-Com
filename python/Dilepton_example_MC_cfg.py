@@ -113,8 +113,6 @@ process.event_selector = cms.PSet(
     JERup                    = cms.bool(False),
     JERdown                  = cms.bool(False),
 
-    do53xJEC                 = cms.bool(True),
-
     MCL1JetPar = cms.string(relBase+'/src/LJMet/singletPrime/JEC/Summer13_V4_MC_L1FastJet_AK5PF.txt'),
     MCL2JetPar = cms.string(relBase+'/src/LJMet/singletPrime/JEC/Summer13_V4_MC_L2Relative_AK5PF.txt'),
     MCL3JetPar = cms.string(relBase+'/src/LJMet/singletPrime/JEC/Summer13_V4_MC_L3Absolute_AK5PF.txt'),

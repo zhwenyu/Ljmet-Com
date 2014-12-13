@@ -66,7 +66,6 @@ process.event_selector = cms.PSet(
                                   JECdown                  = cms.bool(False),
                                   JERup                    = cms.bool(False),
                                   JERdown                  = cms.bool(False),
-                                  do53xJEC                 = cms.bool(True),
                                   
                                   # b tagging
                                   btagOP                  = cms.string("CSVM"),
