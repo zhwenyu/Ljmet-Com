@@ -286,15 +286,10 @@ void WprimeBoostedEventSelector::BeginJob( std::map<std::string, edm::ParameterS
         mbPar["JERup"]                    = par[_key].getParameter<bool>         ("JERup");
         mbPar["JERdown"]                  = par[_key].getParameter<bool>         ("JERdown");
         msPar["JEC_txtfile"]              = par[_key].getParameter<std::string>  ("JEC_txtfile");
-        mbPar["do53xJEC"]                 = par[_key].getParameter<bool>         ("do53xJEC");
         
-        
-        std::cout << mLegend << "config parameters loaded..."
-        << std::endl;
-    }
-    else {
-        std::cout << mLegend << "event selector not configured, exiting"
-        << std::endl;
+        std::cout << mLegend << "config parameters loaded..." << std::endl;
+    } else {
+        std::cout << mLegend << "event selector not configured, exiting" << std::endl;
         std::exit(-1);
     }
     
