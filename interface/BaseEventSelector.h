@@ -35,33 +35,21 @@ class BaseEventSelector : public EventSelector {
     // Base class for all event selector plugins
     //
     
-    
     friend class LjmetFactory;
     
-    
 public:
-    
-    
     BaseEventSelector();
-    
-    
     virtual ~BaseEventSelector();
-    
-    
     virtual void BeginJob(std::map<std::string, edm::ParameterSet const > par);
     virtual bool operator()( edm::EventBase const & event, pat::strbitset & ret) = 0;
     virtual void EndJob();
-    
-    
-    
     virtual void AnalyzeEvent( edm::EventBase const & event, LjmetEventContent & ec );
     std::string GetName();
     double GetPerp(TVector3 & v1, TVector3 & v2);
-    bool AreMatched ( const reco::Candidate & c1,
-                     const reco::Candidate & c2,
-                     double DR,
-                     double DPtRel );
-    
+    bool AreMatched(const reco::Candidate & c1,
+                    const reco::Candidate & c2,
+                    double DR,
+                    double DPtRel);
     
     std::vector<edm::Ptr<pat::Jet> > const & GetAllJets() const;
     std::vector<edm::Ptr<pat::Jet> > const & GetSelectedJets() const;
@@ -101,52 +89,46 @@ public:
     TLorentzVector correctMet(const pat::MET & met, edm::EventBase const & event);
     
 protected:
-    
-    std::vector<edm::Ptr<pat::Jet> > mvAllJets;
-    std::vector<edm::Ptr<pat::Jet> > mvSelJets;
-    std::vector<edm::Ptr<pat::Jet> > mvLooseJets;
-    std::vector<std::pair<TLorentzVector,bool> > mvCorrJetsWithBTags;
-    std::vector<edm::Ptr<pat::Jet> > mvSelBtagJets;
-    std::vector<edm::Ptr<pat::Muon> > mvAllMuons;
-    std::vector<edm::Ptr<pat::Muon> > mvSelMuons;
-    std::vector<edm::Ptr<pat::Muon> > mvLooseMuons;
-    std::vector<edm::Ptr<pat::Electron> > mvAllElectrons;
-    std::vector<edm::Ptr<pat::Electron> > mvSelElectrons;
-    std::vector<edm::Ptr<pat::Electron> > mvLooseElectrons;
+    std::vector<edm::Ptr<pat::Jet>> mvAllJets;
+    std::vector<edm::Ptr<pat::Jet>> mvSelJets;
+    std::vector<edm::Ptr<pat::Jet>> mvLooseJets;
+    std::vector<std::pair<TLorentzVector, bool>> mvCorrJetsWithBTags;
+    std::vector<edm::Ptr<pat::Jet>> mvSelBtagJets;
+    std::vector<edm::Ptr<pat::Muon>> mvAllMuons;
+    std::vector<edm::Ptr<pat::Muon>> mvSelMuons;
+    std::vector<edm::Ptr<pat::Muon>> mvLooseMuons;
+    std::vector<edm::Ptr<pat::Electron>> mvAllElectrons;
+    std::vector<edm::Ptr<pat::Electron>> mvSelElectrons;
+    std::vector<edm::Ptr<pat::Electron>> mvLooseElectrons;
     edm::Ptr<pat::MET> mpMet;
     edm::Ptr<reco::PFMET> mpType1CorrMet;
     TLorentzVector correctedMET_p4;
     std::vector<unsigned int> mvSelTriggers;
-    std::vector<edm::Ptr<reco::Vertex> > mvSelPVs;
+    std::vector<edm::Ptr<reco::Vertex>> mvSelPVs;
     double mTestValue;
     
     // containers for config parameter values
-    std::map<std::string,bool> mbPar;
-    std::map<std::string,int> miPar;
-    std::map<std::string,double> mdPar;
-    std::map<std::string,std::string> msPar;
+    std::map<std::string, bool> mbPar;
+    std::map<std::string, int> miPar;
+    std::map<std::string, double> mdPar;
+    std::map<std::string, std::string> msPar;
     std::map<std::string, edm::InputTag> mtPar;
-    std::map<std::string,std::vector<std::string> > mvsPar;
+    std::map<std::string, std::vector<std::string>> mvsPar;
     
     std::string mName;
     std::string mLegend;
-    
     bool mbIsMc;
     
-    
-    
 private:
-    
     void init();
     void setName(std::string name);
-    void BeginEvent( edm::EventBase const & event, LjmetEventContent & ec );
-    void EndEvent( edm::EventBase const & event, LjmetEventContent & ec );
+    void BeginEvent(edm::EventBase const & event, LjmetEventContent & ec);
+    void EndEvent(edm::EventBase const & event, LjmetEventContent & ec);
     
     BTagSFUtil mBtagSfUtil;
     BtagHardcodedConditions mBtagCond;
     double bTagCut;
     JetCorrectionUncertainty *jecUnc;
-    FactorizedJetCorrector *JetCorrector;
     
     LjmetEventContent * mpEc;
     
