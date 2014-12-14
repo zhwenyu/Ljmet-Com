@@ -1,25 +1,12 @@
-/*
- Interface class for FWLite PAT analyzer-selectors
- Specific selectors must implement the () operator
- 
- Author: Gena Kukartsev, 2010,2012
- */
-
 #include <math.h>
 
 #include "LJMet/Com/interface/BaseEventSelector.h"
 #include "CondFormats/JetMETObjects/interface/JetCorrectorParameters.h"
 #include "CondFormats/JetMETObjects/interface/FactorizedJetCorrector.h"
 
-using namespace std;
-
 BaseEventSelector::BaseEventSelector():
 mName(""),
 mLegend("")
-{
-}
-
-BaseEventSelector::~BaseEventSelector()
 {
 }
 
@@ -99,7 +86,6 @@ void BaseEventSelector::BeginJob(std::map<std::string, edm::ParameterSet const >
         }
     }
     
-    
     msPar["btagger"] = mBtagCond.getAlgoName(msPar["btagOP"]);
     mdPar["btag_min_discr"] = mBtagCond.getDiscriminant(msPar["btagOP"]);
     
@@ -110,175 +96,31 @@ void BaseEventSelector::BeginJob(std::map<std::string, edm::ParameterSet const >
         jecUnc = new JetCorrectionUncertainty(*(new JetCorrectorParameters(msPar["JEC_txtfile"].c_str(), "Total")));
 }
 
-
-
-void BaseEventSelector::EndJob()
+double BaseEventSelector::GetPerp(TVector3 & v1, TVector3 & v2)
 {
-}
-
-void BaseEventSelector::AnalyzeEvent( edm::EventBase const & event, LjmetEventContent & ec )
-{
-}
-
-std::string BaseEventSelector::GetName()
-{
-    return mName;
-}
-
-void BaseEventSelector::SetHistogram(std::string name, int nbins, double low, double high)
-{
-    // Declare a new histogram to be created for the module
-    mpEc->SetHistogram(mName, name, nbins, low, high);
-    return;
-}
-
-void BaseEventSelector::SetHistValue(std::string name,
-                                     double value){
-    mpEc->SetHistValue(mName, name, value);
-    
-    return;
-}
-
-
-
-// evaluates a signed perp components of v1 relative to v2
-// the sign is defined by Phi
-double BaseEventSelector::GetPerp(TVector3 & v1, TVector3 & v2){
-    
     double perp;
-    
     double _mag = v1.Cross(v2.Unit()).Mag();
     double _phi1 = v1.Phi();
     double _phi2 = v2.Phi();
     double _dphi = _phi1 - _phi2;
-    if (_dphi>M_PI || (_dphi>-M_PI && _dphi<0)) perp = _mag;
+    if ( (_dphi > M_PI) || (_dphi > -M_PI && _dphi < 0.0) ) perp = _mag;
     else perp = -_mag;
     
     return perp;
 }
 
-
-
-bool BaseEventSelector::AreMatched ( const reco::Candidate & c1,
-                                    const reco::Candidate & c2,
-                                    double DR,
-                                    double DPtRel ) {
-    unsigned int nPass=0;
-    if ( (reco::deltaR(c1, c2) < DR) && (fabs(c2.pt() - c1.pt())/ c2.pt()<DPtRel)) {
-        nPass++;
-    }
-    return (nPass>0);
-}
-
-
-
-std::vector<edm::Ptr<pat::Jet> > const & BaseEventSelector::GetAllJets() const { return mvAllJets; }
-std::vector<edm::Ptr<pat::Jet> > const & BaseEventSelector::GetSelectedJets() const { return mvSelJets; }
-std::vector<edm::Ptr<pat::Jet> > const & BaseEventSelector::GetLooseJets() const { return mvSelJets; }
-std::vector<edm::Ptr<pat::Jet> > const & BaseEventSelector::GetSelectedBtagJets() const { return mvSelBtagJets; }
-std::vector<std::pair<TLorentzVector,bool>> const & BaseEventSelector::GetCorrJetsWithBTags() const { return mvCorrJetsWithBTags; }
-std::vector<edm::Ptr<pat::Muon> > const & BaseEventSelector::GetAllMuons() const { return mvAllMuons; }
-std::vector<edm::Ptr<pat::Muon> > const & BaseEventSelector::GetSelectedMuons() const { return mvSelMuons; }
-std::vector<edm::Ptr<pat::Muon> > const & BaseEventSelector::GetLooseMuons() const { return mvLooseMuons; }
-std::vector<edm::Ptr<pat::Electron> > const & BaseEventSelector::GetAllElectrons() const { return mvAllElectrons; }
-std::vector<edm::Ptr<pat::Electron> > const & BaseEventSelector::GetSelectedElectrons() const { return mvSelElectrons; }
-std::vector<edm::Ptr<pat::Electron> > const & BaseEventSelector::GetLooseElectrons() const { return mvLooseElectrons; }
-edm::Ptr<pat::MET> const & BaseEventSelector::GetMet() const { return mpMet; }
-edm::Ptr<reco::PFMET> const & BaseEventSelector::GetType1CorrMet() const { return mpType1CorrMet; }
-TLorentzVector const & BaseEventSelector::GetCorrectedMet() const { return correctedMET_p4; }
-std::vector<unsigned > const & BaseEventSelector::GetSelectedTriggers() const { return mvSelTriggers; }
-std::vector<edm::Ptr<reco::Vertex> > const & BaseEventSelector::GetSelectedPVs() const { return mvSelPVs; }
-
-double const &
-BaseEventSelector::GetTestValue() const{
-    return mTestValue;
-}
-
-
-
-void BaseEventSelector::SetTestValue(double & test){
-    mTestValue = test;
-    return;
-}
-
-
-
-void BaseEventSelector::SetCorrJetsWithBTags(std::vector<std::pair<TLorentzVector,bool>> & jets){
-    mvCorrJetsWithBTags = jets;
-    return;
-}
-
-
-
-void BaseEventSelector::SetCorrectedMet(TLorentzVector & met){
-    correctedMET_p4 = met;
-    return;
-}
-
-
-
-void BaseEventSelector::SetMc(bool isMc){
-    mbIsMc = isMc;
-    return;
-}
-
-
-
-bool BaseEventSelector::IsMc(){
-    return mbIsMc;
-}
-
-bool BaseEventSelector::isJetTagged(const pat::Jet & jet, edm::EventBase const & event, bool applySF)
+void BaseEventSelector::Init( void )
 {
-    bool _isTagged = false;
-    
-    
-    if ( jet.bDiscriminator( msPar["btagger"] ) > bTagCut ) _isTagged = true;
-    // DEBUG: list all available taggers with values
-    // cout << "_isTagged "<<_isTagged<<endl;
-    
-    // const std::vector<std::pair<std::string, float> > & vpd = jet.getPairDiscri();
-    // for ( std::vector<std::pair<std::string, float> >::const_iterator i = vpd.begin();
-    // i != vpd.end(); ++i){
-    // std::cout << mLegend << i->first << ", " << i->second << std::endl;
-    // }
-    
-    if (mbPar["isMc"] && applySF){
-        
-        TLorentzVector lvjet = correctJet(jet, event);
-        
-        double _lightSf = mBtagCond.GetMistagScaleFactor(lvjet.Et(), lvjet.Eta(), msPar["btagOP"]);
-        if ( mbPar["BTagUncertUp"] ) _lightSf += mBtagCond.GetMistagSFUncertUp(lvjet.Et(), lvjet.Eta(), msPar["btagOP"]);
-        else if ( mbPar["BTagUncertDown"] )_lightSf -= mBtagCond.GetMistagSFUncertDown(lvjet.Et(), lvjet.Eta(), msPar["btagOP"]);
-        double _lightEff = mBtagCond.GetMistagRate(lvjet.Et(), lvjet.Eta(), msPar["btagOP"]);
-        
-        int _jetFlavor = abs(jet.partonFlavour());
-        double _btagSf = mBtagCond.GetBtagScaleFactor(lvjet.Et(), lvjet.Eta(), msPar["btagOP"]);
-        if ( mbPar["BTagUncertUp"] ) _btagSf += (mBtagCond.GetBtagSFUncertUp(lvjet.Et(), lvjet.Eta(), msPar["btagOP"])*(_jetFlavor==4?2:1));
-        else if ( mbPar["BTagUncertDown"] )_btagSf -= (mBtagCond.GetBtagSFUncertDown(lvjet.Et(), lvjet.Eta(), msPar["btagOP"])*(_jetFlavor==4?2:1));
-        double _btagEff = mBtagCond.GetBtagEfficiency(lvjet.Et(), lvjet.Eta(), msPar["btagOP"]);
-        
-        mBtagSfUtil.SetSeed(abs(static_cast<int>(sin(jet.phi())*100000)));
-        
-        // sanity check
-        bool _orig_tag = _isTagged;
-        
-        mBtagSfUtil.modifyBTagsWithSF(_isTagged, _jetFlavor, _btagSf, _btagEff,
-                                      _lightSf, _lightEff);
-        
-        // sanity check
-        if (_isTagged != _orig_tag) ++mNBtagSfCorrJets;
-        
-    } // end of btag scale factor corrections
-    return _isTagged;
-    
+    // init sanity check histograms
+    mpEc->SetHistogram(mName, "jes_correction", 100, 0.8, 1.2);
+    mpEc->SetHistogram(mName, "met_correction", 100, 0.0, 2.0);
+    mpEc->SetHistogram(mName, "nBtagSfCorrections", 100, 0.0, 10.0);
 }
 
 TLorentzVector BaseEventSelector::correctJet(const pat::Jet & jet, edm::EventBase const & event)
 {
     // JES and JES systematics
-    pat::Jet correctedJet;
-    correctedJet = jet; //copy original jet
+    pat::Jet correctedJet = jet; //copy original jet
     
     double ptscale = 1.0;
     double unc = 1.0;
@@ -322,34 +164,32 @@ TLorentzVector BaseEventSelector::correctJet(const pat::Jet & jet, edm::EventBas
         }
         
         const reco::GenJet * genJet = jet.genJet();
-        if (genJet && genJet->pt()>15. && (abs(genJet->pt()/pt-1)<0.5)) {
+        if (genJet && genJet->pt()>15. && (abs(genJet->pt()/pt-1.)<0.5)) {
             double gen_pt = genJet->pt();
             double reco_pt = pt;
             double deltapt = (reco_pt - gen_pt) * factor;
             ptscale = max(0.0, (reco_pt + deltapt) / reco_pt);
         }
         
-        if ( mbPar["JECup"] || mbPar["JECdown"]) {
+        if ( mbPar["JECup"] || mbPar["JECdown"] ) {
             jecUnc->setJetEta(jet.eta());
             jecUnc->setJetPt(pt*ptscale);
             
             if (mbPar["JECup"]) {
-                try{
+                try {
                     unc = jecUnc->getUncertainty(true);
-                }
-                catch(...){ // catch all exceptions. Jet Uncertainty tool throws when binning out of range
+                } catch(...) { // catch all exceptions. Jet Uncertainty tool throws when binning out of range
                     std::cout << mLegend << "WARNING! Exception thrown by JetCorrectionUncertainty!" << std::endl;
                     std::cout << mLegend << "WARNING! Possibly, trying to correct a jet/MET outside correction range." << std::endl;
                     std::cout << mLegend << "WARNING! Jet/MET will remain uncorrected." << std::endl;
                     unc = 0.0;
                 }
-                unc = 1 + unc;
+                unc += 1.;
             }
             else {
                 try {
                     unc = jecUnc->getUncertainty(false);
-                }
-                catch(...) {
+                } catch(...) {
                     std::cout << mLegend << "WARNING! Exception thrown by JetCorrectionUncertainty!" << std::endl;
                     std::cout << mLegend << "WARNING! Possibly, trying to correct a jet/MET outside correction range." << std::endl;
                     std::cout << mLegend << "WARNING! Jet/MET will remain uncorrected." << std::endl;
@@ -371,7 +211,7 @@ TLorentzVector BaseEventSelector::correctJet(const pat::Jet & jet, edm::EventBas
     // sanity check - save correction of the first jet
     if (mNCorrJets == 0) {
         double _orig_pt = jet.pt();
-        if (fabs(_orig_pt)<1.e-9) {
+        if (abs(_orig_pt) < 1.e-9) {
             _orig_pt = 1.e-9;
         }
         SetHistValue("jes_correction", jetP4.Pt()/_orig_pt);
@@ -380,29 +220,39 @@ TLorentzVector BaseEventSelector::correctJet(const pat::Jet & jet, edm::EventBas
     return jetP4;
 }
 
-
-
-
-// Start of public:
-
-void BaseEventSelector::Init( void )
+bool BaseEventSelector::isJetTagged(const pat::Jet & jet, edm::EventBase const & event, bool applySF)
 {
-    // init sanity check histograms
-    mpEc->SetHistogram(mName, "jes_correction", 100, 0.8, 1.2);
-    mpEc->SetHistogram(mName, "met_correction", 100, 0.0, 2.0);
-    mpEc->SetHistogram(mName, "nBtagSfCorrections", 100, 0.0, 10.0);
+    bool _isTagged = false;
     
-    return;
+    if ( jet.bDiscriminator( msPar["btagger"] ) > bTagCut ) _isTagged = true;
+    
+    if (mbPar["isMc"] && applySF) {
+        TLorentzVector lvjet = correctJet(jet, event);
+        
+        double _lightSf = mBtagCond.GetMistagScaleFactor(lvjet.Et(), lvjet.Eta(), msPar["btagOP"]);
+        if ( mbPar["BTagUncertUp"] ) _lightSf += mBtagCond.GetMistagSFUncertUp(lvjet.Et(), lvjet.Eta(), msPar["btagOP"]);
+        else if ( mbPar["BTagUncertDown"] ) _lightSf -= mBtagCond.GetMistagSFUncertDown(lvjet.Et(), lvjet.Eta(), msPar["btagOP"]);
+        double _lightEff = mBtagCond.GetMistagRate(lvjet.Et(), lvjet.Eta(), msPar["btagOP"]);
+        
+        int _jetFlavor = abs(jet.partonFlavour());
+        double _btagSf = mBtagCond.GetBtagScaleFactor(lvjet.Et(), lvjet.Eta(), msPar["btagOP"]);
+        if ( mbPar["BTagUncertUp"] ) _btagSf += (mBtagCond.GetBtagSFUncertUp(lvjet.Et(), lvjet.Eta(), msPar["btagOP"])*(_jetFlavor==4?2:1));
+        else if ( mbPar["BTagUncertDown"] ) _btagSf -= (mBtagCond.GetBtagSFUncertDown(lvjet.Et(), lvjet.Eta(), msPar["btagOP"])*(_jetFlavor==4?2:1));
+        double _btagEff = mBtagCond.GetBtagEfficiency(lvjet.Et(), lvjet.Eta(), msPar["btagOP"]);
+        
+        mBtagSfUtil.SetSeed(abs(static_cast<int>(sin(jet.phi())*1e5)));
+        
+        // sanity check
+        bool _orig_tag = _isTagged;
+        
+        mBtagSfUtil.modifyBTagsWithSF(_isTagged, _jetFlavor, _btagSf, _btagEff, _lightSf, _lightEff);
+        
+        // sanity check
+        if (_isTagged != _orig_tag) ++mNBtagSfCorrJets;
+        
+    } // end of btag scale factor corrections
+    return _isTagged;
 }
-
-void BaseEventSelector::SetEventContent(LjmetEventContent * pEc)
-{
-    mpEc = pEc;
-    return;
-}
-
-
-// Start of protected:
 
 TLorentzVector BaseEventSelector::correctMet(const pat::MET & met, edm::EventBase const & event)
 {
@@ -420,41 +270,9 @@ TLorentzVector BaseEventSelector::correctMet(const pat::MET & met, edm::EventBas
     
     // sanity check histogram
     double _orig_met = met.pt();
-    if (fabs(_orig_met) < 1.e-9) {
+    if (abs(_orig_met) < 1.e-9) {
         _orig_met = 1.e-9;
     }
     SetHistValue("met_correction", correctedMET_p4.Pt()/_orig_met);
     return correctedMET_p4;
-}
-
-
-// Start of private:
-
-void BaseEventSelector::init()
-{
-    // private init method to be called by LjmetFactory when registering the selector
-    mLegend = "[" + mName + "]: ";
-    std::cout << mLegend << "registering " << mName << std::endl;
-    return;
-}
-
-void BaseEventSelector::setName(std::string name)
-{
-    mName = name;
-}
-
-void BaseEventSelector::BeginEvent(edm::EventBase const & event, LjmetEventContent & ec )
-{
-    // Do what any event selector must do before event gets checked
-    mNCorrJets = 0;
-    mNBtagSfCorrJets = 0;
-    return;
-}
-
-void BaseEventSelector::EndEvent(edm::EventBase const & event, LjmetEventContent & ec )
-{
-    // Do what any event selector must do after event processing is done
-    // (but before event content gets saved to file)
-    SetHistValue("nBtagSfCorrections", mNBtagSfCorrJets);
-    return;
 }
