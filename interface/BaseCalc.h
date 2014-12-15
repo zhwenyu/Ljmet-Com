@@ -29,17 +29,18 @@ class BaseCalc {
     
 public:
     BaseCalc();
-    virtual ~BaseCalc();
+    virtual ~BaseCalc() { }
     BaseCalc(const BaseCalc &); // stop default
-    std::string GetName();
+    std::string GetName() { return mName; }
     virtual int BeginJob() = 0;
-    virtual int ProduceEvent(edm::EventBase const & event, BaseEventSelector * selector);
-    virtual int AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * selector);
-    virtual int EndJob();
+    virtual int ProduceEvent(edm::EventBase const & event, BaseEventSelector * selector) { return 0; }
+    virtual int AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * selector) { return 0; }
+    virtual int EndJob() { return 0; }
     
     // LJMET event content setters
-    void SetHistogram(std::string name, int nbins, double low, double high);
-    void SetHistValue(std::string name, double value);
+    /// Declare a new histogram to be created for the module
+    void SetHistogram(std::string name, int nbins, double low, double high) { mpEc->SetHistogram(mName, name, nbins, low, high); }
+    void SetHistValue(std::string name, double value) { mpEc->SetHistValue(mName, name, value); }
     void SetValue(std::string name, bool value);
     void SetValue(std::string name, int value);
     void SetValue(std::string name, double value);
@@ -54,10 +55,11 @@ protected:
     edm::ParameterSet mPset;
     
 private:
+    /// Private init method to be called by LjmetFactory when registering the calculator
     virtual void init();
-    void setName(std::string name);
-    void SetEventContent(LjmetEventContent * pEc);
-    void SetPSet(edm::ParameterSet pset);
+    void setName(std::string name) { mName = name; }
+    void SetEventContent(LjmetEventContent * pEc) { mpEc = pEc; }
+    void SetPSet(edm::ParameterSet pset) { mPset = pset; }
     LjmetEventContent * mpEc;
 };
 
