@@ -37,19 +37,19 @@ public:
     virtual int AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * selector) { return 0; }
     virtual int EndJob() { return 0; }
     
+    std::string mName;
+    std::string mLegend;
+    
     // LJMET event content setters
     /// Declare a new histogram to be created for the module
-    void SetHistogram(std::string name, int nbins, double low, double high) { mpEc->SetHistogram(mName, name, nbins, low, high); }
-    void SetHistValue(std::string name, double value) { mpEc->SetHistValue(mName, name, value); }
+    void SetHistogram(std::string name, int nbins, double low, double high);
+    void SetHistValue(std::string name, double value);
     void SetValue(std::string name, bool value);
     void SetValue(std::string name, int value);
     void SetValue(std::string name, double value);
     void SetValue(std::string name, std::vector<bool> value);
     void SetValue(std::string name, std::vector<int> value);
     void SetValue(std::string name, std::vector<double> value);
-    
-    std::string mName;
-    std::string mLegend;
     
 protected:
     edm::ParameterSet mPset;

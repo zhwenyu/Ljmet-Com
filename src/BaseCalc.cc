@@ -7,6 +7,16 @@ mLegend("")
 {
 }
 
+void BaseCalc::SetHistogram(std::string name, int nbins, double low, double high)
+{
+    mpEc->SetHistogram(mName, name, nbins, low, high);
+}
+
+void BaseCalc::SetHistValue(std::string name, double value)
+{
+    mpEc->SetHistValue(mName, name, value);
+}
+
 void BaseCalc::SetValue(std::string name, bool value)
 {
     std::string _name = name + "_" + mName;
