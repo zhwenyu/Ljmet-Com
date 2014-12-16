@@ -32,7 +32,6 @@ process.ljmet.excluded_calculators = cms.vstring(
 
 # common calculator options
 process.load('LJMet.Com.commonCalc_cfi')
-process.CommonCalc.dummy_parameter = cms.string('Dummy parameter value')
 
 # pileup calculator options
 process.load('LJMet.Com.pileupCalc_cfi')
