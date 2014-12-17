@@ -182,17 +182,6 @@ process.pvSelector.maxRho  = cms.double(2.0)
 
 # tight muon
 process.load('PhysicsTools.SelectorUtils.pfMuonSelector_cfi') 
-process.pfMuonSelector.version            = cms.string('TOPPAG12_LJETS')
-process.pfMuonSelector.Chi2               = cms.double(10.0)
-process.pfMuonSelector.minTrackerLayers   = cms.int32(6)
-process.pfMuonSelector.minValidMuHits     = cms.int32(1)
-process.pfMuonSelector.maxIp              = cms.double(0.2)
-process.pfMuonSelector.minPixelHits       = cms.int32(1)
-process.pfMuonSelector.minMatchedStations = cms.int32(2)
-process.pfMuonSelector.maxPfRelIso        = cms.double(0.12)
-process.pfMuonSelector.cutsToIgnore       = cms.vstring()
-
-
 
 # loose muon
 process.looseMuonSelector = process.pfMuonSelector.clone()

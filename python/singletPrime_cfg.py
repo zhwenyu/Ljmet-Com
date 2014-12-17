@@ -183,40 +183,20 @@ process.pvSelector.maxRho  = cms.double(2.0)
 
 # Tight muon
 process.load('LJMet.Com.pfMuonSelector_cfi') 
-process.pfMuonSelector.version          = cms.string('TOPPAG12_LJETS')
-process.pfMuonSelector.Chi2             = cms.double(10.0)
-process.pfMuonSelector.NHits            = cms.int32(0)
-process.pfMuonSelector.minValidMuHits       = cms.int32(1)
-process.pfMuonSelector.maxIp               = cms.double(0.2)
-process.pfMuonSelector.maxPfRelIso            = cms.double(0.12) # 0.12
-process.pfMuonSelector.minPixelHits       = cms.int32(1)
-process.pfMuonSelector.minMatchedStations = cms.int32(2)
-process.pfMuonSelector.minTrackerLayers = cms.int32(6)
-process.pfMuonSelector.cutsToIgnore     = cms.vstring('TrackerMuon')
 
 # Loose muon
 process.looseMuonSelector = process.pfMuonSelector.clone()
-process.looseMuonSelector.PFIso        = cms.double(0.2)
-process.looseMuonSelector.nLayersWithMeasurement = cms.int32(0) # not sure why it has to be like this
+process.looseMuonSelector.maxPfRelIso = cms.double(0.2)
 process.looseMuonSelector.cutsToIgnore = cms.vstring('TrackerMuon',
-                                                     'Chi2',
-                                                     'NHits',
-                                                     'NValMuHits',
-                                                     'D0',
-                                                     'nPixelHits',
-                                                     'nMatchedStations',
-                                                     #'nLayersWithMeasurement'
+                                                     'Chi2'
                                                      )
 
 # electron
 process.load('LJMet.Com.cutbasedIDSelector_cfi')
-process.cutbasedIDSelector.version = cms.string('TIGHT')
-process.cutbasedIDSelector.cutsToIgnore     = cms.vstring()
 
 # loose electron
 process.looseElectronSelector = process.cutbasedIDSelector.clone()
 process.looseElectronSelector.version = cms.string('VETO')
-process.looseElectronSelector.cutsToIgnore     = cms.vstring()
 
 # jets
 process.load('PhysicsTools.SelectorUtils.pfJetIDSelector_cfi') 
