@@ -100,7 +100,7 @@ private:
 };
 
 
-//static int reg = LjmetFactory::GetInstance()->Register(new DileptonEventSelector(), "DileptonSelector");
+static int reg = LjmetFactory::GetInstance()->Register(new DileptonEventSelector(), "DileptonSelector");
 
 
 DileptonEventSelector::DileptonEventSelector(){
