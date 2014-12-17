@@ -32,7 +32,6 @@ process.ljmet.excluded_calculators = cms.vstring(
 
 # common calculator options
 process.load('LJMet.Com.commonCalc_cfi')
-process.CommonCalc.dummy_parameter = cms.string('Dummy parameter value')
 
 # pileup calculator options
 process.load('LJMet.Com.pileupCalc_cfi')
@@ -66,7 +65,6 @@ process.event_selector = cms.PSet(
                                   JECdown                  = cms.bool(False),
                                   JERup                    = cms.bool(False),
                                   JERdown                  = cms.bool(False),
-                                  do53xJEC                 = cms.bool(True),
                                   
                                   # b tagging
                                   btagOP                  = cms.string("CSVM"),
@@ -115,11 +113,11 @@ process.event_selector = cms.PSet(
                                   
                                   # input collections
                                   trigger_collection       = cms.InputTag('TriggerResults::HLT'),
-                                  pv_collection            = cms.InputTag('goodOfflinePrimaryVertices'),
-                                  jet_collection           = cms.InputTag('goodPatJetsPFlow'),
-                                  muon_collection          = cms.InputTag('selectedPatMuonsPFlow'),
-                                  electron_collection      = cms.InputTag('selectedPatElectronsPFlow'),
-                                  met_collection           = cms.InputTag('patMETsPFlow'),
+                                  pv_collection            = cms.InputTag('offlineSlimmedPrimaryVertices'),
+                                  jet_collection           = cms.InputTag('slimmedJets'),
+                                  muon_collection          = cms.InputTag('slimmedMuons'),
+                                  electron_collection      = cms.InputTag('slimmedElectrons'),
+                                  met_collection           = cms.InputTag('slimmedMETs'),
                                   type1corrmet_collection  = cms.InputTag('pfType1CorrectedMet'),
                                   
                                   )
@@ -175,7 +173,7 @@ process.outputs = cms.PSet (
 
 # Primary vertex
 process.load('PhysicsTools.SelectorUtils.pvSelector_cfi')
-process.pvSelector.pvSrc   = cms.InputTag('goodOfflinePrimaryVertices')
+process.pvSelector.pvSrc   = cms.InputTag('offlineSlimmedPrimaryVertices')
 process.pvSelector.minNdof = cms.double(4.0)
 process.pvSelector.maxZ    = cms.double(24.0)
 process.pvSelector.maxRho  = cms.double(2.0)
@@ -184,17 +182,6 @@ process.pvSelector.maxRho  = cms.double(2.0)
 
 # tight muon
 process.load('PhysicsTools.SelectorUtils.pfMuonSelector_cfi') 
-process.pfMuonSelector.version            = cms.string('TOPPAG12_LJETS')
-process.pfMuonSelector.Chi2               = cms.double(10.0)
-process.pfMuonSelector.minTrackerLayers   = cms.int32(6)
-process.pfMuonSelector.minValidMuHits     = cms.int32(1)
-process.pfMuonSelector.maxIp              = cms.double(0.2)
-process.pfMuonSelector.minPixelHits       = cms.int32(1)
-process.pfMuonSelector.minMatchedStations = cms.int32(2)
-process.pfMuonSelector.maxPfRelIso        = cms.double(0.12)
-process.pfMuonSelector.cutsToIgnore       = cms.vstring()
-
-
 
 # loose muon
 process.looseMuonSelector = process.pfMuonSelector.clone()
