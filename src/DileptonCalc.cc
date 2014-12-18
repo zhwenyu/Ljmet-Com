@@ -29,7 +29,7 @@ public:
     virtual ~DileptonCalc(){}
     
     virtual int BeginJob();
-    virtual int AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * selector);
+    virtual int AnalyzeEvent(edm::Event const & event, BaseEventSelector * selector);
     virtual int EndJob(){return 0;}
     
 private:
@@ -125,7 +125,7 @@ int DileptonCalc::BeginJob()
     return 0;
 }
 
-int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * selector)
+int DileptonCalc::AnalyzeEvent(edm::Event const & event, BaseEventSelector * selector)
 {
     //
     // compute event variables here
