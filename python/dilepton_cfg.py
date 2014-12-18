@@ -80,11 +80,11 @@ process.event_selector = cms.PSet(
     btag_3                   = cms.bool(False),
 
     trigger_collection       = cms.InputTag('TriggerResults::HLT'),
-    pv_collection            = cms.InputTag('goodOfflinePrimaryVertices'),
-    jet_collection           = cms.InputTag('goodPatJetsPFlow'),
-    muon_collection          = cms.InputTag('selectedPatMuonsPFlow'),
-    electron_collection      = cms.InputTag('selectedPatElectronsPFlow'),
-    met_collection           = cms.InputTag('patMETsPFlow'),
+    pv_collection            = cms.InputTag('offlineSlimmedPrimaryVertices'),
+    jet_collection           = cms.InputTag('slimmedJets'),
+    muon_collection          = cms.InputTag('slimmedMuons'),
+    electron_collection      = cms.InputTag('slimmedElectrons'),
+    met_collection           = cms.InputTag('slimmedMETs'),
 
     
     JEC_txtfile = cms.string('/data1/speer/tblsm/cmssw/CMSSW_5_3_3/src/LJMet/Com/cond/Summer12_V2_DATA_AK5PF_UncertaintySources.txt'),
@@ -131,7 +131,7 @@ process.outputs = cms.PSet (
 
 # Primary vertex
 process.load('PhysicsTools.SelectorUtils.pvSelector_cfi')
-process.pvSelector.pvSrc   = cms.InputTag('goodOfflinePrimaryVertices')
+process.pvSelector.pvSrc   = cms.InputTag('offlineSlimmedPrimaryVertices')
 process.pvSelector.minNdof = cms.double(4.0)
 process.pvSelector.maxZ    = cms.double(24.0)
 process.pvSelector.maxRho  = cms.double(2.0)

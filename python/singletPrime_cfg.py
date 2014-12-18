@@ -22,7 +22,6 @@ process.ljmet.excluded_calculators = cms.vstring(
 
 # common calculator options
 process.load('LJMet.Com.commonCalc_cfi')
-process.CommonCalc.dummy_parameter = cms.string('Dummy parameter value')
 
 # Stop calculator options
 process.load('LJMet.Com.stopCalc_cfi')
@@ -116,14 +115,12 @@ process.event_selector = cms.PSet(
     JERdown                  = cms.bool(False),
     JEC_txtfile = cms.string(relBase+'/src/LJMet/singletPrime/JEC/Summer13_V5_DATA_UncertaintySources_AK5PF.txt'),
     trigger_collection       = cms.InputTag('TriggerResults::HLT'),
-    pv_collection            = cms.InputTag('goodOfflinePrimaryVertices'),
-    jet_collection           = cms.InputTag('goodPatJetsPFlow'),
-    muon_collection          = cms.InputTag('selectedPatMuonsPFlow'),
-    electron_collection      = cms.InputTag('selectedPatElectronsPFlow'),
-    met_collection           = cms.InputTag('patMETsPFlow'),
+    pv_collection            = cms.InputTag('offlineSlimmedPrimaryVertices'),
+    jet_collection           = cms.InputTag('slimmedJets'),
+    muon_collection          = cms.InputTag('slimmedMuons'),
+    electron_collection      = cms.InputTag('slimmedElectrons'),
+    met_collection           = cms.InputTag('slimmedMETs'),
     type1corrmet_collection  = cms.InputTag('pfType1CorrectedMet'),
-
-    do53xJEC                 = cms.bool(True),
 
     MCL1JetPar               = cms.string(relBase+'/src/LJMet/singletPrime/JEC/Summer13_V4_MC_L1FastJet_AK5PFchs.txt'),
     MCL2JetPar               = cms.string(relBase+'/src/LJMet/singletPrime/JEC/Summer13_V4_MC_L2Relative_AK5PFchs.txt'),
@@ -179,47 +176,27 @@ process.outputs = cms.PSet (
 
 # Primary vertex
 process.load('PhysicsTools.SelectorUtils.pvSelector_cfi')
-process.pvSelector.pvSrc   = cms.InputTag('goodOfflinePrimaryVertices')
+process.pvSelector.pvSrc   = cms.InputTag('offlineSlimmedPrimaryVertices')
 process.pvSelector.minNdof = cms.double(4.0)
 process.pvSelector.maxZ    = cms.double(24.0)
 process.pvSelector.maxRho  = cms.double(2.0)
 
 # Tight muon
 process.load('LJMet.Com.pfMuonSelector_cfi') 
-process.pfMuonSelector.version          = cms.string('TOPPAG12_LJETS')
-process.pfMuonSelector.Chi2             = cms.double(10.0)
-process.pfMuonSelector.NHits            = cms.int32(0)
-process.pfMuonSelector.minValidMuHits       = cms.int32(1)
-process.pfMuonSelector.maxIp               = cms.double(0.2)
-process.pfMuonSelector.maxPfRelIso            = cms.double(0.12) # 0.12
-process.pfMuonSelector.minPixelHits       = cms.int32(1)
-process.pfMuonSelector.minMatchedStations = cms.int32(2)
-process.pfMuonSelector.minTrackerLayers = cms.int32(6)
-process.pfMuonSelector.cutsToIgnore     = cms.vstring('TrackerMuon')
 
 # Loose muon
 process.looseMuonSelector = process.pfMuonSelector.clone()
-process.looseMuonSelector.PFIso        = cms.double(0.2)
-process.looseMuonSelector.nLayersWithMeasurement = cms.int32(0) # not sure why it has to be like this
+process.looseMuonSelector.maxPfRelIso = cms.double(0.2)
 process.looseMuonSelector.cutsToIgnore = cms.vstring('TrackerMuon',
-                                                     'Chi2',
-                                                     'NHits',
-                                                     'NValMuHits',
-                                                     'D0',
-                                                     'nPixelHits',
-                                                     'nMatchedStations',
-                                                     #'nLayersWithMeasurement'
+                                                     'Chi2'
                                                      )
 
 # electron
 process.load('LJMet.Com.cutbasedIDSelector_cfi')
-process.cutbasedIDSelector.version = cms.string('TIGHT')
-process.cutbasedIDSelector.cutsToIgnore     = cms.vstring()
 
 # loose electron
 process.looseElectronSelector = process.cutbasedIDSelector.clone()
 process.looseElectronSelector.version = cms.string('VETO')
-process.looseElectronSelector.cutsToIgnore     = cms.vstring()
 
 # jets
 process.load('PhysicsTools.SelectorUtils.pfJetIDSelector_cfi') 

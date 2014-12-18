@@ -1,18 +1,19 @@
 import FWCore.ParameterSet.Config as cms
 
 # available bDiscrimiant:
+# - combinedInclusiveSecondaryVertexV2BJetTags
+# - combinedMVABJetTags
 # - jetBProbabilityBJetTags
 # - jetProbabilityBJetTags
+# - pfCombinedSecondaryVertexBJetTags
+# - simpleSecondaryVertexHighEffBJetTags
 # - trackCountingHighPurBJetTags
 # - trackCountingHighEffBJetTags
-# - simpleSecondaryVertexHighEffBJetTags
 # - simpleSecondaryVertexHighPurBJetTags
-# - combinedSecondaryVertexBJetTags (this is the default)
-# - combinedInclusiveSecondaryVertexBJetTags
 
 JetSubCalc = cms.PSet(
                       slimmedJetColl     = cms.InputTag("slimmedJets"),
                       slimmedJetsAK8Coll = cms.InputTag("slimmedJetsAK8"),
-                      bDiscriminant      = cms.string("combinedSecondaryVertexBJetTags"),
-                      tagInfo            = cms.string("CATop")
+                      bDiscriminant      = cms.string("pfCombinedSecondaryVertexBJetTags"),
+                      tagInfo            = cms.string("caTop")
                       )
