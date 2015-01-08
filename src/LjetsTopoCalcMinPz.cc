@@ -51,7 +51,7 @@ private:
 
 
 
-static int reg = LjmetFactory::GetInstance()->Register(new LjetsTopoCalcMinPz(), "LjetsTopoCalcMinPz");
+//static int reg = LjmetFactory::GetInstance()->Register(new LjetsTopoCalcMinPz(), "LjetsTopoCalcMinPz");
 
 
 
