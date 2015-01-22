@@ -207,7 +207,12 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
     std::vector <double> elOoemoop;
     std::vector <int>    elMHits;
     std::vector <int>    elVtxFitConv;
-    
+
+    //added CMSDAS variables
+    std::vector <double> diElMass;
+    std::vector <int> elCharge1;
+    std::vector <int> elCharge2;
+
     //Extra info about isolation
     std::vector <double> elChIso;
     std::vector <double> elNhIso;
@@ -255,6 +260,23 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
             elPhi    . push_back((*iel)->ecalDrivenMomentum().phi());
             elEnergy . push_back((*iel)->ecalDrivenMomentum().energy());
             
+	    //if there are two electrons calculate invariant mass from two highest pt objects
+	    if(vSelElectrons.size()==2){
+	      for (std::vector<edm::Ptr<pat::Electron> >::const_iterator iiel = vSelElectrons.begin(); iiel != vSelElectrons.end(); iiel++){
+		//float mass = pow( (*iel)->ecalDrivenMomentum().energy() * (*iiel)->ecalDrivenMomentum().energy() - ( (*iel)->ecalDrivenMomentum().pt() * (*iiel)->ecalDrivenMomentum().pt() - (*iel)->ecalDrivenMomentum().pz() * (*iiel)->ecalDrivenMomentum().pz()), 0.5);
+		if(iiel!=iel){
+		  TLorentzVector diElFourVec( (*iel)->ecalDrivenMomentum().px() + (*iiel)->ecalDrivenMomentum().px(),(*iel)->ecalDrivenMomentum().py() + (*iiel)->ecalDrivenMomentum().py(),(*iel)->ecalDrivenMomentum().pz() + (*iiel)->ecalDrivenMomentum().pz(), (*iel)->ecalDrivenMomentum().energy() + (*iiel)->ecalDrivenMomentum().energy());
+		  diElMass.push_back(diElFourVec.M());
+		  elCharge1.push_back( (*iel)->charge());
+		  elCharge2.push_back( (*iiel)->charge());
+		}
+	      }
+	    }
+	    else{ 
+	      diElMass.push_back(-1);
+	      elCharge1.push_back(-99999);
+	      elCharge2.push_back(-99998);
+	      }
             //Isolation
             double AEff  = ElectronEffectiveArea::GetElectronEffectiveArea(ElectronEffectiveArea::kEleGammaAndNeutralHadronIso03,
                                                                            (*iel)->superCluster()->eta(), ElectronEffectiveArea::kEleEAData2012);
@@ -351,6 +373,11 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
     SetValue("elEta"    , elEta);
     SetValue("elPhi"    , elPhi);
     SetValue("elEnergy" , elEnergy);
+
+    //cmsdas variables
+    SetValue("diElMass", diElMass);
+    SetValue("elCharge1", elCharge1);
+    SetValue("elCharge2", elCharge2);
     
     SetValue("elCharge", elCharge);
     //Quality requirements
@@ -427,6 +454,10 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
     std::vector <double> muNhIso;
     std::vector <double> muGIso;
     std::vector <double> muPuIso;
+
+    //ID info
+    std::vector <int> muIsTight;
+    std::vector<int> muIsLoose;
     
     //Generator level information -- MC matching
     vector<double> muGen_Reco_dr;
@@ -461,6 +492,10 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
             muPhi    . push_back((*imu)->phi());
             muEnergy . push_back((*imu)->energy());
             
+
+	    muIsTight.push_back((*imu)->isTightMuon(goodPVs.at(0)));
+	    muIsLoose.push_back((*imu)->isLooseMuon());
+
             muGlobal.push_back(((*imu)->isGlobalMuon()<<2)+(*imu)->isTrackerMuon());
             //Chi2
             muChi2 . push_back((*imu)->globalTrack()->normalizedChi2());
@@ -540,7 +575,11 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
     SetValue("muEta"    , muEta);
     SetValue("muPhi"    , muPhi);
     SetValue("muEnergy" , muEnergy);
-    
+  
+    //muon ids
+    SetValue("muIsTight", muIsTight);
+    SetValue("muIsLoose",muIsLoose);
+  
     //Quality criteria
     SetValue("muChi2"   , muChi2);
     SetValue("muDxy"    , muDxy);
@@ -865,7 +904,7 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
             const reco::GenParticle & p = (*genParticles).at(i);
             
             //Find status 3 particles
-            if (p.status() == 3){
+            if (p.status() == 23){
                 reco::Candidate* mother = (reco::Candidate*) p.mother();
                 if (not mother)            continue;
                 

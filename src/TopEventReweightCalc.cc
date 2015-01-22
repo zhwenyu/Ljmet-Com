@@ -96,7 +96,7 @@ private:
 };
 
 
-static int reg = LjmetFactory::GetInstance()->Register(new TopEventReweightCalc(), "TopEventReweightCalc");
+//static int reg = LjmetFactory::GetInstance()->Register(new TopEventReweightCalc(), "TopEventReweightCalc");
 
 
 TopEventReweightCalc::TopEventReweightCalc(){
