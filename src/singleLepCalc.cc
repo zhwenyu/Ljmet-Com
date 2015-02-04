@@ -11,12 +11,19 @@
 #include "LJMet/Com/interface/LjmetFactory.h"
 #include "LJMet/Com/interface/LjmetEventContent.h"
 #include "TLorentzVector.h"
-#include "EgammaAnalysis/ElectronTools/interface/ElectronEffectiveArea.h"
+
 #include "DataFormats/HLTReco/interface/TriggerEvent.h"
 #include "DataFormats/Common/interface/TriggerResults.h"
 #include "DataFormats/PatCandidates/interface/TriggerObject.h"
 #include "FWCore/Common/interface/TriggerNames.h"
 #include "DataFormats/Math/interface/deltaR.h"
+#include "EgammaAnalysis/ElectronTools/interface/ElectronEffectiveArea.h"
+#include "LJMet/Com/interface/TopElectronSelector.h"
+
+#include "DataFormats/JetReco/interface/CATopJetTagInfo.h"
+
+using std::cout;
+using std::endl;
 
 class LjmetFactory;
 
@@ -26,16 +33,32 @@ public:
     virtual ~singleLepCalc();
     virtual int BeginJob();
     virtual int AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * selector);
-    virtual int EndJob();
+    virtual int EndJob(){return 0;};
     
 private:
-    edm::InputTag triggerSummary_;
-    edm::InputTag triggerCollection_;
     edm::InputTag rhoSrc_;
     edm::InputTag muonSrc_;
     bool isWJets_;
     bool isTB_;
     bool isTT_;
+    bool                      isMc;
+    std::string               dataType;
+//    edm::InputTag             rhoSrc_it;
+    edm::InputTag             pvCollection_it;
+    edm::InputTag             genParticles_it;
+    std::vector<unsigned int> keepPDGID;
+    std::vector<unsigned int> keepMomPDGID;
+    bool keepFullMChistory;
+
+    double rhoIso;
+
+    boost::shared_ptr<TopElectronSelector>     electronSelL_, electronSelM_, electronSelT_;
+    std::vector<reco::Vertex> goodPVs;
+    int findMatch(const reco::GenParticleCollection & genParticles, int idToMatch, double eta, double phi);
+    double mdeltaR(double eta1, double phi1, double eta2, double phi2);
+    void fillMotherInfo(const reco::Candidate *mother, int i, vector <int> & momid, vector <int> & momstatus, vector<double> & mompt, vector<double> & mometa, vector<double> & momphi, vector<double> & momenergy);
+
+
 };
 
 static int reg = LjmetFactory::GetInstance()->Register(new singleLepCalc(), "singleLepCalc");
@@ -50,15 +73,18 @@ singleLepCalc::~singleLepCalc()
 
 int singleLepCalc::BeginJob()
 {
-    if (mPset.exists("triggerSummary")) triggerSummary_ = mPset.getParameter<edm::InputTag>("triggerSummary");
-    else                                triggerSummary_ = edm::InputTag("hltTriggerSummaryAOD");
-    
-    if (mPset.exists("triggerCollection")) triggerCollection_ = mPset.getParameter<edm::InputTag>("triggerCollection");
-    else                                triggerCollection_ = edm::InputTag("TriggerResults::HLT");
-    
+    if (mPset.exists("dataType"))     dataType = mPset.getParameter<std::string>("dataType");
+    else                              dataType = "None"; 
+
     if (mPset.exists("rhoSrc")) rhoSrc_ = mPset.getParameter<edm::InputTag>("rhoSrc");
     else                        rhoSrc_ = edm::InputTag("fixedGridRhoAll");
-    
+
+    if (mPset.exists("pvCollection")) pvCollection_it = mPset.getParameter<edm::InputTag>("pvCollection");
+    else                              pvCollection_it = edm::InputTag("offlineSlimmedPrimaryVertices");
+
+    if (mPset.exists("isMc"))         isMc = mPset.getParameter<bool>("isMc");
+    else                              isMc = false;
+
     if (mPset.exists("isTB"))    isTB_ = mPset.getParameter<bool>("isTB");
     else                         isTB_ = false;
     
@@ -67,449 +93,714 @@ int singleLepCalc::BeginJob()
     
     if (mPset.exists("isWJets")) isWJets_ = mPset.getParameter<bool>("isWJets");
     else                         isWJets_ = false;
-    
+
+    if (mPset.exists("genParticles")) genParticles_it = mPset.getParameter<edm::InputTag>("genParticles");
+    else                              genParticles_it = edm::InputTag("prunedGenParticles");
+
+    if (mPset.exists("keepPDGID"))    keepPDGID = mPset.getParameter<std::vector<unsigned int> >("keepPDGID");
+    else                              keepPDGID.clear();
+
+    if (mPset.exists("keepMomPDGID")) keepMomPDGID = mPset.getParameter<std::vector<unsigned int> >("keepMomPDGID");
+    else                              keepMomPDGID.clear();
+
+    if (mPset.exists("keepFullMChistory")) keepFullMChistory = mPset.getParameter<bool>("keepFullMChistory");
+    else                                   keepFullMChistory = true;
+    cout << "keepFullMChistory "     <<    keepFullMChistory << endl;
+ 
+    if ( mPset.exists("cutbasedIDSelectorLoose")){
+        electronSelL_ = boost::shared_ptr<TopElectronSelector>(
+                                                               new TopElectronSelector(mPset.getParameter<edm::ParameterSet>("cutbasedIDSelectorLoose")) );
+    }
+    else {
+        std::cout << "DileptonCalc: Loose electron selector not configured, exiting"
+        << std::endl;
+        std::exit(-1);
+    }
+    if ( mPset.exists("cutbasedIDSelectorMedium")){
+        electronSelM_ = boost::shared_ptr<TopElectronSelector>(
+                                                               new TopElectronSelector(mPset.getParameter<edm::ParameterSet>("cutbasedIDSelectorMedium")) );
+    }
+    else {
+        std::cout << "DileptonCalc: Medium electron selector not configured, exiting"
+        << std::endl;
+        std::exit(-1);
+    }
+    if ( mPset.exists("cutbasedIDSelectorTight")){
+        electronSelT_ = boost::shared_ptr<TopElectronSelector>(
+                                                               new TopElectronSelector(mPset.getParameter<edm::ParameterSet>("cutbasedIDSelectorTight")) );
+    }
+    else {
+        std::cout << "DileptonCalc: Tight electron selector not configured, exiting"
+        << std::endl;
+        std::exit(-1);
+    }
+   
     return 0;
 }
 
 int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * selector)
-{
-    // ----- Get objects from the selector -----
+{     // ----- Get objects from the selector -----
     std::vector<edm::Ptr<pat::Jet> >            const & vSelJets = selector->GetSelectedJets();
     std::vector<edm::Ptr<pat::Jet> >            const & vSelBtagJets = selector->GetSelectedBtagJets();
     std::vector<edm::Ptr<pat::Jet> >            const & vAllJets = selector->GetAllJets();
     std::vector<std::pair<TLorentzVector,bool>> const & vCorrBtagJets = selector->GetCorrJetsWithBTags();
     std::vector<edm::Ptr<pat::Muon> >           const & vSelMuons = selector->GetSelectedMuons();
-    std::vector<edm::Ptr<pat::Muon> >           const & vLooseMuons = selector->GetLooseMuons();
     std::vector<edm::Ptr<pat::Electron> >       const & vSelElectrons = selector->GetSelectedElectrons();
-    std::vector<edm::Ptr<pat::Electron> >       const & vLooseElectrons = selector->GetLooseElectrons();
     edm::Ptr<pat::MET>                          const & pMet = selector->GetMet();
-    edm::Ptr<reco::PFMET>                       const & pType1CorrMet = selector->GetType1CorrMet();
-    TLorentzVector                              const & corrMET = selector->GetCorrectedMet();
-    std::vector<edm::Ptr<reco::Vertex> >        const & vSelPVs = selector->GetSelectedPVs();
-    
+    std::vector<unsigned int>             const & vSelTriggers  = selector->GetSelectedTriggers();    
     // ----- Event kinematics -----
     int _nAllJets        = (int)vAllJets.size();
     int _nSelJets        = (int)vSelJets.size();
     int _nSelBtagJets    = (int)vSelBtagJets.size();
     int _nCorrBtagJets   = (int)vCorrBtagJets.size();
     int _nSelMuons       = (int)vSelMuons.size();
-    int _nLooseMuons     = (int)vLooseMuons.size();
     int _nSelElectrons   = (int)vSelElectrons.size();
-    int _nLooseElectrons = (int)vLooseElectrons.size();
-    int _nSelPVs         = (int)vSelPVs.size();
-    
-    SetValue("nPV", _nSelPVs);
-    
+    edm::Handle<std::vector<reco::Vertex> > pvHandle;
+    event.getByLabel(pvCollection_it, pvHandle);
+    goodPVs = *(pvHandle.product());
+
+    SetValue("nPV", (int)goodPVs.size());
+
+
+ 
+     // _____ Primary dataset (from python cfg) _____________________
+     //
+     //   
+    int dataE  = 0;
+    int dataM  = 0;
+ 
+    if      (dataType == "E" or dataType == "Electron") dataE = 1;
+    else if (dataType == "M" or dataType == "Muon") dataM = 1;
+    else if (dataType == "All" or dataType == "ALL") {
+        dataE = 1; dataM = 1; 
+    }
+
+    SetValue("dataE", dataE);
+    SetValue("dataM", dataM);
+
+
+ 
     // Trigger
-    edm::Handle<edm::TriggerResults > mhEdmTriggerResults;
-    event.getByLabel(triggerCollection_ , mhEdmTriggerResults);
-    //const edm::ParameterSetID ps = mhEdmTriggerResults->parameterSetID();
-    const edm::TriggerNames trigNames = event.triggerNames(*mhEdmTriggerResults);
-    
-    unsigned int _tSize = mhEdmTriggerResults->size();
-    
-    int passTrigEle27v10 = -1;
-    int passTrigIsoMu24v13 = -1;
-    
-    unsigned int _tElMCIndex = trigNames.triggerIndex("HLT_Ele32_eta2p1_WP85_Gsf_v1");
-    if ( _tElMCIndex<_tSize){
-        passTrigEle27v10 = mhEdmTriggerResults->accept(_tElMCIndex);
+    int passE = 0;
+    int passM = 0;
+
+    if (vSelTriggers.size() == 2) {
+        passE = (int)vSelTriggers.at(0);
+        passM = (int)vSelTriggers.at(1);
     }
-    
-    unsigned int _tMuMCIndex = trigNames.triggerIndex("HLT_IsoMu24_eta2p1_IterTrk02_v1");
-    if ( _tMuMCIndex<_tSize){
-        passTrigIsoMu24v13 = mhEdmTriggerResults->accept(_tMuMCIndex);
-    }
-    
+
+ 
     // Muon
-    double _muon_1_pt     = -std::numeric_limits<double>::max();
-    double _muon_1_phi    = -std::numeric_limits<double>::max();
-    double _muon_1_eta    = -std::numeric_limits<double>::max();
-    double _muon_1_RelIso = -std::numeric_limits<double>::max();
+   
     
-    if (_nSelMuons>0) {
-        _muon_1_pt = vSelMuons[0]->pt();
-        _muon_1_phi = vSelMuons[0]->phi();
-        _muon_1_eta = vSelMuons[0]->eta();
-        
-        double chIso = vSelMuons[0]->userIsolation(pat::PfChargedHadronIso);
-        double nhIso = vSelMuons[0]->userIsolation(pat::PfNeutralHadronIso);
-        double gIso  = vSelMuons[0]->userIsolation(pat::PfGammaIso);
-        double puIso = vSelMuons[0]->userIsolation(pat::PfPUChargedHadronIso);
-        _muon_1_RelIso = (chIso + std::max(0.,nhIso + gIso - 0.5*puIso))/_muon_1_pt;
-    }
     
-    SetValue("muon_1_pt",_muon_1_pt);
-    SetValue("muon_1_phi",_muon_1_phi);
-    SetValue("muon_1_eta",_muon_1_eta);
-    SetValue("muon_1_RelIso",_muon_1_RelIso);
-    
+    std::vector <int> muCharge;
+    std::vector <int> muGlobal;
+    //Four vector
+    std::vector <double> muPt;
+    std::vector <double> muEta;
+    std::vector <double> muPhi;
+    std::vector <double> muEnergy;
+    //Quality criteria
+    std::vector <double> muChi2;
+    std::vector <double> muDxy;
+    std::vector <double> muDz;
+    std::vector <double> muRelIso;
+
+    std::vector <int> muNValMuHits;
+    std::vector <int> muNMatchedStations;
+    std::vector <int> muNValPixelHits;
+    std::vector <int> muNTrackerLayers;
+    //Extra info about isolation
+    std::vector <double> muChIso;
+    std::vector <double> muNhIso;
+    std::vector <double> muGIso;
+    std::vector <double> muPuIso;
+    //ID info
+    std::vector <int> muIsTight;
+    std::vector<int> muIsLoose;
+
+    //Generator level information -- MC matching
+    vector<double> muGen_Reco_dr;
+    vector<int> muPdgId;
+    vector<int> muStatus;
+    vector<int> muMatched;
+    vector<int> muNumberOfMothers;
+    vector<double> muMother_pt;
+    vector<double> muMother_eta;
+    vector<double> muMother_phi;
+    vector<double> muMother_energy;
+    vector<int> muMother_id;
+    vector<int> muMother_status;
+    //Matched gen muon information:
+    vector<double> muMatchedPt;
+    vector<double> muMatchedEta;
+    vector<double> muMatchedPhi;
+    vector<double> muMatchedEnergy;
+
+    for (std::vector<edm::Ptr<pat::Muon> >::const_iterator imu = vSelMuons.begin(); imu != vSelMuons.end(); imu++) 
+        //Protect against muons without tracks (should never happen, but just in case)
+        if ((*imu)->globalTrack().isNonnull() and (*imu)->globalTrack().isAvailable() and
+            (*imu)->innerTrack().isNonnull()  and (*imu)->innerTrack().isAvailable()){
+
+
+            //charge
+            muCharge.push_back((*imu)->charge());
+            // 4-vector 
+            muPt     . push_back((*imu)->pt());
+            muEta    . push_back((*imu)->eta());
+            muPhi    . push_back((*imu)->phi());
+            muEnergy . push_back((*imu)->energy());
+
+            muIsTight.push_back((*imu)->isTightMuon(goodPVs.at(0)));
+            muIsLoose.push_back((*imu)->isLooseMuon());
+
+            muGlobal.push_back(((*imu)->isGlobalMuon()<<2)+(*imu)->isTrackerMuon());
+            //chi2
+            muChi2 . push_back((*imu)->globalTrack()->normalizedChi2());
+            //Isolation
+            double chIso  = (*imu)->userIsolation(pat::PfChargedHadronIso);
+            double nhIso  = (*imu)->userIsolation(pat::PfNeutralHadronIso);
+            double gIso   = (*imu)->userIsolation(pat::PfGammaIso);
+            double puIso  = (*imu)->userIsolation(pat::PfPUChargedHadronIso);
+            double relIso = (chIso + std::max(0.,nhIso + gIso - 0.5*puIso)) / (*imu)->pt();
+            muRelIso . push_back(relIso);
+
+            muChIso . push_back(chIso);
+            muNhIso . push_back(nhIso);
+            muGIso  . push_back(gIso);
+            muPuIso . push_back(puIso);
+            //IP: for some reason this is with respect to the first vertex in the collection
+            if (goodPVs.size() > 0){
+                muDxy . push_back((*imu)->muonBestTrack()->dxy(goodPVs.at(0).position()));
+                muDz  . push_back((*imu)->muonBestTrack()->dz(goodPVs.at(0).position()));
+            } else {
+                muDxy . push_back(-999);
+                muDz  . push_back(-999);
+            }
+            //Numbers of hits
+            muNValMuHits       . push_back((*imu)->globalTrack()->hitPattern().numberOfValidMuonHits());
+            muNMatchedStations . push_back((*imu)->numberOfMatchedStations());
+            muNValPixelHits    . push_back((*imu)->innerTrack()->hitPattern().numberOfValidPixelHits());
+            muNTrackerLayers   . push_back((*imu)->innerTrack()->hitPattern().trackerLayersWithMeasurement());
+            if(isMc && keepFullMChistory){
+                edm::Handle<reco::GenParticleCollection> genParticles;
+                event.getByLabel(genParticles_it, genParticles);
+                int matchId = findMatch(*genParticles, 13, (*imu)->eta(), (*imu)->phi());
+                double closestDR = 10000.;
+                if (matchId>=0) {
+                    const reco::GenParticle & p = (*genParticles).at(matchId);
+                    closestDR = mdeltaR( (*imu)->eta(), (*imu)->phi(), p.eta(), p.phi());
+                    if(closestDR < 0.3){
+                        muGen_Reco_dr.push_back(closestDR);
+                        muPdgId.push_back(p.pdgId());
+                        muStatus.push_back(p.status());
+                        muMatched.push_back(1);
+                        muMatchedPt.push_back( p.pt());
+                        muMatchedEta.push_back(p.eta());
+                        muMatchedPhi.push_back(p.phi());
+                        muMatchedEnergy.push_back(p.energy());
+                        int oldSize = muMother_id.size();
+                        fillMotherInfo(p.mother(), 0, muMother_id, muMother_status, muMother_pt, muMother_eta, muMother_phi, muMother_energy);
+                        muNumberOfMothers.push_back(muMother_id.size()-oldSize);
+                    }
+                }
+                if(closestDR >= 0.3){
+                    muNumberOfMothers.push_back(-1);
+                    muGen_Reco_dr.push_back(-1.0);
+                    muPdgId.push_back(-1);
+                    muStatus.push_back(-1);
+                    muMatched.push_back(0);
+                    muMatchedPt.push_back(-1000.0);
+                    muMatchedEta.push_back(-1000.0);
+                    muMatchedPhi.push_back(-1000.0);
+                    muMatchedEnergy.push_back(-1000.0);
+                }
+            }
+        }
+     // }
+    SetValue("muCharge", muCharge);
+    SetValue("muGlobal", muGlobal);
+    SetValue("muPt"     , muPt);
+    SetValue("muEta"    , muEta);
+    SetValue("muPhi"    , muPhi);
+    SetValue("muEnergy" , muEnergy);
+    SetValue("muIsTight", muIsTight);
+    SetValue("muIsLoose",muIsLoose); 
+    //Quality criteria
+    SetValue("muChi2"   , muChi2);
+    SetValue("muDxy"    , muDxy);
+    SetValue("muDz"     , muDz);
+    SetValue("muRelIso" , muRelIso);
+
+    SetValue("muNValMuHits"       , muNValMuHits);
+    SetValue("muNMatchedStations" , muNMatchedStations);
+    SetValue("muNValPixelHits"    , muNValPixelHits);
+    SetValue("muNTrackerLayers"   , muNTrackerLayers);
+    SetValue("muChIso", muChIso);
+    SetValue("muNhIso", muNhIso);
+    SetValue("muGIso" , muGIso);
+    SetValue("muPuIso", muPuIso);
+    //MC matching -- mother information
+    SetValue("muGen_Reco_dr", muGen_Reco_dr);
+    SetValue("muPdgId", muPdgId);
+    SetValue("muStatus", muStatus);
+    SetValue("muMatched",muMatched);
+    SetValue("muMother_pt", muMother_pt);
+    SetValue("muMother_eta", muMother_eta);
+    SetValue("muMother_phi", muMother_phi);
+    SetValue("muMother_energy", muMother_energy);
+    SetValue("muMother_status", muMother_status);
+    SetValue("muMother_id", muMother_id);
+    SetValue("muNumberOfMothers", muNumberOfMothers);
+    //Matched gen muon information:
+    SetValue("muMatchedPt", muMatchedPt);
+    SetValue("muMatchedEta", muMatchedEta);
+    SetValue("muMatchedPhi", muMatchedPhi);
+    SetValue("muMatchedEnergy", muMatchedEnergy);
+
+
+
+
     // Electron
-    
+    //Four vector
+    std::vector <double> elPt;
+    std::vector <double> elEta;
+    std::vector <double> elPhi;
+    std::vector <double> elEnergy;
+
+    //Quality criteria
+    std::vector <double> elRelIso;
+    std::vector <double> elDxy;
+    std::vector <int>    elNotConversion;
+    std::vector <int>    elChargeConsistent;
+    std::vector <int>    elIsEBEE;
+    std::vector <int>    elQuality;
+    std::vector <int>    elCharge;
+
+    //ID requirement
+    std::vector <double> elDeta;
+    std::vector <double> elDphi;
+    std::vector <double> elSihih;
+    std::vector <double> elHoE;
+    std::vector <double> elD0;
+    std::vector <double> elDZ;
+    std::vector <double> elOoemoop;
+    std::vector <int>    elMHits;
+    std::vector <int>    elVtxFitConv;    
+
+    //Extra info about isolation
+    std::vector <double> elChIso;
+    std::vector <double> elNhIso;
+    std::vector <double> elPhIso;
+    std::vector <double> elAEff;
+    std::vector <double> elRhoIso;
+
+    //mother-information
+    //Generator level information -- MC matching
+    vector<double> elGen_Reco_dr;
+    vector<int> elPdgId;
+    vector<int> elStatus;
+    vector<int> elMatched;
+    vector<int> elNumberOfMothers;
+    vector<double> elMother_pt;
+    vector<double> elMother_eta;
+    vector<double> elMother_phi;
+    vector<double> elMother_energy;
+    vector<int> elMother_id;
+    vector<int> elMother_status;
+    //Matched gen electron information:
+    vector<double> elMatchedPt;
+    vector<double> elMatchedEta;
+    vector<double> elMatchedPhi;
+    vector<double> elMatchedEnergy;
+
+ 
     edm::Handle<double> rhoHandle;
     event.getByLabel(rhoSrc_, rhoHandle);
     double rhoIso = std::max(*(rhoHandle.product()), 0.0);
-    
-    double _electron_1_pt     = -std::numeric_limits<double>::max();
-    double _electron_1_phi    = -std::numeric_limits<double>::max();
-    double _electron_1_eta    = -std::numeric_limits<double>::max();
-    double _electron_1_RelIso = -std::numeric_limits<double>::max();
-    
-    if (_nSelElectrons>0) {
-        _electron_1_pt = vSelElectrons[0]->ecalDrivenMomentum().pt();
-        _electron_1_phi = vSelElectrons[0]->phi();
-        _electron_1_eta = vSelElectrons[0]->eta();
+    pat::strbitset retElectron  = electronSelL_->getBitTemplate();
+    bool retElectronT,retElectronM,retElectronL; 
+    //
+    //_____Electrons______
+    //
+
+    for (std::vector<edm::Ptr<pat::Electron> >::const_iterator iel = vSelElectrons.begin(); iel != vSelElectrons.end(); iel++){
+        //Protect against electrons without tracks (should never happen, but just in case)
+        if ((*iel)->gsfTrack().isNonnull() and (*iel)->gsfTrack().isAvailable()){
+            //Four vector
+            elPt     . push_back((*iel)->ecalDrivenMomentum().pt()); //Must check: why ecalDrivenMomentum?
+            elEta    . push_back((*iel)->ecalDrivenMomentum().eta());
+            elPhi    . push_back((*iel)->ecalDrivenMomentum().phi());
+            elEnergy . push_back((*iel)->ecalDrivenMomentum().energy());
+
+
+            //Isolation
+            double AEff  = ElectronEffectiveArea::GetElectronEffectiveArea(ElectronEffectiveArea::kEleGammaAndNeutralHadronIso03,
+                                                                           (*iel)->superCluster()->eta(), ElectronEffectiveArea::kEleEAData2012);
+            double chIso = (*iel)->chargedHadronIso();
+            double nhIso = (*iel)->neutralHadronIso();
+            double phIso = (*iel)->photonIso();
+            double relIso = ( chIso + max(0.0, nhIso + phIso - rhoIso*AEff) ) / (*iel)->pt();
+
+            elChIso  . push_back(chIso);
+            elNhIso  . push_back(nhIso);
+            elPhIso  . push_back(phIso);
+            elAEff   . push_back(AEff);
+            elRhoIso . push_back(rhoIso);
+
+            elRelIso . push_back(relIso);
+            //Conversion rejection
+            int nLostHits = (*iel)->gsfTrack()->hitPattern().numberOfLostHits(reco::HitPattern::MISSING_INNER_HITS);
+            double dist   = (*iel)->convDist();
+            double dcot   = (*iel)->convDcot();
+            int notConv   = nLostHits == 0 and (fabs(dist) > 0.02 or fabs(dcot) > 0.02);
+            elCharge.push_back((*iel)->charge());
+            elNotConversion.push_back(notConv);
+
+            retElectronL = (*electronSelL_)(**iel, event, retElectron);
+            retElectronM = (*electronSelM_)(**iel, event, retElectron);
+            retElectronT = (*electronSelT_)(**iel, event, retElectron);
+
+            elQuality.push_back((retElectronT<<2) + (retElectronM<<1) + retElectronL);
+
+            //IP: for some reason this is with respect to the first vertex in the collection
+            if(goodPVs.size() > 0){
+                elDxy.push_back((*iel)->gsfTrack()->dxy(goodPVs.at(0).position()));
+                elDZ.push_back((*iel)->gsfTrack()->dz(goodPVs.at(0).position()));
+            } else {
+                elDxy.push_back(-999);
+                elDZ.push_back(-999);
+            }
+            elChargeConsistent.push_back((*iel)->isGsfCtfScPixChargeConsistent());
+            elIsEBEE.push_back(((*iel)->isEBEEGap()<<2) + ((*iel)->isEE()<<1) + (*iel)->isEB());
+            elDeta.push_back((*iel)->deltaEtaSuperClusterTrackAtVtx());
+            elDphi.push_back((*iel)->deltaPhiSuperClusterTrackAtVtx());
+            elSihih.push_back((*iel)->sigmaIetaIeta());
+            elHoE.push_back((*iel)->hadronicOverEm());
+            elD0.push_back((*iel)->dB());
+            elOoemoop.push_back(1.0/(*iel)->ecalEnergy() + (*iel)->eSuperClusterOverP()/(*iel)->ecalEnergy());
+            elMHits.push_back((*iel)->gsfTrack()->hitPattern().numberOfHits(reco::HitPattern::MISSING_INNER_HITS));
+            elVtxFitConv.push_back((*iel)->passConversionVeto());
+            if(isMc && keepFullMChistory){
+                cout << "start\n";
+                edm::Handle<reco::GenParticleCollection> genParticles;
+                event.getByLabel(genParticles_it, genParticles);
+                int matchId = findMatch(*genParticles, 11, (*iel)->eta(), (*iel)->phi());
+                double closestDR = 10000.;
+                cout << "matchId "<<matchId <<endl;
+                if (matchId>=0) {
+                    const reco::GenParticle & p = (*genParticles).at(matchId);
+                    closestDR = mdeltaR( (*iel)->eta(), (*iel)->phi(), p.eta(), p.phi());
+                    cout << "closestDR "<<closestDR <<endl;
+                    if(closestDR < 0.3){
+                        elGen_Reco_dr.push_back(closestDR);
+                        elPdgId.push_back(p.pdgId());
+                        elStatus.push_back(p.status());
+                        elMatched.push_back(1);
+                        elMatchedPt.push_back( p.pt());
+                        elMatchedEta.push_back(p.eta());
+                        elMatchedPhi.push_back(p.phi());
+                        elMatchedEnergy.push_back(p.energy());
+                        int oldSize = elMother_id.size();
+                        fillMotherInfo(p.mother(), 0, elMother_id, elMother_status, elMother_pt, elMother_eta, elMother_phi, elMother_energy);
+                        elNumberOfMothers.push_back(elMother_id.size()-oldSize);
+                    }
+                }
+                if(closestDR >= 0.3){
+                    elNumberOfMothers.push_back(-1);
+                    elGen_Reco_dr.push_back(-1.0);
+                    elPdgId.push_back(-1);
+                    elStatus.push_back(-1);
+                    elMatched.push_back(0);
+                    elMatchedPt.push_back(-1000.0);
+                    elMatchedEta.push_back(-1000.0);
+                    elMatchedPhi.push_back(-1000.0);
+                    elMatchedEnergy.push_back(-1000.0);
+
+                }
+            }//closing the isMC checking criteria
+        }
+    }
+
+    //Four vector
+    SetValue("elPt"     , elPt);
+    SetValue("elEta"    , elEta);
+    SetValue("elPhi"    , elPhi);
+    SetValue("elEnergy" , elEnergy);
+
+    SetValue("elCharge", elCharge);
+    //Quality requirements
+    SetValue("elRelIso" , elRelIso); //Isolation
+    SetValue("elDxy"    , elDxy);    //Dxy
+    SetValue("elNotConversion" , elNotConversion);  //Conversion rejection
+    SetValue("elChargeConsistent", elChargeConsistent);
+    SetValue("elIsEBEE", elIsEBEE);
+    SetValue("elQuality", elQuality);
+
+    //ID cuts
+    SetValue("elDeta", elDeta);
+    SetValue("elDphi", elDphi);
+    SetValue("elSihih", elSihih);
+    SetValue("elHoE", elHoE);
+    SetValue("elD0", elD0);
+    SetValue("elDZ", elDZ);
+    SetValue("elOoemoop", elOoemoop);
+    SetValue("elMHits", elMHits);
+    SetValue("elVtxFitConv", elVtxFitConv);
+
+    //Extra info about isolation
+    SetValue("elChIso" , elChIso);
+    SetValue("elNhIso" , elNhIso);
+    SetValue("elPhIso" , elPhIso);
+    SetValue("elAEff"  , elAEff);
+    SetValue("elRhoIso", elRhoIso);
+
+    //MC matching -- mother information
+    SetValue("elNumberOfMothers", elNumberOfMothers);
+    SetValue("elGen_Reco_dr", elGen_Reco_dr);
+    SetValue("elPdgId", elPdgId);
+    SetValue("elStatus", elStatus);
+    SetValue("elMatched",elMatched);
+    SetValue("elMother_pt", elMother_pt);
+    SetValue("elMother_eta", elMother_eta);
+    SetValue("elMother_phi", elMother_phi);
+    SetValue("elMother_energy", elMother_energy);
+    SetValue("elMother_status", elMother_status);
+    SetValue("elMother_id", elMother_id);
+    //Matched gen muon information:
+    SetValue("elMatchedPt", elMatchedPt);
+    SetValue("elMatchedEta", elMatchedEta);
+    SetValue("elMatchedPhi", elMatchedPhi);
+    SetValue("elMatchedEnergy", elMatchedEnergy);
+
+    //
+    //_____ Jets ______________________________
+    //
+
+       
+    //Get all AK8 jets (not just for W and Top)
+    edm::InputTag AK8JetColl = edm::InputTag("slimmedJetsAK8");
+    edm::Handle<std::vector<pat::Jet> > AK8Jets;
+    event.getByLabel(AK8JetColl, AK8Jets);
+
+    //Four vector
+    std::vector <double> AK8JetPt;
+    std::vector <double> AK8JetEta;
+    std::vector <double> AK8JetPhi;
+    std::vector <double> AK8JetEnergy;
+
+    std::vector <double> AK8JetCSV;
+    //   std::vector <double> AK8JetRCN;       
+    for (std::vector<pat::Jet>::const_iterator ijet = AK8Jets->begin(); ijet != AK8Jets->end(); ijet++){
+
+        //Four vector
+        AK8JetPt     . push_back(ijet->pt());
+        AK8JetEta    . push_back(ijet->eta());
+        AK8JetPhi    . push_back(ijet->phi());
+        AK8JetEnergy . push_back(ijet->energy());
+
+        AK8JetCSV    . push_back(ijet->bDiscriminator( "combinedInclusiveSecondaryVertexV2BJetTags"));
+        //     AK8JetRCN    . push_back((ijet->chargedEmEnergy()+ijet->chargedHadronEnergy()) / (ijet->neutralEmEnergy()+ijet->neutralHadronEnergy()));
+    }
+ 
+    //Four vector
+    SetValue("AK8JetPt"     , AK8JetPt);
+    SetValue("AK8JetEta"    , AK8JetEta);
+    SetValue("AK8JetPhi"    , AK8JetPhi);
+    SetValue("AK8JetEnergy" , AK8JetEnergy);
+
+    SetValue("AK8JetCSV"    , AK8JetCSV);
+    //   SetValue("AK8JetRCN"    , AK8JetRCN);
+    //Get AK4 Jets
+    //Four vector
+    std::vector <double> AK4JetPt;
+    std::vector <double> AK4JetEta;
+    std::vector <double> AK4JetPhi;
+    std::vector <double> AK4JetEnergy;
+
+    std::vector <int>    AK4JetTBag;
+    std::vector <double> AK4JetRCN;   
+    double AK4HT =.0;
+    for (std::vector<edm::Ptr<pat::Jet> >::const_iterator ijet = vSelJets.begin();
+         ijet != vSelJets.end(); ijet++){
+
+        //Four vector
+        TLorentzVector lv = selector->correctJet(**ijet, event);
+
+        AK4JetPt     . push_back(lv.Pt());
+        AK4JetEta    . push_back(lv.Eta());
+        AK4JetPhi    . push_back(lv.Phi());
+        AK4JetEnergy . push_back(lv.Energy());
         
-        double AEff  = ElectronEffectiveArea::GetElectronEffectiveArea(ElectronEffectiveArea::kEleGammaAndNeutralHadronIso03, vSelElectrons[0]->superCluster()->eta(), ElectronEffectiveArea::kEleEAData2012);
-        double chIso = vSelElectrons[0]->chargedHadronIso();
-        double nhIso = vSelElectrons[0]->neutralHadronIso();
-        double phIso = vSelElectrons[0]->photonIso();
-        _electron_1_RelIso  = ( chIso + max(0.0, nhIso + phIso - rhoIso*AEff) )/ vSelElectrons[0]->ecalDrivenMomentum().pt();
-        
+        AK4JetTBag   . push_back(selector->isJetTagged(**ijet, event));
+        AK4JetRCN    . push_back(((*ijet)->chargedEmEnergy()+(*ijet)->chargedHadronEnergy()) / ((*ijet)->neutralEmEnergy()+(*ijet)->neutralHadronEnergy()));
+ 
+        //HT
+        AK4HT += lv.Pt(); 
     }
     
-    SetValue("elec_1_pt", _electron_1_pt);
-    SetValue("elec_1_phi", _electron_1_phi);
-    SetValue("elec_1_eta", _electron_1_eta);
-    SetValue("elec_1_RelIso", _electron_1_RelIso);
-    
-    double _electron_2_pt     = -std::numeric_limits<double>::max();
-    double _electron_2_phi    = -std::numeric_limits<double>::max();
-    double _electron_2_eta    = -std::numeric_limits<double>::max();
-    double _electron_2_RelIso = -std::numeric_limits<double>::max();
-    
-    if (_nSelElectrons>1) {
-        _electron_2_pt = vSelElectrons[1]->ecalDrivenMomentum().pt();
-        _electron_2_phi = vSelElectrons[1]->phi();
-        _electron_2_eta = vSelElectrons[1]->eta();
-        
-        double AEff  = ElectronEffectiveArea::GetElectronEffectiveArea(ElectronEffectiveArea::kEleGammaAndNeutralHadronIso03, vSelElectrons[1]->superCluster()->eta(), ElectronEffectiveArea::kEleEAData2012);
-        double chIso = vSelElectrons[1]->chargedHadronIso();
-        double nhIso = vSelElectrons[1]->neutralHadronIso();
-        double phIso = vSelElectrons[1]->photonIso();
-        _electron_2_RelIso  = ( chIso + max(0.0, nhIso + phIso - rhoIso*AEff) )/ vSelElectrons[1]->ecalDrivenMomentum().pt();
-        
-    }
-    
-    SetValue("elec_2_pt", _electron_2_pt);
-    SetValue("elec_2_phi", _electron_2_phi);
-    SetValue("elec_2_eta", _electron_2_eta);
-    SetValue("elec_2_RelIso", _electron_2_RelIso);
-    
-    // Trigger Matching
-    //    edm::Handle<trigger::TriggerEvent> mhEdmTriggerEvent;
-    //    event.getByLabel(triggerSummary_,mhEdmTriggerEvent);
-    //    trigger::TriggerObjectCollection allObjects = mhEdmTriggerEvent->getObjects();
-    //
-    //    int _electron_1_hltmatched =0;
-    //    int _electron_2_hltmatched =0;
-    //
-    //    if (_nSelElectrons>0) {
-    //      for(int i=0; i<mhEdmTriggerEvent->sizeFilters(); i++){
-    //        if( mhEdmTriggerEvent->filterTag(i).label()!="hltEle27WP80TrackIsoFilter") continue;
-    //	trigger::Keys keys = mhEdmTriggerEvent->filterKeys(i);
-    //        double dR1 = 999.0;
-    //        double dR2 = 999.0;
-    //        for(size_t j=0; j<keys.size(); j++){
-    //	  dR1=deltaR(allObjects[keys[j]].eta(),allObjects[keys[j]].phi(),_electron_1_eta,_electron_1_phi);
-    //	  if (_nSelElectrons>1) dR2=deltaR(allObjects[keys[j]].eta(),allObjects[keys[j]].phi(),_electron_2_eta,_electron_2_phi);
-    //	  if ( (dR1 < 0.5) || (dR2 < 0.5) ) {
-    //	    if (dR1 < 0.5 && dR2 < 0.5 && dR1<dR2 ) _electron_1_hltmatched = 1;
-    //	    else if (dR1 < 0.5 && dR2 < 0.5 && dR2<dR1 ) _electron_2_hltmatched = 1;
-    //	    else if (dR1 < 0.5 && dR2 >= 0.5 ) _electron_1_hltmatched =1;
-    //	    else if (dR2 < 0.5 && dR1 >= 0.5 ) _electron_2_hltmatched =1;
-    //	  }
-    //        }
-    //      }
-    //    }
-    //
-    //    SetValue("electron_1_hltmatched",_electron_1_hltmatched);
-    //    SetValue("electron_2_hltmatched",_electron_2_hltmatched);
-    //
-    //    double _el1el2_mass = -999.0;
-    //    if (_nSelElectrons>1) {
-    //      math::XYZTLorentzVector lv_el1 = vSelElectrons[0]->p4();
-    //      math::XYZTLorentzVector lv_el2 = vSelElectrons[1]->p4();
-    //      math::XYZTLorentzVector lv_el1el2 = lv_el1+lv_el2;
-    //      _el1el2_mass = lv_el1el2.M();
-    //    }
-    //    SetValue("el1el2_mass",_el1el2_mass);
-    
+    //Four vector
+    SetValue("AK4JetPt"     , AK4JetPt);
+    SetValue("AK4JetEta"    , AK4JetEta);
+    SetValue("AK4JetPhi"    , AK4JetPhi);
+    SetValue("AK4JetEnergy" , AK4JetEnergy);
+    SetValue("AK4HT"        , AK4HT);
+    SetValue("AK4JetTBag"   , AK4JetTBag);
+    SetValue("AK4JetRCN"    , AK4JetRCN);
+
     // MET
-    double _met = -std::numeric_limits<double>::max();
-    double _met_phi = -std::numeric_limits<double>::max();
-    math::XYZTLorentzVector lv_met;
+    double _met = -9999.0;
+    double _met_phi = -9999.0;
+    // Corrected MET
+    double _corr_met = -9999.0;
+    double _corr_met_phi = -9999.0;
+
     if(pMet.isNonnull() && pMet.isAvailable()) {
-        lv_met = pMet->p4();
-        _met = lv_met.pt();
-        _met_phi = lv_met.phi();
+        _met = pMet->p4().pt();
+        _met_phi = pMet->p4().phi();
+
+        TLorentzVector corrMET = selector->correctMet(*pMet, event);
+        if(corrMET.Pt()>0) {
+            _corr_met = corrMET.Pt();
+            _corr_met_phi = corrMET.Phi();
+        }
+
     }
     SetValue("met", _met);
     SetValue("met_phi", _met_phi);
-    
-    double _type1corrmet = -std::numeric_limits<double>::max();
-    double _type1corrmet_phi = -std::numeric_limits<double>::max();
-    math::XYZTLorentzVector lv_type1corrmet;
-    if(pType1CorrMet.isNonnull() && pType1CorrMet.isAvailable()) {
-        lv_type1corrmet = pType1CorrMet->p4();
-        _type1corrmet = lv_type1corrmet.pt();
-        _type1corrmet_phi = lv_type1corrmet.phi();
-    }
-    SetValue("type1corrmet", _type1corrmet);
-    SetValue("type1corrmet_phi", _type1corrmet_phi);
-    
-    // Corrected MET
-    Double_t _corr_met = -std::numeric_limits<double>::max();
-    Double_t _corr_met_phi = -std::numeric_limits<double>::max();
-    
-    if(corrMET.Pt()>0) {
-        _corr_met = corrMET.Pt();
-        _corr_met_phi = corrMET.Phi();
-    }
-    
     SetValue("corr_met", _corr_met);
     SetValue("corr_met_phi", _corr_met_phi);
-    
-    // Store Jet Vectors for the selected jets and the bjets
-    vector<Double_t> jet_pt;
-    vector<Double_t> jet_eta;
-    vector<Double_t> jet_phi;
-    vector<int> jet_tag;
-    vector<Double_t> bjet_pt;
-    vector<Double_t> bjet_eta;
-    vector<Double_t> bjet_phi;
-    int nbtags = 0;
-    
-    
-    for(int i=0; i<_nCorrBtagJets; i++){
-        
-        jet_pt.push_back(vCorrBtagJets[i].first.Pt());
-        jet_eta.push_back(vCorrBtagJets[i].first.Eta());
-        jet_phi.push_back(vCorrBtagJets[i].first.Phi());
-        jet_tag.push_back(int(vCorrBtagJets[i].second));
-        
-        if( vCorrBtagJets[i].second ){
-            nbtags++;
-            bjet_pt.push_back(vCorrBtagJets[i].first.Pt());
-            bjet_eta.push_back(vCorrBtagJets[i].first.Eta());
-            bjet_phi.push_back(vCorrBtagJets[i].first.Phi());
-        }
-    }
-    
-    SetValue("jet_pt", jet_pt);
-    SetValue("jet_eta", jet_eta);
-    SetValue("jet_phi", jet_phi);
-    SetValue("jet_tag", jet_tag);
-    SetValue("bjet_pt", bjet_pt);
-    SetValue("bjet_eta", bjet_eta);
-    SetValue("bjet_phi", bjet_phi);
-    SetValue("n_btags", nbtags);
-    
-    
-    vector<int> jet_flavor;
-    int nBjets = 0;
-    int nCjets = 0;
-    
-    for(int i=0; i<_nSelJets; i++){
-        jet_flavor.push_back( abs(vSelJets[i]->partonFlavour()) );
-        if( abs(vSelJets[i]->partonFlavour())==5 ) nBjets++;
-        if( abs(vSelJets[i]->partonFlavour())==4 ) nCjets++;
-    }
-    
-    SetValue("n_Bjets", nBjets);
-    SetValue("n_Cjets", nCjets);
-    SetValue("jet_flavor", jet_flavor);
-    
-    //Event weights
-    
-    double _weight_WJets = 1.0;
-    if (isWJets_) {
-        if ( nBjets > 0)  _weight_WJets = 1.21*0.92;
-        if ( nBjets == 0 and nCjets > 0) _weight_WJets = 1.66*0.92;
-        if ( nBjets == 0 and nCjets == 0) _weight_WJets = 1.0*0.85;
-    } else {
-        _weight_WJets = 1.0;
-    }
-    SetValue("weight_WJets", _weight_WJets);
-    
-    
-    double _weight_muon_eff = 1.0;
-    //A+B+C Tight ID*ISO(dBeta<0.12)*TRIG(IsoMu24_eta2p1)
-    //A+B = 5.32 C = 0.495
-    if (_nSelMuons>0) {
-        if (abs(_muon_1_eta) <= 0.9 ) _weight_muon_eff = 0.9925*1.0000*0.9815;
-        if ( 0.9 < abs(_muon_1_eta) && abs(_muon_1_eta) <= 1.2 ) _weight_muon_eff = 0.9928*1.0006*0.9651;
-        if ( 1.2 < abs(_muon_1_eta) && abs(_muon_1_eta) <= 2.1 ) _weight_muon_eff = 0.9960*1.0006*0.9968;
-    }
-    SetValue("weight_MuonEff", _weight_muon_eff);
-    
-    double _weight_electron_eff = 1.0;
-    // Cut based Tight ID scale factors
-    if (_nSelElectrons>0) {
-        if ( abs(_electron_1_eta) <= 0.8 ) {
-            if (_electron_1_pt > 30.0 && _electron_1_pt <= 40.0 ) _weight_electron_eff = 0.978;
-            else if (_electron_1_pt > 40.0 && _electron_1_pt <= 50.0 ) _weight_electron_eff = 0.981;
-            else if (_electron_1_pt > 50.0 ) _weight_electron_eff = 0.982;
-        }
-        else if (0.8 < abs(_electron_1_eta) && abs(_electron_1_eta) <= 1.442 ) {
-            if (_electron_1_pt > 30.0 && _electron_1_pt <= 40.0 ) _weight_electron_eff = 0.958;
-            else if (_electron_1_pt > 40.0 && _electron_1_pt <= 50.0 ) _weight_electron_eff = 0.969;
-            else if (_electron_1_pt > 50.0 ) _weight_electron_eff = 0.969;
-        }
-        else if ( 1.442 < abs(_electron_1_eta) && abs(_electron_1_eta) <= 1.556 ) {
-            if (_electron_1_pt > 30.0 && _electron_1_pt <= 40.0 ) _weight_electron_eff = 0.907;
-            else if (_electron_1_pt > 40.0 && _electron_1_pt <= 50.0 ) _weight_electron_eff = 0.904;
-            else if (_electron_1_pt > 50.0 ) _weight_electron_eff = 0.926;
-        }
-        else if ( 1.556 < abs(_electron_1_eta) && abs(_electron_1_eta) <=  2.0 ) {
-            if (_electron_1_pt > 30.0 && _electron_1_pt <= 40.0 ) _weight_electron_eff = 0.909;
-            else if (_electron_1_pt > 40.0 && _electron_1_pt <= 50.0 ) _weight_electron_eff = 0.942;
-            else if (_electron_1_pt > 50.0 ) _weight_electron_eff = 0.957;
-        }
-        else if ( 2.0 < abs(_electron_1_eta) && abs(_electron_1_eta) < 2.5 ) {
-            if (_electron_1_pt > 30.0 && _electron_1_pt <= 40.0 ) _weight_electron_eff = 0.987;
-            else if (_electron_1_pt > 40.0 && _electron_1_pt <= 50.0 ) _weight_electron_eff = 0.991;
-            else if (_electron_1_pt > 50.0 ) _weight_electron_eff = 0.999;
-        }
-    }
-    SetValue("weight_ElectronEff", _weight_electron_eff);
-    
-    double _weight_electron_eff_53x = 1.0;
-    // Cut based Tight ID scale factors for 53x
-    if (_nSelElectrons>0) {
-        if ( abs(_electron_1_eta) <= 0.8 ) {
-            if (_electron_1_pt > 30.0 && _electron_1_pt <= 40.0 ) _weight_electron_eff_53x = 0.988;
-            else if (_electron_1_pt > 40.0 && _electron_1_pt <= 50.0 ) _weight_electron_eff_53x = 0.989;
-            else if (_electron_1_pt > 50.0 ) _weight_electron_eff_53x = 0.988;
-        }
-        else if (0.8 < abs(_electron_1_eta) && abs(_electron_1_eta) <= 1.442 ) {
-            if (_electron_1_pt > 30.0 && _electron_1_pt <= 40.0 ) _weight_electron_eff_53x = 0.971;
-            else if (_electron_1_pt > 40.0 && _electron_1_pt <= 50.0 ) _weight_electron_eff_53x = 0.977;
-            else if (_electron_1_pt > 50.0 ) _weight_electron_eff_53x = 0.981;
-        }
-        else if ( 1.442 < abs(_electron_1_eta) && abs(_electron_1_eta) <= 1.556 ) {
-            if (_electron_1_pt > 30.0 && _electron_1_pt <= 40.0 ) _weight_electron_eff_53x = 0.995;
-            else if (_electron_1_pt > 40.0 && _electron_1_pt <= 50.0 ) _weight_electron_eff_53x = 0.963;
-            else if (_electron_1_pt > 50.0 ) _weight_electron_eff_53x = 0.974;
-        }
-        else if ( 1.556 < abs(_electron_1_eta) && abs(_electron_1_eta) <=  2.0 ) {
-            if (_electron_1_pt > 30.0 && _electron_1_pt <= 40.0 ) _weight_electron_eff_53x = 0.977;
-            else if (_electron_1_pt > 40.0 && _electron_1_pt <= 50.0 ) _weight_electron_eff_53x = 0.994;
-            else if (_electron_1_pt > 50.0 ) _weight_electron_eff_53x = 0.991;
-        }
-        else if ( 2.0 < abs(_electron_1_eta) && abs(_electron_1_eta) < 2.5 ) {
-            if (_electron_1_pt > 30.0 && _electron_1_pt <= 40.0 ) _weight_electron_eff_53x = 1.027;
-            else if (_electron_1_pt > 40.0 && _electron_1_pt <= 50.0 ) _weight_electron_eff_53x = 1.025;
-            else if (_electron_1_pt > 50.0 ) _weight_electron_eff_53x = 1.015;
-        }
-    }
-    SetValue("weight_ElectronEff_53x", _weight_electron_eff_53x);
-    
-    // Generator information
-    double _genTopMass = -1.0;
-    double _genTopPt = -1.0;
-    double _genDrLeptonTopBjet = -std::numeric_limits<double>::max();
-    double _genTopBjetPt = -1.0;
-    double _genTopBjetEta = -1.0;
-    double _genTopBjetPhi = -1.0;
-    
-    if (isTB_) {
+
+    //_____ Gen Info ______________________________
+    //
+
+    //Four vector
+    std::vector <double> genPt;
+    std::vector <double> genEta;
+    std::vector <double> genPhi;
+    std::vector <double> genEnergy;
+
+    //Identity
+    std::vector <int> genID;
+    std::vector <int> genIndex;
+    std::vector <int> genStatus;
+    std::vector <int> genMotherID;
+    std::vector <int> genMotherIndex;
+
+    if (isMc){
         edm::Handle<reco::GenParticleCollection> genParticles;
-        edm::InputTag genParticles_it = edm::InputTag("prunedGenParticles");
         event.getByLabel(genParticles_it, genParticles);
-        
-        int qLep = 0;
-        math::XYZTLorentzVector lv_genLep;
-        math::XYZTLorentzVector lv_genNu;
-        math::XYZTLorentzVector lv_genB;
-        math::XYZTLorentzVector lv_genBbar;
-        
-        for (size_t i = 0; i < genParticles->size(); i++) {
+
+        for(size_t i = 0; i < genParticles->size(); i++){
             const reco::GenParticle & p = (*genParticles).at(i);
-            if (p.status() == 3) {
-                if (fabs(p.pdgId())==11 or fabs(p.pdgId())==13) {
-                    lv_genLep = p.p4();
-                    if (p.pdgId()<0) qLep = 1;
-                    else qLep = -1;
+
+            //Find status 3 particles
+            if (p.status() == 23){
+                reco::Candidate* mother = (reco::Candidate*) p.mother();
+                if (not mother)            continue;
+
+                bool bKeep = false;
+                for (unsigned int uk = 0; uk < keepMomPDGID.size(); uk++){
+                    if (abs(mother->pdgId()) == (int) keepMomPDGID.at(uk)){
+                        bKeep = true;
+                        break;
+                    }
                 }
-                if (fabs(p.pdgId())==12 or fabs(p.pdgId())==14) lv_genNu = p.p4();
-                if (p.pdgId()==5) lv_genB = p.p4();
-                if (p.pdgId()==-5) lv_genBbar = p.p4();
+
+                if (not bKeep){
+                    for (unsigned int uk = 0; uk < keepPDGID.size(); uk++){
+                        if (abs(p.pdgId()) == (int) keepPDGID.at(uk)){
+                            bKeep = true;
+                            break;
+                        }
+                    }
+                }
+
+                if (not bKeep) continue;
+
+                //Find index of mother
+                int mInd = 0;
+                for(size_t j = 0; j < genParticles->size(); j++){
+                    const reco::GenParticle & q = (*genParticles).at(j);
+                    if (q.status() != 3) continue;
+                    if (mother->pdgId() == q.pdgId() and fabs(mother->eta() - q.eta()) < 0.01 and fabs(mother->pt() - q.pt()) < 0.01){
+                        mInd = (int) j;
+                        break;
+                    }
+                }
+
+                //Four vector
+                genPt     . push_back(p.pt());
+                genEta    . push_back(p.eta());
+                genPhi    . push_back(p.phi());
+                genEnergy . push_back(p.energy());
+
+                //Identity
+                genID            . push_back(p.pdgId());
+                genIndex         . push_back((int) i);
+                genStatus        . push_back(p.status());
+                genMotherID      . push_back(mother->pdgId());
+                genMotherIndex   . push_back(mInd);
             }
-        }
-        
-        math::XYZTLorentzVector lv_genTop;
-        math::XYZTLorentzVector lv_genOtherTop;
-        
-        if (qLep > 0) {
-            lv_genTop = lv_genLep + lv_genNu + lv_genB;
-            lv_genOtherTop = lv_genLep + lv_genNu + lv_genBbar;
-        }
-        else {
-            lv_genTop = lv_genLep + lv_genNu + lv_genBbar;
-            lv_genOtherTop = lv_genLep + lv_genNu + lv_genB;
-        }
-        
-        
-        
-        _genTopMass = lv_genTop.M();
-        _genTopPt = lv_genTop.Pt();
-        _genTopBjetPt = (qLep<0?lv_genBbar.Pt():lv_genB.Pt());
-        _genTopBjetEta = (qLep<0?lv_genBbar.Eta():lv_genB.Eta());
-        _genTopBjetPhi = (qLep<0?lv_genBbar.Phi():lv_genB.Phi());
-        
-        double deta = -std::numeric_limits<double>::max();
-        double dphi = -std::numeric_limits<double>::max();
-        
-        if (qLep<0) {
-            deta = lv_genLep.Eta()-lv_genBbar.Eta();
-            dphi = lv_genLep.Phi()-lv_genBbar.Phi();
-            if ( dphi > TMath::Pi() ) dphi -= 2.*TMath::Pi();
-            if ( dphi <= -TMath::Pi() ) dphi += 2.*TMath::Pi();
-            _genDrLeptonTopBjet = TMath::Sqrt(deta*deta + dphi*dphi);
-        } else {
-            deta = lv_genLep.Eta()-lv_genB.Eta();
-            dphi = lv_genLep.Phi()-lv_genB.Phi();
-            if ( dphi > TMath::Pi() ) dphi -= 2.*TMath::Pi();
-            if ( dphi <= -TMath::Pi() ) dphi += 2.*TMath::Pi();
-            _genDrLeptonTopBjet = TMath::Sqrt(deta*deta + dphi*dphi);
-        }
-        
-    }
-    
-    SetValue("genTopMass", _genTopMass);
-    SetValue("genTopPt", _genTopPt);
-    SetValue("genDrLeptonTopBjet", _genDrLeptonTopBjet);
-    SetValue("genTopBjetPt", _genTopBjetPt);
-    SetValue("genTopBjetEta", _genTopBjetEta);
-    SetValue("genTopBjetPhi", _genTopBjetPhi);
-    
-    double _genTTMass = -1.0;
-    
-    if (isTT_) {
-        edm::Handle<reco::GenParticleCollection> genParticles;
-        edm::InputTag genParticles_it = edm::InputTag("prunedGenParticles");
-        event.getByLabel(genParticles_it, genParticles);
-        
-        math::XYZTLorentzVector lv_genT;
-        math::XYZTLorentzVector lv_genTbar;
-        
-        for (size_t i = 0; i < genParticles->size(); i++) {
-            const reco::GenParticle & p = (*genParticles).at(i);
-            if (p.pdgId()==6) lv_genT = p.p4();
-            if (p.pdgId()==-6) lv_genTbar = p.p4();
-        }
-        math::XYZTLorentzVector lv_genTT =  lv_genT + lv_genTbar;
-        _genTTMass = lv_genTT.M();
-    }
-    
-    SetValue("genTTMass", _genTTMass);
-    
-    
+        }//End loop over gen particles
+    }  //End MC-only if
+    // Four vector
+    SetValue("genPt"    , genPt);
+    SetValue("genEta"   , genEta);
+    SetValue("genPhi"   , genPhi);
+    SetValue("genEnergy", genEnergy);
+
+    // Identity
+    SetValue("genID"         , genID);
+    SetValue("genIndex"      , genIndex);
+    SetValue("genStatus"     , genStatus);
+    SetValue("genMotherID"   , genMotherID);
+    SetValue("genMotherIndex", genMotherIndex);
+
+
+
     return 0;
 }
 
-int singleLepCalc::EndJob()
+int singleLepCalc::findMatch(const reco::GenParticleCollection & genParticles, int idToMatch, double eta, double phi)
 {
-    return 0;
+    float dRtmp = 1000;
+    float closestDR = 10000.;
+    int closestGenPart = -1;
+
+    for(size_t j = 0; j < genParticles.size(); ++ j) {
+        const reco::GenParticle & p = (genParticles).at(j);
+        dRtmp = mdeltaR( eta, phi, p.eta(), p.phi());
+        if ( dRtmp < closestDR && abs(p.pdgId()) == idToMatch){// && dRtmp < 0.3) {
+            closestDR = dRtmp;
+            closestGenPart = j;
+        }//end of requirement for matching
+    }//end of gen particle loop 
+    return closestGenPart;
 }
+
+
+double singleLepCalc::mdeltaR(double eta1, double phi1, double eta2, double phi2) {
+    return std::sqrt(deltaR2 (eta1, phi1, eta2, phi2));
+}
+
+void singleLepCalc::fillMotherInfo(const reco::Candidate *mother, int i, vector <int> & momid, vector <int> & momstatus, vector<double> & mompt, vector<double> & mometa, vector<double> & momphi, vector<double> & momenergy)
+{
+    if(mother) {
+        momid.push_back(mother->pdgId());
+        momstatus.push_back(mother->status());
+        mompt.push_back(mother->pt());
+        mometa.push_back(mother->eta());
+        momphi.push_back(mother->phi());
+        momenergy.push_back(mother->energy());
+        if(i<10)fillMotherInfo(mother->mother(), i+1, momid, momstatus, mompt, mometa, momphi, momenergy);
+    }
+
+
+}
+
+
+
+
+

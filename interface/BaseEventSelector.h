@@ -126,6 +126,7 @@ private:
     BTagSFUtil mBtagSfUtil;
     BtagHardcodedConditions mBtagCond;
     JetCorrectionUncertainty *jecUnc;
+    FactorizedJetCorrector *JetCorrector;
     LjmetEventContent * mpEc;
     
     /// Private init method to be called by LjmetFactory when registering the selector

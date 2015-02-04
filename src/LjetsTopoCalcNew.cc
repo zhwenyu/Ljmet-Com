@@ -54,7 +54,7 @@ private:
 
 
 
-static int reg = LjmetFactory::GetInstance()->Register(new LjetsTopoCalcNew(), "LjetsTopoCalcNew");
+//static int reg = LjmetFactory::GetInstance()->Register(new LjetsTopoCalcNew(), "LjetsTopoCalcNew");
 
 
 

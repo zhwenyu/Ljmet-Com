@@ -5,7 +5,7 @@ from LJMet.Com.cutbasedIDSelector_cfi import *
 DileptonCalc = cms.PSet (
                          isMc         = cms.bool(False),
                          dataType     = cms.string('ElMu'),
-                         rhoSrc       = cms.InputTag("kt6PFJetsForIsolation", "rho"),
+#                         rhoSrc       = cms.InputTag("fixedGridRhoAll", "rho"),
                          pvCollection = cms.InputTag("offlineSlimmedPrimaryVertices"),
                          genParticles = cms.InputTag("prunedGenParticles"),
                          keepPDGID    = cms.vuint32(8000001, 11, 12, 13, 14, 15, 16),

@@ -66,10 +66,10 @@ std::string BtagHardcodedConditions::getAlgoName(const std::string & op){
     else if( op == "JP")    return "jetProbabilityBJetTags";
     else if( op == "TCHPT") return "trackCountingHighPurBJetTags";
     else if( op == "TCHP") return "trackCountingHighPurBJetTags";
-    else if( op == "CSVL")  return "combinedSecondaryVertexBJetTags";
-    else if( op == "CSVM")  return "combinedSecondaryVertexBJetTags";
-    else if( op == "CSVT")  return "combinedSecondaryVertexBJetTags";
-    else if( op == "CSV")  return "combinedSecondaryVertexBJetTags";
+    else if( op == "CSVL")  return "combinedInclusiveSecondaryVertexV2BJetTags";
+    else if( op == "CSVM")  return "combinedInclusiveSecondaryVertexV2BJetTags";
+    else if( op == "CSVT")  return "combinedInclusiveSecondaryVertexV2BJetTags";
+    else if( op == "CSV")  return "combinedInclusiveSecondaryVertexV2BJetTags";
     throw cms::Exception("InvalidInput") << "Unknown tagger/operating point: "<< op << std::endl;
 }
 
@@ -78,9 +78,9 @@ float BtagHardcodedConditions::getDiscriminant(const std::string & op){
     else if( op == "JPM")   return 0.545;
     else if( op == "JPT")   return 0.79;
     else if( op == "TCHPT") return 3.41;
-    else if( op == "CSVL")  return 0.244;
-    else if( op == "CSVM")  return 0.679;
-    else if( op == "CSVT")  return 0.898;
+    else if( op == "CSVL")  return 0.423;
+    else if( op == "CSVM")  return 0.814;
+    else if( op == "CSVT")  return 0.941;
     throw cms::Exception("InvalidInput") << "Unknown operating point: "<< op << std::endl;
 }
 
