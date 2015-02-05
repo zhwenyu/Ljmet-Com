@@ -55,6 +55,21 @@ void BaseEventSelector::BeginJob(std::map<std::string, edm::ParameterSet const >
             msPar["MCL3JetPar"] = "../data/PHYS14_25_V2_L3Absolute_AK4PFchs.txt";
             _missing_config = true;
         }
+        if (par[_key].exists("MCL1JetParAK8")) msPar["MCL1JetParAK8"] = par[_key].getParameter<std::string> ("MCL1JetParAK8");
+        else{
+            msPar["MCL1JetParAK8"] = "../data/PHYS14_25_V2_L1FastJet_AK8PFchs.txt";
+            _missing_config = true;
+        }
+        if (par[_key].exists("MCL2JetParAK8")) msPar["MCL2JetParAK8"] = par[_key].getParameter<std::string> ("MCL2JetParAK8");
+        else{
+            msPar["MCL2JetParAK8"] = "../data/PHYS14_25_V2_L2Relative_AK8PFchs.txt";
+            _missing_config = true;
+        }
+        if (par[_key].exists("MCL3JetParAK8")) msPar["MCL3JetParAK8"] = par[_key].getParameter<std::string> ("MCL3JetParAK8");
+        else{
+            msPar["MCL3JetParAK8"] = "../data/PHYS14_25_V2_L3Absolute_AK8PFchs.txt";
+            _missing_config = true;
+        }
         
         if (par[_key].exists("DataL1JetPar")) msPar["DataL1JetPar"] = par[_key].getParameter<std::string> ("DataL1JetPar");
         else{
@@ -74,6 +89,26 @@ void BaseEventSelector::BeginJob(std::map<std::string, edm::ParameterSet const >
         if (par[_key].exists("DataResJetPar")) msPar["DataResJetPar"] = par[_key].getParameter<std::string> ("DataResJetPar");
         else{
             msPar["DataResJetPar"] = "../data/FT_53_V10_AN3_L2L3Residual_AK5PFchs.txt";
+            _missing_config = true;
+        }
+        if (par[_key].exists("DataL1JetParAK8")) msPar["DataL1JetParAK8"] = par[_key].getParameter<std::string> ("DataL1JetParAK8");
+        else{
+            msPar["DataL1JetParAK8"] = "../data/FT_53_V10_AN3_L1FastJet_AK5PFchs.txt";
+            _missing_config = true;
+        }
+        if (par[_key].exists("DataL2JetParAK8")) msPar["DataL2JetParAK8"] = par[_key].getParameter<std::string> ("DataL2JetParAK8");
+        else{
+            msPar["DataL2JetParAK8"] = "../data/FT_53_V10_AN3_L2Relative_AK5PFchs.txt";
+            _missing_config = true;
+        }
+        if (par[_key].exists("DataL3JetParAK8")) msPar["DataL3JetParAK8"] = par[_key].getParameter<std::string> ("DataL3JetParAK8");
+        else{
+            msPar["DataL3JetParAK8"] = "../data/FT_53_V10_AN3_L3Absolute_AK5PFchs.txt";
+            _missing_config = true;
+        }
+        if (par[_key].exists("DataResJetParAK8")) msPar["DataResJetParAK8"] = par[_key].getParameter<std::string> ("DataResJetParAK8");
+        else{
+            msPar["DataResJetParAK8"] = "../data/FT_53_V10_AN3_L2L3Residual_AK5PFchs.txt";
             _missing_config = true;
         }
         if (par[_key].exists("doNewJEC")) mbPar["doNewJEC"] = par[_key].getParameter<bool> ("doNewJEC");
@@ -98,8 +133,8 @@ void BaseEventSelector::BeginJob(std::map<std::string, edm::ParameterSet const >
     if ( mbPar["isMc"] && ( mbPar["JECup"] || mbPar["JECdown"]))
         jecUnc = new JetCorrectionUncertainty(*(new JetCorrectorParameters(msPar["JEC_txtfile"].c_str(), "Total")));
 
-  
     vector<JetCorrectorParameters> vPar;
+    vector<JetCorrectorParameters> vParAK8;
 
     if ( mbPar["isMc"] && mbPar["doNewJEC"] ) {
         // Create the JetCorrectorParameter objects, the order does not matter.
@@ -107,11 +142,19 @@ void BaseEventSelector::BeginJob(std::map<std::string, edm::ParameterSet const >
         JetCorrectorParameters *L3JetPar  = new JetCorrectorParameters(msPar["MCL3JetPar"]);
         JetCorrectorParameters *L2JetPar  = new JetCorrectorParameters(msPar["MCL2JetPar"]);
     	JetCorrectorParameters *L1JetPar  = new JetCorrectorParameters(msPar["MCL1JetPar"]);
+        
+	JetCorrectorParameters *L3JetParAK8  = new JetCorrectorParameters(msPar["MCL3JetParAK8"]);
+        JetCorrectorParameters *L2JetParAK8  = new JetCorrectorParameters(msPar["MCL2JetParAK8"]);
+    	JetCorrectorParameters *L1JetParAK8  = new JetCorrectorParameters(msPar["MCL1JetParAK8"]);
     	// Load the JetCorrectorParameter objects into a vector,
     	// IMPORTANT: THE ORDER MATTERS HERE !!!! 
     	vPar.push_back(*L1JetPar);
     	vPar.push_back(*L2JetPar);
     	vPar.push_back(*L3JetPar);
+
+    	vParAK8.push_back(*L1JetParAK8);
+    	vParAK8.push_back(*L2JetParAK8);
+    	vParAK8.push_back(*L3JetParAK8);
 
     	std::cout << mLegend << "Applying new jet energy corrections" << std::endl;
     }
@@ -122,6 +165,11 @@ void BaseEventSelector::BeginJob(std::map<std::string, edm::ParameterSet const >
     	JetCorrectorParameters *L3JetPar  = new JetCorrectorParameters(msPar["DataL3JetPar"]);
     	JetCorrectorParameters *L2JetPar  = new JetCorrectorParameters(msPar["DataL2JetPar"]);
     	JetCorrectorParameters *L1JetPar  = new JetCorrectorParameters(msPar["DataL1JetPar"]);
+
+        JetCorrectorParameters *ResJetParAK8 = new JetCorrectorParameters(msPar["DataResJetParAK8"]); 
+    	JetCorrectorParameters *L3JetParAK8  = new JetCorrectorParameters(msPar["DataL3JetParAK8"]);
+    	JetCorrectorParameters *L2JetParAK8  = new JetCorrectorParameters(msPar["DataL2JetParAK8"]);
+    	JetCorrectorParameters *L1JetParAK8  = new JetCorrectorParameters(msPar["DataL1JetParAK8"]);
     	// Load the JetCorrectorParameter objects into a vector,
     	// IMPORTANT: THE ORDER MATTERS HERE !!!! 
     	vPar.push_back(*L1JetPar);
@@ -129,12 +177,19 @@ void BaseEventSelector::BeginJob(std::map<std::string, edm::ParameterSet const >
     	vPar.push_back(*L3JetPar);
     	vPar.push_back(*ResJetPar);
 
+    	vParAK8.push_back(*L1JetParAK8);
+   	vParAK8.push_back(*L2JetParAK8);
+    	vParAK8.push_back(*L3JetParAK8);
+    	vParAK8.push_back(*ResJetParAK8);
+
     	std::cout << mLegend << "Applying new jet energy corrections" << std::endl;
     }
     else{
     	std::cout << mLegend << "NOT applying new jet energy corrections - ARE YOU SURE?" << std::endl;
     }
     JetCorrector = new FactorizedJetCorrector(vPar);
+    JetCorrectorAK8 = new FactorizedJetCorrector(vParAK8);
+  
 }
 
 double BaseEventSelector::GetPerp(TVector3 & v1, TVector3 & v2)
@@ -158,7 +213,7 @@ void BaseEventSelector::Init( void )
     mpEc->SetHistogram(mName, "nBtagSfCorrections", 100, 0.0, 10.0);
 }
 
-TLorentzVector BaseEventSelector::correctJet(const pat::Jet & jet, edm::EventBase const & event)
+TLorentzVector BaseEventSelector::correctJet(const pat::Jet & jet, edm::EventBase const & event, bool doAK8Corr)
 {
 
   // JES and JES systematics
@@ -184,19 +239,38 @@ TLorentzVector BaseEventSelector::correctJet(const pat::Jet & jet, edm::EventBas
       	    // We need to undo the default corrections and then apply the new ones
 
       	    double pt_raw = jet.correctedJet(0).pt();
-            JetCorrector->setJetEta(jet.eta());
-      	    JetCorrector->setJetPt(pt_raw);
-            JetCorrector->setJetA(jet.jetArea());
-      	    JetCorrector->setRho(rho); 
 
-            try{
-		correction = JetCorrector->getCorrection();
-            }
-      	    catch(...){
-		std::cout << mLegend << "WARNING! Exception thrown by JetCorrectionUncertainty!" << std::endl;
-		std::cout << mLegend << "WARNING! Possibly, trying to correct a jet/MET outside correction range." << std::endl;
-		std::cout << mLegend << "WARNING! Jet/MET will remain uncorrected." << std::endl;
-            }
+	    if (doAK8Corr){
+                JetCorrectorAK8->setJetEta(jet.eta());
+          	JetCorrectorAK8->setJetPt(pt_raw);
+                JetCorrectorAK8->setJetA(jet.jetArea());
+          	JetCorrectorAK8->setRho(rho); 
+    
+                try{
+    		    correction = JetCorrectorAK8->getCorrection();
+                }
+          	catch(...){
+    		    std::cout << mLegend << "WARNING! Exception thrown by JetCorrectionUncertainty!" << std::endl;
+    		    std::cout << mLegend << "WARNING! Possibly, trying to correct a jet/MET outside correction range." << std::endl;
+    		    std::cout << mLegend << "WARNING! Jet/MET will remain uncorrected." << std::endl;
+                }
+	    }
+
+	    else{
+                JetCorrector->setJetEta(jet.eta());
+          	JetCorrector->setJetPt(pt_raw);
+                JetCorrector->setJetA(jet.jetArea());
+          	JetCorrector->setRho(rho); 
+    
+                try{
+    		    correction = JetCorrector->getCorrection();
+                }
+          	catch(...){
+    		    std::cout << mLegend << "WARNING! Exception thrown by JetCorrectionUncertainty!" << std::endl;
+    		    std::cout << mLegend << "WARNING! Possibly, trying to correct a jet/MET outside correction range." << std::endl;
+    		    std::cout << mLegend << "WARNING! Jet/MET will remain uncorrected." << std::endl;
+                }
+	    }
       
             correctedJet.scaleEnergy(correction);
             pt = correctedJet.pt();
