@@ -167,7 +167,7 @@ void singleLepEventSelector::BeginJob( std::map<std::string, edm::ParameterSet c
         std::exit(-1);
     }
 
-      _key = "TopElectronSelector";
+    _key = "TopElectronSelector";
     if ( par.find(_key)!=par.end() ){
         electronSel_ = boost::shared_ptr<TopElectronSelector>( new TopElectronSelector(par[_key]) );
         std::cout << mLegend << "cut based electron selector configured!"
@@ -512,38 +512,6 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
                 _pass = true;
                 break;
             }
-			
-<<<<<<< HEAD
-			if( mbPar["removeJetLepOverlap"] && _pass ){
-				
-				if (mbPar["debug"]) std::cout << "Checking Overlap" << std::endl;
-				event.getByLabel( mtPar["muon_collection"], mhMuons );
-            			for (std::vector<pat::Muon>::const_iterator _imu = mhMuons->begin(); _imu != mhMuons->end(); _imu++){
-            				reco::Vertex const & pv = pvSel_->vertices()->at(0);
-		            		if ( _imu->globalTrack().isNonnull() && _imu->globalTrack().isAvailable() && (*muonSel_)( *_imu, retMuon ) && _imu->pt()>mdPar["tight_muon_minpt"] &&  fabs(_imu->eta())<mdPar["tight_muon_maxeta"] && fabs(_imu->muonBestTrack()->dz(pv.position())) < 0.5 && _imu->isPFMuon()){
-            		
-		            			if (  deltaR(_imu->p4(),_ijet->p4()) < 0.5 ){
-            						if (mbPar["debug"]) std::cout << "Jet Overlaps with the Muon... Fail" << std::endl;
-            						_pass = false;
-		            			}
-            				}
-		            	}
-            
-            			event.getByLabel( mtPar["electron_collection"], mhElectrons );
-	      	                for (std::vector<pat::Electron>::const_iterator _iel = mhElectrons->begin(); _iel != mhElectrons->end(); _iel++){
-          	                	reco::Vertex const & pv = pvSel_->vertices()->at(0);	
-                			if ( (*electronSel_)( *_iel, event, retElectron ) && _iel->ecalDrivenMomentum().pt()>mdPar["tight_electron_minpt"] && fabs(_iel->eta())<mdPar["tight_electron_maxeta"] && !_iel->isEBEEGap() && fabs(_iel->gsfTrack()->dxy(pv.position())) < 0.02){
-                	
-		                		if ( deltaR(_iel->p4(),_ijet->p4()) < 0.5 ){
-            						if (mbPar["debug"]) std::cout << "Jet Overlaps with the Electron... Fail" << std::endl;
-                					_pass = false;
-     			           		}
-                			}
-                		}            							
-			}
-=======
-	
->>>>>>> 3e5215bbbfddef06a7b579e1ccdf26e70ac86af9
 
             pair<TLorentzVector,bool> jetwithtag;
             jetwithtag.first = jetP4;
