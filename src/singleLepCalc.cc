@@ -52,7 +52,6 @@ private:
 
     double rhoIso;
 
-    boost::shared_ptr<TopElectronSelector>     electronSelL_, electronSelM_, electronSelT_;
     std::vector<reco::Vertex> goodPVs;
     int findMatch(const reco::GenParticleCollection & genParticles, int idToMatch, double eta, double phi);
     double mdeltaR(double eta1, double phi1, double eta2, double phi2);
@@ -107,34 +106,6 @@ int singleLepCalc::BeginJob()
     else                                   keepFullMChistory = true;
     cout << "keepFullMChistory "     <<    keepFullMChistory << endl;
  
-    if ( mPset.exists("cutbasedIDSelectorLoose")){
-        electronSelL_ = boost::shared_ptr<TopElectronSelector>(
-                                                               new TopElectronSelector(mPset.getParameter<edm::ParameterSet>("cutbasedIDSelectorLoose")) );
-    }
-    else {
-        std::cout << "DileptonCalc: Loose electron selector not configured, exiting"
-        << std::endl;
-        std::exit(-1);
-    }
-    if ( mPset.exists("cutbasedIDSelectorMedium")){
-        electronSelM_ = boost::shared_ptr<TopElectronSelector>(
-                                                               new TopElectronSelector(mPset.getParameter<edm::ParameterSet>("cutbasedIDSelectorMedium")) );
-    }
-    else {
-        std::cout << "DileptonCalc: Medium electron selector not configured, exiting"
-        << std::endl;
-        std::exit(-1);
-    }
-    if ( mPset.exists("cutbasedIDSelectorTight")){
-        electronSelT_ = boost::shared_ptr<TopElectronSelector>(
-                                                               new TopElectronSelector(mPset.getParameter<edm::ParameterSet>("cutbasedIDSelectorTight")) );
-    }
-    else {
-        std::cout << "DileptonCalc: Tight electron selector not configured, exiting"
-        << std::endl;
-        std::exit(-1);
-    }
-   
     return 0;
 }
 
@@ -375,7 +346,6 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
     std::vector <int>    elNotConversion;
     std::vector <int>    elChargeConsistent;
     std::vector <int>    elIsEBEE;
-    std::vector <int>    elQuality;
     std::vector <int>    elCharge;
 
     //ID requirement
@@ -419,8 +389,6 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
     edm::Handle<double> rhoHandle;
     event.getByLabel(rhoSrc_, rhoHandle);
     double rhoIso = std::max(*(rhoHandle.product()), 0.0);
-    pat::strbitset retElectron  = electronSelL_->getBitTemplate();
-    bool retElectronT,retElectronM,retElectronL; 
     //
     //_____Electrons______
     //
@@ -457,12 +425,6 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
             int notConv   = nLostHits == 0 and (fabs(dist) > 0.02 or fabs(dcot) > 0.02);
             elCharge.push_back((*iel)->charge());
             elNotConversion.push_back(notConv);
-
-            retElectronL = (*electronSelL_)(**iel, event, retElectron);
-            retElectronM = (*electronSelM_)(**iel, event, retElectron);
-            retElectronT = (*electronSelT_)(**iel, event, retElectron);
-
-            elQuality.push_back((retElectronT<<2) + (retElectronM<<1) + retElectronL);
 
             //IP: for some reason this is with respect to the first vertex in the collection
             if(goodPVs.size() > 0){
@@ -536,7 +498,6 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
     SetValue("elNotConversion" , elNotConversion);  //Conversion rejection
     SetValue("elChargeConsistent", elChargeConsistent);
     SetValue("elIsEBEE", elIsEBEE);
-    SetValue("elQuality", elQuality);
 
     //ID cuts
     SetValue("elDeta", elDeta);
