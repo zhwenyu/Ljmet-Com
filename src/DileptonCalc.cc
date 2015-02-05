@@ -341,11 +341,11 @@ int DileptonCalc::AnalyzeEvent(edm::Event const & event, BaseEventSelector * sel
                 event.getByToken(genParticles_tok, genParticles);
                 int matchId = findMatch(*genParticles, 11, (*iel)->eta(), (*iel)->phi());
                 double closestDR = 10000.;
-                cout << "matchId "<<matchId <<endl;
+                //cout << "matchId "<<matchId <<endl;
                 if (matchId>=0) {
                     const reco::GenParticle & p = (*genParticles).at(matchId);
                     closestDR = mdeltaR( (*iel)->eta(), (*iel)->phi(), p.eta(), p.phi());
-                    cout << "closestDR "<<closestDR <<endl;
+                    //cout << "closestDR "<<closestDR <<endl;
                     if(closestDR < 0.3){
                         elGen_Reco_dr.push_back(closestDR);
                         elPdgId.push_back(p.pdgId());
@@ -648,7 +648,7 @@ int DileptonCalc::AnalyzeEvent(edm::Event const & event, BaseEventSelector * sel
       genJetPhi.push_back(ijet->phi());
       genJetEnergy.push_back(ijet->energy());
       genJetMass.push_back(ijet->mass());
-
+      cout<<"setting gen jet info"<<endl;
 
     }
 
@@ -708,19 +708,28 @@ int DileptonCalc::AnalyzeEvent(edm::Event const & event, BaseEventSelector * sel
         //CATopJetIndex      . push_back(index);
         CATopJetnDaughters . push_back((int)ijet->numberOfDaughters());
         
-        reco::CATopJetTagInfo const * jetInfo = dynamic_cast<reco::CATopJetTagInfo const *> (ijet->tagInfo("caTop"));
-        
-        CATopJetTopMass     . push_back(jetInfo->properties().topMass);
-        CATopJetMinPairMass . push_back(jetInfo->properties().minMass);
-        
+	//	cout<<"tag infos"<<(ijet->tagInfoLabels()).at(0)<<endl;
+
+        if(ijet->tagInfoLabels().size()>0){
+	  reco::CATopJetTagInfo const * jetInfo = dynamic_cast<reco::CATopJetTagInfo const *> (ijet->tagInfo("caTop"));
+	  CATopJetTopMass     . push_back(jetInfo->properties().topMass);
+	  CATopJetMinPairMass . push_back(jetInfo->properties().minMass);
+	}
+	else{
+	  CATopJetTopMass     . push_back(-999);
+	  CATopJetMinPairMass . push_back(-999);
+	}
+
         for (size_t ui = 0; ui < ijet->numberOfDaughters(); ui++) {
-            CATopDaughterPt     . push_back(ijet->daughter(ui)->pt());
-            CATopDaughterEta    . push_back(ijet->daughter(ui)->eta());
-            CATopDaughterPhi    . push_back(ijet->daughter(ui)->phi());
-            CATopDaughterEnergy . push_back(ijet->daughter(ui)->energy());
-            
+	  cout<<"in top daughter loop"<<endl;
+	  CATopDaughterPt     . push_back(ijet->daughter(ui)->pt());
+	  CATopDaughterEta    . push_back(ijet->daughter(ui)->eta());
+	  CATopDaughterPhi    . push_back(ijet->daughter(ui)->phi());
+	  CATopDaughterEnergy . push_back(ijet->daughter(ui)->energy());
+	  
             //CATopDaughterMotherIndex . push_back(index);
         }
+	//cout<<"finished top daughter loop"<<endl;
     }
     
     //Four vector
@@ -734,12 +743,12 @@ int DileptonCalc::AnalyzeEvent(edm::Event const & event, BaseEventSelector * sel
     
     //Identity
     SetValue("CATopJetIndex"      , CATopJetIndex);*/
-    SetValue("CATopJetnDaughters" , CATopJetnDaughters);
+    //SetValue("CATopJetnDaughters" , CATopJetnDaughters);
     
     //Properties
     //    SetValue("CATopJetTopMass"     , CATopJetTopMass);
     //    SetValue("CATopJetMinPairMass" , CATopJetMinPairMass);
-    
+    cout<<"setting values for top daughters"<<endl;
     //Daughter four vector and index
     SetValue("CATopDaughterPt"     , CATopDaughterPt);
     SetValue("CATopDaughterEta"    , CATopDaughterEta);
@@ -802,17 +811,17 @@ int DileptonCalc::AnalyzeEvent(edm::Event const & event, BaseEventSelector * sel
         //Identity
         CAWJetIndex      . push_back(index);*/
         CAWJetnDaughters . push_back((int)ijet->numberOfDaughters());
-        
+	cout<<"about to set w masses"<<endl;
         //Mass
         CAWJetTrimmedMass . push_back(ijet->userFloat("ak8PFJetsCHSTrimmedLinks"));
         CAWJetPrunedMass . push_back(ijet->userFloat("ak8PFJetsCHSPrunedLinks"));
         CAWJetFilteredMass . push_back(ijet->userFloat("ak8PFJetsCHSFilteredLinks"));
-  
+	cout<<"set w masses"<<endl;
 	//nsubjettiness
 	CAWJetTau1.push_back( ijet->userFloat("NjettinessAK8:tau1"));
 	CAWJetTau2.push_back( ijet->userFloat("NjettinessAK8:tau2"));
 	CAWJetTau3.push_back( ijet->userFloat("NjettinessAK8:tau3"));
-      
+	cout<<"set n subjettiness"<<endl;
         for (size_t ui = 0; ui < ijet->numberOfDaughters(); ui++){
             CAWDaughterPt     . push_back(ijet->daughter(ui)->pt());
             CAWDaughterEta    . push_back(ijet->daughter(ui)->eta());
