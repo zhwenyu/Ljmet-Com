@@ -73,18 +73,9 @@ singleLepCalc::~singleLepCalc()
 
 int singleLepCalc::BeginJob()
 {
-<<<<<<< HEAD
-    if (mPset.exists("triggerSummary")) triggerSummary_ = mPset.getParameter<edm::InputTag>("triggerSummary");
-    else                                triggerSummary_ = edm::InputTag("selectedPatTrigger");
-    
-    if (mPset.exists("triggerCollection")) triggerCollection_ = mPset.getParameter<edm::InputTag>("triggerCollection");
-    else                                triggerCollection_ = edm::InputTag("TriggerResults::HLT");
-    
-=======
     if (mPset.exists("dataType"))     dataType = mPset.getParameter<std::string>("dataType");
     else                              dataType = "None"; 
 
->>>>>>> 3e5215bbbfddef06a7b579e1ccdf26e70ac86af9
     if (mPset.exists("rhoSrc")) rhoSrc_ = mPset.getParameter<edm::InputTag>("rhoSrc");
     else                        rhoSrc_ = edm::InputTag("fixedGridRhoAll");
 
@@ -603,11 +594,12 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
     //   std::vector <double> AK8JetRCN;       
     for (std::vector<pat::Jet>::const_iterator ijet = AK8Jets->begin(); ijet != AK8Jets->end(); ijet++){
 
+        TLorentzVector lvak8 = selector->correctJet(*ijet, event,true);
         //Four vector
-        AK8JetPt     . push_back(ijet->pt());
-        AK8JetEta    . push_back(ijet->eta());
-        AK8JetPhi    . push_back(ijet->phi());
-        AK8JetEnergy . push_back(ijet->energy());
+        AK8JetPt     . push_back(lvak8.Pt());
+        AK8JetEta    . push_back(lvak8.Eta());
+        AK8JetPhi    . push_back(lvak8.Phi());
+        AK8JetEnergy . push_back(lvak8.Energy());
 
         AK8JetCSV    . push_back(ijet->bDiscriminator( "combinedInclusiveSecondaryVertexV2BJetTags"));
         //     AK8JetRCN    . push_back((ijet->chargedEmEnergy()+ijet->chargedHadronEnergy()) / (ijet->neutralEmEnergy()+ijet->neutralHadronEnergy()));
@@ -703,15 +695,8 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
 
         for(size_t i = 0; i < genParticles->size(); i++){
             const reco::GenParticle & p = (*genParticles).at(i);
-<<<<<<< HEAD
-            if (p.status() == 23 || p.status() == 1 || p.status() == 22) {
-                if (fabs(p.pdgId())==11 or fabs(p.pdgId())==13) {
-                    lv_genLep = p.p4();
-                    if (p.pdgId()<0) qLep = 1;
-                    else qLep = -1;
-=======
 
-            //Find status 3 particles
+            //Find status 23 particles
             if (p.status() == 23){
                 reco::Candidate* mother = (reco::Candidate*) p.mother();
                 if (not mother)            continue;
@@ -731,7 +716,6 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
                             break;
                         }
                     }
->>>>>>> 3e5215bbbfddef06a7b579e1ccdf26e70ac86af9
                 }
 
                 if (not bKeep) continue;
