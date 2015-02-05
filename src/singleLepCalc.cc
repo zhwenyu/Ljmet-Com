@@ -594,12 +594,11 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
     //   std::vector <double> AK8JetRCN;       
     for (std::vector<pat::Jet>::const_iterator ijet = AK8Jets->begin(); ijet != AK8Jets->end(); ijet++){
 
-        TLorentzVector lvak8 = selector->correctJet(*ijet, event,true);
         //Four vector
-        AK8JetPt     . push_back(lvak8.Pt());
-        AK8JetEta    . push_back(lvak8.Eta());
-        AK8JetPhi    . push_back(lvak8.Phi());
-        AK8JetEnergy . push_back(lvak8.Energy());
+        AK8JetPt     . push_back(ijet->pt());
+        AK8JetEta    . push_back(ijet->eta());
+        AK8JetPhi    . push_back(ijet->phi());
+        AK8JetEnergy . push_back(ijet->energy());
 
         AK8JetCSV    . push_back(ijet->bDiscriminator( "combinedInclusiveSecondaryVertexV2BJetTags"));
         //     AK8JetRCN    . push_back((ijet->chargedEmEnergy()+ijet->chargedHadronEnergy()) / (ijet->neutralEmEnergy()+ijet->neutralHadronEnergy()));
@@ -696,7 +695,7 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
         for(size_t i = 0; i < genParticles->size(); i++){
             const reco::GenParticle & p = (*genParticles).at(i);
 
-            //Find status 23 particles
+            //Find status 3 particles
             if (p.status() == 23){
                 reco::Candidate* mother = (reco::Candidate*) p.mother();
                 if (not mother)            continue;
