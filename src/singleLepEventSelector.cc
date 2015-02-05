@@ -167,7 +167,7 @@ void singleLepEventSelector::BeginJob( std::map<std::string, edm::ParameterSet c
         std::exit(-1);
     }
 
-    _key = "TopElectronSelector";
+      _key = "TopElectronSelector";
     if ( par.find(_key)!=par.end() ){
         electronSel_ = boost::shared_ptr<TopElectronSelector>( new TopElectronSelector(par[_key]) );
         std::cout << mLegend << "cut based electron selector configured!"
@@ -512,6 +512,8 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
                 _pass = true;
                 break;
             }
+			
+	
 
             pair<TLorentzVector,bool> jetwithtag;
             jetwithtag.first = jetP4;
