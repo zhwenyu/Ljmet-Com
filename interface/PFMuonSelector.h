@@ -16,7 +16,7 @@ public: // interface
     
     bool verbose_;
     
-    enum Version_t { TOPPAG12_LJETS, TOPPAG12_LJETS_MOD, TOPPAG12_LJETS_VETO, N_VERSIONS };
+    enum Version_t { TOPPAG12_LJETS, TIGHT_RUN1, TOPPAG12_LJETS_MOD, TOPPAG12_LJETS_VETO, N_VERSIONS };
     
     PFMuonSelector() {}
     
@@ -30,6 +30,9 @@ public: // interface
         
         if ( versionStr == "TOPPAG12_LJETS" ) {
             version = TOPPAG12_LJETS;
+        }
+        else if ( versionStr == "TIGHT_RUN1" ) {
+            version = TIGHT_RUN1;
         }
         else if ( versionStr == "TOPPAG12_LJETS_VETO" ) {
             version = TOPPAG12_LJETS_VETO;
@@ -113,6 +116,21 @@ public: // interface
             set("TrackerMuon", false);
         }
         
+        if (version_ == TIGHT_RUN1 ){ //https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideMuonId#Tight_Muon
+            set("GlobalMuon",true);
+            set("GlobalOrTrackerMuon",false);
+            set("TrackerMuon", false);
+            
+            set("maxPfRelIso", 0.2);
+            set("Chi2", 10);
+            set("minTrackerLayers", 5);
+            set("minValidMuHits", 0);
+            set("maxIp", 0.2);
+            set("maxZImpact", 0.5);
+            set("minPixelHits", 0);
+            set("minMatchedStations", 1);
+        }
+        
         if (version_ == TOPPAG12_LJETS_MOD ){
             set("GlobalMuon",true);
             set("GlobalOrTrackerMuon",false);
@@ -140,7 +158,7 @@ public: // interface
     // Allow for multiple definitions of the cuts.
     bool operator()( const pat::Muon & muon, pat::strbitset & ret )
     {
-        if (version_ == TOPPAG12_LJETS || version_ == TOPPAG12_LJETS_VETO || version_ == TOPPAG12_LJETS_MOD) return TopPag12LjetsCuts(muon, ret);
+        if (version_ == TOPPAG12_LJETS || version_ == TIGHT_RUN1 || version_ == TOPPAG12_LJETS_VETO || version_ == TOPPAG12_LJETS_MOD) return TopPag12LjetsCuts(muon, ret);
         else {
             return false;
         }
@@ -193,17 +211,17 @@ public: // interface
         //else std::cout<<"failed GlobalOrTrackerMuon"<<std::endl;
         if ( norm_chi2          <  cut(indexChi2_,   double()) || ignoreCut(indexChi2_)    ) passCut(ret, indexChi2_   );
         //else std::cout<<"failed Chi2"<<std::endl;
-        if ( minTrackerLayers   >= cut(indexMinTrackerLayers_,int()) || ignoreCut(indexMinTrackerLayers_)) passCut(ret, indexMinTrackerLayers_  );
+        if ( minTrackerLayers   >  cut(indexMinTrackerLayers_,int()) || ignoreCut(indexMinTrackerLayers_)) passCut(ret, indexMinTrackerLayers_  );
         //else std::cout<<"failed minTrackerLayers"<<std::endl;
-        if ( minValidMuonHits   >= cut(indexminValidMuHits_,int()) || ignoreCut(indexminValidMuHits_)) passCut(ret, indexminValidMuHits_  );
+        if ( minValidMuonHits   >  cut(indexminValidMuHits_,int()) || ignoreCut(indexminValidMuHits_)) passCut(ret, indexminValidMuHits_  );
         //else std::cout<<"failed minValidMuonHits"<<std::endl;
         if ( _ip                <  cut(indexMaxIp_,double()) || ignoreCut(indexMaxIp_)) passCut(ret, indexMaxIp_  );
         //else std::cout<<"failed maxIp"<<std::endl;
-        if ( _ipz              <  cut(indexMaxZImpact_,double()) || ignoreCut(indexMaxZImpact_)) passCut(ret, indexMaxZImpact_  );
+        if ( _ipz               <  cut(indexMaxZImpact_,double()) || ignoreCut(indexMaxZImpact_)) passCut(ret, indexMaxZImpact_  );
         //else std::cout<<"failed maxZImpact"<<std::endl;
-        if ( minPixelHits       >= cut(indexPixHits_,int())    || ignoreCut(indexPixHits_))  passCut(ret, indexPixHits_); 
+        if ( minPixelHits       >  cut(indexPixHits_,int())    || ignoreCut(indexPixHits_))  passCut(ret, indexPixHits_); 
         //else std::cout<<"failed minPixelHits"<<std::endl;
-        if ( minMatchedStations >= cut(indexStations_,int())  || ignoreCut(indexStations_))  passCut(ret, indexStations_); 
+        if ( minMatchedStations >  cut(indexStations_,int())  || ignoreCut(indexStations_))  passCut(ret, indexStations_); 
         //else std::cout<<"failed minMatchedStations"<<std::endl;
         if ( pfIso              <  cut(indexmaxPfRelIso_, double())  || ignoreCut(indexmaxPfRelIso_)  ) passCut(ret, indexmaxPfRelIso_ ); 
         //else std::cout<<"failed pfIso"<<std::endl;
