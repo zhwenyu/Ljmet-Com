@@ -170,7 +170,7 @@ void singleLepEventSelector::BeginJob( std::map<std::string, edm::ParameterSet c
     _key = "TopElectronSelector";
     if ( par.find(_key)!=par.end() ){
         electronSel_ = boost::shared_ptr<TopElectronSelector>( new TopElectronSelector(par[_key]) );
-        std::cout << mLegend << "cut based electron selector configured!"
+        std::cout << mLegend << "top electron selector configured!"
         << std::endl;
     }
     else {
