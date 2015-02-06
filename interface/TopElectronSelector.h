@@ -39,27 +39,27 @@ public: // interface
         
         if (versionStr == "VETO"){
             version = VETO;
-            if(verbose_) std::cout << "CutBasedElectronSelector: You have choosen version = VETO " <<  std::endl;
+            if(verbose_) std::cout << "TopElectronSelector: You have choosen version = VETO " <<  std::endl;
         }
         
         if (versionStr == "LOOSE"){
             version = LOOSE;
-            if(verbose_) std::cout << "CutBasedElectronSelector: You have choosen version = LOOSE " <<  std::endl;
+            if(verbose_) std::cout << "TopElectronSelector: You have choosen version = LOOSE " <<  std::endl;
         }
         
         if (versionStr == "MEDIUM"){
             version = MEDIUM;
-            if(verbose_) std::cout << "CutBasedElectronSelector: You have choosen version = MEDIUM " <<  std::endl;
+            if(verbose_) std::cout << "TopElectronSelector: You have choosen version = MEDIUM " <<  std::endl;
         }
         
         if (versionStr == "TIGHT"){
             version = TIGHT;
-            if(verbose_) std::cout << "CutBasedElectronSelector: You have choosen version = TIGHT " <<  std::endl;
+            if(verbose_) std::cout << "TopElectronSelector: You have choosen version = TIGHT " <<  std::endl;
         }
         
         if ( versionStr == "NONE" ){
             version = NONE;
-            if(verbose_){ std::cout << "CutBasedElectronSelector: If you want to use version NONE "
+            if(verbose_){ std::cout << "TopElectronSelector: If you want to use version NONE "
                 << "then make sure to provide the selection cuts by yourself " << std::endl;}
         }
         initialize( version,
@@ -142,87 +142,87 @@ public: // interface
         }
         
         if (version_ == VETO) {
-            set("deta_EB",     7.0e-03);
-            set("dphi_EB",     8.0e-01);
-            set("sihih_EB",    1.0e-02);
-            set("hoe_EB",      1.5e-01);
-            set("d0_EB",       4.0e-02);
-            set("dZ_EB",       2.0e-01);
-            set("ooemoop_EB",  false);
-            set("reliso_EB",   1.5e-01);
-            set("deta_EE",     1.0e-02);
-            set("dphi_EE",     7.0e-01);
-            set("sihih_EE",    3.0e-02);
-            set("hoe_EE",      false);//
-            set("d0_EE",       4.0e-02);
-            set("dZ_EE",       2.0e-01);
-            set("ooemoop_EE",  false);
-            set("reliso_EE",   1.5e-01);
-            set("mHits",       false);
-            set("vtxFitConv",  false);
+            set("deta_EB",     0.016315);
+            set("dphi_EB",     0.252044);
+            set("sihih_EB",    0.011100);
+            set("hoe_EB",      0.345843);
+            set("d0_EB",       0.060279);
+            set("dZ_EB",       0.800538);
+            set("ooemoop_EB",  0.248070);
+            set("reliso_EB",   0.164369);
+            set("deta_EE",     0.010671);
+            set("dphi_EE",     0.245263);
+            set("sihih_EE",    0.033987);
+            set("hoe_EE",      0.134691);//
+            set("d0_EE",       0.273097);
+            set("dZ_EE",       0.885860);
+            set("ooemoop_EE",  0.157160);
+            set("reliso_EE",   0.212604);
+            set("mHits",       2);
+            set("vtxFitConv",  true);
         }
         
         if (version_ == LOOSE) {
-            set("deta_EB",     7.0e-03);
-            set("dphi_EB",     1.5e-01);
-            set("sihih_EB",    1.0e-02);
-            set("hoe_EB",      1.2e-01);
-            set("d0_EB",       2.0e-02);
-            set("dZ_EB",       2.0e-01);
-            set("ooemoop_EB",  5.0e-02);
-            set("reliso_EB",   1.5e-01);
-            set("deta_EE",     9.0e-03);
-            set("dphi_EE",     1.0e-01);
-            set("sihih_EE",    3.0e-02);
-            set("hoe_EE",      1.0e-01);
-            set("d0_EE",       2.0e-02);
-            set("dZ_EE",       2.0e-01);
-            set("ooemoop_EE",  5.0e-02);
-            set("reliso_EE",   1.5e-01);//
+            set("deta_EB",     0.012442);
+            set("dphi_EB",     0.072624);
+            set("sihih_EB",    0.010557);
+            set("hoe_EB",      0.121476);
+            set("d0_EB",       0.022664);
+            set("dZ_EB",       0.173670);
+            set("ooemoop_EB",  0.221803);
+            set("reliso_EB",   0.120026);
+            set("deta_EE",     0.010654);
+            set("dphi_EE",     0.145129);
+            set("sihih_EE",    0.032602);
+            set("hoe_EE",      0.131862);
+            set("d0_EE",       0.097358);
+            set("dZ_EE",       0.198444);
+            set("ooemoop_EE",  0.142283);
+            set("reliso_EE",   0.162914);//
             set("mHits",       1);
-            set("vtxFitConv",  1);
+            set("vtxFitConv",  true);
         }
         
         if (version_ == MEDIUM) {
-            set("deta_EB",     4.0e-03);
-            set("dphi_EB",     6.0e-02);
-            set("sihih_EB",    1.0e-02);
-            set("hoe_EB",      1.2e-01);
-            set("d0_EB",       2.0e-02);
-            set("dZ_EB",       1.0e-01);
-            set("ooemoop_EB",  5.0e-02);
-            set("reliso_EB",   1.5e-01);
-            set("deta_EE",     7.0e-03);
-            set("dphi_EE",     3.0e-02);
-            set("sihih_EE",    3.0e-02);
-            set("hoe_EE",      1.0e-01);
-            set("d0_EE",       2.0e-02);
-            set("dZ_EE",       1.0e-01);
-            set("ooemoop_EE",  5.0e-02);
-            set("reliso_EE",   1.5e-01);//
+            set("deta_EB",     0.007641);
+            set("dphi_EB",     0.032643);
+            set("sihih_EB",    0.010399);
+            set("hoe_EB",      0.060662);
+            set("d0_EB",       0.011811);
+            set("dZ_EB",       0.070775);
+            set("ooemoop_EB",  0.153897);
+            set("reliso_EB",   0.097213);
+            set("deta_EE",     0.009285);
+            set("dphi_EE",     0.042447);
+            set("sihih_EE",    0.029524);
+            set("hoe_EE",      0.104263);
+            set("d0_EE",       0.051682);
+            set("dZ_EE",       0.180720);
+            set("ooemoop_EE",  0.137468);
+            set("reliso_EE",   0.116708);//
             set("mHits",       1);
-            set("vtxFitConv",  1);
+            set("vtxFitConv",  true);
         }
         
         if (version_ == TIGHT) {
-            set("deta_EB",     4.0e-03);
-            set("dphi_EB",     3.0e-02);
-            set("sihih_EB",    1.0e-02);
-            set("hoe_EB",      1.2e-01);
-            set("d0_EB",       2.0e-02);
-            set("dZ_EB",       1.0e-01);
-            set("ooemoop_EB",  5.0e-02);
-            set("reliso_EB",   1.0e-01);
-            set("deta_EE",     5.0e-03);
-            set("dphi_EE",     2.0e-02);
-            set("sihih_EE",    3.0e-02);
-            set("hoe_EE",      1.0e-01);
-            set("d0_EE",       2.0e-02);
-            set("dZ_EE",       1.0e-01);
-            set("ooemoop_EE",  5.0e-02);
-            set("reliso_EE",   1.0e-01);//
-            set("mHits",       0);
-            set("vtxFitConv",  1);
+            set("deta_EB",     0.006574);
+            set("dphi_EB",     0.022868);
+            set("sihih_EB",    0.010181);
+            set("hoe_EB",      0.037553);
+            set("d0_EB",       0.009924);
+            set("dZ_EB",       0.015310);
+            set("ooemoop_EB",  0.131191);
+            set("reliso_EB",   0.074355);
+            set("deta_EE",     0.005681);
+            set("dphi_EE",     0.032046);
+            set("sihih_EE",    0.028766);
+            set("hoe_EE",      0.081902);
+            set("d0_EE",       0.027261);
+            set("dZ_EE",       0.147154);
+            set("ooemoop_EE",  0.106055);
+            set("reliso_EE",   0.090185);//
+            set("mHits",       1);
+            set("vtxFitConv",  true);
         }
         
         indexSinhih_EB_     = index_type(&bits_, "sihih_EB"     );
