@@ -85,7 +85,7 @@ public:
     void SetCorrJetsWithBTags(std::vector<std::pair<TLorentzVector, bool>> & jets) { mvCorrJetsWithBTags = jets; }
     
     bool isJetTagged(const pat::Jet &jet, edm::EventBase const & event, bool applySF = true);
-    TLorentzVector correctJet(const pat::Jet & jet, edm::EventBase const & event);
+    TLorentzVector correctJet(const pat::Jet & jet, edm::EventBase const & event, bool doAK8Corr = false);
     TLorentzVector correctMet(const pat::MET & met, edm::EventBase const & event);
     
 protected:
@@ -127,6 +127,7 @@ private:
     BtagHardcodedConditions mBtagCond;
     JetCorrectionUncertainty *jecUnc;
     FactorizedJetCorrector *JetCorrector;
+    FactorizedJetCorrector *JetCorrectorAK8;
     LjmetEventContent * mpEc;
     
     /// Private init method to be called by LjmetFactory when registering the selector
