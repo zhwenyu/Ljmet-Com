@@ -44,6 +44,8 @@ private:
     bool                      isMc;
     std::string               dataType;
 //    edm::InputTag             rhoSrc_it;
+    edm::InputTag             triggerSummary_;
+    edm::InputTag             triggerCollection_;
     edm::InputTag             pvCollection_it;
     edm::InputTag             genParticles_it;
     std::vector<unsigned int> keepPDGID;
@@ -81,6 +83,12 @@ int singleLepCalc::BeginJob()
     if (mPset.exists("pvCollection")) pvCollection_it = mPset.getParameter<edm::InputTag>("pvCollection");
     else                              pvCollection_it = edm::InputTag("offlineSlimmedPrimaryVertices");
 
+    if (mPset.exists("triggerSummary")) triggerSummary_ = mPset.getParameter<edm::InputTag>("triggerSummary");
+    else                                triggerSummary_ = edm::InputTag("selectedPatTrigger");
+    
+    if (mPset.exists("triggerCollection")) triggerCollection_ = mPset.getParameter<edm::InputTag>("triggerCollection");
+    else                                   triggerCollection_ = edm::InputTag("TriggerResults::HLT");
+    
     if (mPset.exists("isMc"))         isMc = mPset.getParameter<bool>("isMc");
     else                              isMc = false;
 
@@ -445,16 +453,16 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
             elMHits.push_back((*iel)->gsfTrack()->hitPattern().numberOfHits(reco::HitPattern::MISSING_INNER_HITS));
             elVtxFitConv.push_back((*iel)->passConversionVeto());
             if(isMc && keepFullMChistory){
-                cout << "start\n";
+                //cout << "start\n";
                 edm::Handle<reco::GenParticleCollection> genParticles;
                 event.getByLabel(genParticles_it, genParticles);
                 int matchId = findMatch(*genParticles, 11, (*iel)->eta(), (*iel)->phi());
                 double closestDR = 10000.;
-                cout << "matchId "<<matchId <<endl;
+                //cout << "matchId "<<matchId <<endl;
                 if (matchId>=0) {
                     const reco::GenParticle & p = (*genParticles).at(matchId);
                     closestDR = mdeltaR( (*iel)->eta(), (*iel)->phi(), p.eta(), p.phi());
-                    cout << "closestDR "<<closestDR <<endl;
+                    //cout << "closestDR "<<closestDR <<endl;
                     if(closestDR < 0.3){
                         elGen_Reco_dr.push_back(closestDR);
                         elPdgId.push_back(p.pdgId());
@@ -534,6 +542,40 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
     SetValue("elMatchedEta", elMatchedEta);
     SetValue("elMatchedPhi", elMatchedPhi);
     SetValue("elMatchedEnergy", elMatchedEnergy);
+
+    //
+    //______Trigger Matching __________________
+    //
+
+    edm::Handle<edm::TriggerResults > mhEdmTriggerResults;
+    event.getByLabel( triggerCollection_ , mhEdmTriggerResults );
+    edm::Handle<pat::TriggerObjectStandAloneCollection> mhEdmTriggerObjectColl;  
+    event.getByLabel(triggerSummary_,mhEdmTriggerObjectColl);
+
+    const edm::TriggerNames &names = event.triggerNames(*mhEdmTriggerResults);
+
+    int _electron_1_hltmatched =0;
+    int _muon_1_hltmatched =0;
+
+    if (_nSelElectrons>0 || _nSelMuons>0) {
+        for(pat::TriggerObjectStandAlone obj : *mhEdmTriggerObjectColl){       
+            obj.unpackPathNames(names);
+            for(unsigned h = 0; h < obj.filterLabels().size(); ++h){
+		if ( _nSelElectrons>0 ){
+                    if ( obj.filterLabels()[h]!="hltEle32WP85GsfTrackIsoFilter" ) continue;
+  	            if ( deltaR(obj.eta(),obj.phi(),elEta[0],elPhi[0]) < 0.5 ) _electron_1_hltmatched = 1;
+		}
+		if ( _nSelMuons>0 ){
+                    if ( obj.filterLabels()[h]!="hltL3crIsoL1sMu20Eta2p1L1f0L2f20QL3f24QL3crIsoRhoFiltered0p15IterTrk02" ) continue;
+  	            if ( deltaR(obj.eta(),obj.phi(),muEta[0],muPhi[0]) < 0.5 ) _muon_1_hltmatched = 1;
+		}
+            }
+        }
+    }
+
+    SetValue("electron_1_hltmatched",_electron_1_hltmatched);
+    SetValue("muon_1_hltmatched",_muon_1_hltmatched);
+
 
     //
     //_____ Jets ______________________________
