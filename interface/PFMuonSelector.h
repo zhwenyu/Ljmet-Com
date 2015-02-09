@@ -199,7 +199,7 @@ public: // interface
         //else std::cout<<"failed minValidMuonHits"<<std::endl;
         if ( _ip                <  cut(indexMaxIp_,double()) || ignoreCut(indexMaxIp_)) passCut(ret, indexMaxIp_  );
         //else std::cout<<"failed maxIp"<<std::endl;
-        if ( _ipz              <  cut(indexMaxZImpact_,double()) || ignoreCut(indexMaxZImpact_)) passCut(ret, indexMaxZImpact_  );
+        if ( _ipz               <  cut(indexMaxZImpact_,double()) || ignoreCut(indexMaxZImpact_)) passCut(ret, indexMaxZImpact_  );
         //else std::cout<<"failed maxZImpact"<<std::endl;
         if ( minPixelHits       >= cut(indexPixHits_,int())    || ignoreCut(indexPixHits_))  passCut(ret, indexPixHits_); 
         //else std::cout<<"failed minPixelHits"<<std::endl;
