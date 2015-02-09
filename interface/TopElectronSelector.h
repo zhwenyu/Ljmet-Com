@@ -153,13 +153,13 @@ public: // interface
             set("deta_EE",     0.010671);
             set("dphi_EE",     0.245263);
             set("sihih_EE",    0.033987);
-            set("hoe_EE",      0.134691);//
+            set("hoe_EE",      0.134691);
             set("d0_EE",       0.273097);
             set("dZ_EE",       0.885860);
             set("ooemoop_EE",  0.157160);
             set("reliso_EE",   0.212604);
             set("mHits",       2);
-            set("vtxFitConv",  true);
+            set("vtxFitConv",  1);
         }
         
         if (version_ == LOOSE) {
@@ -178,9 +178,9 @@ public: // interface
             set("d0_EE",       0.097358);
             set("dZ_EE",       0.198444);
             set("ooemoop_EE",  0.142283);
-            set("reliso_EE",   0.162914);//
+            set("reliso_EE",   0.162914);
             set("mHits",       1);
-            set("vtxFitConv",  true);
+            set("vtxFitConv",  1);
         }
         
         if (version_ == MEDIUM) {
@@ -199,9 +199,9 @@ public: // interface
             set("d0_EE",       0.051682);
             set("dZ_EE",       0.180720);
             set("ooemoop_EE",  0.137468);
-            set("reliso_EE",   0.116708);//
+            set("reliso_EE",   0.116708);
             set("mHits",       1);
-            set("vtxFitConv",  true);
+            set("vtxFitConv",  1);
         }
         
         if (version_ == TIGHT) {
@@ -220,9 +220,10 @@ public: // interface
             set("d0_EE",       0.027261);
             set("dZ_EE",       0.147154);
             set("ooemoop_EE",  0.106055);
-            set("reliso_EE",   0.090185);//
+            set("reliso_EE",   0.090185);
+            //set("reliso_EE",   999999.0);
             set("mHits",       1);
-            set("vtxFitConv",  true);
+            set("vtxFitConv",  1);
         }
         
         indexSinhih_EB_     = index_type(&bits_, "sihih_EB"     );
@@ -289,29 +290,44 @@ public: // interface
         Double_t RelIso  = ( chIso + max(0.0, nhIso + phIso - rhoIso*AEff) )/ electron.ecalDrivenMomentum().pt();
         Int_t mHits   =  electron.gsfTrack()->hitPattern().numberOfHits(reco::HitPattern::MISSING_INNER_HITS);
         Bool_t vtxFitConv = electron.passConversionVeto();
+
+	bool verbosity = false;
+
+	if (verbosity) {
+	    std::cout << "\tfabs(Deta) = " << fabs(Deta) << std::endl;
+	    std::cout << "\tfabs(Dphi) = " << fabs(Dphi) << std::endl;
+	    std::cout << "\tsihih = " << sihih << std::endl;
+	    std::cout << "\tHoE = " << HoE << std::endl;
+	    std::cout << "\tfabs(D0) = " << fabs(D0) << std::endl;
+	    std::cout << "\tfabs(DZ) = " << fabs(DZ) << std::endl;
+	    std::cout << "\tfabs(Ooemoop) = " << fabs(Ooemoop) << std::endl;
+	    std::cout << "\tRelIso = " << RelIso << std::endl;
+	    std::cout << "\tmHits = " << mHits << std::endl;
+	    std::cout << "\tvtxFitConv = " << vtxFitConv << std::endl;
+	}
         
         // now apply the cuts
         if (electron.isEB()) { // BARREL case
             // check the EB cuts
             if ( fabs(Deta)    <  cut(indexDeta_EB_,  double()) || ignoreCut(indexDeta_EB_)  ) passCut(ret, indexDeta_EB_);
-            //else std::cout<<"failed Deta"<<std::endl;
+            else if (verbosity) std::cout<<"failed Deta"<<std::endl;
             if ( fabs(Dphi)    <  cut(indexDphi_EB_,  double()) || ignoreCut(indexDphi_EB_)  ) passCut(ret, indexDphi_EB_);
-            //else std::cout<<"failed Dphi"<<std::endl;
+            else if (verbosity) std::cout<<"failed Dphi"<<std::endl;
             if ( sihih         <  cut(indexSinhih_EB_,double()) || ignoreCut(indexSinhih_EB_)) passCut(ret, indexSinhih_EB_);
-            //else std::cout<<"failed sihih"<<std::endl;
+            else if (verbosity) std::cout<<"failed sihih"<<std::endl;
             if ( HoE           <  cut(indexHoE_EB_,   double()) || ignoreCut(indexHoE_EB_)   ) passCut(ret, indexHoE_EB_);
-            //else std::cout<<"failed HoE"<<std::endl;
+            else if (verbosity) std::cout<<"failed HoE"<<std::endl;
             if ( fabs(D0)      <  cut(indexD0_EB_,    double()) || ignoreCut(indexD0_EB_)    ) passCut(ret, indexD0_EB_);
-            //else std::cout<<"failed D0"<<std::endl;
+            else if (verbosity) std::cout<<"failed D0"<<std::endl;
             if ( fabs(DZ)      <  cut(indexDZ_EB_,    double()) || ignoreCut(indexDZ_EB_)    ) passCut(ret, indexDZ_EB_);
-            //else std::cout<<"failed DZ"<<std::endl;
+            else if (verbosity) std::cout<<"failed DZ"<<std::endl;
             if ( fabs(Ooemoop) <  cut(indexOoemoop_EB_, double()) || ignoreCut(indexOoemoop_EB_) ) passCut(ret, indexOoemoop_EB_);
-            //else std::cout<<"failed Ooemoop"<<std::endl;
+            else if (verbosity) std::cout<<"failed Ooemoop"<<std::endl;
             if ( RelIso        <  cut(indexRelIso_EB_, double()) || ignoreCut(indexRelIso_EB_) ) passCut(ret, indexRelIso_EB_);
-            //else std::cout<<"failed RelIso"<<std::endl;
+            else if (verbosity) std::cout<<"failed RelIso"<<std::endl;
             
             // pass all the EE cuts
-           	passCut(ret, indexDeta_EE_);
+            passCut(ret, indexDeta_EE_);
             passCut(ret, indexDphi_EE_);
             passCut(ret, indexSinhih_EE_);
             passCut(ret, indexHoE_EE_);
@@ -322,13 +338,21 @@ public: // interface
         } else if (electron.isEE()) {  // ENDCAPS case
             // check the EE cuts
             if ( fabs(Deta)    <  cut(indexDeta_EE_,  double()) || ignoreCut(indexDeta_EE_)  ) passCut(ret, indexDeta_EE_);
+            else if (verbosity) std::cout<<"failed Deta"<<std::endl;
             if ( fabs(Dphi)    <  cut(indexDphi_EE_,  double()) || ignoreCut(indexDphi_EE_)  ) passCut(ret, indexDphi_EE_);
+            else if (verbosity) std::cout<<"failed Dphi"<<std::endl;
             if ( sihih         <  cut(indexSinhih_EE_,double()) || ignoreCut(indexSinhih_EE_)) passCut(ret, indexSinhih_EE_);
+            else if (verbosity) std::cout<<"failed sihih"<<std::endl;
             if ( HoE           <  cut(indexHoE_EE_,   double()) || ignoreCut(indexHoE_EE_)   ) passCut(ret, indexHoE_EE_);
+            else if (verbosity) std::cout<<"failed HoE"<<std::endl;
             if ( D0            <  cut(indexD0_EE_,    double()) || ignoreCut(indexD0_EE_)    ) passCut(ret, indexD0_EE_);
+            else if (verbosity) std::cout<<"failed D0"<<std::endl;
             if ( DZ            <  cut(indexDZ_EE_,    double()) || ignoreCut(indexDZ_EE_)    ) passCut(ret, indexDZ_EE_);
+            else if (verbosity) std::cout<<"failed DZ"<<std::endl;
             if ( fabs(Ooemoop) <  cut(indexOoemoop_EE_, double()) || ignoreCut(indexOoemoop_EE_) ) passCut(ret, indexOoemoop_EE_);
+            else if (verbosity) std::cout<<"failed Ooemoop"<<std::endl;
             if ( RelIso        <  cut(indexRelIso_EE_, double()) || ignoreCut(indexRelIso_EE_) ) passCut(ret, indexRelIso_EE_);
+            else if (verbosity) std::cout<<"failed RelIso"<<std::endl;
             // pass all the EB cuts
             passCut(ret, indexDeta_EB_);
             passCut(ret, indexDphi_EB_);
