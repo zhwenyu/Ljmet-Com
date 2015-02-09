@@ -185,6 +185,7 @@ void singleLepEventSelector::BeginJob( std::map<std::string, edm::ParameterSet c
         mbPar["debug"]                    = par[_key].getParameter<bool>         ("debug");
         mbPar["isMc"]                     = par[_key].getParameter<bool>         ("isMc");
         mbPar["keepFullMChistory"]        = par[_key].getParameter<bool>         ("keepFullMChistory");
+        
         mbPar["trigger_cut"]              = par[_key].getParameter<bool>         ("trigger_cut");
         mbPar["dump_trigger"]             = par[_key].getParameter<bool>         ("dump_trigger");
         mvsPar["trigger_path_el"]         = par[_key].getParameter<std::vector<std::string>>  ("trigger_path_el");
@@ -263,13 +264,6 @@ void singleLepEventSelector::BeginJob( std::map<std::string, edm::ParameterSet c
     push_back("Trigger");
     push_back("Primary vertex");
     push_back("HBHE noise and scraping filter");
-    push_back("Min lepton");
-    push_back("Max lepton");
-    push_back("Min muon");
-    push_back("Min electron");
-    push_back("Trigger consistent");
-    push_back("Second lepton veto");
-    push_back("Tau veto");
     push_back("One jet or more");
     push_back("Two jets or more");
     push_back("Three jets or more");
@@ -277,6 +271,13 @@ void singleLepEventSelector::BeginJob( std::map<std::string, edm::ParameterSet c
     push_back("Max jet multiplicity");
     push_back("Leading jet pt");
     push_back("Min MET");
+    push_back("Min lepton");
+    push_back("Max lepton");
+    push_back("Min muon");
+    push_back("Min electron");
+    //push_back("Trigger consistent");
+    push_back("Second lepton veto");
+    push_back("Tau veto");
     push_back("1 btag or more");
     push_back("2 btag or more");
     push_back("3 btag or more");
@@ -289,14 +290,6 @@ void singleLepEventSelector::BeginJob( std::map<std::string, edm::ParameterSet c
     set("Primary vertex", mbPar["pv_cut"]);
     set("HBHE noise and scraping filter", mbPar["hbhe_cut"]); 
  
-    set("Min lepton", miPar["min_lepton"]);  
-    set("Max lepton", miPar["max_lepton"]);  
-    set("Min muon", miPar["min_muon"]);  
-    set("Min electron", miPar["min_electron"]);  
-    set("Trigger consistent", mbPar["trigger_consistent"]);  
-    set("Second lepton veto", mbPar["second_lepton_veto"]);
-	set("Tau veto", mbPar["tau_veto"]);
-     
     if (mbPar["jet_cuts"]){
         set("One jet or more", false);
         set("Two jets or more", false);
@@ -312,11 +305,18 @@ void singleLepEventSelector::BeginJob( std::map<std::string, edm::ParameterSet c
         set("Min jet multiplicity", false);
         set("Max jet multiplicity", false);
         set("Leading jet pt", false);
-
     }
 
     if (mbPar["met_cuts"]) set("Min MET", mdPar["min_met"]);
 
+    set("Min lepton", miPar["min_lepton"]);  
+    set("Max lepton", miPar["max_lepton"]);  
+    set("Min muon", miPar["min_muon"]);  
+    set("Min electron", miPar["min_electron"]);  
+    //set("Trigger consistent", mbPar["trigger_consistent"]);  
+    set("Second lepton veto", mbPar["second_lepton_veto"]);
+    set("Tau veto", mbPar["tau_veto"]);
+     
     if (mbPar["btag_cuts"]){
         set("1 btag or more", mbPar["btag_1"]);
         set("2 btag or more", mbPar["btag_2"]);
