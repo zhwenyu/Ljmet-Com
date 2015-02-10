@@ -76,6 +76,8 @@ public:
 
     boost::shared_ptr<PFJetIDSelectionFunctor> const & jetSel()        const { return jetSel_;}
     boost::shared_ptr<PVSelector>              const & pvSel()         const { return pvSel_;}
+    boost::shared_ptr<PFMuonSelector>          const & muonSel()       const { return muonSel_;}
+    boost::shared_ptr<TopElectronSelector>     const & electronSel()   const { return electronSel_;}
 
 protected:
     std::string legend;
@@ -271,10 +273,10 @@ void singleLepEventSelector::BeginJob( std::map<std::string, edm::ParameterSet c
     push_back("Max jet multiplicity");
     push_back("Leading jet pt");
     push_back("Min MET");
-    push_back("Min lepton");
-    push_back("Max lepton");
     push_back("Min muon");
     push_back("Min electron");
+    push_back("Min lepton");
+    push_back("Max lepton");
     //push_back("Trigger consistent");
     push_back("Second lepton veto");
     push_back("Tau veto");
@@ -309,10 +311,10 @@ void singleLepEventSelector::BeginJob( std::map<std::string, edm::ParameterSet c
 
     if (mbPar["met_cuts"]) set("Min MET", mdPar["min_met"]);
 
-    set("Min lepton", miPar["min_lepton"]);  
-    set("Max lepton", miPar["max_lepton"]);  
     set("Min muon", miPar["min_muon"]);  
     set("Min electron", miPar["min_electron"]);  
+    set("Min lepton", miPar["min_lepton"]);  
+    set("Max lepton", miPar["max_lepton"]);  
     //set("Trigger consistent", mbPar["trigger_consistent"]);  
     set("Second lepton veto", mbPar["second_lepton_veto"]);
     set("Tau veto", mbPar["tau_veto"]);
@@ -606,36 +608,13 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
                 //muon cuts
                 while(1){
 
-                    // safety for nonexistent track - selector was not safe
-                    if ( _imu->globalTrack().isNonnull() && 
-                         _imu->globalTrack().isAvailable() ){ }
-                    else  {
-                        break; // fail
-                    }
                     if ( (*muonSel_)( *_imu, retMuon ) ){ }
                     else break; // fail
-
                     if (_imu->pt()>mdPar["muon_minpt"]){ }
-                    else { 
-                        break;
-                    }
-	  
+                    else break;
+
                     if ( fabs(_imu->eta())<mdPar["muon_maxeta"] ){ }
-                    else { 
-                        break;
-                    }
-
-                    // vertex-pv Z distance
-                    reco::Vertex const & pv = pvSel_->vertices()->at(0);
-                    if( fabs(_imu->muonBestTrack()->dz(pv.position())) < 0.5 ) {}
-                    else  {
-                        break;
-                    }
-
-                    if (_imu->isPFMuon()){}
-                    else {
-                        break;
-                    }
+                    else break;
 
                     pass = true; // success
                     break;
@@ -675,6 +654,7 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
 
                 //electron cuts
                 while(1){
+
                     if ( (*electronSel_)( *_iel, event, retElectron ) ){ }
                     else break; // fail
                     if (_iel->pt()>mdPar["electron_minpt"]){ }
@@ -682,12 +662,6 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
 	  
                     if ( fabs(_iel->eta())<mdPar["electron_maxeta"] ){ }
                     else break;
-
-
-                    // IP cut
-                    reco::Vertex const & pv = pvSel_->vertices()->at(0);
-                    if( fabs(_iel->gsfTrack()->dxy(pv.position())) < 0.02){ }
-                    else  break;
 
                     pass = true; // success
                     break;
@@ -751,13 +725,13 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
 
         int nLeptons = nSelElectrons + nSelMuons;
 
+        if( nSelMuons >= cut("Min muon", int()) || ignoreCut("Min muon") ) passCut(ret, "Min muon");
+        else break;
+        if( nSelElectrons >= cut("Min electron", int()) || ignoreCut("Min electron") ) passCut(ret, "Min electron");
+        else break;
         if( nLeptons >= cut("Min lepton", int()) || ignoreCut("Min lepton") ) passCut(ret, "Min lepton");
         else break;
         if( nLeptons <= cut("Max lepton", int()) || ignoreCut("Max lepton") ) passCut(ret, "Max lepton");
-        else break;
-        if(_n_muons >= cut("Min muon", int()) || ignoreCut("Min muon") ) passCut(ret, "Min muon");
-        else break;
-        if(_n_electrons >= cut("Min electron", int()) || ignoreCut("Min electron") ) passCut(ret, "Min electron");
         else break;
 
         
