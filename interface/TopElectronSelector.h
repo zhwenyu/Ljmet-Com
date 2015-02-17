@@ -25,7 +25,7 @@ public: // interface
     bool runData_;
     
     void setUseData(const bool &flag) { runData_ = flag; }
-    enum Version_t { VETO, LOOSE, MEDIUM, TIGHT, LOOSE_NOISO, MEDIUM_NOISO, TIGHT_NOISO, NONE, N_VERSIONS};
+    enum Version_t { VETO, LOOSE, MEDIUM, TIGHT, NONE, N_VERSIONS};
     TopElectronSelector() {}
     
     
