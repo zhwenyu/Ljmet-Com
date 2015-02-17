@@ -624,6 +624,7 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
             bool _pass = false;
             bool _passpf = false;
             bool _isTagged = false;
+	    bool _cleaned = false;
 
 	    TLorentzVector jetP4;
 
@@ -633,15 +634,18 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
 		event.getByLabel( mtPar["muon_collection"], mhMuons );
             	for (std::vector<pat::Muon>::const_iterator _imu = mhMuons->begin(); _imu != mhMuons->end(); _imu++){
             	    if ( (*muonSel_)( *_imu, retMuon ) && _imu->pt()>mdPar["muon_minpt"] && fabs(_imu->eta())<mdPar["muon_maxeta"] ){
-            		if (  deltaR(_imu->p4(),_ijet->p4()) < 0.5 ){
-            		    if (mbPar["debug"]) std::cout << "Jet Overlaps with the Muon... Cleaning constituents..." << std::endl;
-			    std::vector<reco::PFCandidatePtr> Jet_Const = tmpJet.getPFConstituents();
+            		if ( deltaR(_imu->p4(),_ijet->p4()) < 0.4 ){
+            		    if (mbPar["debug"]) std::cout << "Jet Overlaps with the Muon... Cleaning jet..." << std::endl;
+			    tmpJet.setP4( _ijet->p4()-_imu->p4() );
+			    jetP4 = correctJet(tmpJet, event);
+			    _cleaned = true;
+			    /*std::vector<reco::PFCandidatePtr> Jet_Const = (*_ijet).getPFConstituents();
 			    for (std::vector<reco::PFCandidatePtr>::const_iterator _ijet_const = Jet_Const.begin(); _ijet_const != Jet_Const.end(); ++_ijet_const){
 			        if ( deltaR(_imu->p4(),(*_ijet_const)->p4()) < 0.001 ) {
 				    tmpJet.setP4( _ijet->p4()-_imu->p4() );
 				    jetP4 = correctJet(tmpJet, event);
 				}
-                            }
+                            }*/
             		}
 		    }
             	}
@@ -649,20 +653,24 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
             	event.getByLabel( mtPar["electron_collection"], mhElectrons );      	
 	        for (std::vector<pat::Electron>::const_iterator _iel = mhElectrons->begin(); _iel != mhElectrons->end(); _iel++){
                     if ( (*electronSel_)( *_iel, event, retElectron ) && _iel->ecalDrivenMomentum().pt()>mdPar["electron_minpt"] && fabs(_iel->eta())<mdPar["electron_maxeta"] ){
-                	if ( deltaR(_iel->p4(),_ijet->p4()) < 0.5 ){
-            		    if (mbPar["debug"]) std::cout << "Jet Overlaps with the Electron... Cleaning constituents..." << std::endl;
-			    std::vector<reco::PFCandidatePtr> Jet_Const = tmpJet.getPFConstituents();
+                	if ( deltaR(_iel->p4(),_ijet->p4()) < 0.4 ){
+            		    if (mbPar["debug"]) std::cout << "Jet Overlaps with the Electron... Cleaning jet..." << std::endl;
+			    tmpJet.setP4( _ijet->p4()-_iel->p4() );
+			    jetP4 = correctJet(tmpJet, event);
+			    _cleaned = true;
+			    /*std::vector<reco::PFCandidatePtr> Jet_Const = (*_ijet).getPFConstituents();
 			    for (std::vector<reco::PFCandidatePtr>::const_iterator _ijet_const = Jet_Const.begin(); _ijet_const != Jet_Const.end(); ++_ijet_const){
 			        if ( deltaR(_iel->p4(),(*_ijet_const)->p4()) < 0.001 ) {
 				    tmpJet.setP4( _ijet->p4()-_iel->p4() );
 				    jetP4 = correctJet(tmpJet, event);
 				}
-                            }
+                            }*/
                 	}
                     }
                 }            							
 	    }
-	    else jetP4 = correctJet(*_ijet, event);
+	    if (!_cleaned) jetP4 = correctJet(*_ijet, event);
+
             _isTagged = isJetTagged(*_ijet, event);
 
             // jet cuts

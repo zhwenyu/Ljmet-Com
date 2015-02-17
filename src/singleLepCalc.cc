@@ -624,21 +624,20 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
     std::vector <double> AK4JetEnergy;
 
     std::vector <int>    AK4JetBTag;
-    std::vector <double> AK4JetRCN;   
+    //std::vector <double> AK4JetRCN;   
     double AK4HT =.0;
-    for (std::vector<edm::Ptr<pat::Jet> >::const_iterator ijet = vSelJets.begin();
-         ijet != vSelJets.end(); ijet++){
+    for (unsigned int ii = 0; ii < vCorrBtagJets.size(); ii++){
 
         //Four vector
-        TLorentzVector lv = selector->correctJet(**ijet, event);
+        TLorentzVector lv = vCorrBtagJets[ii].first;
 
         AK4JetPt     . push_back(lv.Pt());
         AK4JetEta    . push_back(lv.Eta());
         AK4JetPhi    . push_back(lv.Phi());
         AK4JetEnergy . push_back(lv.Energy());
         
-        AK4JetBTag   . push_back(selector->isJetTagged(**ijet, event));
-        AK4JetRCN    . push_back(((*ijet)->chargedEmEnergy()+(*ijet)->chargedHadronEnergy()) / ((*ijet)->neutralEmEnergy()+(*ijet)->neutralHadronEnergy()));
+        AK4JetBTag   . push_back(vCorrBtagJets[ii].second);
+        //AK4JetRCN    . push_back(((*ijet)->chargedEmEnergy()+(*ijet)->chargedHadronEnergy()) / ((*ijet)->neutralEmEnergy()+(*ijet)->neutralHadronEnergy()));
  
         //HT
         AK4HT += lv.Pt(); 
@@ -651,7 +650,7 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
     SetValue("AK4JetEnergy" , AK4JetEnergy);
     SetValue("AK4HT"        , AK4HT);
     SetValue("AK4JetBTag"   , AK4JetBTag);
-    SetValue("AK4JetRCN"    , AK4JetRCN);
+    //SetValue("AK4JetRCN"    , AK4JetRCN);
 
     // MET
     double _met = -9999.0;
