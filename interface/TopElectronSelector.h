@@ -25,7 +25,7 @@ public: // interface
     bool runData_;
     
     void setUseData(const bool &flag) { runData_ = flag; }
-    enum Version_t { VETO, LOOSE, MEDIUM, TIGHT, NONE, N_VERSIONS};
+    enum Version_t { VETO, LOOSE, MEDIUM, TIGHT, LOOSE_NOISO, MEDIUM_NOISO, TIGHT_NOISO, NONE, N_VERSIONS};
     TopElectronSelector() {}
     
     
@@ -221,7 +221,6 @@ public: // interface
             set("dZ_EE",       0.147154);
             set("ooemoop_EE",  0.106055);
             set("reliso_EE",   0.090185);
-            //set("reliso_EE",   999999.0);
             set("mHits",       1);
             set("vtxFitConv",  1);
         }
