@@ -204,7 +204,6 @@ void singleLepEventSelector::BeginJob( std::map<std::string, edm::ParameterSet c
         miPar["min_jet"]                  = par[_key].getParameter<int>          ("min_jet");
         miPar["max_jet"]                  = par[_key].getParameter<int>          ("max_jet");
         mdPar["leading_jet_pt"]           = par[_key].getParameter<double>       ("leading_jet_pt");
-        mbPar["removeJetLepOverlap"]      = par[_key].getParameter<bool>         ("removeJetLepOverlap");
 
         mbPar["muon_cuts"]                = par[_key].getParameter<bool>         ("muon_cuts");
         mdPar["muon_minpt"]         = par[_key].getParameter<double>       ("muon_minpt");
@@ -245,6 +244,7 @@ void singleLepEventSelector::BeginJob( std::map<std::string, edm::ParameterSet c
         mbPar["JERdown"]                  = par[_key].getParameter<bool>         ("JERdown");
         msPar["JEC_txtfile"]              = par[_key].getParameter<std::string>  ("JEC_txtfile");
         mbPar["doNewJEC"]                 = par[_key].getParameter<bool>         ("doNewJEC");
+        mbPar["doLepJetCleaning"]         = par[_key].getParameter<bool>         ("doLepJetCleaning");
       
 
         std::cout << mLegend << "config parameters loaded..."
@@ -463,130 +463,6 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
 
         //======================================================
         //
-        // jet loop
-        //
-        //
-        if (mbPar["debug"]) std::cout<<"start jet cuts..."<<std::endl;
-
-        event.getByLabel( mtPar["jet_collection"], mhJets );
-
-        int _n_good_jets = 0;
-        int _n_jets = 0;
-        int nBtagJets = 0;
-        double _leading_jet_pt = 0.0;
-
-        mvSelJets.clear();
-        mvAllJets.clear();
-        mvCorrJetsWithBTags.clear();
-        mvSelBtagJets.clear();
-
-        // try to get earlier produced data (in a calc)
-        //std::cout << "Must be 2.34: " << GetTestValue() << std::endl;
-
-        for (std::vector<pat::Jet>::const_iterator _ijet = mhJets->begin();
-             _ijet != mhJets->end(); ++_ijet){
-      
-
-            retJet.set(false);
-
-            bool _pass = false;
-            bool _passpf = false;
-            bool _isTagged = false;
-
-            TLorentzVector jetP4 = correctJet(*_ijet, event);
-            _isTagged = isJetTagged(*_ijet, event);
-
-            // jet cuts
-            while(1){ 
-
-                // quality cuts
-                if ( (*jetSel_)( *_ijet, retJet ) ){ } 
-                else break; // fail 
-	
-                _passpf = true;
-
-                if ( jetP4.Pt() > mdPar["jet_minpt"] ){ }
-                else break; // fail 
-	
-                if ( fabs(jetP4.Eta()) < mdPar["jet_maxeta"] ){ }
-                else break; // fail
-	
-                _pass = true;
-                break;
-            }
-
-            pair<TLorentzVector,bool> jetwithtag;
-            jetwithtag.first = jetP4;
-            jetwithtag.second = _isTagged;
-
-            if ( _pass ){
-
-
-                // save all the good jets
-                ++_n_good_jets;
-                mvSelJets.push_back(edm::Ptr<pat::Jet>(mhJets, _n_jets)); 
-                mvCorrJetsWithBTags.push_back(jetwithtag);
-
-                if (jetP4.Pt() > _leading_jet_pt) _leading_jet_pt = jetP4.Pt();                         
-            
-                if (_isTagged) {
-                    ++nBtagJets;
-                    // save all the good b-tagged jets
-                    mvSelBtagJets.push_back(edm::Ptr<pat::Jet>(mhJets, _n_jets)); 
-                }
-            }
-      
-            // save all the pf jets regardless of pt or eta
-            // needed for MET corrections with JER/JES uncertainty
-            if (_passpf) mvAllJets.push_back(edm::Ptr<pat::Jet>(mhJets, _n_jets)); 
-
-            ++_n_jets; 
-      
-        } // end of loop over jets
-
-        //
-        if ( mbPar["jet_cuts"] ) {
-
-            if ( ignoreCut("One jet or more") || _n_good_jets >= 1 ) passCut(ret, "One jet or more");
-            else break; 
-	
-            if ( ignoreCut("Two jets or more") || _n_good_jets >= 2 ) passCut(ret, "Two jets or more");
-            else break; 
-	
-            if ( ignoreCut("Three jets or more") || _n_good_jets >= 3 ) passCut(ret, "Three jets or more");
-            else break; 
-	
-            if ( ignoreCut("Min jet multiplicity") || _n_good_jets >= cut("Min jet multiplicity",int()) ) passCut(ret, "Min jet multiplicity");
-            else break; 
-	
-            if ( ignoreCut("Max jet multiplicity") || _n_good_jets <= cut("Max jet multiplicity",int()) ) passCut(ret, "Max jet multiplicity");
-            else break; 
-            if ( ignoreCut("Leading jet pt") ||  _leading_jet_pt >= cut("Leading jet pt",double()) ) passCut(ret, "Leading jet pt");
-            else break;
-
-        } // end of jet cuts
-        if (mbPar["debug"]) std::cout<<"finish jet cuts..."<<std::endl;
-
-        //
-        //_____ MET cuts __________________________________
-        //   
-        if (mbPar["debug"]) std::cout<<"start met cuts..."<<std::endl;
-
-        event.getByLabel( mtPar["met_collection"], mhMet );
-        mpMet = edm::Ptr<pat::MET>( mhMet, 0);
-
-        if ( mbPar["met_cuts"] ) {
-
-            // pfMet
-            //if ( mpType1CorrMet.isNonnull() && mpType1CorrMet.isAvailable() ) {
-            if ( mpMet.isNonnull() && mpMet.isAvailable() ) {
-                pat::MET const & met = mhMet->at(0);
-                if ( ignoreCut("Min MET") ||met.et()>cut("Min MET", double()) ) passCut(ret, "Min MET");
-            }
-        } // end of MET cuts
-        if (mbPar["debug"]) std::cout<<"finish met cuts..."<<std::endl;
-        
-        //
         //_____ Muon cuts ________________________________
         //      
         // loop over muons
@@ -718,8 +594,174 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
 
 		}
         if (mbPar["debug"]) std::cout<<"finish tau cuts..."<<std::endl;
+        
+	//
+        // jet loop
+        //
+        //
+        if (mbPar["debug"]) std::cout<<"start jet cuts..."<<std::endl;
+
+        event.getByLabel( mtPar["jet_collection"], mhJets );
+
+        int _n_good_jets = 0;
+        int _n_jets = 0;
+        int nBtagJets = 0;
+        double _leading_jet_pt = 0.0;
+
+        mvSelJets.clear();
+        mvAllJets.clear();
+        mvCorrJetsWithBTags.clear();
+        mvSelBtagJets.clear();
+
+        // try to get earlier produced data (in a calc)
+        //std::cout << "Must be 2.34: " << GetTestValue() << std::endl;
+
+        for (std::vector<pat::Jet>::const_iterator _ijet = mhJets->begin();
+             _ijet != mhJets->end(); ++_ijet){
+      
+            retJet.set(false);
+
+            bool _pass = false;
+            bool _passpf = false;
+            bool _isTagged = false;
+	    bool _cleaned = false;
+
+	    TLorentzVector jetP4;
+
+	    if ( mbPar["doLepJetCleaning"] ){
+	        pat::Jet tmpJet = *_ijet;
+		if (mbPar["debug"]) std::cout << "Checking Overlap" << std::endl;
+		event.getByLabel( mtPar["muon_collection"], mhMuons );
+            	for (std::vector<pat::Muon>::const_iterator _imu = mhMuons->begin(); _imu != mhMuons->end(); _imu++){
+            	    if ( (*muonSel_)( *_imu, retMuon ) && _imu->pt()>mdPar["muon_minpt"] && fabs(_imu->eta())<mdPar["muon_maxeta"] ){
+            		if ( deltaR(_imu->p4(),_ijet->p4()) < 0.4 ){
+            		    if (mbPar["debug"]) std::cout << "Jet Overlaps with the Muon... Cleaning jet..." << std::endl;
+        		    for (unsigned int id = 0, nd = (*_ijet).numberOfDaughters(); id < nd; ++id) {
+            			const pat::PackedCandidate &_ijet_const = dynamic_cast<const pat::PackedCandidate &>(*(*_ijet).daughter(id));
+			        if ( deltaR(_imu->p4(),_ijet_const.p4()) < 0.001 ) {
+				    tmpJet.setP4( _ijet->p4()-_imu->p4() );
+				    jetP4 = correctJet(tmpJet, event);
+				}
+                            }
+			    _cleaned = true;
+            		}
+		    }
+            	}
+            
+            	event.getByLabel( mtPar["electron_collection"], mhElectrons );      	
+	        for (std::vector<pat::Electron>::const_iterator _iel = mhElectrons->begin(); _iel != mhElectrons->end(); _iel++){
+                    if ( (*electronSel_)( *_iel, event, retElectron ) && _iel->ecalDrivenMomentum().pt()>mdPar["electron_minpt"] && fabs(_iel->eta())<mdPar["electron_maxeta"] ){
+                	if ( deltaR(_iel->p4(),_ijet->p4()) < 0.4 ){
+            		    if (mbPar["debug"]) std::cout << "Jet Overlaps with the Electron... Cleaning jet..." << std::endl;
+        		    for (unsigned int id = 0, nd = (*_ijet).numberOfDaughters(); id < nd; ++id) {
+            			const pat::PackedCandidate &_ijet_const = dynamic_cast<const pat::PackedCandidate &>(*(*_ijet).daughter(id));
+			        if ( deltaR(_iel->p4(),_ijet_const.p4()) < 0.001 ) {
+				    tmpJet.setP4( _ijet->p4()-_iel->p4() );
+				    jetP4 = correctJet(tmpJet, event);
+				}
+                            }
+			    _cleaned = true;
+                	}
+                    }
+                }            							
+	    }
+	    if (!_cleaned) jetP4 = correctJet(*_ijet, event);
+
+            _isTagged = isJetTagged(*_ijet, event);
+
+            // jet cuts
+            while(1){ 
+
+                // quality cuts
+                if ( (*jetSel_)( *_ijet, retJet ) ){ } 
+                else break; // fail 
+	
+                _passpf = true;
+
+                if ( jetP4.Pt() > mdPar["jet_minpt"] ){ }
+                else break; // fail 
+	
+                if ( fabs(jetP4.Eta()) < mdPar["jet_maxeta"] ){ }
+                else break; // fail
+	
+                _pass = true;
+                break;
+            }
+
+            pair<TLorentzVector,bool> jetwithtag;
+            jetwithtag.first = jetP4;
+            jetwithtag.second = _isTagged;
+
+            if ( _pass ){
+
+
+                // save all the good jets
+                ++_n_good_jets;
+                mvSelJets.push_back(edm::Ptr<pat::Jet>( mhJets, _n_jets)); 
+                mvCorrJetsWithBTags.push_back(jetwithtag);
+
+                if (jetP4.Pt() > _leading_jet_pt) _leading_jet_pt = jetP4.Pt();                         
+            
+                if (_isTagged) {
+                    ++nBtagJets;
+                    // save all the good b-tagged jets
+                    mvSelBtagJets.push_back(edm::Ptr<pat::Jet>( mhJets, _n_jets)); 
+                }
+            }
+      
+            // save all the pf jets regardless of pt or eta
+            // needed for MET corrections with JER/JES uncertainty
+            if (_passpf) mvAllJets.push_back(edm::Ptr<pat::Jet>( mhJets, _n_jets)); 
+
+            ++_n_jets; 
+      
+        } // end of loop over jets
+
 		
-		
+        //
+        if ( mbPar["jet_cuts"] ) {
+
+            if ( ignoreCut("One jet or more") || _n_good_jets >= 1 ) passCut(ret, "One jet or more");
+            else break; 
+	
+            if ( ignoreCut("Two jets or more") || _n_good_jets >= 2 ) passCut(ret, "Two jets or more");
+            else break; 
+	
+            if ( ignoreCut("Three jets or more") || _n_good_jets >= 3 ) passCut(ret, "Three jets or more");
+            else break; 
+	
+            if ( ignoreCut("Min jet multiplicity") || _n_good_jets >= cut("Min jet multiplicity",int()) ) passCut(ret, "Min jet multiplicity");
+            else break; 
+	
+            if ( ignoreCut("Max jet multiplicity") || _n_good_jets <= cut("Max jet multiplicity",int()) ) passCut(ret, "Max jet multiplicity");
+            else break; 
+            if ( ignoreCut("Leading jet pt") ||  _leading_jet_pt >= cut("Leading jet pt",double()) ) passCut(ret, "Leading jet pt");
+            else break;
+
+        } // end of jet cuts
+        if (mbPar["debug"]) std::cout<<"finish jet cuts..."<<std::endl;
+
+        //
+        //_____ MET cuts __________________________________
+        //   
+        if (mbPar["debug"]) std::cout<<"start met cuts..."<<std::endl;
+
+        event.getByLabel( mtPar["met_collection"], mhMet );
+        mpMet = edm::Ptr<pat::MET>( mhMet, 0);
+
+        if ( mbPar["met_cuts"] ) {
+
+            // pfMet
+            //if ( mpType1CorrMet.isNonnull() && mpType1CorrMet.isAvailable() ) {
+            if ( mpMet.isNonnull() && mpMet.isAvailable() ) {
+                pat::MET const & met = mhMet->at(0);
+                if ( ignoreCut("Min MET") ||met.et()>cut("Min MET", double()) ) passCut(ret, "Min MET");
+            }
+        } // end of MET cuts
+        if (mbPar["debug"]) std::cout<<"finish met cuts..."<<std::endl;
+
+	//
+	//_____ Lepton cuts ________________________________
 
         if (mbPar["debug"]) std::cout<<"start lepton cuts..."<<std::endl;
 
