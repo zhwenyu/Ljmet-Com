@@ -293,8 +293,8 @@ void singleLepEventSelector::BeginJob( std::map<std::string, edm::ParameterSet c
     set("HBHE noise and scraping filter", mbPar["hbhe_cut"]); 
  
     if (mbPar["jet_cuts"]){
-        set("One jet or more", false);
-        set("Two jets or more", false);
+        set("One jet or more", true);
+        set("Two jets or more", true);
         set("Three jets or more", false);
         set("Min jet multiplicity", miPar["min_jet"]);
         set("Max jet multiplicity", miPar["max_jet"]);
