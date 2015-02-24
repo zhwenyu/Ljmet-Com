@@ -7,6 +7,7 @@
 
 
 #include <iostream>
+#include <string>
 #include "LJMet/Com/interface/BaseCalc.h"
 #include "LJMet/Com/interface/LjmetFactory.h"
 #include "LJMet/Com/interface/LjmetEventContent.h"
@@ -15,11 +16,19 @@
 #include "LJMet/Com/interface/TopElectronSelector.h"
 
 #include "DataFormats/JetReco/interface/CATopJetTagInfo.h"
+#include "FWCore/Common/interface/TriggerNames.h"
+#include "DataFormats/Common/interface/TriggerResults.h"
+#include "DataFormats/PatCandidates/interface/TriggerObjectStandAlone.h"
+#include "DataFormats/PatCandidates/interface/PackedTriggerPrescales.h"
+
+//#include "LJMet/Com/interface/VVString.h"
 
 using std::cout;
 using std::endl;
 
 class LjmetFactory;
+
+
 
 class DileptonCalc : public BaseCalc {
     
@@ -39,10 +48,12 @@ private:
     edm::InputTag             rhoSrc_it;
     edm::InputTag             pvCollection_it;
     edm::InputTag             genParticles_it;
+    edm::InputTag             triggerObjects_;
+    edm::InputTag             triggerBits_;
     std::vector<unsigned int> keepPDGID;
     std::vector<unsigned int> keepMomPDGID;
     bool keepFullMChistory;
-    
+    bool doTriggerStudy_; 
     double rhoIso;
     
     boost::shared_ptr<TopElectronSelector>     electronSelL_, electronSelM_, electronSelT_;
@@ -80,7 +91,16 @@ int DileptonCalc::BeginJob()
     
     if (mPset.exists("keepMomPDGID")) keepMomPDGID = mPset.getParameter<std::vector<unsigned int> >("keepMomPDGID");
     else                              keepMomPDGID.clear();
+
+    if(mPset.exists("TriggerObjects")) triggerObjects_ = mPset.getParameter<edm::InputTag>("TriggerObjects");
+    else                               triggerObjects_ = edm::InputTag("selectedPatTrigger");
+
+    if(mPset.exists("TriggerBits")) triggerBits_ = mPset.getParameter<edm::InputTag>("TriggerBits");
+    else                            triggerBits_ = edm::InputTag("TriggerResults","","HLT");
     
+    if(mPset.exists("doTriggerStudy")) doTriggerStudy_ = mPset.getParameter<bool>("doTriggerStudy");
+    else                             doTriggerStudy_ = true;
+
     //   if (mPset.exists("keepFullMChistory")) keepFullMChistory = mPset.getParameter<bool>("keepFullMChistory");
     //else                                   keepFullMChistory = true;
     keepFullMChistory = true;
@@ -168,6 +188,7 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
     SetValue("trigEM", passEM);
     SetValue("trigMM", passMM);
     
+
     //
     //_____ Event kinematics __________________
     //
@@ -239,6 +260,11 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
     vector<double> elMatchedEta;
     vector<double> elMatchedPhi;
     vector<double> elMatchedEnergy;
+    vector<std::string> TriggerElectronFilters;
+    vector<double> TriggerElectronPts;
+    vector<double> TriggerElectronEtas;
+    vector<double> TriggerElectronPhis;
+    vector<double> TriggerElectronEnergies;
     
     edm::Handle<double> rhoHandle;
     event.getByLabel(rhoSrc_it, rhoHandle);
@@ -252,123 +278,184 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
     //_____Electrons______
     //
     
+    //keep track of which electron we are looking at
+    int ElIndex = 0;
     for (std::vector<edm::Ptr<pat::Electron> >::const_iterator iel = vSelElectrons.begin(); iel != vSelElectrons.end(); iel++){
-        //Protect against electrons without tracks (should never happen, but just in case)
-        if ((*iel)->gsfTrack().isNonnull() and (*iel)->gsfTrack().isAvailable()){
-            //Four vector
-            elPt     . push_back((*iel)->ecalDrivenMomentum().pt()); //Must check: why ecalDrivenMomentum?
-            elEta    . push_back((*iel)->ecalDrivenMomentum().eta());
-            elPhi    . push_back((*iel)->ecalDrivenMomentum().phi());
-            elEnergy . push_back((*iel)->ecalDrivenMomentum().energy());
-            
-	    //if there are two electrons calculate invariant mass from two highest pt objects
-	    if(vSelElectrons.size()==2){
-	      for (std::vector<edm::Ptr<pat::Electron> >::const_iterator iiel = vSelElectrons.begin(); iiel != vSelElectrons.end(); iiel++){
-		//float mass = pow( (*iel)->ecalDrivenMomentum().energy() * (*iiel)->ecalDrivenMomentum().energy() - ( (*iel)->ecalDrivenMomentum().pt() * (*iiel)->ecalDrivenMomentum().pt() - (*iel)->ecalDrivenMomentum().pz() * (*iiel)->ecalDrivenMomentum().pz()), 0.5);
-		if(iiel!=iel){
-		  TLorentzVector diElFourVec( (*iel)->ecalDrivenMomentum().px() + (*iiel)->ecalDrivenMomentum().px(),(*iel)->ecalDrivenMomentum().py() + (*iiel)->ecalDrivenMomentum().py(),(*iel)->ecalDrivenMomentum().pz() + (*iiel)->ecalDrivenMomentum().pz(), (*iel)->ecalDrivenMomentum().energy() + (*iiel)->ecalDrivenMomentum().energy());
-		  diElMass.push_back(diElFourVec.M());
-		  elCharge1.push_back( (*iel)->charge());
-		  elCharge2.push_back( (*iiel)->charge());
-		}
-	      }
+      //Protect against electrons without tracks (should never happen, but just in case)
+      if ((*iel)->gsfTrack().isNonnull() and (*iel)->gsfTrack().isAvailable()){
+	//increment index
+	ElIndex+=1;
+	//Four vector
+	elPt     . push_back((*iel)->ecalDrivenMomentum().pt()); //Must check: why ecalDrivenMomentum?
+	elEta    . push_back((*iel)->ecalDrivenMomentum().eta());
+	elPhi    . push_back((*iel)->ecalDrivenMomentum().phi());
+	elEnergy . push_back((*iel)->ecalDrivenMomentum().energy());
+        
+	//if there are two electrons calculate invariant mass from two highest pt objects
+	if(vSelElectrons.size()==2){
+	  for (std::vector<edm::Ptr<pat::Electron> >::const_iterator iiel = vSelElectrons.begin(); iiel != vSelElectrons.end(); iiel++){
+	    //float mass = pow( (*iel)->ecalDrivenMomentum().energy() * (*iiel)->ecalDrivenMomentum().energy() - ( (*iel)->ecalDrivenMomentum().pt() * (*iiel)->ecalDrivenMomentum().pt() - (*iel)->ecalDrivenMomentum().pz() * (*iiel)->ecalDrivenMomentum().pz()), 0.5);
+	    if(iiel!=iel){
+	      TLorentzVector diElFourVec( (*iel)->ecalDrivenMomentum().px() + (*iiel)->ecalDrivenMomentum().px(),(*iel)->ecalDrivenMomentum().py() + (*iiel)->ecalDrivenMomentum().py(),(*iel)->ecalDrivenMomentum().pz() + (*iiel)->ecalDrivenMomentum().pz(), (*iel)->ecalDrivenMomentum().energy() + (*iiel)->ecalDrivenMomentum().energy());
+	      diElMass.push_back(diElFourVec.M());
+	      elCharge1.push_back( (*iel)->charge());
+	      elCharge2.push_back( (*iiel)->charge());
 	    }
-	    else{ 
-	      diElMass.push_back(-1);
-	      elCharge1.push_back(-99999);
-	      elCharge2.push_back(-99998);
-	      }
-            //Isolation
-            double AEff  = ElectronEffectiveArea::GetElectronEffectiveArea(ElectronEffectiveArea::kEleGammaAndNeutralHadronIso03,
-                                                                           (*iel)->superCluster()->eta(), ElectronEffectiveArea::kEleEAData2012);
-            double chIso = (*iel)->chargedHadronIso();
-            double nhIso = (*iel)->neutralHadronIso();
-            double phIso = (*iel)->photonIso();
-            double relIso = ( chIso + max(0.0, nhIso + phIso - rhoIso*AEff) ) / (*iel)->pt();
+	  }
+	}
+	else{ 
+	  diElMass.push_back(-1);
+	  elCharge1.push_back(-99999);
+	  elCharge2.push_back(-99998);
+	}
+	//Isolation
+	double AEff  = ElectronEffectiveArea::GetElectronEffectiveArea(ElectronEffectiveArea::kEleGammaAndNeutralHadronIso03,
+								       (*iel)->superCluster()->eta(), ElectronEffectiveArea::kEleEAData2012);
+	double chIso = (*iel)->chargedHadronIso();
+	double nhIso = (*iel)->neutralHadronIso();
+	double phIso = (*iel)->photonIso();
+	double relIso = ( chIso + max(0.0, nhIso + phIso - rhoIso*AEff) ) / (*iel)->pt();
+	
+	elChIso  . push_back(chIso);
+	elNhIso  . push_back(nhIso);
+	elPhIso  . push_back(phIso);
+	elAEff   . push_back(AEff);
+	elRhoIso . push_back(rhoIso);
+        
+	elRelIso . push_back(relIso);
+        
+	//Conversion rejection
+	int nLostHits = (*iel)->gsfTrack()->hitPattern().numberOfLostHits(reco::HitPattern::MISSING_INNER_HITS);
+	double dist   = (*iel)->convDist();
+	double dcot   = (*iel)->convDcot();
+	int notConv   = nLostHits == 0 and (fabs(dist) > 0.02 or fabs(dcot) > 0.02);
+	elCharge.push_back((*iel)->charge());
+	elNotConversion . push_back(notConv);
+        
+	retElectronL = (*electronSelL_)(**iel, event, retElectron);
+	retElectronM = (*electronSelM_)(**iel, event, retElectron);
+	retElectronT = (*electronSelT_)(**iel, event, retElectron);
+        
+	elQuality.push_back((retElectronT<<2) + (retElectronM<<1) + retElectronL);
+        
+	//IP: for some reason this is with respect to the first vertex in the collection
+	if(goodPVs.size() > 0){
+	  elDxy.push_back((*iel)->gsfTrack()->dxy(goodPVs.at(0).position()));
+	  elDZ.push_back((*iel)->gsfTrack()->dz(goodPVs.at(0).position()));
+	} else {
+	  elDxy.push_back(-999);
+	  elDZ.push_back(-999);
+	}
+	elChargeConsistent.push_back((*iel)->isGsfCtfScPixChargeConsistent());
+	elIsEBEE.push_back(((*iel)->isEBEEGap()<<2) + ((*iel)->isEE()<<1) + (*iel)->isEB());
+	elDeta.push_back((*iel)->deltaEtaSuperClusterTrackAtVtx());
+	elDphi.push_back((*iel)->deltaPhiSuperClusterTrackAtVtx());
+	elSihih.push_back((*iel)->sigmaIetaIeta());
+	elHoE.push_back((*iel)->hadronicOverEm());
+	elD0.push_back((*iel)->dB());
+	elOoemoop.push_back(1.0/(*iel)->ecalEnergy() + (*iel)->eSuperClusterOverP()/(*iel)->ecalEnergy());
+	elMHits.push_back((*iel)->gsfTrack()->hitPattern().numberOfHits(reco::HitPattern::MISSING_INNER_HITS));
+	elVtxFitConv.push_back((*iel)->passConversionVeto());
+        
+	//Trigger Matching - store 4-vector and filter information for all trigger objects deltaR matched to electrons
+	if(doTriggerStudy_){
+	  
+	  //read in trigger objects
+	  edm::Handle<pat::TriggerObjectStandAloneCollection> triggerObjects;
+	  event.getByLabel(triggerObjects_,triggerObjects);
+	  
+	  edm::Handle<edm::TriggerResults> triggerBits;
+	  event.getByLabel(triggerBits_,triggerBits);
+	  const edm::TriggerNames &names = event.triggerNames(*triggerBits);
+	  
+	  //loop over them for deltaR matching
+	  TLorentzVector trigObj;
+	  pat::TriggerObjectStandAlone matchedObj;
+	  std::vector<std::string> paths;
+	  float closestDR = 10000.;
+	  for( pat::TriggerObjectStandAlone obj : *triggerObjects){
+	    obj.unpackPathNames(names);
+	    float dR = mdeltaR( (*iel)->eta(), (*iel)->phi(), obj.eta(),obj.phi() );
+	    if(dR < closestDR){
+	      closestDR = dR;
+	      trigObj.SetPtEtaPhiE((*iel)->pt(),(*iel)->eta(),(*iel)->phi(),(*iel)->energy());
+	      matchedObj=obj;
+	    }
+	  }
+	  if(closestDR<0.05){
+	    TriggerElectronPts.push_back(trigObj.Pt());
+	    TriggerElectronEtas.push_back(trigObj.Eta());
+	    TriggerElectronPhis.push_back(trigObj.Phi());
+	    TriggerElectronEnergies.push_back(trigObj.Energy());
+	    std::cout<<"found matched trigger object!"<<std::endl;
+	    //now store information about filters
+	    for (unsigned h = 0; h < matchedObj.filterLabels().size(); ++h){
+	      std::string filter = matchedObj.filterLabels()[h];
+	      std::string Index = Form("MatchedIndex%i_",ElIndex);
+	      std::string hltFilter_wIndex = Index+filter;
+	      std::cout<<hltFilter_wIndex<<std::endl;
+	      TriggerElectronFilters.push_back(hltFilter_wIndex);
+	    }	    
+	  }
+	  else{
+	    TriggerElectronPts.push_back(-9999);
+	    TriggerElectronEtas.push_back(-9999);
+	    TriggerElectronPhis.push_back(-9999);
+	    TriggerElectronEnergies.push_back(-9999);
+	  }
+	  
+	}
+	
+	if(isMc && keepFullMChistory){
+	  //cout << "start\n";
+	  edm::Handle<reco::GenParticleCollection> genParticles;
+	  event.getByLabel(genParticles_it, genParticles);
+	  int matchId = findMatch(*genParticles, 11, (*iel)->eta(), (*iel)->phi());
+	  double closestDR = 10000.;
+	  //cout << "matchId "<<matchId <<endl;
+	  if (matchId>=0) {
+	    const reco::GenParticle & p = (*genParticles).at(matchId);
+	    closestDR = mdeltaR( (*iel)->eta(), (*iel)->phi(), p.eta(), p.phi());
+	    //cout << "closestDR "<<closestDR <<endl;
+	    if(closestDR < 0.3){
+	      elGen_Reco_dr.push_back(closestDR);
+	      elPdgId.push_back(p.pdgId());
+	      elStatus.push_back(p.status());
+	      elMatched.push_back(1);
+	      elMatchedPt.push_back( p.pt());
+	      elMatchedEta.push_back(p.eta());
+	      elMatchedPhi.push_back(p.phi());
+	      elMatchedEnergy.push_back(p.energy());
+	      int oldSize = elMother_id.size();
+	      fillMotherInfo(p.mother(), 0, elMother_id, elMother_status, elMother_pt, elMother_eta, elMother_phi, elMother_energy);
+	      elNumberOfMothers.push_back(elMother_id.size()-oldSize);
+	    }
+	  }
+	  if(closestDR >= 0.3){
+	    elNumberOfMothers.push_back(-1);
+	    elGen_Reco_dr.push_back(-1.0);
+	    elPdgId.push_back(-1);
+	    elStatus.push_back(-1);
+	    elMatched.push_back(0);
+	    elMatchedPt.push_back(-1000.0);
+	    elMatchedEta.push_back(-1000.0);
+	    elMatchedPhi.push_back(-1000.0);
+	    elMatchedEnergy.push_back(-1000.0);
             
-            elChIso  . push_back(chIso);
-            elNhIso  . push_back(nhIso);
-            elPhIso  . push_back(phIso);
-            elAEff   . push_back(AEff);
-            elRhoIso . push_back(rhoIso);
-            
-            elRelIso . push_back(relIso);
-            
-            //Conversion rejection
-            int nLostHits = (*iel)->gsfTrack()->hitPattern().numberOfLostHits(reco::HitPattern::MISSING_INNER_HITS);
-            double dist   = (*iel)->convDist();
-            double dcot   = (*iel)->convDcot();
-            int notConv   = nLostHits == 0 and (fabs(dist) > 0.02 or fabs(dcot) > 0.02);
-            elCharge.push_back((*iel)->charge());
-            elNotConversion . push_back(notConv);
-            
-            retElectronL = (*electronSelL_)(**iel, event, retElectron);
-            retElectronM = (*electronSelM_)(**iel, event, retElectron);
-            retElectronT = (*electronSelT_)(**iel, event, retElectron);
-            
-            elQuality.push_back((retElectronT<<2) + (retElectronM<<1) + retElectronL);
-            
-            //IP: for some reason this is with respect to the first vertex in the collection
-            if(goodPVs.size() > 0){
-                elDxy.push_back((*iel)->gsfTrack()->dxy(goodPVs.at(0).position()));
-                elDZ.push_back((*iel)->gsfTrack()->dz(goodPVs.at(0).position()));
-            } else {
-                elDxy.push_back(-999);
-                elDZ.push_back(-999);
-            }
-            elChargeConsistent.push_back((*iel)->isGsfCtfScPixChargeConsistent());
-            elIsEBEE.push_back(((*iel)->isEBEEGap()<<2) + ((*iel)->isEE()<<1) + (*iel)->isEB());
-            elDeta.push_back((*iel)->deltaEtaSuperClusterTrackAtVtx());
-            elDphi.push_back((*iel)->deltaPhiSuperClusterTrackAtVtx());
-            elSihih.push_back((*iel)->sigmaIetaIeta());
-            elHoE.push_back((*iel)->hadronicOverEm());
-            elD0.push_back((*iel)->dB());
-            elOoemoop.push_back(1.0/(*iel)->ecalEnergy() + (*iel)->eSuperClusterOverP()/(*iel)->ecalEnergy());
-            elMHits.push_back((*iel)->gsfTrack()->hitPattern().numberOfHits(reco::HitPattern::MISSING_INNER_HITS));
-            elVtxFitConv.push_back((*iel)->passConversionVeto());
-            if(isMc && keepFullMChistory){
-                cout << "start\n";
-                edm::Handle<reco::GenParticleCollection> genParticles;
-                event.getByLabel(genParticles_it, genParticles);
-                int matchId = findMatch(*genParticles, 11, (*iel)->eta(), (*iel)->phi());
-                double closestDR = 10000.;
-                //cout << "matchId "<<matchId <<endl;
-                if (matchId>=0) {
-                    const reco::GenParticle & p = (*genParticles).at(matchId);
-                    closestDR = mdeltaR( (*iel)->eta(), (*iel)->phi(), p.eta(), p.phi());
-                    //cout << "closestDR "<<closestDR <<endl;
-                    if(closestDR < 0.3){
-                        elGen_Reco_dr.push_back(closestDR);
-                        elPdgId.push_back(p.pdgId());
-                        elStatus.push_back(p.status());
-                        elMatched.push_back(1);
-                        elMatchedPt.push_back( p.pt());
-                        elMatchedEta.push_back(p.eta());
-                        elMatchedPhi.push_back(p.phi());
-                        elMatchedEnergy.push_back(p.energy());
-                        int oldSize = elMother_id.size();
-                        fillMotherInfo(p.mother(), 0, elMother_id, elMother_status, elMother_pt, elMother_eta, elMother_phi, elMother_energy);
-                        elNumberOfMothers.push_back(elMother_id.size()-oldSize);
-                    }
-                }
-                if(closestDR >= 0.3){
-                    elNumberOfMothers.push_back(-1);
-                    elGen_Reco_dr.push_back(-1.0);
-                    elPdgId.push_back(-1);
-                    elStatus.push_back(-1);
-                    elMatched.push_back(0);
-                    elMatchedPt.push_back(-1000.0);
-                    elMatchedEta.push_back(-1000.0);
-                    elMatchedPhi.push_back(-1000.0);
-                    elMatchedEnergy.push_back(-1000.0);
-                    
-                }
-                
-                
-            }//closing the isMC checking criteria
-        }
+	  }
+          
+          
+	}//closing the isMC checking criteria
+      }
     }
     
+    //trigger info
+    SetValue("TrigElPt",TriggerElectronPts);
+    SetValue("TrigElEta",TriggerElectronEtas);
+    SetValue("TrigElPhi",TriggerElectronPhis);
+    SetValue("TrigElEnergy",TriggerElectronEnergies);
+    SetValue("TrigElFilters",TriggerElectronFilters);
+
     //Four vector
     SetValue("elPt"     , elPt);
     SetValue("elEta"    , elEta);
@@ -639,7 +726,7 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
       genJetPhi.push_back(ijet->phi());
       genJetEnergy.push_back(ijet->energy());
       genJetMass.push_back(ijet->mass());
-      cout<<"setting gen jet info"<<endl;
+      //cout<<"setting gen jet info"<<endl;
 
     }
 
@@ -711,7 +798,7 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
 	}
 
         for (size_t ui = 0; ui < ijet->numberOfDaughters(); ui++) {
-	  cout<<"in top daughter loop"<<endl;
+	  //cout<<"in top daughter loop"<<endl;
 	  CATopDaughterPt     . push_back(ijet->daughter(ui)->pt());
 	  CATopDaughterEta    . push_back(ijet->daughter(ui)->eta());
 	  CATopDaughterPhi    . push_back(ijet->daughter(ui)->phi());
@@ -738,7 +825,7 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
     //Properties
     //    SetValue("CATopJetTopMass"     , CATopJetTopMass);
     //    SetValue("CATopJetMinPairMass" , CATopJetMinPairMass);
-    cout<<"setting values for top daughters"<<endl;
+    //cout<<"setting values for top daughters"<<endl;
     //Daughter four vector and index
     SetValue("CATopDaughterPt"     , CATopDaughterPt);
     SetValue("CATopDaughterEta"    , CATopDaughterEta);
@@ -800,17 +887,17 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
         //Identity
         CAWJetIndex      . push_back(index);*/
         CAWJetnDaughters . push_back((int)ijet->numberOfDaughters());
-	cout<<"about to set w masses"<<endl;
+	//cout<<"about to set w masses"<<endl;
         //Mass
         CAWJetTrimmedMass . push_back(ijet->userFloat("ak8PFJetsCHSTrimmedLinks"));
         CAWJetPrunedMass . push_back(ijet->userFloat("ak8PFJetsCHSPrunedLinks"));
         CAWJetFilteredMass . push_back(ijet->userFloat("ak8PFJetsCHSFilteredLinks"));
-	cout<<"set w masses"<<endl;
+	//cout<<"set w masses"<<endl;
 	//nsubjettiness
 	CAWJetTau1.push_back( ijet->userFloat("NjettinessAK8:tau1"));
 	CAWJetTau2.push_back( ijet->userFloat("NjettinessAK8:tau2"));
 	CAWJetTau3.push_back( ijet->userFloat("NjettinessAK8:tau3"));
-	cout<<"set n subjettiness"<<endl;
+	//cout<<"set n subjettiness"<<endl;
         for (size_t ui = 0; ui < ijet->numberOfDaughters(); ui++){
             CAWDaughterPt     . push_back(ijet->daughter(ui)->pt());
             CAWDaughterEta    . push_back(ijet->daughter(ui)->eta());
