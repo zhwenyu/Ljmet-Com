@@ -11,12 +11,12 @@
 
 #include <iostream>
 #include <vector>
+#include <string>
 #include <map>
 #include <limits>
 #include "TTree.h"
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
-
-
+//#include "LJMet/Com/interface/VVString.h"
 
 class LjmetEventContent {
     //
@@ -82,7 +82,7 @@ public:
     void SetValue(std::string key, std::vector<bool> value);
     void SetValue(std::string key, std::vector<int> value);
     void SetValue(std::string key, std::vector<double> value);
-    
+    void SetValue(std::string key, std::vector<std::string> value);
     // histograms: mDoubleHist[module][histname]
     // actual histograms get created by TFileService in the main application
     // based on info in this container
@@ -108,7 +108,7 @@ private:
     std::map<std::string,std::vector<bool> > mVectorBoolBranch;
     std::map<std::string,std::vector<int> > mVectorIntBranch;
     std::map<std::string,std::vector<double> > mVectorDoubleBranch;
-    
+    std::map<std::string,std::vector<std::string> > mVectorStringBranch;
     // mDoubleHist[module][histname]=value
     std::map<std::string,std::map<std::string,HistMetadata> > mDoubleHist;
     
