@@ -283,8 +283,7 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
     for (std::vector<edm::Ptr<pat::Electron> >::const_iterator iel = vSelElectrons.begin(); iel != vSelElectrons.end(); iel++){
       //Protect against electrons without tracks (should never happen, but just in case)
       if ((*iel)->gsfTrack().isNonnull() and (*iel)->gsfTrack().isAvailable()){
-	//increment index
-	ElIndex+=1;
+	
 	//Four vector
 	elPt     . push_back((*iel)->ecalDrivenMomentum().pt()); //Must check: why ecalDrivenMomentum?
 	elEta    . push_back((*iel)->ecalDrivenMomentum().eta());
@@ -447,6 +446,8 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
           
 	}//closing the isMC checking criteria
       }
+      //increment index
+      ElIndex+=1;
     }
     
     //trigger info
@@ -564,7 +565,16 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
     vector<double> muMatchedEta;
     vector<double> muMatchedPhi;
     vector<double> muMatchedEnergy;
+
+    vector<std::string> TriggerMuonFilters;
+    vector<double> TriggerMuonPts;
+    vector<double> TriggerMuonEtas;
+    vector<double> TriggerMuonPhis;
+    vector<double> TriggerMuonEnergies;
     
+
+    //make index for muons
+    int MuIndex = 0;
     for (std::vector<edm::Ptr<pat::Muon> >::const_iterator imu = vSelMuons.begin(); imu != vSelMuons.end(); imu++){
         //Protect against muons without tracks (should never happen, but just in case)
         if ((*imu)->globalTrack().isNonnull() and (*imu)->globalTrack().isAvailable() and
@@ -614,6 +624,57 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
             muNMatchedStations . push_back((*imu)->numberOfMatchedStations());
             muNValPixelHits    . push_back((*imu)->innerTrack()->hitPattern().numberOfValidPixelHits());
             muNTrackerLayers   . push_back((*imu)->innerTrack()->hitPattern().trackerLayersWithMeasurement());
+
+	   
+	    //Trigger Matching - store 4-vector and filter information for all trigger objects deltaR matched to electrons
+	    if(doTriggerStudy_){
+	  
+	      //read in trigger objects
+	      edm::Handle<pat::TriggerObjectStandAloneCollection> triggerObjects;
+	      event.getByLabel(triggerObjects_,triggerObjects);
+	      
+	      edm::Handle<edm::TriggerResults> triggerBits;
+	      event.getByLabel(triggerBits_,triggerBits);
+	      const edm::TriggerNames &names = event.triggerNames(*triggerBits);
+	      
+	      //loop over them for deltaR matching
+	      TLorentzVector trigObj;
+	      pat::TriggerObjectStandAlone matchedObj;
+	      std::vector<std::string> paths;
+	      float closestDR = 10000.;
+	      for( pat::TriggerObjectStandAlone obj : *triggerObjects){
+		obj.unpackPathNames(names);
+		float dR = mdeltaR( (*imu)->eta(), (*imu)->phi(), obj.eta(),obj.phi() );
+		if(dR < closestDR){
+		  closestDR = dR;
+		  trigObj.SetPtEtaPhiE((*imu)->pt(),(*imu)->eta(),(*imu)->phi(),(*imu)->energy());
+		  matchedObj=obj;
+		}
+	      }
+	      if(closestDR<0.05){
+		TriggerMuonPts.push_back(trigObj.Pt());
+		TriggerMuonEtas.push_back(trigObj.Eta());
+		TriggerMuonPhis.push_back(trigObj.Phi());
+		TriggerMuonEnergies.push_back(trigObj.Energy());
+		std::cout<<"found muon matched trigger object!"<<std::endl;
+		//now store information about filters
+		for (unsigned h = 0; h < matchedObj.filterLabels().size(); ++h){
+		  std::string filter = matchedObj.filterLabels()[h];
+		  std::string Index = Form("MatchedIndex%i_",MuIndex);
+		  std::string hltFilter_wIndex = Index+filter;
+		  std::cout<<hltFilter_wIndex<<std::endl;
+		  TriggerMuonFilters.push_back(hltFilter_wIndex);
+		}	    
+	      }
+	      else{
+		TriggerMuonPts.push_back(-9999);
+		TriggerMuonEtas.push_back(-9999);
+		TriggerMuonPhis.push_back(-9999);
+		TriggerMuonEnergies.push_back(-9999);
+	      }
+	      
+	    }
+
             
             if(isMc && keepFullMChistory){
                 edm::Handle<reco::GenParticleCollection> genParticles;
@@ -653,7 +714,16 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
                 
             }
         }
+	//increment index
+	MuIndex+=1;
     }
+
+    //trigger info
+    SetValue("TrigMuPt",TriggerMuonPts);
+    SetValue("TrigMuEta",TriggerMuonEtas);
+    SetValue("TrigMuPhi",TriggerMuonPhis);
+    SetValue("TrigMuEnergy",TriggerMuonEnergies);
+    SetValue("TrigMuFilters",TriggerMuonFilters);
     
     
     SetValue("muCharge", muCharge);
