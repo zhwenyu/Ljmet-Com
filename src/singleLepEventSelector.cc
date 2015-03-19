@@ -206,18 +206,19 @@ void singleLepEventSelector::BeginJob( std::map<std::string, edm::ParameterSet c
         mdPar["leading_jet_pt"]           = par[_key].getParameter<double>       ("leading_jet_pt");
 
         mbPar["muon_cuts"]                = par[_key].getParameter<bool>         ("muon_cuts");
-        mdPar["muon_reliso"]         = par[_key].getParameter<double>       ("muon_reliso");
-        mdPar["muon_minpt"]         = par[_key].getParameter<double>       ("muon_minpt");
-        mdPar["muon_maxeta"]        = par[_key].getParameter<double>       ("muon_maxeta");
-        miPar["min_muon"]           = par[_key].getParameter<int>          ("min_muon");
+        mbPar["muon_selector"]            = par[_key].getParameter<bool>         ("muon_selector");
+        mdPar["muon_reliso"]              = par[_key].getParameter<double>       ("muon_reliso");
+        mdPar["muon_minpt"]               = par[_key].getParameter<double>       ("muon_minpt");
+        mdPar["muon_maxeta"]              = par[_key].getParameter<double>       ("muon_maxeta");
+        miPar["min_muon"]                 = par[_key].getParameter<int>          ("min_muon");
 
         mbPar["electron_cuts"]            = par[_key].getParameter<bool>         ("electron_cuts");
-        mdPar["electron_minpt"]     = par[_key].getParameter<double>       ("electron_minpt");
-        mdPar["electron_maxeta"]    = par[_key].getParameter<double>       ("electron_maxeta");
-        miPar["min_electron"]       = par[_key].getParameter<int>          ("min_electron");
+        mdPar["electron_minpt"]           = par[_key].getParameter<double>       ("electron_minpt");
+        mdPar["electron_maxeta"]          = par[_key].getParameter<double>       ("electron_maxeta");
+        miPar["min_electron"]             = par[_key].getParameter<int>          ("min_electron");
 
-        miPar["min_lepton"]         = par[_key].getParameter<int>          ("min_lepton");
-        miPar["max_lepton"]         = par[_key].getParameter<int>          ("max_lepton");
+        miPar["min_lepton"]               = par[_key].getParameter<int>          ("min_lepton");
+        miPar["max_lepton"]               = par[_key].getParameter<int>          ("max_lepton");
         mbPar["second_lepton_veto"]       = par[_key].getParameter<bool>         ("second_lepton_veto");
         mbPar["tau_veto"]                 = par[_key].getParameter<bool>         ("tau_veto");
 
@@ -485,21 +486,25 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
                 //muon cuts
                 while(1){
 
-                    //if ( (*muonSel_)( *_imu, retMuon ) ){ }
-                    //else break; // fail
-                    if ( (*_imu).isTightMuon(*mvSelPVs[0]) ){ }
-		    else break; // fail
+		    if (mbPar["muon_selector"]) {
+                        if ( (*muonSel_)( *_imu, retMuon ) ){ }
+                        else break; // fail
+		    }
+		    else {
+                        if ( (*_imu).isTightMuon(*mvSelPVs[0]) ){ }
+		        else break; // fail
 
-		    double chIso = (*_imu).userIsolation(pat::PfChargedHadronIso);
-		    double nhIso = (*_imu).userIsolation(pat::PfNeutralHadronIso);
-		    double gIso  = (*_imu).userIsolation(pat::PfGammaIso);
-		    double puIso = (*_imu).userIsolation(pat::PfPUChargedHadronIso);
-		    double pt    = (*_imu).pt() ;
+		        double chIso = (*_imu).userIsolation(pat::PfChargedHadronIso);
+		        double nhIso = (*_imu).userIsolation(pat::PfNeutralHadronIso);
+		        double gIso  = (*_imu).userIsolation(pat::PfGammaIso);
+		        double puIso = (*_imu).userIsolation(pat::PfPUChargedHadronIso);
+		        double pt    = (*_imu).pt() ;
 
-		    double pfIso = (chIso + std::max(0.,nhIso + gIso - 0.5*puIso))/pt;
+		        double pfIso = (chIso + std::max(0.,nhIso + gIso - 0.5*puIso))/pt;
 
-		    if ( pfIso<mdPar["muon_reliso"] ) {}
-		    else break;
+		        if ( pfIso<mdPar["muon_reliso"] ) {}
+		        else break;
+		    }
                     
                     if ( _imu->pt()>mdPar["muon_minpt"] ){ }
                     else break;
