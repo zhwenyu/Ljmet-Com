@@ -33,8 +33,8 @@
 //#include "PhysicsTools/SelectorUtils/interface/PFElectronSelector.h"
 #include "LJMet/Com/interface/TopElectronSelector.h"
 #include "PhysicsTools/SelectorUtils/interface/PFJetIDSelectionFunctor.h"
-//#include "LJMet/Com/interface/PFMuonSelector.h"
-#include "PhysicsTools/SelectorUtils/interface/PFMuonSelector.h"
+#include "LJMet/Com/interface/PFMuonSelector.h"
+//#include "PhysicsTools/SelectorUtils/interface/PFMuonSelector.h"
 
 #include "PhysicsTools/SelectorUtils/interface/PVSelector.h"
 #include "PhysicsTools/SelectorUtils/interface/PVObjectSelector.h"
@@ -206,6 +206,7 @@ void singleLepEventSelector::BeginJob( std::map<std::string, edm::ParameterSet c
         mdPar["leading_jet_pt"]           = par[_key].getParameter<double>       ("leading_jet_pt");
 
         mbPar["muon_cuts"]                = par[_key].getParameter<bool>         ("muon_cuts");
+        mdPar["muon_reliso"]         = par[_key].getParameter<double>       ("muon_reliso");
         mdPar["muon_minpt"]         = par[_key].getParameter<double>       ("muon_minpt");
         mdPar["muon_maxeta"]        = par[_key].getParameter<double>       ("muon_maxeta");
         miPar["min_muon"]           = par[_key].getParameter<int>          ("min_muon");
@@ -484,9 +485,23 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
                 //muon cuts
                 while(1){
 
-                    if ( (*muonSel_)( *_imu, retMuon ) ){ }
-                    else break; // fail
-                    if (_imu->pt()>mdPar["muon_minpt"]){ }
+                    //if ( (*muonSel_)( *_imu, retMuon ) ){ }
+                    //else break; // fail
+                    if ( (*_imu).isTightMuon(*mvSelPVs[0]) ){ }
+		    else break; // fail
+
+		    double chIso = (*_imu).userIsolation(pat::PfChargedHadronIso);
+		    double nhIso = (*_imu).userIsolation(pat::PfNeutralHadronIso);
+		    double gIso  = (*_imu).userIsolation(pat::PfGammaIso);
+		    double puIso = (*_imu).userIsolation(pat::PfPUChargedHadronIso);
+		    double pt    = (*_imu).pt() ;
+
+		    double pfIso = (chIso + std::max(0.,nhIso + gIso - 0.5*puIso))/pt;
+
+		    if ( pfIso<mdPar["muon_reliso"] ) {}
+		    else break;
+                    
+                    if ( _imu->pt()>mdPar["muon_minpt"] ){ }
                     else break;
 
                     if ( fabs(_imu->eta())<mdPar["muon_maxeta"] ){ }
@@ -631,39 +646,43 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
 	    if ( mbPar["doLepJetCleaning"] ){
 	        pat::Jet tmpJet = *_ijet;
 		if (mbPar["debug"]) std::cout << "Checking Overlap" << std::endl;
-		event.getByLabel( mtPar["muon_collection"], mhMuons );
-            	for (std::vector<pat::Muon>::const_iterator _imu = mhMuons->begin(); _imu != mhMuons->end(); _imu++){
-            	    if ( (*muonSel_)( *_imu, retMuon ) && _imu->pt()>mdPar["muon_minpt"] && fabs(_imu->eta())<mdPar["muon_maxeta"] ){
-            		if ( deltaR(_imu->p4(),_ijet->p4()) < 0.4 ){
-            		    if (mbPar["debug"]) std::cout << "Jet Overlaps with the Muon... Cleaning jet..." << std::endl;
-        		    for (unsigned int id = 0, nd = (*_ijet).numberOfDaughters(); id < nd; ++id) {
-            			const pat::PackedCandidate &_ijet_const = dynamic_cast<const pat::PackedCandidate &>(*(*_ijet).daughter(id));
-			        if ( deltaR(_imu->p4(),_ijet_const.p4()) < 0.001 ) {
-				    tmpJet.setP4( _ijet->p4()-_imu->p4() );
-				    jetP4 = correctJet(tmpJet, event);
-				}
-                            }
-			    _cleaned = true;
-            		}
+                if (mvSelMuons.size()>0){
+	            if ( deltaR(mvSelMuons[0]->p4(),_ijet->p4()) < 0.4 ){
+            	        if (mbPar["debug"]) {
+			    std::cout << "Jet Overlaps with the Muon... Cleaning jet..." << std::endl;
+            	            std::cout << "Lepton : pT = " << mvSelMuons[0]->pt() << " eta = " << mvSelMuons[0]->eta() << " phi = " << mvSelMuons[0]->phi() << std::endl;
+            	            std::cout << "      Raw Jet : pT = " << _ijet->pt() << " eta = " << _ijet->eta() << " phi = " << _ijet->phi() << std::endl;
+			}
+			const std::vector<edm::Ptr<reco::Candidate> > _ijet_consts = _ijet->daughterPtrVector();
+        		for ( std::vector<edm::Ptr<reco::Candidate> >::const_iterator _i_const = _ijet_consts.begin(); _i_const != _ijet_consts.end(); ++_i_const){
+			    if ( (*_i_const).key() == mvSelMuons[0]->originalObjectRef().key() ) {
+				tmpJet.setP4( _ijet->p4() - mvSelMuons[0]->p4() );
+				jetP4 = correctJet(tmpJet, event);
+				if (mbPar["debug"]) std::cout << "Corrected Jet : pT = " << jetP4.Pt() << " eta = " << jetP4.Eta() << " phi = " << jetP4.Phi() << std::endl;
+			        _cleaned = true;
+			    }
+			}
 		    }
             	}
             
-            	event.getByLabel( mtPar["electron_collection"], mhElectrons );      	
-	        for (std::vector<pat::Electron>::const_iterator _iel = mhElectrons->begin(); _iel != mhElectrons->end(); _iel++){
-                    if ( (*electronSel_)( *_iel, event, retElectron ) && _iel->ecalDrivenMomentum().pt()>mdPar["electron_minpt"] && fabs(_iel->eta())<mdPar["electron_maxeta"] ){
-                	if ( deltaR(_iel->p4(),_ijet->p4()) < 0.4 ){
-            		    if (mbPar["debug"]) std::cout << "Jet Overlaps with the Electron... Cleaning jet..." << std::endl;
-        		    for (unsigned int id = 0, nd = (*_ijet).numberOfDaughters(); id < nd; ++id) {
-            			const pat::PackedCandidate &_ijet_const = dynamic_cast<const pat::PackedCandidate &>(*(*_ijet).daughter(id));
-			        if ( deltaR(_iel->p4(),_ijet_const.p4()) < 0.001 ) {
-				    tmpJet.setP4( _ijet->p4()-_iel->p4() );
-				    jetP4 = correctJet(tmpJet, event);
-				}
-                            }
-			    _cleaned = true;
-                	}
-                    }
-                }            							
+                if (mvSelElectrons.size()>0){
+	            if ( deltaR(mvSelElectrons[0]->p4(),_ijet->p4()) < 0.4 ){
+            	        if (mbPar["debug"]) {
+			    std::cout << "Jet Overlaps with the Electron... Cleaning jet..." << std::endl;
+            	            std::cout << "Lepton : pT = " << mvSelElectrons[0]->pt() << " eta = " << mvSelElectrons[0]->eta() << " phi = " << mvSelElectrons[0]->phi() << std::endl;
+            	            std::cout << "      Raw Jet : pT = " << _ijet->pt() << " eta = " << _ijet->eta() << " phi = " << _ijet->phi() << std::endl;
+			}
+			const std::vector<edm::Ptr<reco::Candidate> > _ijet_consts = _ijet->daughterPtrVector();
+        		for ( std::vector<edm::Ptr<reco::Candidate> >::const_iterator _i_const = _ijet_consts.begin(); _i_const != _ijet_consts.end(); ++_i_const){
+			    if ( (*_i_const).key() == mvSelElectrons[0]->originalObjectRef().key() ) {
+				tmpJet.setP4( _ijet->p4() - mvSelElectrons[0]->p4() );
+				jetP4 = correctJet(tmpJet, event);
+				if (mbPar["debug"]) std::cout << "Corrected Jet : pT = " << jetP4.Pt() << " eta = " << jetP4.Eta() << " phi = " << jetP4.Phi() << std::endl;
+			        _cleaned = true;
+			    }
+			}
+		    }
+            	}
 	    }
 	    if (!_cleaned) jetP4 = correctJet(*_ijet, event);
 
