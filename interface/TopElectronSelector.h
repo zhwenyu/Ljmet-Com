@@ -79,7 +79,8 @@ public: // interface
                    parameters.getParameter<Double_t>("dZ_EE"),
                    parameters.getParameter<Double_t>("ooemoop_EE"),
                    parameters.getParameter<Double_t>("reliso_EE"),
-                   parameters.getParameter<Int_t>("mHits"),
+                   parameters.getParameter<Int_t>("mHits_EB"),
+                   parameters.getParameter<Int_t>("mHits_EE"),
                    parameters.getParameter<Bool_t>("vtxFitConv")
                    );
         
@@ -97,7 +98,7 @@ public: // interface
     void initialize(Version_t version,
                     Double_t sihih_EB, Double_t  dphi_EB, Double_t deta_EB, Double_t hoe_EB, Double_t d0_EB, Double_t dZ_EB, Double_t ooemoop_EB,
                     Double_t sihih_EE, Double_t  dphi_EE, Double_t deta_EE, Double_t hoe_EE, Double_t d0_EE, Double_t dZ_EE, Double_t ooemoop_EE,
-                    Double_t reliso_EB, Double_t reliso_EE, Int_t mHits, Bool_t vtxFitConv)
+                    Double_t reliso_EB, Double_t reliso_EE, Int_t mHits_EB, Int_t mHits_EE, Bool_t vtxFitConv)
     {
         version_ = version;
         
@@ -117,7 +118,8 @@ public: // interface
         push_back("dZ_EE"      );
         push_back("ooemoop_EE" );
         push_back("reliso_EE"  );
-        push_back("mHits"      );
+        push_back("mHits_EB"      );
+        push_back("mHits_EE"      );
         push_back("vtxFitConv" );
         
         if (version_ == NONE){
@@ -137,7 +139,8 @@ public: // interface
             set("dZ_EB",       dZ_EE);
             set("ooemoop_EE",  ooemoop_EE);
             set("reliso_EE",   reliso_EE);
-            set("mHits",       mHits);
+            set("mHits_EB",    mHits_EB);
+            set("mHits_EE",    mHits_EE);
             set("vtxFitConv",  vtxFitConv);
         }
         
@@ -158,7 +161,8 @@ public: // interface
             set("dZ_EE",       0.885860);
             set("ooemoop_EE",  0.157160);
             set("reliso_EE",   0.212604);
-            set("mHits",       2);
+            set("mHits_EB",    2);
+            set("mHits_EE",    3);
             set("vtxFitConv",  1);
         }
         
@@ -179,7 +183,8 @@ public: // interface
             set("dZ_EE",       0.198444);
             set("ooemoop_EE",  0.142283);
             set("reliso_EE",   0.162914);
-            set("mHits",       1);
+            set("mHits_EB",    1);
+            set("mHits_EE",    1);
             set("vtxFitConv",  1);
         }
         
@@ -200,7 +205,8 @@ public: // interface
             set("dZ_EE",       0.180720);
             set("ooemoop_EE",  0.137468);
             set("reliso_EE",   0.116708);
-            set("mHits",       1);
+            set("mHits_EB",    1);
+            set("mHits_EE",    1);
             set("vtxFitConv",  1);
         }
         
@@ -221,7 +227,8 @@ public: // interface
             set("dZ_EE",       0.147154);
             set("ooemoop_EE",  0.106055);
             set("reliso_EE",   0.090185);
-            set("mHits",       1);
+            set("mHits_EB",    1);
+            set("mHits_EE",    1);
             set("vtxFitConv",  1);
         }
         
@@ -241,7 +248,8 @@ public: // interface
         indexDZ_EE_         = index_type(&bits_, "dZ_EE"        );
         indexOoemoop_EE_    = index_type(&bits_, "ooemoop_EE"   );
         indexRelIso_EE_     = index_type(&bits_, "reliso_EE"    );
-        indexMHits_         = index_type(&bits_, "mHits"        );
+        indexMHits_EB_      = index_type(&bits_, "mHits_EB"     );
+        indexMHits_EE_      = index_type(&bits_, "mHits_EE"     );
         indexVtxFitConv_    = index_type(&bits_, "vtxFitConv"   );
     }
     
@@ -324,6 +332,8 @@ public: // interface
             else if (verbosity) std::cout<<"failed Ooemoop"<<std::endl;
             if ( RelIso        <  cut(indexRelIso_EB_, double()) || ignoreCut(indexRelIso_EB_) ) passCut(ret, indexRelIso_EB_);
             else if (verbosity) std::cout<<"failed RelIso"<<std::endl;
+            if ( mHits         <=  cut(indexMHits_EB_, int()) || ignoreCut(indexMHits_EB_) ) passCut(ret, indexMHits_EB_);
+            else if (verbosity) std::cout<<"failed mHits"<<std::endl;
             
             // pass all the EE cuts
             passCut(ret, indexDeta_EE_);
@@ -334,6 +344,7 @@ public: // interface
             passCut(ret, indexDZ_EE_);
             passCut(ret, indexOoemoop_EE_);
             passCut(ret, indexRelIso_EE_);
+            passCut(ret, indexMHits_EE_);
         } else if (electron.isEE()) {  // ENDCAPS case
             // check the EE cuts
             if ( fabs(Deta)    <  cut(indexDeta_EE_,  double()) || ignoreCut(indexDeta_EE_)  ) passCut(ret, indexDeta_EE_);
@@ -352,6 +363,9 @@ public: // interface
             else if (verbosity) std::cout<<"failed Ooemoop"<<std::endl;
             if ( RelIso        <  cut(indexRelIso_EE_, double()) || ignoreCut(indexRelIso_EE_) ) passCut(ret, indexRelIso_EE_);
             else if (verbosity) std::cout<<"failed RelIso"<<std::endl;
+            if ( mHits         <=  cut(indexMHits_EE_, int()) || ignoreCut(indexMHits_EE_) ) passCut(ret, indexMHits_EE_);
+            else if (verbosity) std::cout<<"failed mHits"<<std::endl;
+
             // pass all the EB cuts
             passCut(ret, indexDeta_EB_);
             passCut(ret, indexDphi_EB_);
@@ -361,9 +375,9 @@ public: // interface
             passCut(ret, indexDZ_EB_);
             passCut(ret, indexOoemoop_EB_);
             passCut(ret, indexRelIso_EB_);
+            passCut(ret, indexMHits_EB_);
             
         }
-        if ( mHits         <=  cut(indexMHits_, int()) || ignoreCut(indexMHits_) ) passCut(ret, indexMHits_);
         if (vtxFitConv     ==  cut(indexVtxFitConv_, bool()) || ignoreCut(indexVtxFitConv_) ) passCut(ret, indexVtxFitConv_);
         
         setIgnored(ret);
@@ -392,7 +406,8 @@ private: // member variables
     index_type indexDZ_EE_;
     index_type indexOoemoop_EE_;
     index_type indexRelIso_EE_;
-    index_type indexMHits_;
+    index_type indexMHits_EB_;
+    index_type indexMHits_EE_;
     index_type indexVtxFitConv_;
 };
 
