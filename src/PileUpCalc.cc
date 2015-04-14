@@ -449,7 +449,7 @@ private:
 
 
 
-//static int reg = LjmetFactory::GetInstance()->Register(new PileUpCalc(), "PileUpCalc");
+static int reg = LjmetFactory::GetInstance()->Register(new PileUpCalc(), "PileUpCalc");
 
 
 
