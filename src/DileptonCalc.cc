@@ -381,18 +381,18 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
 	      matchedObj=obj;
 	    }
 	  }
-	  if(closestDR<0.05){
+	  if(closestDR<0.5){
 	    TriggerElectronPts.push_back(trigObj.Pt());
 	    TriggerElectronEtas.push_back(trigObj.Eta());
 	    TriggerElectronPhis.push_back(trigObj.Phi());
 	    TriggerElectronEnergies.push_back(trigObj.Energy());
-	    std::cout<<"found matched trigger object!"<<std::endl;
+	    //std::cout<<"found matched trigger object!"<<std::endl;
 	    //now store information about filters
 	    for (unsigned h = 0; h < matchedObj.filterLabels().size(); ++h){
 	      std::string filter = matchedObj.filterLabels()[h];
 	      std::string Index = Form("MatchedIndex%i_",ElIndex);
 	      std::string hltFilter_wIndex = Index+filter;
-	      std::cout<<hltFilter_wIndex<<std::endl;
+	      //std::cout<<hltFilter_wIndex<<std::endl;
 	      TriggerElectronFilters.push_back(hltFilter_wIndex);
 	    }	    
 	  }
@@ -651,18 +651,18 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
 		  matchedObj=obj;
 		}
 	      }
-	      if(closestDR<0.05){
+	      if(closestDR<0.5){
 		TriggerMuonPts.push_back(trigObj.Pt());
 		TriggerMuonEtas.push_back(trigObj.Eta());
 		TriggerMuonPhis.push_back(trigObj.Phi());
 		TriggerMuonEnergies.push_back(trigObj.Energy());
-		std::cout<<"found muon matched trigger object!"<<std::endl;
+		//std::cout<<"found muon matched trigger object!"<<std::endl;
 		//now store information about filters
-		for (unsigned h = 0; h < matchedObj.filterLabels().size(); ++h){
+		for (unsigned int h = 0; h < matchedObj.filterLabels().size(); h++){
 		  std::string filter = matchedObj.filterLabels()[h];
 		  std::string Index = Form("MatchedIndex%i_",MuIndex);
 		  std::string hltFilter_wIndex = Index+filter;
-		  std::cout<<hltFilter_wIndex<<std::endl;
+		  //std::cout<<hltFilter_wIndex<<std::endl;
 		  TriggerMuonFilters.push_back(hltFilter_wIndex);
 		}	    
 	      }
@@ -816,16 +816,16 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
     event.getByLabel(topJetColl, topJets);
     
     //Four vector -- COMMENT OUT BECAUSE FOR NOW WE CAN'T ACCESS THESE
-    /*    std::vector <double> CATopJetPt;
+    std::vector <double> CATopJetPt;
     std::vector <double> CATopJetEta;
     std::vector <double> CATopJetPhi;
     std::vector <double> CATopJetEnergy;
     
-    //std::vector <double> CATopJetCSV;
+    std::vector <double> CATopJetCSV;
     //   std::vector <double> CATopJetRCN;
-    */
+    
     //Identity
-    //std::vector <int> CATopJetIndex;
+    std::vector <int> CATopJetIndex;
     std::vector <int> CATopJetnDaughters;
     
     //Top-like properties
@@ -844,15 +844,15 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
         
         int index = (int)(ijet-topJets->begin());
         
-	/*        CATopJetPt     . push_back(ijet->pt());
+	CATopJetPt     . push_back(ijet->pt());
         CATopJetEta    . push_back(ijet->eta());
         CATopJetPhi    . push_back(ijet->phi());
         CATopJetEnergy . push_back(ijet->energy());
         
         CATopJetCSV    . push_back(ijet->bDiscriminator( "combinedSecondaryVertexBJetTags"));
         //     CATopJetRCN    . push_back((ijet->chargedEmEnergy()+ijet->chargedHadronEnergy()) / (ijet->neutralEmEnergy()+ijet->neutralHadronEnergy()));
-	*/   
-        //CATopJetIndex      . push_back(index);
+	 
+        CATopJetIndex      . push_back(index);
         CATopJetnDaughters . push_back((int)ijet->numberOfDaughters());
         
 	//	cout<<"tag infos"<<(ijet->tagInfoLabels()).at(0)<<endl;
@@ -874,13 +874,13 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
 	  CATopDaughterPhi    . push_back(ijet->daughter(ui)->phi());
 	  CATopDaughterEnergy . push_back(ijet->daughter(ui)->energy());
 	  
-            //CATopDaughterMotherIndex . push_back(index);
+	  CATopDaughterMotherIndex . push_back(index);
         }
 	//cout<<"finished top daughter loop"<<endl;
     }
     
     //Four vector
-    /*    SetValue("CATopJetPt"    , CATopJetPt);
+    SetValue("CATopJetPt"    , CATopJetPt);
     SetValue("CATopJetEta"   , CATopJetEta);
     SetValue("CATopJetPhi"   , CATopJetPhi);
     SetValue("CATopJetEnergy", CATopJetEnergy);
@@ -889,12 +889,12 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
     //   SetValue("CATopJetRCN"    , CATopJetRCN);
     
     //Identity
-    SetValue("CATopJetIndex"      , CATopJetIndex);*/
-    //SetValue("CATopJetnDaughters" , CATopJetnDaughters);
+    SetValue("CATopJetIndex"      , CATopJetIndex);
+    SetValue("CATopJetnDaughters" , CATopJetnDaughters);
     
     //Properties
-    //    SetValue("CATopJetTopMass"     , CATopJetTopMass);
-    //    SetValue("CATopJetMinPairMass" , CATopJetMinPairMass);
+    SetValue("CATopJetTopMass"     , CATopJetTopMass);
+    SetValue("CATopJetMinPairMass" , CATopJetMinPairMass);
     //cout<<"setting values for top daughters"<<endl;
     //Daughter four vector and index
     SetValue("CATopDaughterPt"     , CATopDaughterPt);
@@ -902,24 +902,24 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
     SetValue("CATopDaughterPhi"    , CATopDaughterPhi);
     SetValue("CATopDaughterEnergy" , CATopDaughterEnergy);
     
-    //    SetValue("CATopDaughterMotherIndex"      , CATopDaughterMotherIndex);
+    SetValue("CATopDaughterMotherIndex"      , CATopDaughterMotherIndex);
     
     //Get CA8 jets for W's
     edm::InputTag CAWJetColl = edm::InputTag("slimmedJetsAK8");
     edm::Handle<std::vector<pat::Jet> > CAWJets;
     event.getByLabel(CAWJetColl, CAWJets);
     
-    /*    //Four vector
+    //Four vector
     std::vector <double> CAWJetPt;
     std::vector <double> CAWJetEta;
     std::vector <double> CAWJetPhi;
     std::vector <double> CAWJetEnergy;
     
-    std::vector <double> CAWJetCSV;*/
+    std::vector <double> CAWJetCSV;
     //   std::vector <double> CAWJetRCN;
     
     //Identity
-    //std::vector <int> CAWJetIndex;
+    std::vector <int> CAWJetIndex;
     std::vector <int> CAWJetnDaughters;
     
     //Mass
@@ -946,7 +946,7 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
         int index = (int)(ijet-CAWJets->begin());
         
         //Four vector
-	/*        CAWJetPt     . push_back(ijet->pt());
+	CAWJetPt     . push_back(ijet->pt());
         CAWJetEta    . push_back(ijet->eta());
         CAWJetPhi    . push_back(ijet->phi());
         CAWJetEnergy . push_back(ijet->energy());
@@ -955,7 +955,7 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
         //     CAWJetRCN    . push_back((ijet->chargedEmEnergy()+ijet->chargedHadronEnergy()) / (ijet->neutralEmEnergy()+ijet->neutralHadronEnergy()));
         
         //Identity
-        CAWJetIndex      . push_back(index);*/
+        CAWJetIndex      . push_back(index);
         CAWJetnDaughters . push_back((int)ijet->numberOfDaughters());
 	//cout<<"about to set w masses"<<endl;
         //Mass
@@ -979,7 +979,7 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
     }
     
     //Four vector
-    /*    SetValue("CAWJetPt"     , CAWJetPt);
+    SetValue("CAWJetPt"     , CAWJetPt);
     SetValue("CAWJetEta"    , CAWJetEta);
     SetValue("CAWJetPhi"    , CAWJetPhi);
     SetValue("CAWJetEnergy" , CAWJetEnergy);
@@ -988,7 +988,7 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
     //   SetValue("CAWJetRCN"    , CAWJetRCN);
     
     //Identity
-    SetValue("CAWJetIndex"      , CAWJetIndex);*/
+    SetValue("CAWJetIndex"      , CAWJetIndex);
     SetValue("CAWJetnDaughters" , CAWJetnDaughters);
     
     //Mass
