@@ -599,10 +599,17 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
             muChi2 . push_back((*imu)->globalTrack()->normalizedChi2());
             
             //Isolation
-            double chIso  = (*imu)->userIsolation(pat::PfChargedHadronIso);
+	    /*            double chIso  = (*imu)->userIsolation(pat::PfChargedHadronIso);
             double nhIso  = (*imu)->userIsolation(pat::PfNeutralHadronIso);
             double gIso   = (*imu)->userIsolation(pat::PfGammaIso);
-            double puIso  = (*imu)->userIsolation(pat::PfPUChargedHadronIso);
+            double puIso  = (*imu)->userIsolation(pat::PfPUChargedHadronIso);*/
+
+	    //new definition of iso based on muon pog page
+	    const MuonPFIsolation pfIsolationR04 = (*imu)->isolationR04();
+	    double chIso  = pfIsolationR04.sumChargedHadronPt;
+            double nhIso  = pfIsolationR04.sumNeutralHadronEt;
+            double gIso   = pfIsolationR04.sumPhotonEt;
+            double puIso  = pfIsolationR04.sumPUPt;
             double relIso = (chIso + std::max(0.,nhIso + gIso - 0.5*puIso)) / (*imu)->pt();
             muRelIso . push_back(relIso);
             
@@ -620,7 +627,7 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
                 muDz  . push_back(-999);
             }
             //Numbers of hits
-            muNValMuHits       . push_back((*imu)->globalTrack()->hitPattern().numberOfValidMuonHits());
+            muNValMuHits       . push_back((*imu)->muonBestTrack()->hitPattern().numberOfValidMuonHits());
             muNMatchedStations . push_back((*imu)->numberOfMatchedStations());
             muNValPixelHits    . push_back((*imu)->innerTrack()->hitPattern().numberOfValidPixelHits());
             muNTrackerLayers   . push_back((*imu)->innerTrack()->hitPattern().trackerLayersWithMeasurement());
