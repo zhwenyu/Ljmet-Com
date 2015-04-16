@@ -14,6 +14,7 @@
 
 #include "EgammaAnalysis/ElectronTools/interface/ElectronEffectiveArea.h"
 #include "LJMet/Com/interface/TopElectronSelector.h"
+#include "DataFormats/MuonReco/interface/MuonPFIsolation.h"
 
 #include "DataFormats/JetReco/interface/CATopJetTagInfo.h"
 #include "FWCore/Common/interface/TriggerNames.h"
@@ -605,7 +606,7 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
             double puIso  = (*imu)->userIsolation(pat::PfPUChargedHadronIso);*/
 
 	    //new definition of iso based on muon pog page
-	    const MuonPFIsolation pfIsolationR04 = (*imu)->isolationR04();
+	    const reco::MuonPFIsolation pfIsolationR04 = (*imu)->pfIsolationR04();
 	    double chIso  = pfIsolationR04.sumChargedHadronPt;
             double nhIso  = pfIsolationR04.sumNeutralHadronEt;
             double gIso   = pfIsolationR04.sumPhotonEt;
