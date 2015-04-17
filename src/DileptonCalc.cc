@@ -630,8 +630,8 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
             //Numbers of hits
             muNValMuHits       . push_back((*imu)->muonBestTrack()->hitPattern().numberOfValidMuonHits());
             muNMatchedStations . push_back((*imu)->numberOfMatchedStations());
-            muNValPixelHits    . push_back((*imu)->innerTrack()->hitPattern().numberOfValidPixelHits());
-            muNTrackerLayers   . push_back((*imu)->innerTrack()->hitPattern().trackerLayersWithMeasurement());
+            muNValPixelHits    . push_back((*imu)->muonBestTrack()->hitPattern().numberOfValidPixelHits());
+            muNTrackerLayers   . push_back((*imu)->muonBestTrack()->hitPattern().trackerLayersWithMeasurement());
 
 	   
 	    //Trigger Matching - store 4-vector and filter information for all trigger objects deltaR matched to electrons
