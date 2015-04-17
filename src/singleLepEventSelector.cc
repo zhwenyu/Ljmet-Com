@@ -768,6 +768,27 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
 			        _cleaned = true;
 			    }
 			}
+			// zprime method (gives same results as far as i can tell)
+			/*double muEchk = _ijet->energy()*_ijet->muonEnergyFraction()/mvSelMuons[0]->energy();
+			if ( !(muEchk < 0.9 || (muEchk > 1.1 && _ijet->muonMultiplicity()==1)) ) {
+ 			    tmpJet.setP4( _ijet->p4()-mvSelMuons[0]->p4() );
+			    if (tmpJet.pt() > 5 && deltaR(_ijet->p4(),tmpJet.p4()) > 1.57) std::cout << "Lepton-Jet cleaning flipped direction, not cleaning!" << std::endl;
+			    else {
+ 			        jetP4 = correctJet(tmpJet, event);
+			        if (mbPar["debug"]) std::cout << "Corrected Jet : pT = " << jetP4.Pt() << " eta = " << jetP4.Eta() << " phi = " << jetP4.Phi() << std::endl;
+			        _cleaned = true;
+			    }
+                        }*/
+			//old deltaR matching method
+			/*for (unsigned int id = 0, nd = (*_ijet).numberOfDaughters(); id < nd; ++id) {
+            		    const pat::PackedCandidate &_ijet_const = dynamic_cast<const pat::PackedCandidate &>(*(*_ijet).daughter(id));
+			    if ( deltaR(mvSelMuons[0]->p4(),_ijet_const.p4()) < 0.001 ) {
+ 				tmpJet.setP4( _ijet->p4()-mvSelMuons[0]->p4() );
+ 				jetP4 = correctJet(tmpJet, event);
+				if (mbPar["debug"]) std::cout << "Corrected Jet : pT = " << jetP4.Pt() << " eta = " << jetP4.Eta() << " phi = " << jetP4.Phi() << std::endl;
+			        _cleaned = true;
+ 			    }
+                        }*/
 		    }
             	}
             
