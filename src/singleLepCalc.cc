@@ -38,9 +38,6 @@ public:
 private:
     edm::InputTag rhoSrc_;
     edm::InputTag muonSrc_;
-    bool isWJets_;
-    bool isTB_;
-    bool isTT_;
     bool                      isMc;
     std::string               dataType;
 //    edm::InputTag             rhoSrc_it;
@@ -48,6 +45,7 @@ private:
     edm::InputTag             triggerCollection_;
     edm::InputTag             pvCollection_it;
     edm::InputTag             genParticles_it;
+    edm::InputTag             genJets_it;
     std::vector<unsigned int> keepPDGID;
     std::vector<unsigned int> keepMomPDGID;
     bool keepFullMChistory;
@@ -92,24 +90,18 @@ int singleLepCalc::BeginJob()
     if (mPset.exists("isMc"))         isMc = mPset.getParameter<bool>("isMc");
     else                              isMc = false;
 
-    if (mPset.exists("isTB"))    isTB_ = mPset.getParameter<bool>("isTB");
-    else                         isTB_ = false;
-    
-    if (mPset.exists("isTT"))    isTT_ = mPset.getParameter<bool>("isTT");
-    else                         isTT_ = false;
-    
-    if (mPset.exists("isWJets")) isWJets_ = mPset.getParameter<bool>("isWJets");
-    else                         isWJets_ = false;
-
     if (mPset.exists("genParticles")) genParticles_it = mPset.getParameter<edm::InputTag>("genParticles");
     else                              genParticles_it = edm::InputTag("prunedGenParticles");
+
+    if (mPset.exists("genJets"))      genJets_it = mPset.getParameter<edm::InputTag>("genJets");
+    else                              genJets_it = edm::InputTag("slimmedGenJets");
 
     if (mPset.exists("keepPDGID"))    keepPDGID = mPset.getParameter<std::vector<unsigned int> >("keepPDGID");
     else                              keepPDGID.clear();
 
     if (mPset.exists("keepMomPDGID")) keepMomPDGID = mPset.getParameter<std::vector<unsigned int> >("keepMomPDGID");
     else                              keepMomPDGID.clear();
-
+    
     if (mPset.exists("keepFullMChistory")) keepFullMChistory = mPset.getParameter<bool>("keepFullMChistory");
     else                                   keepFullMChistory = true;
     cout << "keepFullMChistory "     <<    keepFullMChistory << endl;
@@ -604,7 +596,7 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
         AK8JetPhi    . push_back(lvak8.Phi());
         AK8JetEnergy . push_back(lvak8.Energy());
 
-        AK8JetCSV    . push_back(ijet->bDiscriminator( "combinedInclusiveSecondaryVertexV2BJetTags"));
+        AK8JetCSV    . push_back(ijet->bDiscriminator( "combinedInclusiveSecondaryVertexV2BJetTags" ));
         //     AK8JetRCN    . push_back((ijet->chargedEmEnergy()+ijet->chargedHadronEnergy()) / (ijet->neutralEmEnergy()+ijet->neutralHadronEnergy()));
     }
  
@@ -624,21 +616,25 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
     std::vector <double> AK4JetEnergy;
 
     std::vector <int>    AK4JetBTag;
-    std::vector <double> AK4JetRCN;   
+    std::vector <double> AK4JetBDisc;
+    std::vector <int>    AK4JetFlav;
+
+    //std::vector <double> AK4JetRCN;   
     double AK4HT =.0;
-    for (std::vector<edm::Ptr<pat::Jet> >::const_iterator ijet = vSelJets.begin();
-         ijet != vSelJets.end(); ijet++){
+    for (unsigned int ii = 0; ii < vCorrBtagJets.size(); ii++){
 
         //Four vector
-        TLorentzVector lv = selector->correctJet(**ijet, event);
+        TLorentzVector lv = vCorrBtagJets[ii].first;
 
         AK4JetPt     . push_back(lv.Pt());
         AK4JetEta    . push_back(lv.Eta());
         AK4JetPhi    . push_back(lv.Phi());
         AK4JetEnergy . push_back(lv.Energy());
         
-        AK4JetBTag   . push_back(selector->isJetTagged(**ijet, event));
-        AK4JetRCN    . push_back(((*ijet)->chargedEmEnergy()+(*ijet)->chargedHadronEnergy()) / ((*ijet)->neutralEmEnergy()+(*ijet)->neutralHadronEnergy()));
+        AK4JetBTag   . push_back(vCorrBtagJets[ii].second);
+        //AK4JetRCN    . push_back(((*ijet)->chargedEmEnergy()+(*ijet)->chargedHadronEnergy()) / ((*ijet)->neutralEmEnergy()+(*ijet)->neutralHadronEnergy()));
+        AK4JetBDisc  . push_back(vSelJets[ii]->bDiscriminator( "combinedInclusiveSecondaryVertexV2BJetTags" ));
+        AK4JetFlav   . push_back(abs(vSelJets[ii]->partonFlavour()));
  
         //HT
         AK4HT += lv.Pt(); 
@@ -651,7 +647,9 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
     SetValue("AK4JetEnergy" , AK4JetEnergy);
     SetValue("AK4HT"        , AK4HT);
     SetValue("AK4JetBTag"   , AK4JetBTag);
-    SetValue("AK4JetRCN"    , AK4JetRCN);
+    //SetValue("AK4JetRCN"    , AK4JetRCN);
+    SetValue("AK4JetBDisc"  , AK4JetBDisc);
+    SetValue("AK4JetFlav"   , AK4JetFlav);
 
     // MET
     double _met = -9999.0;
@@ -692,9 +690,18 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
     std::vector <int> genMotherID;
     std::vector <int> genMotherIndex;
 
+
+    std::vector <double> genJetPt;
+    std::vector <double> genJetEta;
+    std::vector <double> genJetPhi;
+    std::vector <double> genJetEnergy;
+
     if (isMc){
         edm::Handle<reco::GenParticleCollection> genParticles;
         event.getByLabel(genParticles_it, genParticles);
+
+        edm::Handle<reco::GenJetCollection> genJets;
+        event.getByLabel(genJets_it, genJets);
 
         for(size_t i = 0; i < genParticles->size(); i++){
             const reco::GenParticle & p = (*genParticles).at(i);
@@ -748,6 +755,15 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
                 genMotherIndex   . push_back(mInd);
             }
         }//End loop over gen particles
+        for(size_t i = 0; i < genJets->size(); i++){
+            const reco::GenJet & j = (*genJets).at(i);
+
+            //Four vector
+            genJetPt     . push_back(j.pt());
+            genJetEta    . push_back(j.eta());
+            genJetPhi    . push_back(j.phi());
+            genJetEnergy . push_back(j.energy());
+        }  //End loop over gen jets
     }  //End MC-only if
     // Four vector
     SetValue("genPt"    , genPt);
@@ -762,6 +778,11 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
     SetValue("genMotherID"   , genMotherID);
     SetValue("genMotherIndex", genMotherIndex);
 
+    // Four vector
+    SetValue("genJetPt"    , genJetPt);
+    SetValue("genJetEta"   , genJetEta);
+    SetValue("genJetPhi"   , genJetPhi);
+    SetValue("genJetEnergy", genJetEnergy);
 
 
     return 0;
