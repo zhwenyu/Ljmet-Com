@@ -5,6 +5,7 @@ singleLepCalc = cms.PSet(
                          isMc              = cms.bool(True),
                          pvCollection = cms.InputTag("offlineSlimmedPrimaryVertices"),
                          genParticles = cms.InputTag("prunedGenParticles"),
+			 genJets_it = cms.InputTag("slimmedGenJets"),
 			 triggerCollection = cms.InputTag("TriggerResults::HLT"),
 			 triggerSummary = cms.InputTag("selectedPatTrigger"),
                          keepFullMChistory = cms.bool(True),
