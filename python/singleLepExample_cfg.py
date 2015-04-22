@@ -159,7 +159,7 @@ process.event_selector = cms.PSet(
 #
 
 process.inputs = cms.PSet (
-    nEvents    = cms.int32(-1),
+    nEvents    = cms.int32(100),
     skipEvents = cms.int32(0),
     lumisToProcess = CfgTypes.untracked(CfgTypes.VLuminosityBlockRange()),
     
@@ -202,6 +202,8 @@ process.pfJetIDSelector.quality = cms.string('LOOSE')
 
 # Tight muon
 process.load('LJMet.Com.pfMuonSelector_cfi') 
+process.pfMuonSelector.maxPfRelIso = cms.double(0.2)
+process.pfMuonSelector.cutsToIgnore = cms.vstring('TrackerMuon','Chi2')
 
 # Loose muon
 process.LoosepfMuonSelector = process.pfMuonSelector.clone()
