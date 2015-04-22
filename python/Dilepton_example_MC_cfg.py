@@ -52,7 +52,6 @@ process.event_selector = cms.PSet(
     dump_trigger             = cms.bool(False),
 
     # Can use same trigger paths for data and MC since MC is always one of the data versions
-    # SOME TRIGGERS ARE LIKELY OLD
     trigger_path_ee          = cms.vstring('HLT_Ele23_Ele12_CaloId_TrackId_Iso_v1', 'HLT_Ele17_Ele12_Ele10_CaloId_TrackId_v1',
                                            'HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v15',
                                            'HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v16',
@@ -121,7 +120,7 @@ process.event_selector = cms.PSet(
     electron_collection      = cms.InputTag('slimmedElectrons'),
     met_collection           = cms.InputTag('slimmedMETs'),
 
-    # Jet corrections are possible, read from txt files. These will certainly need updating!
+    # Jet corrections are possible, read from txt files. Need updating to PHYS14. 
     JEC_txtfile = cms.string(relBase+'/src/LJMet/singleLepton/JEC/Summer13_V5_DATA_UncertaintySources_AK5PF.txt'),
     JECup		     = cms.bool(False),
     JECdown                  = cms.bool(False),
@@ -144,7 +143,7 @@ process.event_selector = cms.PSet(
 #
 
 process.inputs = cms.PSet (
-    nEvents    = cms.int32(1000),
+    nEvents    = cms.int32(100),
     skipEvents = cms.int32(0),
     useHcalLaserEventFilter = cms.bool(True),
     lumisToProcess = CfgTypes.untracked(CfgTypes.VLuminosityBlockRange()),
@@ -166,7 +165,7 @@ if not condorIsMC:
 # Output
 #
 process.outputs = cms.PSet (
-    outputName = cms.string('ljmet_dilep'),
+    outputName = cms.string('ljmet_tree'),
     treeName   = cms.string('ljmet'),
 )
 
@@ -185,4 +184,4 @@ process.pvSelector.maxRho  = cms.double(2.0)
 # jets
 process.load('PhysicsTools.SelectorUtils.pfJetIDSelector_cfi') 
 process.pfJetIDSelector.version = cms.string('FIRSTDATA')
-process.pfJetIDSelector.quality = cms.string('TIGHT')
+process.pfJetIDSelector.quality = cms.string('LOOSE')
