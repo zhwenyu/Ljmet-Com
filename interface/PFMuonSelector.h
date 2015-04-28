@@ -48,7 +48,6 @@ public: // interface
                    parameters.getParameter<double>("maxIp"),
                    parameters.getParameter<int>   ("minPixelHits"),
                    parameters.getParameter<int>   ("minMatchedStations"),
-                   parameters.getParameter<double>("maxZImpact"),
                    parameters.getParameter<double>("maxPfRelIso")
                    );
         if ( parameters.exists("cutsToIgnore") )
@@ -67,7 +66,6 @@ public: // interface
                     double    maxIp            = 0.2,
                     int       minPixelHits     = 1,
                     int       minNMatches      = 2,
-                    double    maxZImpact       = 0.5,
                     double    pfiso            = 0.12
                     )
     {
@@ -80,7 +78,6 @@ public: // interface
         push_back("minTrackerLayers",    minTrackerLayers);
         push_back("minValidMuHits",      minValidMuonHits  );
         push_back("maxIp",               maxIp );
-        push_back("maxZImpact",          maxZImpact );
         push_back("minPixelHits",        minPixelHits);
         push_back("minMatchedStations",  minNMatches);
         push_back("maxPfRelIso",         pfiso );
@@ -92,7 +89,6 @@ public: // interface
         set("minTrackerLayers");
         set("minValidMuHits");
         set("maxIp");
-        set("maxZImpact");
         set("minPixelHits");
         set("minMatchedStations");
         set("maxPfRelIso");
@@ -101,7 +97,6 @@ public: // interface
         indexMinTrackerLayers_ = index_type(&bits_, "minTrackerLayers" );
         indexminValidMuHits_   = index_type(&bits_, "minValidMuHits"      );
         indexMaxIp_            = index_type(&bits_, "maxIp"      );
-        indexMaxZImpact_       = index_type(&bits_, "maxZImpact"      );
         indexPixHits_          = index_type(&bits_, "minPixelHits"      );
         indexStations_         = index_type(&bits_, "minMatchedStations");
         indexmaxPfRelIso_      = index_type(&bits_, "maxPfRelIso"           );
@@ -164,14 +159,12 @@ public: // interface
         int minTrackerLayers = 0;
         int minValidMuonHits = 0;
         double _ip = 9999999.0;
-        double _ipz = 9999999.0;
         int minPixelHits = 0;
         if ( muon.globalTrack().isNonnull() && muon.globalTrack().isAvailable() ){
             norm_chi2        = muon.normChi2();
             minTrackerLayers = static_cast<int> (muon.track()->hitPattern().trackerLayersWithMeasurement());
             minValidMuonHits = static_cast<int> (muon.globalTrack()->hitPattern().numberOfValidMuonHits());
             _ip = fabs(muon.dB());
-            _ipz = fabs(muon.edB());
             minPixelHits = muon.innerTrack()->hitPattern().numberOfValidPixelHits();
         }
         
@@ -199,8 +192,6 @@ public: // interface
         //else std::cout<<"failed minValidMuonHits"<<std::endl;
         if ( _ip                <  cut(indexMaxIp_,double()) || ignoreCut(indexMaxIp_)) passCut(ret, indexMaxIp_  );
         //else std::cout<<"failed maxIp"<<std::endl;
-        if ( _ipz              <  cut(indexMaxZImpact_,double()) || ignoreCut(indexMaxZImpact_)) passCut(ret, indexMaxZImpact_  );
-        //else std::cout<<"failed maxZImpact"<<std::endl;
         if ( minPixelHits       >= cut(indexPixHits_,int())    || ignoreCut(indexPixHits_))  passCut(ret, indexPixHits_); 
         //else std::cout<<"failed minPixelHits"<<std::endl;
         if ( minMatchedStations >= cut(indexStations_,int())  || ignoreCut(indexStations_))  passCut(ret, indexStations_); 
@@ -223,7 +214,6 @@ private: // member variables
     index_type indexMinTrackerLayers_;
     index_type indexminValidMuHits_;
     index_type indexMaxIp_;
-    index_type indexMaxZImpact_;
     index_type indexPixHits_;
     index_type indexStations_;
     index_type indexmaxPfRelIso_;

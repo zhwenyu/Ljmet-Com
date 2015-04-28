@@ -38,21 +38,20 @@ public:
 private:
     edm::InputTag rhoSrc_;
     edm::InputTag muonSrc_;
-    bool isWJets_;
-    bool isTB_;
-    bool isTT_;
     bool                      isMc;
     std::string               dataType;
 //    edm::InputTag             rhoSrc_it;
+    edm::InputTag             triggerSummary_;
+    edm::InputTag             triggerCollection_;
     edm::InputTag             pvCollection_it;
     edm::InputTag             genParticles_it;
+    edm::InputTag             genJets_it;
     std::vector<unsigned int> keepPDGID;
     std::vector<unsigned int> keepMomPDGID;
     bool keepFullMChistory;
 
     double rhoIso;
 
-    boost::shared_ptr<TopElectronSelector>     electronSelL_, electronSelM_, electronSelT_;
     std::vector<reco::Vertex> goodPVs;
     int findMatch(const reco::GenParticleCollection & genParticles, int idToMatch, double eta, double phi);
     double mdeltaR(double eta1, double phi1, double eta2, double phi2);
@@ -82,59 +81,31 @@ int singleLepCalc::BeginJob()
     if (mPset.exists("pvCollection")) pvCollection_it = mPset.getParameter<edm::InputTag>("pvCollection");
     else                              pvCollection_it = edm::InputTag("offlineSlimmedPrimaryVertices");
 
+    if (mPset.exists("triggerSummary")) triggerSummary_ = mPset.getParameter<edm::InputTag>("triggerSummary");
+    else                                triggerSummary_ = edm::InputTag("selectedPatTrigger");
+    
+    if (mPset.exists("triggerCollection")) triggerCollection_ = mPset.getParameter<edm::InputTag>("triggerCollection");
+    else                                   triggerCollection_ = edm::InputTag("TriggerResults::HLT");
+    
     if (mPset.exists("isMc"))         isMc = mPset.getParameter<bool>("isMc");
     else                              isMc = false;
 
-    if (mPset.exists("isTB"))    isTB_ = mPset.getParameter<bool>("isTB");
-    else                         isTB_ = false;
-    
-    if (mPset.exists("isTT"))    isTT_ = mPset.getParameter<bool>("isTT");
-    else                         isTT_ = false;
-    
-    if (mPset.exists("isWJets")) isWJets_ = mPset.getParameter<bool>("isWJets");
-    else                         isWJets_ = false;
-
     if (mPset.exists("genParticles")) genParticles_it = mPset.getParameter<edm::InputTag>("genParticles");
     else                              genParticles_it = edm::InputTag("prunedGenParticles");
+
+    if (mPset.exists("genJets"))      genJets_it = mPset.getParameter<edm::InputTag>("genJets");
+    else                              genJets_it = edm::InputTag("slimmedGenJets");
 
     if (mPset.exists("keepPDGID"))    keepPDGID = mPset.getParameter<std::vector<unsigned int> >("keepPDGID");
     else                              keepPDGID.clear();
 
     if (mPset.exists("keepMomPDGID")) keepMomPDGID = mPset.getParameter<std::vector<unsigned int> >("keepMomPDGID");
     else                              keepMomPDGID.clear();
-
+    
     if (mPset.exists("keepFullMChistory")) keepFullMChistory = mPset.getParameter<bool>("keepFullMChistory");
     else                                   keepFullMChistory = true;
     cout << "keepFullMChistory "     <<    keepFullMChistory << endl;
  
-    if ( mPset.exists("cutbasedIDSelectorLoose")){
-        electronSelL_ = boost::shared_ptr<TopElectronSelector>(
-                                                               new TopElectronSelector(mPset.getParameter<edm::ParameterSet>("cutbasedIDSelectorLoose")) );
-    }
-    else {
-        std::cout << "DileptonCalc: Loose electron selector not configured, exiting"
-        << std::endl;
-        std::exit(-1);
-    }
-    if ( mPset.exists("cutbasedIDSelectorMedium")){
-        electronSelM_ = boost::shared_ptr<TopElectronSelector>(
-                                                               new TopElectronSelector(mPset.getParameter<edm::ParameterSet>("cutbasedIDSelectorMedium")) );
-    }
-    else {
-        std::cout << "DileptonCalc: Medium electron selector not configured, exiting"
-        << std::endl;
-        std::exit(-1);
-    }
-    if ( mPset.exists("cutbasedIDSelectorTight")){
-        electronSelT_ = boost::shared_ptr<TopElectronSelector>(
-                                                               new TopElectronSelector(mPset.getParameter<edm::ParameterSet>("cutbasedIDSelectorTight")) );
-    }
-    else {
-        std::cout << "DileptonCalc: Tight electron selector not configured, exiting"
-        << std::endl;
-        std::exit(-1);
-    }
-   
     return 0;
 }
 
@@ -375,7 +346,6 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
     std::vector <int>    elNotConversion;
     std::vector <int>    elChargeConsistent;
     std::vector <int>    elIsEBEE;
-    std::vector <int>    elQuality;
     std::vector <int>    elCharge;
 
     //ID requirement
@@ -419,8 +389,6 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
     edm::Handle<double> rhoHandle;
     event.getByLabel(rhoSrc_, rhoHandle);
     double rhoIso = std::max(*(rhoHandle.product()), 0.0);
-    pat::strbitset retElectron  = electronSelL_->getBitTemplate();
-    bool retElectronT,retElectronM,retElectronL; 
     //
     //_____Electrons______
     //
@@ -458,12 +426,6 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
             elCharge.push_back((*iel)->charge());
             elNotConversion.push_back(notConv);
 
-            retElectronL = (*electronSelL_)(**iel, event, retElectron);
-            retElectronM = (*electronSelM_)(**iel, event, retElectron);
-            retElectronT = (*electronSelT_)(**iel, event, retElectron);
-
-            elQuality.push_back((retElectronT<<2) + (retElectronM<<1) + retElectronL);
-
             //IP: for some reason this is with respect to the first vertex in the collection
             if(goodPVs.size() > 0){
                 elDxy.push_back((*iel)->gsfTrack()->dxy(goodPVs.at(0).position()));
@@ -483,16 +445,16 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
             elMHits.push_back((*iel)->gsfTrack()->hitPattern().numberOfHits(reco::HitPattern::MISSING_INNER_HITS));
             elVtxFitConv.push_back((*iel)->passConversionVeto());
             if(isMc && keepFullMChistory){
-                cout << "start\n";
+                //cout << "start\n";
                 edm::Handle<reco::GenParticleCollection> genParticles;
                 event.getByLabel(genParticles_it, genParticles);
                 int matchId = findMatch(*genParticles, 11, (*iel)->eta(), (*iel)->phi());
                 double closestDR = 10000.;
-                cout << "matchId "<<matchId <<endl;
+                //cout << "matchId "<<matchId <<endl;
                 if (matchId>=0) {
                     const reco::GenParticle & p = (*genParticles).at(matchId);
                     closestDR = mdeltaR( (*iel)->eta(), (*iel)->phi(), p.eta(), p.phi());
-                    cout << "closestDR "<<closestDR <<endl;
+                    //cout << "closestDR "<<closestDR <<endl;
                     if(closestDR < 0.3){
                         elGen_Reco_dr.push_back(closestDR);
                         elPdgId.push_back(p.pdgId());
@@ -536,7 +498,6 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
     SetValue("elNotConversion" , elNotConversion);  //Conversion rejection
     SetValue("elChargeConsistent", elChargeConsistent);
     SetValue("elIsEBEE", elIsEBEE);
-    SetValue("elQuality", elQuality);
 
     //ID cuts
     SetValue("elDeta", elDeta);
@@ -575,6 +536,40 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
     SetValue("elMatchedEnergy", elMatchedEnergy);
 
     //
+    //______Trigger Matching __________________
+    //
+
+    edm::Handle<edm::TriggerResults > mhEdmTriggerResults;
+    event.getByLabel( triggerCollection_ , mhEdmTriggerResults );
+    edm::Handle<pat::TriggerObjectStandAloneCollection> mhEdmTriggerObjectColl;  
+    event.getByLabel(triggerSummary_,mhEdmTriggerObjectColl);
+
+    const edm::TriggerNames &names = event.triggerNames(*mhEdmTriggerResults);
+
+    int _electron_1_hltmatched =0;
+    int _muon_1_hltmatched =0;
+
+    if (_nSelElectrons>0 || _nSelMuons>0) {
+        for(pat::TriggerObjectStandAlone obj : *mhEdmTriggerObjectColl){       
+            obj.unpackPathNames(names);
+            for(unsigned h = 0; h < obj.filterLabels().size(); ++h){
+		if ( _nSelElectrons>0 ){
+                    if ( obj.filterLabels()[h]!="hltEle32WP85GsfTrackIsoFilter" ) continue;
+  	            if ( deltaR(obj.eta(),obj.phi(),elEta[0],elPhi[0]) < 0.5 ) _electron_1_hltmatched = 1;
+		}
+		if ( _nSelMuons>0 ){
+                    if ( obj.filterLabels()[h]!="hltL3crIsoL1sMu20Eta2p1L1f0L2f20QL3f24QL3crIsoRhoFiltered0p15IterTrk02" ) continue;
+  	            if ( deltaR(obj.eta(),obj.phi(),muEta[0],muPhi[0]) < 0.5 ) _muon_1_hltmatched = 1;
+		}
+            }
+        }
+    }
+
+    SetValue("electron_1_hltmatched",_electron_1_hltmatched);
+    SetValue("muon_1_hltmatched",_muon_1_hltmatched);
+
+
+    //
     //_____ Jets ______________________________
     //
 
@@ -594,13 +589,14 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
     //   std::vector <double> AK8JetRCN;       
     for (std::vector<pat::Jet>::const_iterator ijet = AK8Jets->begin(); ijet != AK8Jets->end(); ijet++){
 
+        TLorentzVector lvak8 = selector->correctJet(*ijet, event,true);
         //Four vector
-        AK8JetPt     . push_back(ijet->pt());
-        AK8JetEta    . push_back(ijet->eta());
-        AK8JetPhi    . push_back(ijet->phi());
-        AK8JetEnergy . push_back(ijet->energy());
+        AK8JetPt     . push_back(lvak8.Pt());
+        AK8JetEta    . push_back(lvak8.Eta());
+        AK8JetPhi    . push_back(lvak8.Phi());
+        AK8JetEnergy . push_back(lvak8.Energy());
 
-        AK8JetCSV    . push_back(ijet->bDiscriminator( "combinedInclusiveSecondaryVertexV2BJetTags"));
+        AK8JetCSV    . push_back(ijet->bDiscriminator( "combinedInclusiveSecondaryVertexV2BJetTags" ));
         //     AK8JetRCN    . push_back((ijet->chargedEmEnergy()+ijet->chargedHadronEnergy()) / (ijet->neutralEmEnergy()+ijet->neutralHadronEnergy()));
     }
  
@@ -619,22 +615,26 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
     std::vector <double> AK4JetPhi;
     std::vector <double> AK4JetEnergy;
 
-    std::vector <int>    AK4JetTBag;
-    std::vector <double> AK4JetRCN;   
+    std::vector <int>    AK4JetBTag;
+    std::vector <double> AK4JetBDisc;
+    std::vector <int>    AK4JetFlav;
+
+    //std::vector <double> AK4JetRCN;   
     double AK4HT =.0;
-    for (std::vector<edm::Ptr<pat::Jet> >::const_iterator ijet = vSelJets.begin();
-         ijet != vSelJets.end(); ijet++){
+    for (unsigned int ii = 0; ii < vCorrBtagJets.size(); ii++){
 
         //Four vector
-        TLorentzVector lv = selector->correctJet(**ijet, event);
+        TLorentzVector lv = vCorrBtagJets[ii].first;
 
         AK4JetPt     . push_back(lv.Pt());
         AK4JetEta    . push_back(lv.Eta());
         AK4JetPhi    . push_back(lv.Phi());
         AK4JetEnergy . push_back(lv.Energy());
         
-        AK4JetTBag   . push_back(selector->isJetTagged(**ijet, event));
-        AK4JetRCN    . push_back(((*ijet)->chargedEmEnergy()+(*ijet)->chargedHadronEnergy()) / ((*ijet)->neutralEmEnergy()+(*ijet)->neutralHadronEnergy()));
+        AK4JetBTag   . push_back(vCorrBtagJets[ii].second);
+        //AK4JetRCN    . push_back(((*ijet)->chargedEmEnergy()+(*ijet)->chargedHadronEnergy()) / ((*ijet)->neutralEmEnergy()+(*ijet)->neutralHadronEnergy()));
+        AK4JetBDisc  . push_back(vSelJets[ii]->bDiscriminator( "combinedInclusiveSecondaryVertexV2BJetTags" ));
+        AK4JetFlav   . push_back(abs(vSelJets[ii]->partonFlavour()));
  
         //HT
         AK4HT += lv.Pt(); 
@@ -646,8 +646,10 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
     SetValue("AK4JetPhi"    , AK4JetPhi);
     SetValue("AK4JetEnergy" , AK4JetEnergy);
     SetValue("AK4HT"        , AK4HT);
-    SetValue("AK4JetTBag"   , AK4JetTBag);
-    SetValue("AK4JetRCN"    , AK4JetRCN);
+    SetValue("AK4JetBTag"   , AK4JetBTag);
+    //SetValue("AK4JetRCN"    , AK4JetRCN);
+    SetValue("AK4JetBDisc"  , AK4JetBDisc);
+    SetValue("AK4JetFlav"   , AK4JetFlav);
 
     // MET
     double _met = -9999.0;
@@ -688,14 +690,23 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
     std::vector <int> genMotherID;
     std::vector <int> genMotherIndex;
 
+
+    std::vector <double> genJetPt;
+    std::vector <double> genJetEta;
+    std::vector <double> genJetPhi;
+    std::vector <double> genJetEnergy;
+
     if (isMc){
         edm::Handle<reco::GenParticleCollection> genParticles;
         event.getByLabel(genParticles_it, genParticles);
 
+        edm::Handle<reco::GenJetCollection> genJets;
+        event.getByLabel(genJets_it, genJets);
+
         for(size_t i = 0; i < genParticles->size(); i++){
             const reco::GenParticle & p = (*genParticles).at(i);
 
-            //Find status 3 particles
+            //Find status 23 particles
             if (p.status() == 23){
                 reco::Candidate* mother = (reco::Candidate*) p.mother();
                 if (not mother)            continue;
@@ -744,6 +755,15 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
                 genMotherIndex   . push_back(mInd);
             }
         }//End loop over gen particles
+        for(size_t i = 0; i < genJets->size(); i++){
+            const reco::GenJet & j = (*genJets).at(i);
+
+            //Four vector
+            genJetPt     . push_back(j.pt());
+            genJetEta    . push_back(j.eta());
+            genJetPhi    . push_back(j.phi());
+            genJetEnergy . push_back(j.energy());
+        }  //End loop over gen jets
     }  //End MC-only if
     // Four vector
     SetValue("genPt"    , genPt);
@@ -758,6 +778,11 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
     SetValue("genMotherID"   , genMotherID);
     SetValue("genMotherIndex", genMotherIndex);
 
+    // Four vector
+    SetValue("genJetPt"    , genJetPt);
+    SetValue("genJetEta"   , genJetEta);
+    SetValue("genJetPhi"   , genJetPhi);
+    SetValue("genJetEnergy", genJetEnergy);
 
 
     return 0;
