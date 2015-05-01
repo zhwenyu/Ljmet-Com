@@ -82,9 +82,9 @@ int BTagSFCalc::AnalyzeEvent(edm::EventBase const & event,
     string tagger_ssv_he = "simpleSecondaryVertexHighEffBJetTags";
     string tagger_jBp = "jetBProbabilityBJetTags";
     string tagger_jp = "jetProbabilityBJetTags";
-    string tagger_csv = "combinedSecondaryVertexBJetTags";
-    string tagger_csvmva = "combinedSecondaryVertexMVABJetTags";
-    string tagger_csvivf = "combinedInclusiveSecondaryVertexBJetTags";
+    string tagger_csv = "combinedSecondaryVertexV2BJetTags";
+    string tagger_csvmva = "combinedSecondaryVertexV2MVABJetTags";
+    string tagger_csvivf = "combinedInclusiveSecondaryVertexV2BJetTags";
     string tagger_cmva = "combinedMVABJetTags";
     
     vector<string> tagger;
@@ -105,7 +105,7 @@ int BTagSFCalc::AnalyzeEvent(edm::EventBase const & event,
     
     for( Int_t jetcount = 0; jetcount < _nJets; jetcount++){
         for(vector<string>::iterator st  = tagger.begin(); st != tagger.end(); ++st){
-            Discrims[*st].push_back(-10000.0);
+            Discrims[*st].push_back(-15.0);
         }
     }
     
