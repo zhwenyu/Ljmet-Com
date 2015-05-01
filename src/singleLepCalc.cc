@@ -312,26 +312,25 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
     SetValue("muNhIso", muNhIso);
     SetValue("muGIso" , muGIso);
     SetValue("muPuIso", muPuIso);
+    //MC matching -- mother information
+    SetValue("muGen_Reco_dr", muGen_Reco_dr);
+    SetValue("muPdgId", muPdgId);
+    SetValue("muStatus", muStatus);
+    SetValue("muMatched",muMatched);
+    SetValue("muMother_pt", muMother_pt);
+    SetValue("muMother_eta", muMother_eta);
+    SetValue("muMother_phi", muMother_phi);
+    SetValue("muMother_energy", muMother_energy);
+    SetValue("muMother_status", muMother_status);
+    SetValue("muMother_id", muMother_id);
+    SetValue("muNumberOfMothers", muNumberOfMothers);
+    //Matched gen muon information:
+    SetValue("muMatchedPt", muMatchedPt);
+    SetValue("muMatchedEta", muMatchedEta);
+    SetValue("muMatchedPhi", muMatchedPhi);
+    SetValue("muMatchedEnergy", muMatchedEnergy);
 
-    if(isMc && keepFullMChistory){
-      //MC matching -- mother information
-      SetValue("muGen_Reco_dr", muGen_Reco_dr);
-      SetValue("muPdgId", muPdgId);
-      SetValue("muStatus", muStatus);
-      SetValue("muMatched",muMatched);
-      SetValue("muMother_pt", muMother_pt);
-      SetValue("muMother_eta", muMother_eta);
-      SetValue("muMother_phi", muMother_phi);
-      SetValue("muMother_energy", muMother_energy);
-      SetValue("muMother_status", muMother_status);
-      SetValue("muMother_id", muMother_id);
-      SetValue("muNumberOfMothers", muNumberOfMothers);
-      //Matched gen muon information:
-      SetValue("muMatchedPt", muMatchedPt);
-      SetValue("muMatchedEta", muMatchedEta);
-      SetValue("muMatchedPhi", muMatchedPhi);
-      SetValue("muMatchedEnergy", muMatchedEnergy);
-    }
+
 
 
     // Electron
@@ -518,26 +517,24 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
     SetValue("elAEff"  , elAEff);
     SetValue("elRhoIso", elRhoIso);
 
-    if(isMc && keepFullMChistory){
-      //MC matching -- mother information
-      SetValue("elNumberOfMothers", elNumberOfMothers);
-      SetValue("elGen_Reco_dr", elGen_Reco_dr);
-      SetValue("elPdgId", elPdgId);
-      SetValue("elStatus", elStatus);
-      SetValue("elMatched",elMatched);
-      SetValue("elMother_pt", elMother_pt);
-      SetValue("elMother_eta", elMother_eta);
-      SetValue("elMother_phi", elMother_phi);
-      SetValue("elMother_energy", elMother_energy);
-      SetValue("elMother_status", elMother_status);
-      SetValue("elMother_id", elMother_id);
+    //MC matching -- mother information
+    SetValue("elNumberOfMothers", elNumberOfMothers);
+    SetValue("elGen_Reco_dr", elGen_Reco_dr);
+    SetValue("elPdgId", elPdgId);
+    SetValue("elStatus", elStatus);
+    SetValue("elMatched",elMatched);
+    SetValue("elMother_pt", elMother_pt);
+    SetValue("elMother_eta", elMother_eta);
+    SetValue("elMother_phi", elMother_phi);
+    SetValue("elMother_energy", elMother_energy);
+    SetValue("elMother_status", elMother_status);
+    SetValue("elMother_id", elMother_id);
+    //Matched gen muon information:
+    SetValue("elMatchedPt", elMatchedPt);
+    SetValue("elMatchedEta", elMatchedEta);
+    SetValue("elMatchedPhi", elMatchedPhi);
+    SetValue("elMatchedEnergy", elMatchedEnergy);
 
-      //Matched gen muon information:
-      SetValue("elMatchedPt", elMatchedPt);
-      SetValue("elMatchedEta", elMatchedEta);
-      SetValue("elMatchedPhi", elMatchedPhi);
-      SetValue("elMatchedEnergy", elMatchedEnergy);
-    }
     //
     //______Trigger Matching __________________
     //
@@ -571,7 +568,7 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
     SetValue("electron_1_hltmatched",_electron_1_hltmatched);
     SetValue("muon_1_hltmatched",_muon_1_hltmatched);
 
-    /*
+
     //
     //_____ Jets ______________________________
     //
@@ -609,7 +606,7 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
     SetValue("AK8JetPhi"    , AK8JetPhi);
     SetValue("AK8JetEnergy" , AK8JetEnergy);
 
-    SetValue("AK8JetCSVV2"    , AK8JetCSV);
+    SetValue("AK8JetCSV"    , AK8JetCSV);
     //   SetValue("AK8JetRCN"    , AK8JetRCN);
     //Get AK4 Jets
     //Four vector
@@ -651,9 +648,9 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
     SetValue("AK4HT"        , AK4HT);
     SetValue("AK4JetBTag"   , AK4JetBTag);
     //SetValue("AK4JetRCN"    , AK4JetRCN);
-    SetValue("AK4JetCSVV2"  , AK4JetBDisc);
+    SetValue("AK4JetBDisc"  , AK4JetBDisc);
     SetValue("AK4JetFlav"   , AK4JetFlav);
-    */
+
     // MET
     double _met = -9999.0;
     double _met_phi = -9999.0;
@@ -769,26 +766,24 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
         }  //End loop over gen jets
     }  //End MC-only if
     // Four vector
+    SetValue("genPt"    , genPt);
+    SetValue("genEta"   , genEta);
+    SetValue("genPhi"   , genPhi);
+    SetValue("genEnergy", genEnergy);
 
-    //    if(keepFullMChistory){
-      SetValue("genPt"    , genPt);
-      SetValue("genEta"   , genEta);
-      SetValue("genPhi"   , genPhi);
-      SetValue("genEnergy", genEnergy);
-      
-      // Identity
-      SetValue("genID"         , genID);
-      SetValue("genIndex"      , genIndex);
-      SetValue("genStatus"     , genStatus);
-      SetValue("genMotherID"   , genMotherID);
-      SetValue("genMotherIndex", genMotherIndex);
-      
-      // Four vector
-      SetValue("genJetPt"    , genJetPt);
-      SetValue("genJetEta"   , genJetEta);
-      SetValue("genJetPhi"   , genJetPhi);
-      SetValue("genJetEnergy", genJetEnergy);
-      //    }
+    // Identity
+    SetValue("genID"         , genID);
+    SetValue("genIndex"      , genIndex);
+    SetValue("genStatus"     , genStatus);
+    SetValue("genMotherID"   , genMotherID);
+    SetValue("genMotherIndex", genMotherIndex);
+
+    // Four vector
+    SetValue("genJetPt"    , genJetPt);
+    SetValue("genJetEta"   , genJetEta);
+    SetValue("genJetPhi"   , genJetPhi);
+    SetValue("genJetEnergy", genJetEnergy);
+
 
     return 0;
 }
