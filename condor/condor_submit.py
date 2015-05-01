@@ -142,7 +142,7 @@ int_file = open(dir+'/'+'interactive.csh','w')
 while ( nfiles <= count ):    
 
     # ADD YOUR CONFIG FILE HERE!!
-    py_templ_file = open(relBase+'/src/LJMet/condor/ljmet_cfg.py')
+    py_templ_file = open(relBase+'/src/LJMet/Com/condor/ljmet_cfg.py')
     
     py_file = open(dir+'/'+prefix+'_'+str(j)+'.py','w')
 
@@ -173,7 +173,7 @@ os.system('chmod +x '+dir+'/'+'interactive.csh')
 
 njobs = j - 1
 
-jdl_templ_file = open(relBase+'/src/LJMet/condor/template.jdl')
+jdl_templ_file = open(relBase+'/src/LJMet/Com/condor/template.jdl')
 jdl_file       = open(dir+'/'+prefix+'.jdl','w')
 
 
