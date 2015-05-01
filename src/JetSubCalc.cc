@@ -54,8 +54,10 @@ int JetSubCalc::BeginJob()
     else slimmedJetsAK8Coll_it = edm::InputTag("slimmedJetsAK8");
     
     if (mPset.exists("bDiscriminant")) bDiscriminant = mPset.getParameter<std::string>("bDiscriminant");
-    else bDiscriminant = "pfCombinedSecondaryVertexBJetTags";
+    else bDiscriminant = "pfCombinedInclusiveSecondaryVertexV2BJetTags";
     
+    std::cout << " JetSubCalc Bdisc = " << bDiscriminant << std::endl;
+
     if (mPset.exists("tagInfo")) tagInfo = mPset.getParameter<std::string>("tagInfo");
     else tagInfo = "caTop";
     
@@ -188,19 +190,19 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * s
     SetValue("theJetVtx3DSig",    theJetVtx3DSig);
     SetValue("theJetPileupJetId", theJetPileupJetId);
     
-    SetValue("theJetIndex",      theJetIndex);
+    //    SetValue("theJetIndex",      theJetIndex);
     SetValue("theJetnDaughters", theJetnDaughters);
-    
+    /*    
     SetValue("theJetDaughterPt",     theJetDaughterPt);
     SetValue("theJetDaughterEta",    theJetDaughterEta);
     SetValue("theJetDaughterPhi",    theJetDaughterPhi);
     SetValue("theJetDaughterEnergy", theJetDaughterEnergy);
+    */
+    //    SetValue("theJetDaughterMotherIndex", theJetDaughterMotherIndex);
     
-    SetValue("theJetDaughterMotherIndex", theJetDaughterMotherIndex);
-    
-    SetValue("theJetCSVLSubJets", theJetCSVLSubJets);
-    SetValue("theJetCSVMSubJets", theJetCSVMSubJets);
-    SetValue("theJetCSVTSubJets", theJetCSVTSubJets);
+    //    SetValue("theJetCSVLSubJets", theJetCSVLSubJets);
+    //    SetValue("theJetCSVMSubJets", theJetCSVMSubJets);
+    //    SetValue("theJetCSVTSubJets", theJetCSVTSubJets);
     
     // I think these are AK8 jets so topMass, minMass and nSubJets make sense
     edm::Handle<std::vector<pat::Jet> > theAK8Jets;
@@ -313,17 +315,18 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * s
             theJetAK8DaughterEnergy.push_back(theDaughter->energy());
             
             theJetAK8DaughterMotherIndex.push_back(index);
-            
-//            subjetCSV = subjet->bDiscriminator(bDiscriminant);
-//            if (subjetCSV > 0.244 && ijet->daughter(ui)->pt() > 20.) {
-//                CSVL++;
-//            }
-//            if (subjetCSV > 0.679 && ijet->daughter(ui)->pt() > 20.){
-//                CSVM++;
-//            }
-//            if (subjetCSV > 0.898 && ijet->daughter(ui)->pt() > 20.){
-//                CSVT++;
-//            }
+	    /*            
+            subjetCSV = subjet->bDiscriminator(bDiscriminant);
+            if (subjetCSV > 0.244 && ijet->daughter(ui)->pt() > 20.) {
+	      CSVL++;
+            }
+            if (subjetCSV > 0.679 && ijet->daughter(ui)->pt() > 20.){
+	      CSVM++;
+            }
+            if (subjetCSV > 0.898 && ijet->daughter(ui)->pt() > 20.){
+	      CSVT++;
+            }
+	    */
         }
         theJetAK8CSVLSubJets.push_back(CSVL);
         theJetAK8CSVMSubJets.push_back(CSVM);
@@ -346,23 +349,23 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * s
     
     SetValue("theJetAK8Mass",   theJetAK8Mass);
     
-    SetValue("theJetAK8Index",      theJetAK8Index);
+    //    SetValue("theJetAK8Index",      theJetAK8Index);
     SetValue("theJetAK8nDaughters", theJetAK8nDaughters);
     
     SetValue("theJetAK8caTopTopMass", theJetAK8caTopTopMass);
     SetValue("theJetAK8caTopMinMass", theJetAK8caTopMinMass);
     SetValue("theJetAK8caTopnSubJets", theJetAK8caTopnSubJets);
-    
+    /*    
     SetValue("theJetAK8DaughterPt",     theJetAK8DaughterPt);
     SetValue("theJetAK8DaughterEta",    theJetAK8DaughterEta);
     SetValue("theJetAK8DaughterPhi",    theJetAK8DaughterPhi);
     SetValue("theJetAK8DaughterEnergy", theJetAK8DaughterEnergy);
+    */
+    //    SetValue("theJetAK8DaughterMotherIndex", theJetAK8DaughterMotherIndex);
     
-    SetValue("theJetAK8DaughterMotherIndex", theJetAK8DaughterMotherIndex);
-    
-    SetValue("theJetAK8CSVLSubJets", theJetAK8CSVLSubJets);
-    SetValue("theJetAK8CSVMSubJets", theJetAK8CSVMSubJets);
-    SetValue("theJetAK8CSVTSubJets", theJetAK8CSVTSubJets);
+    //    SetValue("theJetAK8CSVLSubJets", theJetAK8CSVLSubJets);
+    //    SetValue("theJetAK8CSVMSubJets", theJetAK8CSVMSubJets);
+    //    SetValue("theJetAK8CSVTSubJets", theJetAK8CSVTSubJets);
     
     return 0;
 }
