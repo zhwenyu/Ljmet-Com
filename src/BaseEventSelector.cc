@@ -4,6 +4,7 @@
 #include "JetMETCorrections/Objects/interface/JetCorrector.h"
 #include "CondFormats/JetMETObjects/interface/JetCorrectorParameters.h"
 #include "CondFormats/JetMETObjects/interface/FactorizedJetCorrector.h"
+#include "CondFormats/JetMETObjects/interface/FactorizedJetCorrectorCalculator.h"
 
 BaseEventSelector::BaseEventSelector():
 mName(""),
@@ -245,7 +246,9 @@ TLorentzVector BaseEventSelector::correctJet(const pat::Jet & jet, edm::EventBas
           	JetCorrectorAK8->setJetPt(pt_raw);
                 JetCorrectorAK8->setJetA(jet.jetArea());
           	JetCorrectorAK8->setRho(rho); 
-    
+
+		std::cout << "Did jet corrector AK8 set commands" << std::endl;
+
                 try{
     		    correction = JetCorrectorAK8->getCorrection();
                 }
@@ -261,6 +264,8 @@ TLorentzVector BaseEventSelector::correctJet(const pat::Jet & jet, edm::EventBas
           	JetCorrector->setJetPt(pt_raw);
                 JetCorrector->setJetA(jet.jetArea());
           	JetCorrector->setRho(rho); 
+
+		std::cout << "Did jet corrector AK4 set commands" << std::endl;
     
                 try{
     		    correction = JetCorrector->getCorrection();
