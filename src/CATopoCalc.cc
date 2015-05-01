@@ -55,9 +55,7 @@ int CATopoCalc::BeginJob()
     
     if (mPset.exists("AK8slimmedJetColl")) AK8slimmedJetColl_it = mPset.getParameter<edm::InputTag>("AK8slimmedJetColl");
     else AK8slimmedJetColl_it = edm::InputTag("slimmedJetsAK8");
-
-    //    std::cout << "RUNNING CATopoCalc::BeginJob" << std::endl;
-
+    
     return 0;
 }
 
@@ -70,9 +68,6 @@ int CATopoCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * s
     //
     // _____ Get objects from the selector _____________________
     //
-
-  //  std::cout << "RUNNING CATopoCalc::AnalyzeEvent" << std::endl;
-
     std::vector<std::pair<TLorentzVector,bool>> const & vCorrBtagJets = selector->GetCorrJetsWithBTags();
     std::vector<edm::Ptr<pat::Muon> > const & vSelMuons = selector->GetSelectedMuons();
     std::vector<edm::Ptr<pat::Electron> > const & vSelElectrons = selector->GetSelectedElectrons();
@@ -101,9 +96,7 @@ int CATopoCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * s
         if (debug_) std::cout << mLegend << "No Corrected MET in event! " << std::endl;
         return 0;
     }
-
-    //    std::cout << "GOT PAST ZERO CHECKS" << std::endl;    
-
+    
     edm::Handle<std::vector<pat::Jet> > CAWJets;
     event.getByLabel(AK8slimmedJetColl_it, CAWJets);
     std::vector<TLorentzVector> CAWP4;
@@ -117,7 +110,6 @@ int CATopoCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * s
         CAWP4.push_back(CAJet);
     }
     
-    //    std::cout << "CALLING CATopoCalc::FillBranches" << std::endl;
     FillBranches(vSelMuons,
                  vSelElectrons,
                  vCorrBtagJets,
@@ -136,7 +128,6 @@ int CATopoCalc::FillBranches( std::vector<edm::Ptr<pat::Muon> > const & vSelMuon
                              bool isMuon
                              )
 {
-  //  std::cout << "RUNNING CATopoCalc::FillBranches" << std::endl;
     while(1) {
         //Create lepton and met four vectors
         TLorentzVector tlv_lepton;
@@ -233,7 +224,6 @@ int CATopoCalc::FillBranches( std::vector<edm::Ptr<pat::Muon> > const & vSelMuon
             }
         }
         
-	//	std::cout << "CREATING CATopoCalc BRANCHES" << std::endl;
         // Create branches
         SetValue("tPrimeMass",        tPrimeMass);
         SetValue("tPrimeMassBestTop", tPrimeMassBestTop );
@@ -247,7 +237,7 @@ int CATopoCalc::FillBranches( std::vector<edm::Ptr<pat::Muon> > const & vSelMuon
         SetValue("bJetPhi" ,          bJetPhi);
         break;
     }
-
+    
     return 0;
 }
 
