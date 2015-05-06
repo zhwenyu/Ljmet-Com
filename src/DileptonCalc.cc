@@ -520,8 +520,9 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
     //
     
     std::vector <int> muCharge;
-    std::vector <int> muGlobal;
-    
+    std::vector <bool> muGlobal;
+    std::vector <bool> muTracker;
+    std::vector <bool> muPF;
     //Four vector
     std::vector <double> muPt;
     std::vector <double> muEta;
@@ -595,7 +596,9 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
 	    muIsTight.push_back((*imu)->isTightMuon(goodPVs.at(0)));
 	    muIsLoose.push_back((*imu)->isLooseMuon());
 
-            muGlobal.push_back(((*imu)->isGlobalMuon()<<2)+(*imu)->isTrackerMuon());
+            muGlobal.push_back((*imu)->isGlobalMuon());
+	    muTracker.push_back((*imu)->isTrackerMuon());
+	    muPF.push_back((*imu)->isPFMuon());
             //Chi2
             muChi2 . push_back((*imu)->globalTrack()->normalizedChi2());
             
@@ -628,10 +631,10 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
                 muDz  . push_back(-999);
             }
             //Numbers of hits
-            muNValMuHits       . push_back((*imu)->muonBestTrack()->hitPattern().numberOfValidMuonHits());
+            muNValMuHits       . push_back((*imu)->globalTrack()->hitPattern().numberOfValidMuonHits());
             muNMatchedStations . push_back((*imu)->numberOfMatchedStations());
-            muNValPixelHits    . push_back((*imu)->muonBestTrack()->hitPattern().numberOfValidPixelHits());
-            muNTrackerLayers   . push_back((*imu)->muonBestTrack()->hitPattern().trackerLayersWithMeasurement());
+            muNValPixelHits    . push_back((*imu)->innerTrack()->hitPattern().numberOfValidPixelHits());
+            muNTrackerLayers   . push_back((*imu)->innerTrack()->hitPattern().trackerLayersWithMeasurement());
 
 	   
 	    //Trigger Matching - store 4-vector and filter information for all trigger objects deltaR matched to electrons
@@ -736,6 +739,9 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
     
     SetValue("muCharge", muCharge);
     SetValue("muGlobal", muGlobal);
+    SetValue("muTracker",muTracker);
+    SetValue("muPF",muPF);
+
     //Four vector
     SetValue("muPt"     , muPt);
     SetValue("muEta"    , muEta);
