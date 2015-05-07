@@ -353,7 +353,7 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
 	elSihih.push_back((*iel)->sigmaIetaIeta());
 	elHoE.push_back((*iel)->hadronicOverEm());
 	elD0.push_back((*iel)->dB());
-	elOoemoop.push_back(1.0/(*iel)->ecalEnergy() + (*iel)->eSuperClusterOverP()/(*iel)->ecalEnergy());
+	elOoemoop.push_back(1.0/(*iel)->ecalEnergy() - (*iel)->eSuperClusterOverP()/(*iel)->ecalEnergy());
 	elMHits.push_back((*iel)->gsfTrack()->hitPattern().numberOfHits(reco::HitPattern::MISSING_INNER_HITS));
 	elVtxFitConv.push_back((*iel)->passConversionVeto());
         
@@ -624,11 +624,12 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
             
             //IP: for some reason this is with respect to the first vertex in the collection
             if (goodPVs.size() > 0){
-                muDxy . push_back((*imu)->muonBestTrack()->dxy(goodPVs.at(0).position()));
-                muDz  . push_back((*imu)->muonBestTrack()->dz(goodPVs.at(0).position()));
-            } else {
-                muDxy . push_back(-999);
-                muDz  . push_back(-999);
+	      muDxy . push_back((*imu)->dB());
+	      muDz  . push_back((*imu)->muonBestTrack()->dz(goodPVs.at(0).position()));
+            } 
+	    else {
+	      muDxy . push_back(-999);
+	      muDz  . push_back(-999);
             }
             //Numbers of hits
             muNValMuHits       . push_back((*imu)->globalTrack()->hitPattern().numberOfValidMuonHits());
