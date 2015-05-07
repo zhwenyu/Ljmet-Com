@@ -21,7 +21,7 @@
 #include "DataFormats/Common/interface/TriggerResults.h"
 #include "DataFormats/PatCandidates/interface/TriggerObjectStandAlone.h"
 #include "DataFormats/PatCandidates/interface/PackedTriggerPrescales.h"
-
+#include "DataFormats/EgammaCandidates/interface/GsfElectron.h"
 //#include "LJMet/Com/interface/VVString.h"
 
 using std::cout;
@@ -313,11 +313,11 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
 	double AEff  = ElectronEffectiveArea::GetElectronEffectiveArea(ElectronEffectiveArea::kEleGammaAndNeutralHadronIso03,
 								       (*iel)->superCluster()->eta(), ElectronEffectiveArea::kEleEAData2012);
 
-	GsfElectron::PflowIsolationVariables pfIso = (*iel)->pfIsolationVariables();
+	reco::GsfElectron::PflowIsolationVariables pfIso = (*iel)->pfIsolationVariables();
 	double chIso = pfIso.sumChargedHadronPt;
 	double nhIso = pfIso.sumNeutralHadronEt;
 	double phIso = pfIso.sumPhotonEt;
-	double PUIso = pfIso.SumPUPt;
+	double PUIso = pfIso.sumPUPt;
 	double relIso = ( chIso + max(0.0, nhIso + phIso - PUIso*AEff) ) / (*iel)->pt();
 	
 	elChIso  . push_back(chIso);
