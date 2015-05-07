@@ -56,7 +56,7 @@ private:
     bool keepFullMChistory;
     bool doTriggerStudy_; 
     double rhoIso;
-    
+
     boost::shared_ptr<TopElectronSelector>     electronSelL_, electronSelM_, electronSelT_;
     std::vector<reco::Vertex> goodPVs;
     int findMatch(const reco::GenParticleCollection & genParticles, int idToMatch, double eta, double phi);
@@ -242,6 +242,7 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
     std::vector <double> elPhIso;
     std::vector <double> elAEff;
     std::vector <double> elRhoIso;
+    std::vector <double> elPUIso;
     
     //mother-information
     //Generator level information -- MC matching
@@ -286,17 +287,17 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
       if ((*iel)->gsfTrack().isNonnull() and (*iel)->gsfTrack().isAvailable()){
 	
 	//Four vector
-	elPt     . push_back((*iel)->ecalDrivenMomentum().pt()); //Must check: why ecalDrivenMomentum?
-	elEta    . push_back((*iel)->ecalDrivenMomentum().eta());
-	elPhi    . push_back((*iel)->ecalDrivenMomentum().phi());
-	elEnergy . push_back((*iel)->ecalDrivenMomentum().energy());
+	elPt     . push_back((*iel)->pt()); //Must check: why ecalDrivenMomentum?
+	elEta    . push_back((*iel)->superCluster()->eta());
+	elPhi    . push_back((*iel)->phi());
+	elEnergy . push_back((*iel)->energy());
         
 	//if there are two electrons calculate invariant mass from two highest pt objects
 	if(vSelElectrons.size()==2){
 	  for (std::vector<edm::Ptr<pat::Electron> >::const_iterator iiel = vSelElectrons.begin(); iiel != vSelElectrons.end(); iiel++){
-	    //float mass = pow( (*iel)->ecalDrivenMomentum().energy() * (*iiel)->ecalDrivenMomentum().energy() - ( (*iel)->ecalDrivenMomentum().pt() * (*iiel)->ecalDrivenMomentum().pt() - (*iel)->ecalDrivenMomentum().pz() * (*iiel)->ecalDrivenMomentum().pz()), 0.5);
+	    //float mass = pow( (*iel)->energy() * (*iiel)->energy() - ( (*iel)->pt() * (*iiel)->pt() - (*iel)->pz() * (*iiel)->pz()), 0.5);
 	    if(iiel!=iel){
-	      TLorentzVector diElFourVec( (*iel)->ecalDrivenMomentum().px() + (*iiel)->ecalDrivenMomentum().px(),(*iel)->ecalDrivenMomentum().py() + (*iiel)->ecalDrivenMomentum().py(),(*iel)->ecalDrivenMomentum().pz() + (*iiel)->ecalDrivenMomentum().pz(), (*iel)->ecalDrivenMomentum().energy() + (*iiel)->ecalDrivenMomentum().energy());
+	      TLorentzVector diElFourVec( (*iel)->px() + (*iiel)->px(),(*iel)->py() + (*iiel)->py(),(*iel)->pz() + (*iiel)->pz(), (*iel)->energy() + (*iiel)->energy());
 	      diElMass.push_back(diElFourVec.M());
 	      elCharge1.push_back( (*iel)->charge());
 	      elCharge2.push_back( (*iiel)->charge());
@@ -311,21 +312,25 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
 	//Isolation
 	double AEff  = ElectronEffectiveArea::GetElectronEffectiveArea(ElectronEffectiveArea::kEleGammaAndNeutralHadronIso03,
 								       (*iel)->superCluster()->eta(), ElectronEffectiveArea::kEleEAData2012);
-	double chIso = (*iel)->chargedHadronIso();
-	double nhIso = (*iel)->neutralHadronIso();
-	double phIso = (*iel)->photonIso();
-	double relIso = ( chIso + max(0.0, nhIso + phIso - rhoIso*AEff) ) / (*iel)->pt();
+
+	GsfElectron::PflowIsolationVariables pfIso = (*iel)->pfIsolationVariables();
+	double chIso = pfIso.sumChargedHadronPt;
+	double nhIso = pfIso.sumNeutralHadronEt;
+	double phIso = pfIso.sumPhotonEt;
+	double PUIso = pfIso.SumPUPt;
+	double relIso = ( chIso + max(0.0, nhIso + phIso - PUIso*AEff) ) / (*iel)->pt();
 	
 	elChIso  . push_back(chIso);
 	elNhIso  . push_back(nhIso);
 	elPhIso  . push_back(phIso);
+	elPUIso  . push_back(PUIso);
 	elAEff   . push_back(AEff);
 	elRhoIso . push_back(rhoIso);
         
 	elRelIso . push_back(relIso);
         
 	//Conversion rejection
-	int nLostHits = (*iel)->gsfTrack()->hitPattern().numberOfLostHits(reco::HitPattern::MISSING_INNER_HITS);
+	int nLostHits = (*iel)->gsfTrack()->hitPattern().numberOfHits(reco::HitPattern::MISSING_INNER_HITS);
 	double dist   = (*iel)->convDist();
 	double dcot   = (*iel)->convDcot();
 	int notConv   = nLostHits == 0 and (fabs(dist) > 0.02 or fabs(dcot) > 0.02);
@@ -350,8 +355,8 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
 	elIsEBEE.push_back(((*iel)->isEBEEGap()<<2) + ((*iel)->isEE()<<1) + (*iel)->isEB());
 	elDeta.push_back((*iel)->deltaEtaSuperClusterTrackAtVtx());
 	elDphi.push_back((*iel)->deltaPhiSuperClusterTrackAtVtx());
-	elSihih.push_back((*iel)->sigmaIetaIeta());
-	elHoE.push_back((*iel)->hadronicOverEm());
+	elSihih.push_back((*iel)->full5x5_sigmaIetaIeta());
+	elHoE.push_back((*iel)->hcalOverEcal());
 	elD0.push_back((*iel)->dB());
 	elOoemoop.push_back(1.0/(*iel)->ecalEnergy() - (*iel)->eSuperClusterOverP()/(*iel)->ecalEnergy());
 	elMHits.push_back((*iel)->gsfTrack()->hitPattern().numberOfHits(reco::HitPattern::MISSING_INNER_HITS));
@@ -495,6 +500,7 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
     SetValue("elPhIso" , elPhIso);
     SetValue("elAEff"  , elAEff);
     SetValue("elRhoIso", elRhoIso);
+    SetValue("elPUIso", elPUIso);
     
     //MC matching -- mother information
     SetValue("elNumberOfMothers", elNumberOfMothers);
