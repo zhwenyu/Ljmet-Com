@@ -287,10 +287,10 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
       if ((*iel)->gsfTrack().isNonnull() and (*iel)->gsfTrack().isAvailable()){
 	
 	//Four vector
-	elPt     . push_back((*iel)->pt()); //Must check: why ecalDrivenMomentum?
-	elEta    . push_back((*iel)->superCluster()->eta());
-	elPhi    . push_back((*iel)->phi());
-	elEnergy . push_back((*iel)->energy());
+	elPt     . push_back((*iel)->ecalDrivenMomentum().pt()); //Must check: why ecalDrivenMomentum?
+	elEta    . push_back((*iel)->ecalDrivenMomentum().eta());
+	elPhi    . push_back((*iel)->ecalDrivenMomentum().phi());
+	elEnergy . push_back((*iel)->ecalDrivenMomentum().energy());
         
 	//if there are two electrons calculate invariant mass from two highest pt objects
 	if(vSelElectrons.size()==2){
