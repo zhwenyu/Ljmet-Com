@@ -49,6 +49,7 @@ private:
     std::vector<unsigned int> keepPDGID;
     std::vector<unsigned int> keepMomPDGID;
     bool keepFullMChistory;
+    bool cleanGenJets;
 
     double rhoIso;
 
@@ -57,6 +58,7 @@ private:
     double mdeltaR(double eta1, double phi1, double eta2, double phi2);
     void fillMotherInfo(const reco::Candidate *mother, int i, vector <int> & momid, vector <int> & momstatus, vector<double> & mompt, vector<double> & mometa, vector<double> & momphi, vector<double> & momenergy);
 
+    static bool SortLVByPt(const TLorentzVector a, const TLorentzVector b) {return a.Pt() > b.Pt();}
 
 };
 
@@ -106,6 +108,9 @@ int singleLepCalc::BeginJob()
     else                                   keepFullMChistory = true;
     cout << "keepFullMChistory "     <<    keepFullMChistory << endl;
  
+    if (mPset.exists("cleanGenJets")) cleanGenJets = mPset.getParameter<bool>("cleanGenJets");
+    else                              cleanGenJets = false;
+
     return 0;
 }
 
@@ -161,10 +166,11 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
     }
 
  
+    std::vector< TLorentzVector > vGenLep;
+    TLorentzVector tmpLV;
+
     // Muon
    
-    
-    
     std::vector <int> muCharge;
     std::vector <int> muGlobal;
     //Four vector
@@ -214,6 +220,10 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
         if ((*imu)->globalTrack().isNonnull() and (*imu)->globalTrack().isAvailable() and
             (*imu)->innerTrack().isNonnull()  and (*imu)->innerTrack().isAvailable()){
 
+	    if ((*imu)->genParticle()!=0) {
+	        tmpLV.SetPtEtaPhiE((*imu)->genParticle()->pt(),(*imu)->genParticle()->eta(),(*imu)->genParticle()->phi(),(*imu)->genParticle()->energy());
+                vGenLep.push_back(tmpLV);
+	    }
 
             //charge
             muCharge.push_back((*imu)->charge());
@@ -396,6 +406,12 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
     for (std::vector<edm::Ptr<pat::Electron> >::const_iterator iel = vSelElectrons.begin(); iel != vSelElectrons.end(); iel++){
         //Protect against electrons without tracks (should never happen, but just in case)
         if ((*iel)->gsfTrack().isNonnull() and (*iel)->gsfTrack().isAvailable()){
+
+	    if ((*iel)->genParticle()!=0) {
+                tmpLV.SetPtEtaPhiE((*iel)->genParticle()->pt(),(*iel)->genParticle()->eta(),(*iel)->genParticle()->phi(),(*iel)->genParticle()->energy());
+                vGenLep.push_back(tmpLV);
+            }
+
             //Four vector
             elPt     . push_back((*iel)->ecalDrivenMomentum().pt()); //Must check: why ecalDrivenMomentum?
             elEta    . push_back((*iel)->ecalDrivenMomentum().eta());
@@ -700,14 +716,23 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
         edm::Handle<reco::GenParticleCollection> genParticles;
         event.getByLabel(genParticles_it, genParticles);
 
-        edm::Handle<reco::GenJetCollection> genJets;
+        edm::Handle<std::vector< reco::GenJet> > genJets;
         event.getByLabel(genJets_it, genJets);
 
+	//std::cout << "---------------------------------" << std::endl;
+	//std::cout << "\tStatus\tmass\tpt\teta\tphi\tID\tMomID" << std::endl;
+	//std::cout << std::endl;
+	
         for(size_t i = 0; i < genParticles->size(); i++){
             const reco::GenParticle & p = (*genParticles).at(i);
 
+	    //std::cout << i << "\t" << p.status() << "\t" << p.mass() << "\t" << p.pt() << "\t" << p.eta() << "\t" << p.phi() << "\t" << p.pdgId() << "\t";
+	    //if (!(!(p.mother()))) std::cout << p.mother()->pdgId();
+	    //std::cout << std::endl;
+
             //Find status 23 particles
             if (p.status() == 23){
+
                 reco::Candidate* mother = (reco::Candidate*) p.mother();
                 if (not mother)            continue;
 
@@ -755,14 +780,40 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
                 genMotherIndex   . push_back(mInd);
             }
         }//End loop over gen particles
-        for(size_t i = 0; i < genJets->size(); i++){
-            const reco::GenJet & j = (*genJets).at(i);
-
-            //Four vector
-            genJetPt     . push_back(j.pt());
-            genJetEta    . push_back(j.eta());
-            genJetPhi    . push_back(j.phi());
-            genJetEnergy . push_back(j.energy());
+	TLorentzVector tmpJet;
+	TLorentzVector tmpLep;
+	TLorentzVector tmpCand;
+        std::vector<TLorentzVector> tmpVec;
+        for(const reco::GenJet &j : *genJets){
+            tmpJet.SetPtEtaPhiE(j.pt(),j.eta(),j.phi(),j.energy());
+            if (cleanGenJets) {
+	        for(size_t k = 0; k < vGenLep.size(); k++){
+                    tmpLep = vGenLep[k];
+	            for (unsigned int id = 0, nd = j.numberOfDaughters(); id < nd; ++id) {
+		        if ( !(j.daughterPtr(id).isNonnull()) ) continue;
+		        if ( !(j.daughterPtr(id).isAvailable()) ) continue;
+		        const reco::Candidate &_ijet_const = dynamic_cast<const reco::Candidate &>(*j.daughter(id));
+                        tmpCand.SetPtEtaPhiE(_ijet_const.pt(),_ijet_const.eta(),_ijet_const.phi(),_ijet_const.energy());
+	                if ( tmpLep.DeltaR(tmpCand) < 0.001 && (abs(_ijet_const.pdgId())==13 || abs(_ijet_const.pdgId())==11) ) {//genjet cleaning to mimic reco jet cleaning
+			    //std::cout<<"Found overlap:"<<std::endl;
+			    //std::cout<<"Gen Lep      : pt = "<<tmpLep.Pt()<<", eta = "<<tmpLep.Eta()<<", phi = "<<tmpLep.Phi()<<std::endl;
+			    //std::cout<<"Gen Jet      : pt = "<<tmpJet.Pt()<<", eta = "<<tmpJet.Eta()<<", phi = "<<tmpJet.Phi()<<std::endl;
+			    //std::cout<<"Gen Jet Const: pt = "<<tmpCand.Pt()<<", eta = "<<tmpCand.Eta()<<", phi = "<<tmpCand.Phi()<<std::endl;
+ 		            tmpJet = tmpJet - tmpLep;
+ 	                }
+                        if (abs(_ijet_const.pdgId())==12 || abs(_ijet_const.pdgId())==14 || abs(_ijet_const.pdgId())==16) tmpJet = tmpJet - tmpCand;//temporary fix for neutrinos being included in genjets, can be removed in later releases (i.e. >74X)
+		    }
+                }
+            }
+            tmpVec.push_back(tmpJet);
+        }
+        std::sort(tmpVec.begin(), tmpVec.end(), SortLVByPt);
+        for (unsigned int i = 0; i < tmpVec.size(); i++) {
+	    //std::cout<<"Gen Jet      : pt = "<<tmpVec.at(i).Pt()<<", eta = "<<tmpVec.at(i).Eta()<<", phi = "<<tmpVec.at(i).Phi()<<std::endl;
+            genJetPt     . push_back(tmpVec.at(i).Pt());
+            genJetEta    . push_back(tmpVec.at(i).Eta());
+            genJetPhi    . push_back(tmpVec.at(i).Phi());
+            genJetEnergy . push_back(tmpVec.at(i).Energy());
         }  //End loop over gen jets
     }  //End MC-only if
     // Four vector
