@@ -19,7 +19,8 @@ process.ljmet.excluded_calculators = cms.vstring(
 	'LjetsTopoCalc',
 	'LjetsTopoCalcNew',
 	'WprimeCalc',
-	'JetSubCalc'
+	'JetSubCalc',
+	'BTagSFCalc'
 	) 
 
 # common calculator options
@@ -151,7 +152,7 @@ process.inputs = cms.PSet (
            skipEvents = cms.int32(0),
            lumisToProcess = CfgTypes.untracked(CfgTypes.VLuminosityBlockRange()),
            fileNames  = cms.vstring(
-			'file:///uscms_data/d3/drankin/Wprimetotb/gen/CMSSW_7_2_0/src/PHYS14_Step3/SingletopWprime_M2700.root'
+			'file:///uscms_data/d3/drankin/Wprimetotb/gen/CMSSW_7_2_0/src/PHYS14_Step3/SingletopWprime_M2000.root'
                    )
        )
 
@@ -170,7 +171,7 @@ if (not process.ljmet.isMc==cms.bool(True)):
 # Output
 #
 process.outputs = cms.PSet (
-    outputName = cms.string('Wprime2700Right_singleLep'),
+    outputName = cms.string('Wprime2000Right_singleLep'),
     treeName   = cms.string('ljmet'),
 )
 
