@@ -310,8 +310,16 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
 	  elCharge2.push_back(-99998);
 	}
 	//Isolation
-	double AEff  = ElectronEffectiveArea::GetElectronEffectiveArea(ElectronEffectiveArea::kEleGammaAndNeutralHadronIso03,
-								       (*iel)->superCluster()->eta(), ElectronEffectiveArea::kEleEAData2012);
+	//double AEff  = ElectronEffectiveArea::GetElectronEffectiveArea(ElectronEffectiveArea::kEleGammaAndNeutralHadronIso03,
+	//							       (*iel)->superCluster()->eta(), ElectronEffectiveArea::kEleEAData2012);
+
+	//implement effective area: up-to-date as of PHYS14
+	double AEff;
+	if(fabs((*iel)->ecalDrivenMomentum().eta()) >2.2) AEff = 0.1530;
+	else if(fabs((*iel)->ecalDrivenMomentum().eta()) >2.0) AEff = 0.0842;
+	else if(fabs((*iel)->ecalDrivenMomentum().eta()) >1.3) AEff = 0.0572;
+	else if(fabs((*iel)->ecalDrivenMomentum().eta()) >0.8) AEff = 0.0988;
+	else if(fabs((*iel)->ecalDrivenMomentum().eta()) >0.0) AEff = 0.1013;
 
 	reco::GsfElectron::PflowIsolationVariables pfIso = (*iel)->pfIsolationVariables();
 	double chIso = pfIso.sumChargedHadronPt;
