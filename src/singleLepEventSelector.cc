@@ -122,7 +122,7 @@ private:
 
 
 
-//static int reg = LjmetFactory::GetInstance()->Register(new singleLepEventSelector(), "singleLepSelector");
+static int reg = LjmetFactory::GetInstance()->Register(new singleLepEventSelector(), "singleLepSelector");
 
 singleLepEventSelector::singleLepEventSelector()
 {
