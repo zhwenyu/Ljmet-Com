@@ -5,6 +5,8 @@
 #include "CondFormats/JetMETObjects/interface/JetCorrectorParameters.h"
 #include "CondFormats/JetMETObjects/interface/FactorizedJetCorrector.h"
 
+using namespace std;
+
 BaseEventSelector::BaseEventSelector():
 mName(""),
 mLegend("")
