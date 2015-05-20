@@ -4,6 +4,7 @@
 <use name="DataFormats/JetReco"/>
 <use name="DataFormats/MuonReco"/>
 <use name="DataFormats/PatCandidates"/>
+<use name="DataFormats/EgammaCandidates"/>
 <use name="FWCore/Utilities"/>
 <use name="FWCore/Framework"/>
 <use name="FWCore/ParameterSet"/>
