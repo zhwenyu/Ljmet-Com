@@ -12,6 +12,7 @@
 
 #include "FWCore/ParameterSet/interface/ProcessDesc.h"
 #include "FWCore/PythonParameterSet/interface/PythonProcessDesc.h"
+//#include "LJMet/Com/interface/VVString.h"
 
 class BaseEventSelector;
 class LjmetEventContent;
@@ -50,7 +51,8 @@ public:
     void SetValue(std::string name, std::vector<bool> value);
     void SetValue(std::string name, std::vector<int> value);
     void SetValue(std::string name, std::vector<double> value);
-    
+    void SetValue(std::string name, std::vector<std::string> value);
+
 protected:
     edm::ParameterSet mPset;
     
