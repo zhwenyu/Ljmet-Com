@@ -25,6 +25,4 @@ cutbasedIDSelector = cms.PSet(
                               pvSrc      = cms.InputTag("offlineSlimmedPrimaryVertices"),
                               rhoSrc     = cms.InputTag("fixedGridRhoAll", ''),
                               cutsToIgnore = cms.vstring(""), 
-                              mHits_EE    = cms.int32(3),
-                              mHits_EB    = cms.int32(2),
                               )
