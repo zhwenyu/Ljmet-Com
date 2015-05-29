@@ -88,6 +88,8 @@ public: // interface
                    parameters.getParameter<Int_t>("mHits_EB"),
                    parameters.getParameter<Int_t>("mHits_EE"),
                    parameters.getParameter<Bool_t>("vtxFitConv")
+
+
                    );
         
         
@@ -102,9 +104,9 @@ public: // interface
     }
     
     void initialize(Version_t version,
-                    Double_t sihih_EB, Double_t  dphi_EB, Double_t deta_EB, Double_t hoe_EB, Double_t d0_EB, Double_t dZ_EB, Double_t ooemoop_EB,
-                    Double_t sihih_EE, Double_t  dphi_EE, Double_t deta_EE, Double_t hoe_EE, Double_t d0_EE, Double_t dZ_EE, Double_t ooemoop_EE,
-                    Double_t reliso_EB, Double_t reliso_EE, Int_t mHits_EB, Int_t mHits_EE, Bool_t vtxFitConv)
+                    Double_t deta_EB, Double_t  dphi_EB, Double_t sihih_EB, Double_t hoe_EB, Double_t d0_EB, Double_t dZ_EB, Double_t ooemoop_EB, Double_t reliso_EB,
+                    Double_t deta_EE, Double_t  dphi_EE, Double_t sihih_EE, Double_t hoe_EE, Double_t d0_EE, Double_t dZ_EE, Double_t ooemoop_EE, Double_t reliso_EE,
+                    Int_t mHits_EB, Int_t mHits_EE, Bool_t vtxFitConv)
     {
         version_ = version;
         
@@ -128,6 +130,7 @@ public: // interface
         push_back("mHits_EE"      );
         push_back("vtxFitConv" );
         
+
         if (version_ == NONE){
             set("deta_EB",     deta_EB);
             set("dphi_EB",     dphi_EB);
@@ -141,8 +144,8 @@ public: // interface
             set("dphi_EE",     dphi_EE);
             set("sihih_EE",    sihih_EE);
             set("hoe_EE",      hoe_EE);
-            set("d0_EB",       d0_EE);
-            set("dZ_EB",       dZ_EE);
+            set("d0_EE",       d0_EE);
+            set("dZ_EE",       dZ_EE);
             set("ooemoop_EE",  ooemoop_EE);
             set("reliso_EE",   reliso_EE);
             set("mHits_EB",    mHits_EB);
@@ -216,6 +219,7 @@ public: // interface
             set("vtxFitConv",  1);
         }
         
+
         if (version_ == TIGHT) {
             set("deta_EB",     0.006574);
             set("dphi_EB",     0.022868);
@@ -238,17 +242,17 @@ public: // interface
             set("vtxFitConv",  1);
         }
         
-        indexSinhih_EB_     = index_type(&bits_, "sihih_EB"     );
         indexDphi_EB_       = index_type(&bits_, "dphi_EB"      );
         indexDeta_EB_       = index_type(&bits_, "deta_EB"      );
+        indexSinhih_EB_     = index_type(&bits_, "sihih_EB"     );
         indexHoE_EB_        = index_type(&bits_, "hoe_EB"       );
         indexD0_EB_         = index_type(&bits_, "d0_EB"        );
         indexDZ_EB_         = index_type(&bits_, "dZ_EB"        );
         indexOoemoop_EB_    = index_type(&bits_, "ooemoop_EB"   );
         indexRelIso_EB_     = index_type(&bits_, "reliso_EB"    );
-        indexSinhih_EE_     = index_type(&bits_, "sihih_EE"     );
         indexDphi_EE_       = index_type(&bits_, "dphi_EE"      );
         indexDeta_EE_       = index_type(&bits_, "deta_EE"      );
+        indexSinhih_EE_     = index_type(&bits_, "sihih_EE"     );
         indexHoE_EE_        = index_type(&bits_, "hoe_EE"       );
         indexD0_EE_         = index_type(&bits_, "d0_EE"        );
         indexDZ_EE_         = index_type(&bits_, "dZ_EE"        );
@@ -433,9 +437,9 @@ public: // interface
                 else if (verbosity) std::cout<<"failed sihih"<<std::endl;
                 if ( HoE           <  cut(indexHoE_EE_,   double()) || ignoreCut(indexHoE_EE_)   ) passCut(ret, indexHoE_EE_);
                 else if (verbosity) std::cout<<"failed HoE"<<std::endl;
-                if ( D0            <  cut(indexD0_EE_,    double()) || ignoreCut(indexD0_EE_)    ) passCut(ret, indexD0_EE_);
+                if ( fabs(D0)            <  cut(indexD0_EE_,    double()) || ignoreCut(indexD0_EE_)    ) passCut(ret, indexD0_EE_);
                 else if (verbosity) std::cout<<"failed D0"<<std::endl;
-                if ( DZ            <  cut(indexDZ_EE_,    double()) || ignoreCut(indexDZ_EE_)    ) passCut(ret, indexDZ_EE_);
+                if ( fabs(DZ)            <  cut(indexDZ_EE_,    double()) || ignoreCut(indexDZ_EE_)    ) passCut(ret, indexDZ_EE_);
                 else if (verbosity) std::cout<<"failed DZ"<<std::endl;
                 if ( fabs(Ooemoop) <  cut(indexOoemoop_EE_, double()) || ignoreCut(indexOoemoop_EE_) ) passCut(ret, indexOoemoop_EE_);
                 else if (verbosity) std::cout<<"failed Ooemoop"<<std::endl;
@@ -470,17 +474,17 @@ private: // member variables
     Point PVtx;
     edm::InputTag rhoSrc_;
     Double_t rhoIso;
-    index_type indexSinhih_EB_;
     index_type indexDphi_EB_;
     index_type indexDeta_EB_;
+    index_type indexSinhih_EB_;
     index_type indexHoE_EB_;
     index_type indexD0_EB_;
     index_type indexDZ_EB_;
     index_type indexOoemoop_EB_;
     index_type indexRelIso_EB_;
-    index_type indexSinhih_EE_;
     index_type indexDphi_EE_;
     index_type indexDeta_EE_;
+    index_type indexSinhih_EE_;
     index_type indexHoE_EE_;
     index_type indexD0_EE_;
     index_type indexDZ_EE_;
