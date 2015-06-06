@@ -1151,12 +1151,13 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
         for(size_t i = 0; i < genParticles->size(); i++){
             const reco::GenParticle & p = (*genParticles).at(i);
             
-            //Find status 3 particles
-            if (p.status() == 23){
+            //Find particles from hard scattering/stable
+            if (p.status() >=20 && p.status()<=29){
                 reco::Candidate* mother = (reco::Candidate*) p.mother();
                 if (not mother)            continue;
                 
-                bool bKeep = false;
+		// comment below out to keep all gen particles
+		/*bool bKeep = false;
                 for (unsigned int uk = 0; uk < keepMomPDGID.size(); uk++){
                     if (abs(mother->pdgId()) == (int) keepMomPDGID.at(uk)){
                         bKeep = true;
@@ -1174,17 +1175,17 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
                 }
                 
                 if (not bKeep) continue;
-                
+                */
                 //Find index of mother
                 int mInd = 0;
-                for(size_t j = 0; j < genParticles->size(); j++){
+		/*               for(size_t j = 0; j < genParticles->size(); j++){
                     const reco::GenParticle & q = (*genParticles).at(j);
-                    if (q.status() != 3) continue;
+                    if (q.status() != 23) continue;
                     if (mother->pdgId() == q.pdgId() and fabs(mother->eta() - q.eta()) < 0.01 and fabs(mother->pt() - q.pt()) < 0.01){
                         mInd = (int) j;
                         break;
                     }
-                }
+		    }*/
                 
                 //Four vector
                 genPt     . push_back(p.pt());
