@@ -20,6 +20,7 @@ process.ljmet.excluded_calculators = cms.vstring(
 	'LjetsTopoCalcNew',
 	'WprimeCalc',
 	'JetSubCalc',
+        'TpTpCalc',
 	'BTagSFCalc'
 	) 
 
@@ -57,10 +58,10 @@ process.event_selector = cms.PSet(
     trigger_cut  = cms.bool(True),
     dump_trigger = cms.bool(False),
     
-    mctrigger_path_el = cms.string('HLT_Ele32_eta2p1_WP85_Gsf_v1'),
-    mctrigger_path_mu = cms.string('HLT_IsoMu24_eta2p1_IterTrk02_v1'),
-    #mctrigger_path_el = cms.string('HLT_Ele45_CaloIdVT_GsfTrkIdT_PFJet200_PFJet50_v1'),
-    #mctrigger_path_mu = cms.string('HLT_Mu40_eta2p1_PFJet200_PFJet50_v1'),
+    mctrigger_path_el = cms.vstring('HLT_Ele32_eta2p1_WP85_Gsf_v1'),
+    mctrigger_path_mu = cms.vstring('HLT_IsoMu24_eta2p1_IterTrk02_v1'),
+    #mctrigger_path_el = cms.vstring('HLT_Ele45_CaloIdVT_GsfTrkIdT_PFJet200_PFJet50_v1'),
+    #mctrigger_path_mu = cms.vstring('HLT_Mu40_eta2p1_PFJet200_PFJet50_v1'),
     trigger_path_el = cms.vstring('HLT_Ele27_WP80_v8','HLT_Ele27_WP80_v9','HLT_Ele27_WP80_v10','HLT_Ele27_WP80_v11'),
     trigger_path_mu = cms.vstring('HLT_IsoMu24_eta2p1_v11','HLT_IsoMu24_eta2p1_v12','HLT_IsoMu24_eta2p1_v13','HLT_IsoMu24_eta2p1_v14','HLT_IsoMu24_eta2p1_v15'),
 
@@ -76,7 +77,7 @@ process.event_selector = cms.PSet(
 
     muon_cuts                = cms.bool(True),
     muon_selector            = cms.bool(False),
-    muon_minpt               = cms.double(35.0),
+    muon_minpt               = cms.double(25.0),
     muon_reliso              = cms.double(0.12),
     muon_maxeta              = cms.double(2.1),
     loose_muon_selector      = cms.bool(False),
@@ -87,7 +88,7 @@ process.event_selector = cms.PSet(
     min_muon                 = cms.int32(0),
 
     electron_cuts            = cms.bool(True),
-    electron_minpt           = cms.double(35.0),
+    electron_minpt           = cms.double(25.0),
     electron_maxeta          = cms.double(2.5),
     loose_electron_minpt     = cms.double(25.0),
     loose_electron_maxeta    = cms.double(2.5),

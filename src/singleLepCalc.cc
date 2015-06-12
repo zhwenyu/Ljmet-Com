@@ -40,6 +40,8 @@ private:
     edm::InputTag muonSrc_;
     bool                      isMc;
     std::string               dataType;
+    std::vector<std::string>  elTrigMatchFilters;
+    std::vector<std::string>  muTrigMatchFilters;
 //    edm::InputTag             rhoSrc_it;
     edm::InputTag             triggerSummary_;
     edm::InputTag             triggerCollection_;
@@ -76,6 +78,10 @@ int singleLepCalc::BeginJob()
 {
     if (mPset.exists("dataType"))     dataType = mPset.getParameter<std::string>("dataType");
     else                              dataType = "None"; 
+
+    if (mPset.exists("elTrigMatchFilters"))     elTrigMatchFilters = mPset.getParameter<std::vector<std::string>>("elTrigMatchFilters");
+
+    if (mPset.exists("muTrigMatchFilters"))     muTrigMatchFilters = mPset.getParameter<std::vector<std::string>>("muTrigMatchFilters");
 
     if (mPset.exists("rhoSrc")) rhoSrc_ = mPset.getParameter<edm::InputTag>("rhoSrc");
     else                        rhoSrc_ = edm::InputTag("fixedGridRhoAll");
@@ -123,7 +129,10 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
     std::vector<edm::Ptr<pat::Muon> >           const & vSelMuons = selector->GetSelectedMuons();
     std::vector<edm::Ptr<pat::Electron> >       const & vSelElectrons = selector->GetSelectedElectrons();
     edm::Ptr<pat::MET>                          const & pMet = selector->GetMet();
-    std::vector<unsigned int>             const & vSelTriggers  = selector->GetSelectedTriggers();    
+    std::map<std::string, unsigned int>         const & mSelMCTriggersEl = selector->GetSelectedMCTriggersEl();
+    std::map<std::string, unsigned int>         const & mSelTriggersEl = selector->GetSelectedTriggersEl();
+    std::map<std::string, unsigned int>         const & mSelMCTriggersMu = selector->GetSelectedMCTriggersMu();
+    std::map<std::string, unsigned int>         const & mSelTriggersMu = selector->GetSelectedTriggersMu();
     // ----- Event kinematics -----
     int _nAllJets        = (int)vAllJets.size();
     int _nSelJets        = (int)vSelJets.size();
@@ -157,13 +166,32 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
 
  
     // Trigger
-    int passE = 0;
-    int passM = 0;
-
-    if (vSelTriggers.size() == 2) {
-        passE = (int)vSelTriggers.at(0);
-        passM = (int)vSelTriggers.at(1);
+    std::vector<std::string> vsSelMCTriggersEl, vsSelTriggersEl, vsSelMCTriggersMu, vsSelTriggersMu;
+    std::vector<int> vuiSelMCTriggersEl, vuiSelTriggersEl, vuiSelMCTriggersMu, vuiSelTriggersMu;
+    for(std::map<std::string, unsigned int>::const_iterator j = mSelMCTriggersEl.begin(); j != mSelMCTriggersEl.end();j++) {
+        vsSelMCTriggersEl.push_back(j->first);
+        vuiSelMCTriggersEl.push_back((int)(j->second));
     }
+    for(std::map<std::string, unsigned int>::const_iterator j = mSelTriggersEl.begin(); j != mSelTriggersEl.end();j++) {
+        vsSelTriggersEl.push_back(j->first);
+        vuiSelTriggersEl.push_back((int)(j->second));
+    }
+    for(std::map<std::string, unsigned int>::const_iterator j = mSelMCTriggersMu.begin(); j != mSelMCTriggersMu.end();j++) {
+        vsSelMCTriggersMu.push_back(j->first);
+        vuiSelMCTriggersMu.push_back((int)(j->second));
+    }
+    for(std::map<std::string, unsigned int>::const_iterator j = mSelTriggersMu.begin(); j != mSelTriggersMu.end();j++) {
+        vsSelTriggersMu.push_back(j->first);
+        vuiSelTriggersMu.push_back((int)(j->second));
+    }
+    SetValue("vsSelMCTriggersEl", vsSelMCTriggersEl);
+    SetValue("vsSelTriggersEl", vsSelTriggersEl);
+    SetValue("vsSelMCTriggersMu", vsSelMCTriggersMu);
+    SetValue("vsSelTriggersMu", vsSelTriggersMu);
+    SetValue("vuiSelMCTriggersEl", vuiSelMCTriggersEl);
+    SetValue("vuiSelTriggersEl", vuiSelTriggersEl);
+    SetValue("vuiSelMCTriggersMu", vuiSelMCTriggersMu);
+    SetValue("vuiSelTriggersMu", vuiSelTriggersMu);
 
  
     std::vector< TLorentzVector > vGenLep;
@@ -562,25 +590,39 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
 
     const edm::TriggerNames &names = event.triggerNames(*mhEdmTriggerResults);
 
-    int _electron_1_hltmatched =0;
-    int _muon_1_hltmatched =0;
+    std::vector<int> _electron_1_hltmatched;
+    std::vector<int> _muon_1_hltmatched;
 
     if (_nSelElectrons>0 || _nSelMuons>0) {
         for(pat::TriggerObjectStandAlone obj : *mhEdmTriggerObjectColl){       
             obj.unpackPathNames(names);
             for(unsigned h = 0; h < obj.filterLabels().size(); ++h){
-		if ( _nSelElectrons>0 ){
-                    if ( obj.filterLabels()[h]!="hltEle32WP85GsfTrackIsoFilter" ) continue;
-  	            if ( deltaR(obj.eta(),obj.phi(),elEta[0],elPhi[0]) < 0.5 ) _electron_1_hltmatched = 1;
+                for (unsigned int iel = 0; iel < elTrigMatchFilters.size(); iel++) {
+		    if ( _nSelElectrons>0 ){
+                        if ( obj.filterLabels()[h]!=elTrigMatchFilters[iel] ) {
+                            _electron_1_hltmatched.push_back(0);
+                            continue;
+                        }
+  	                if ( deltaR(obj.eta(),obj.phi(),elEta[0],elPhi[0]) < 0.5 ) _electron_1_hltmatched.push_back(1);
+                        else _electron_1_hltmatched.push_back(0);
+		    }
 		}
-		if ( _nSelMuons>0 ){
-                    if ( obj.filterLabels()[h]!="hltL3crIsoL1sMu20Eta2p1L1f0L2f20QL3f24QL3crIsoRhoFiltered0p15IterTrk02" ) continue;
-  	            if ( deltaR(obj.eta(),obj.phi(),muEta[0],muPhi[0]) < 0.5 ) _muon_1_hltmatched = 1;
+                for (unsigned int imu = 0; imu < muTrigMatchFilters.size(); imu++) {
+		    if ( _nSelMuons>0 ){
+                        if ( obj.filterLabels()[h]!=muTrigMatchFilters[imu] ) {
+                            _muon_1_hltmatched.push_back(0);
+                            continue;
+                        }
+  	                if ( deltaR(obj.eta(),obj.phi(),muEta[0],muPhi[0]) < 0.5 ) _muon_1_hltmatched.push_back(1);
+                        else _muon_1_hltmatched.push_back(0);
+		    }
 		}
             }
         }
     }
 
+    SetValue("electron_hltfilters",elTrigMatchFilters);
+    SetValue("muon_hltfilters",muTrigMatchFilters);
     SetValue("electron_1_hltmatched",_electron_1_hltmatched);
     SetValue("muon_1_hltmatched",_muon_1_hltmatched);
 
@@ -712,6 +754,20 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
     std::vector <double> genJetPhi;
     std::vector <double> genJetEnergy;
 
+    //Tau Decay Lepton
+    double genTDLPt = -9999.;
+    double genTDLEta = -9999.;
+    double genTDLPhi = -9999.;
+    double genTDLEnergy = -9999.;
+    int genTDLID = 0;
+
+    //B Soft Leptons
+    std::vector <double> genBSLPt;
+    std::vector <double> genBSLEta;
+    std::vector <double> genBSLPhi;
+    std::vector <double> genBSLEnergy;
+    std::vector <int> genBSLID;
+
     if (isMc){
         edm::Handle<reco::GenParticleCollection> genParticles;
         event.getByLabel(genParticles_it, genParticles);
@@ -729,6 +785,31 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
 	    //std::cout << i << "\t" << p.status() << "\t" << p.mass() << "\t" << p.pt() << "\t" << p.eta() << "\t" << p.phi() << "\t" << p.pdgId() << "\t";
 	    //if (!(!(p.mother()))) std::cout << p.mother()->pdgId();
 	    //std::cout << std::endl;
+
+	    if (p.status() == 1 && (abs(p.pdgId()) == 11 || abs(p.pdgId() == 13))){
+		if (!(!(p.mother()))) {
+		    if (!(p.mother()->status()==23 && (abs(p.mother()->pdgId()) == 11 || abs(p.mother()->pdgId()) == 13))) {
+                        if (!(!(p.mother()->mother())) && !(!(p.mother()->mother()->mother()))) {
+			    if (abs(p.mother()->mother()->pdgId()) == 15 && abs(p.mother()->mother()->pdgId()) == 15 && p.mother()->mother()->status() == 23) {
+                		genTDLPt     = p.pt();
+                		genTDLEta    = p.eta();
+                		genTDLPhi    = p.phi();
+                		genTDLEnergy = p.energy();
+                		genTDLID     = p.pdgId();
+                        	//std::cout << "TDL Pt = " << p.pt() << "\tTDL ID = " << p.pdgId() << std::endl;
+			    }
+			    else {
+                		genBSLPt     . push_back(p.pt());
+                		genBSLEta    . push_back(p.eta());
+                		genBSLPhi    . push_back(p.phi());
+                		genBSLEnergy . push_back(p.energy());
+                		genBSLID     . push_back(p.pdgId());
+                        	//std::cout << "BSL Pt = " << p.pt() << "\tBSL ID = " << p.pdgId() << std::endl;
+			    }
+			}
+		    }
+		}
+	    }
 
             //Find status 23 particles
             if (p.status() == 23){
@@ -835,6 +916,17 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
     SetValue("genJetPhi"   , genJetPhi);
     SetValue("genJetEnergy", genJetEnergy);
 
+    SetValue("genBSLPt"    , genBSLPt);
+    SetValue("genBSLEta"   , genBSLEta);
+    SetValue("genBSLPhi"   , genBSLPhi);
+    SetValue("genBSLEnergy", genBSLEnergy);
+    SetValue("genBSLID"    , genBSLID);
+
+    SetValue("genTDLPt"    , genTDLPt);
+    SetValue("genTDLEta"   , genTDLEta);
+    SetValue("genTDLPhi"   , genTDLPhi);
+    SetValue("genTDLEnergy", genTDLEnergy);
+    SetValue("genTDLID"    , genTDLID);
 
     return 0;
 }
