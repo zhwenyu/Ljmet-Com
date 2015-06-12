@@ -167,31 +167,31 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
  
     // Trigger
     std::vector<std::string> vsSelMCTriggersEl, vsSelTriggersEl, vsSelMCTriggersMu, vsSelTriggersMu;
-    std::vector<int> vuiSelMCTriggersEl, vuiSelTriggersEl, vuiSelMCTriggersMu, vuiSelTriggersMu;
+    std::vector<int> viSelMCTriggersEl, viSelTriggersEl, viSelMCTriggersMu, viSelTriggersMu;
     for(std::map<std::string, unsigned int>::const_iterator j = mSelMCTriggersEl.begin(); j != mSelMCTriggersEl.end();j++) {
         vsSelMCTriggersEl.push_back(j->first);
-        vuiSelMCTriggersEl.push_back((int)(j->second));
+        viSelMCTriggersEl.push_back((int)(j->second));
     }
     for(std::map<std::string, unsigned int>::const_iterator j = mSelTriggersEl.begin(); j != mSelTriggersEl.end();j++) {
         vsSelTriggersEl.push_back(j->first);
-        vuiSelTriggersEl.push_back((int)(j->second));
+        viSelTriggersEl.push_back((int)(j->second));
     }
     for(std::map<std::string, unsigned int>::const_iterator j = mSelMCTriggersMu.begin(); j != mSelMCTriggersMu.end();j++) {
         vsSelMCTriggersMu.push_back(j->first);
-        vuiSelMCTriggersMu.push_back((int)(j->second));
+        viSelMCTriggersMu.push_back((int)(j->second));
     }
     for(std::map<std::string, unsigned int>::const_iterator j = mSelTriggersMu.begin(); j != mSelTriggersMu.end();j++) {
         vsSelTriggersMu.push_back(j->first);
-        vuiSelTriggersMu.push_back((int)(j->second));
+        viSelTriggersMu.push_back((int)(j->second));
     }
     SetValue("vsSelMCTriggersEl", vsSelMCTriggersEl);
     SetValue("vsSelTriggersEl", vsSelTriggersEl);
     SetValue("vsSelMCTriggersMu", vsSelMCTriggersMu);
     SetValue("vsSelTriggersMu", vsSelTriggersMu);
-    SetValue("vuiSelMCTriggersEl", vuiSelMCTriggersEl);
-    SetValue("vuiSelTriggersEl", vuiSelTriggersEl);
-    SetValue("vuiSelMCTriggersMu", vuiSelMCTriggersMu);
-    SetValue("vuiSelTriggersMu", vuiSelTriggersMu);
+    SetValue("viSelMCTriggersEl", viSelMCTriggersEl);
+    SetValue("viSelTriggersEl", viSelTriggersEl);
+    SetValue("viSelMCTriggersMu", viSelMCTriggersMu);
+    SetValue("viSelTriggersMu", viSelTriggersMu);
 
  
     std::vector< TLorentzVector > vGenLep;
