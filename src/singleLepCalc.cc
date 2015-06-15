@@ -593,31 +593,45 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
     std::vector<int> _electron_1_hltmatched;
     std::vector<int> _muon_1_hltmatched;
 
-    if (_nSelElectrons>0 || _nSelMuons>0) {
-        for(pat::TriggerObjectStandAlone obj : *mhEdmTriggerObjectColl){       
-            obj.unpackPathNames(names);
-            for(unsigned h = 0; h < obj.filterLabels().size(); ++h){
-                for (unsigned int iel = 0; iel < elTrigMatchFilters.size(); iel++) {
-		    if ( _nSelElectrons>0 ){
-                        if ( obj.filterLabels()[h]!=elTrigMatchFilters[iel] ) {
-                            _electron_1_hltmatched.push_back(0);
-                            continue;
-                        }
-  	                if ( deltaR(obj.eta(),obj.phi(),elEta[0],elPhi[0]) < 0.5 ) _electron_1_hltmatched.push_back(1);
-                        else _electron_1_hltmatched.push_back(0);
-		    }
-		}
-                for (unsigned int imu = 0; imu < muTrigMatchFilters.size(); imu++) {
-		    if ( _nSelMuons>0 ){
-                        if ( obj.filterLabels()[h]!=muTrigMatchFilters[imu] ) {
-                            _muon_1_hltmatched.push_back(0);
-                            continue;
-                        }
-  	                if ( deltaR(obj.eta(),obj.phi(),muEta[0],muPhi[0]) < 0.5 ) _muon_1_hltmatched.push_back(1);
-                        else _muon_1_hltmatched.push_back(0);
-		    }
-		}
+    bool trigmatched;
+    if ( _nSelElectrons>0 ){
+        for (unsigned int iel = 0; iel < elTrigMatchFilters.size(); iel++) {
+            trigmatched = false;
+            for(pat::TriggerObjectStandAlone obj : *mhEdmTriggerObjectColl){       
+                obj.unpackPathNames(names);
+                for(unsigned h = 0; h < obj.filterLabels().size(); ++h){
+                    if ( obj.filterLabels()[h]!=elTrigMatchFilters[iel] ) {
+                        continue;
+                    }
+                    if ( deltaR(obj.eta(),obj.phi(),elEta[0],elPhi[0]) < 0.5 ) {
+                        _electron_1_hltmatched.push_back(1);
+                        trigmatched = true;
+                        break;
+                    }
+	        }
+                if (trigmatched) break;
             }
+            if (!trigmatched) _electron_1_hltmatched.push_back(0);
+        }
+    }
+    if ( _nSelMuons>0 ){
+        for (unsigned int imu = 0; imu < muTrigMatchFilters.size(); imu++) {
+            trigmatched = false;
+            for(pat::TriggerObjectStandAlone obj : *mhEdmTriggerObjectColl){       
+                obj.unpackPathNames(names);
+                for(unsigned h = 0; h < obj.filterLabels().size(); ++h){
+                    if ( obj.filterLabels()[h]!=muTrigMatchFilters[imu] ) {
+                        continue;
+                    }
+	            if ( deltaR(obj.eta(),obj.phi(),muEta[0],muPhi[0]) < 0.5 ) {
+                        _muon_1_hltmatched.push_back(1);
+                        trigmatched = true;
+                        break;
+                    }
+	        }
+                if (trigmatched) break;
+	    }
+            if (!trigmatched) _muon_1_hltmatched.push_back(0);
         }
     }
 
