@@ -19,9 +19,11 @@
 #include "DataFormats/JetReco/interface/CATopJetTagInfo.h"
 #include "FWCore/Common/interface/TriggerNames.h"
 #include "DataFormats/Common/interface/TriggerResults.h"
+#include "DataFormats/HLTReco/interface/TriggerEvent.h"
 #include "DataFormats/PatCandidates/interface/TriggerObjectStandAlone.h"
 #include "DataFormats/PatCandidates/interface/PackedTriggerPrescales.h"
 #include "DataFormats/EgammaCandidates/interface/GsfElectron.h"
+#include "HLTrigger/HLTcore/interface/HLTConfigProvider.h"
 //#include "LJMet/Com/interface/VVString.h"
 
 using std::cout;
@@ -35,13 +37,15 @@ class DileptonCalc : public BaseCalc {
     
 public:
     
-    DileptonCalc();
-    virtual ~DileptonCalc(){}
-    
-    virtual int BeginJob();
-    virtual int AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * selector);
-    virtual int EndJob(){return 0;}
-    
+  DileptonCalc();
+  virtual ~DileptonCalc(){}
+  
+  virtual int BeginJob();
+  virtual int AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * selector);
+
+  virtual int EndJob(){return 0;}
+
+
 private:
     
     bool                      isMc;
@@ -56,7 +60,7 @@ private:
     bool keepFullMChistory;
     bool doTriggerStudy_; 
     double rhoIso;
-
+  // HLTConfigProvider hltConfig_;
     boost::shared_ptr<TopElectronSelector>     electronSelL_, electronSelM_, electronSelT_;
     std::vector<reco::Vertex> goodPVs;
     int findMatch(const reco::GenParticleCollection & genParticles, int idToMatch, double eta, double phi);
@@ -134,6 +138,9 @@ int DileptonCalc::BeginJob()
         << std::endl;
         std::exit(-1);
     }
+    
+
+
     
     return 0;
 }
@@ -372,7 +379,23 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
         
 	//Trigger Matching - store 4-vector and filter information for all trigger objects deltaR matched to electrons
 	if(doTriggerStudy_){
+
+	  edm::Handle<edm::TriggerResults> triggerBits;
+	  event.getByLabel(triggerBits_,triggerBits);
+	  const edm::TriggerNames &names = event.triggerNames(*triggerBits);
 	  
+
+	  for (unsigned int i=0; i!=triggerBits->size(); ++i) {
+	    string Path = names.triggerName(i);
+	    std::cout<<"path is: "<<Path<<std::endl;
+	    const unsigned int triggerIndex(i);
+	    if(triggerBits->accept(triggerIndex)){
+	      std::cout<<"Path fired was: "<<Path<<std::endl;
+	    }
+	  }
+
+
+	  /* RIGHT NOW JUST SAVE SOME BOOLS FOR PATHS SO COMMENT OUT BELOW
 	  //read in trigger objects
 	  edm::Handle<pat::TriggerObjectStandAloneCollection> triggerObjects;
 	  event.getByLabel(triggerObjects_,triggerObjects);
@@ -416,7 +439,7 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
 	    TriggerElectronPhis.push_back(-9999);
 	    TriggerElectronEnergies.push_back(-9999);
 	  }
-	  
+	  */
 	}
 	
 	if(isMc && keepFullMChistory){
@@ -652,7 +675,7 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
             muNTrackerLayers   . push_back((*imu)->innerTrack()->hitPattern().trackerLayersWithMeasurement());
 
 	   
-	    //Trigger Matching - store 4-vector and filter information for all trigger objects deltaR matched to electrons
+	    //Trigger Matching - store 4-vector and filter information for all trigger objects deltaR matched to muons
 	    if(doTriggerStudy_){
 	  
 	      //read in trigger objects
