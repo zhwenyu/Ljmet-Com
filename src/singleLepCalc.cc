@@ -790,27 +790,31 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
         event.getByLabel(genJets_it, genJets);
 
 	//std::cout << "---------------------------------" << std::endl;
-	//std::cout << "\tStatus\tmass\tpt\teta\tphi\tID\tMomID" << std::endl;
+	//std::cout << "\tStatus\tmass\tpt\teta\tphi\tID\tMomID\tMomStat\tGMomID\tGMomSt\tGGMomID\tGGMomSt" << std::endl;
 	//std::cout << std::endl;
 	
         for(size_t i = 0; i < genParticles->size(); i++){
             const reco::GenParticle & p = (*genParticles).at(i);
 
-	    //std::cout << i << "\t" << p.status() << "\t" << p.mass() << "\t" << p.pt() << "\t" << p.eta() << "\t" << p.phi() << "\t" << p.pdgId() << "\t";
-	    //if (!(!(p.mother()))) std::cout << p.mother()->pdgId();
-	    //std::cout << std::endl;
+            /*if (abs(p.pdgId())==11 || abs(p.pdgId())==13) {
+	        std::cout << i << "\t" << p.status() << "\t" << p.mass() << "\t" << p.pt() << "\t" << p.eta() << "\t" << p.phi() << "\t" << p.pdgId() << "\t";
+	        if (!(!(p.mother()))) {
+                    std::cout << p.mother()->pdgId() << "\t" << p.mother()->status() << "\t";
+	            if (!(!(p.mother()->mother()))) std::cout << p.mother()->mother()->pdgId() << "\t" << p.mother()->mother()->status() << "\t";
+                }
+            }*/
 
 	    if (p.status() == 1 && (abs(p.pdgId()) == 11 || abs(p.pdgId() == 13))){
 		if (!(!(p.mother()))) {
 		    if (!(p.mother()->status()==23 && (abs(p.mother()->pdgId()) == 11 || abs(p.mother()->pdgId()) == 13))) {
-                        if (!(!(p.mother()->mother())) && !(!(p.mother()->mother()->mother()))) {
-			    if (abs(p.mother()->mother()->pdgId()) == 15 && abs(p.mother()->mother()->pdgId()) == 15 && p.mother()->mother()->status() == 23) {
+                        if (!(!(p.mother()->mother()))) {
+			    if (abs(p.mother()->mother()->pdgId()) == 15 && p.mother()->mother()->status() == 23) {
                 		genTDLPt     = p.pt();
                 		genTDLEta    = p.eta();
                 		genTDLPhi    = p.phi();
                 		genTDLEnergy = p.energy();
                 		genTDLID     = p.pdgId();
-                        	//std::cout << "TDL Pt = " << p.pt() << "\tTDL ID = " << p.pdgId() << std::endl;
+                        	//std::cout << "<-- TDL";
 			    }
 			    else {
                 		genBSLPt     . push_back(p.pt());
@@ -818,12 +822,15 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
                 		genBSLPhi    . push_back(p.phi());
                 		genBSLEnergy . push_back(p.energy());
                 		genBSLID     . push_back(p.pdgId());
-                        	//std::cout << "BSL Pt = " << p.pt() << "\tBSL ID = " << p.pdgId() << std::endl;
+                        	//std::cout << "<-- BSL";
 			    }
 			}
 		    }
 		}
 	    }
+            /*if (abs(p.pdgId())==11 || abs(p.pdgId())==13) {
+	        std::cout << std::endl;
+            }*/
 
             //Find status 23 particles
             if (p.status() == 23){
