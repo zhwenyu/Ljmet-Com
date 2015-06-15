@@ -15,7 +15,10 @@ DileptonCalc = cms.PSet (
                          cutbasedIDSelectorTight  = cutbasedIDSelector.clone()
                          
                          )
+
 DileptonCalc.cutbasedIDSelectorLoose.version = cms.string('LOOSE')
+DileptonCalc.cutbasedIDSelectorLoose.mHits_EE = cms.int32(1)
+DileptonCalc.cutbasedIDSelectorLoose.mHits_EB = cms.int32(1)
 DileptonCalc.cutbasedIDSelectorMedium.version = cms.string('MEDIUM')
 DileptonCalc.cutbasedIDSelectorLoose.cutsToIgnore = cms.vstring('reliso_EB',
                                                                 'reliso_EE',
