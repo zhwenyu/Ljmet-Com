@@ -1150,57 +1150,35 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
         
         for(size_t i = 0; i < genParticles->size(); i++){
             const reco::GenParticle & p = (*genParticles).at(i);
-            
+	    bool keep=false;
             //Find particles from hard scattering/stable
-            if (p.status() >=20 && p.status()<=29){
-                reco::Candidate* mother = (reco::Candidate*) p.mother();
-                if (not mother)            continue;
-                
-		// comment below out to keep all gen particles
-		/*bool bKeep = false;
-                for (unsigned int uk = 0; uk < keepMomPDGID.size(); uk++){
-                    if (abs(mother->pdgId()) == (int) keepMomPDGID.at(uk)){
-                        bKeep = true;
-                        break;
-                    }
-                }
-                
-                if (not bKeep){
-                    for (unsigned int uk = 0; uk < keepPDGID.size(); uk++){
-                        if (abs(p.pdgId()) == (int) keepPDGID.at(uk)){
-                            bKeep = true;
-                            break;
-                        }
-                    }
-                }
-                
-                if (not bKeep) continue;
-                */
-                //Find index of mother
-                int mInd = 0;
-		/*               for(size_t j = 0; j < genParticles->size(); j++){
-                    const reco::GenParticle & q = (*genParticles).at(j);
-                    if (q.status() != 23) continue;
-                    if (mother->pdgId() == q.pdgId() and fabs(mother->eta() - q.eta()) < 0.01 and fabs(mother->pt() - q.pt()) < 0.01){
-                        mInd = (int) j;
-                        break;
-                    }
-		    }*/
-                
-                //Four vector
-                genPt     . push_back(p.pt());
-                genEta    . push_back(p.eta());
-                genPhi    . push_back(p.phi());
-                genEnergy . push_back(p.energy());
-                
-                //Identity
-                genID            . push_back(p.pdgId());
-                genIndex         . push_back((int) i);
-                genStatus        . push_back(p.status());
-                genMotherID      . push_back(mother->pdgId());
-                genMotherIndex   . push_back(mInd);
-            }
-        }//End loop over gen particles
+            if (p.status() >=20 && p.status()<=29) keep=true;
+	    else if(p.status()==1 && ( fabs(p.pdgId())>10 && fabs(p.pdgId())<19) ){
+	      //since we know it's a status 1 lepton, only keep if it's mother is a W and either status 22 or 52
+	      if(p.mother()){
+		reco::Candidate* mother = (reco::Candidate*) p.mother();
+		genMotherID      . push_back(mother->pdgId());
+		if( fabs(mother->pdgId())==24 && ( (mother->status()>=20 && mother->status()<=29) || (mother->status()>=50 && mother->status()<=59)) ) keep=true;
+	      }
+	      else{
+		genMotherID      . push_back(-999);
+	      }
+	    }
+
+            if(!keep) continue;    
+	    //Four vector
+	    genPt     . push_back(p.pt());
+	    genEta    . push_back(p.eta());
+	    genPhi    . push_back(p.phi());
+	    genEnergy . push_back(p.energy());
+            
+	    //Identity
+	    genID            . push_back(p.pdgId());
+	    genIndex         . push_back((int) i);
+	    genStatus        . push_back(p.status());
+	    //genMotherIndex   . push_back(mInd);
+	
+	}//End loop over gen particles
     }  //End MC-only if
     
     // Four vector
