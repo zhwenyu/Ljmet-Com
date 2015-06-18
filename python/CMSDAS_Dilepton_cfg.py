@@ -155,28 +155,28 @@ process.inputs = cms.PSet (
 
 
 #WW
-fileNames = cms.vstring(
-        'root://cms-xrd-global.cern.ch//store/mc/Spring14miniaod/WWTo2L2Nu_CT10_13TeV-powheg-pythia8-tauola/MINIAODSIM/PU20bx25_POSTLS170_V5-v1/10000/06DCE7A0-F93C-E411-9DEA-002590D0B0CC.root',
-        'root://cms-xrd-global.cern.ch//store/mc/Spring14miniaod/WWTo2L2Nu_CT10_13TeV-powheg-pythia8-tauola/MINIAODSIM/PU20bx25_POSTLS170_V5-v1/10000/0E8FABAE-F93C-E411-BE7C-00259073E4CA.root',
-        'root://cms-xrd-global.cern.ch//store/mc/Spring14miniaod/WWTo2L2Nu_CT10_13TeV-powheg-pythia8-tauola/MINIAODSIM/PU20bx25_POSTLS170_V5-v1/10000/20F72179-F83C-E411-B119-002590D0B0CA.root',
-        'root://cms-xrd-global.cern.ch//store/mc/Spring14miniaod/WWTo2L2Nu_CT10_13TeV-powheg-pythia8-tauola/MINIAODSIM/PU20bx25_POSTLS170_V5-v1/10000/285B065B-F83C-E411-8D53-0025907B4ECA.root',
-        'root://cms-xrd-global.cern.ch//store/mc/Spring14miniaod/WWTo2L2Nu_CT10_13TeV-powheg-pythia8-tauola/MINIAODSIM/PU20bx25_POSTLS170_V5-v1/10000/2C3AA376-F83C-E411-A3FB-BCAEC53F6D4E.root',
-        'root://cms-xrd-global.cern.ch//store/mc/Spring14miniaod/WWTo2L2Nu_CT10_13TeV-powheg-pythia8-tauola/MINIAODSIM/PU20bx25_POSTLS170_V5-v1/10000/34BC6B92-F83C-E411-B41A-00259074AE8A.root',
-        'root://cms-xrd-global.cern.ch//store/mc/Spring14miniaod/WWTo2L2Nu_CT10_13TeV-powheg-pythia8-tauola/MINIAODSIM/PU20bx25_POSTLS170_V5-v1/10000/441F9D43-F83C-E411-A75C-0025907B4E18.root',
-        'root://cms-xrd-global.cern.ch//store/mc/Spring14miniaod/WWTo2L2Nu_CT10_13TeV-powheg-pythia8-tauola/MINIAODSIM/PU20bx25_POSTLS170_V5-v1/10000/54EB3A50-F93C-E411-97B0-BCAEC53F6D4E.root',
-        'root://cms-xrd-global.cern.ch//store/mc/Spring14miniaod/WWTo2L2Nu_CT10_13TeV-powheg-pythia8-tauola/MINIAODSIM/PU20bx25_POSTLS170_V5-v1/10000/6034FA75-F63C-E411-BF9E-002590D0B0CC.root',
-        'root://cms-xrd-global.cern.ch//store/mc/Spring14miniaod/WWTo2L2Nu_CT10_13TeV-powheg-pythia8-tauola/MINIAODSIM/PU20bx25_POSTLS170_V5-v1/10000/6C11DD75-F83C-E411-9A20-485B3989720C.root',
-        'root://cms-xrd-global.cern.ch//store/mc/Spring14miniaod/WWTo2L2Nu_CT10_13TeV-powheg-pythia8-tauola/MINIAODSIM/PU20bx25_POSTLS170_V5-v1/10000/7264C812-F93C-E411-AC74-002590D0AFD4.root',
-        'root://cms-xrd-global.cern.ch//store/mc/Spring14miniaod/WWTo2L2Nu_CT10_13TeV-powheg-pythia8-tauola/MINIAODSIM/PU20bx25_POSTLS170_V5-v1/10000/7A3CB834-FD3C-E411-BE9F-0025907B4F44.root',
-        'root://cms-xrd-global.cern.ch//store/mc/Spring14miniaod/WWTo2L2Nu_CT10_13TeV-powheg-pythia8-tauola/MINIAODSIM/PU20bx25_POSTLS170_V5-v1/10000/9486BC2A-F93C-E411-AA61-20CF305B058C.root',
-        'root://cms-xrd-global.cern.ch//store/mc/Spring14miniaod/WWTo2L2Nu_CT10_13TeV-powheg-pythia8-tauola/MINIAODSIM/PU20bx25_POSTLS170_V5-v1/10000/981C84AB-F83C-E411-8CB5-525400CE57D5.root',
-        'root://cms-xrd-global.cern.ch//store/mc/Spring14miniaod/WWTo2L2Nu_CT10_13TeV-powheg-pythia8-tauola/MINIAODSIM/PU20bx25_POSTLS170_V5-v1/10000/AA8A2779-F83C-E411-AF24-00259073E4EA.root',
-        'root://cms-xrd-global.cern.ch//store/mc/Spring14miniaod/WWTo2L2Nu_CT10_13TeV-powheg-pythia8-tauola/MINIAODSIM/PU20bx25_POSTLS170_V5-v1/10000/CCFB75A5-F93C-E411-BFDC-0025907B4E18.root',
-        'root://cms-xrd-global.cern.ch//store/mc/Spring14miniaod/WWTo2L2Nu_CT10_13TeV-powheg-pythia8-tauola/MINIAODSIM/PU20bx25_POSTLS170_V5-v1/10000/D88D8EC2-F83C-E411-848E-E0CB4E19F969.root',
-        'root://cms-xrd-global.cern.ch//store/mc/Spring14miniaod/WWTo2L2Nu_CT10_13TeV-powheg-pythia8-tauola/MINIAODSIM/PU20bx25_POSTLS170_V5-v1/10000/DAA10D50-F93C-E411-ADBA-002590D0AFEC.root',
-        'root://cms-xrd-global.cern.ch//store/mc/Spring14miniaod/WWTo2L2Nu_CT10_13TeV-powheg-pythia8-tauola/MINIAODSIM/PU20bx25_POSTLS170_V5-v1/10000/E64EAF05-F83C-E411-BE04-002590D0B0CC.root',
-        'root://cms-xrd-global.cern.ch//store/mc/Spring14miniaod/WWTo2L2Nu_CT10_13TeV-powheg-pythia8-tauola/MINIAODSIM/PU20bx25_POSTLS170_V5-v1/10000/E833FC89-F93C-E411-9CAB-002590D0B056.root',
-)
+#fileNames = cms.vstring(
+        #'root://cms-xrd-global.cern.ch//store/mc/Spring14miniaod/WWTo2L2Nu_CT10_13TeV-powheg-pythia8-tauola/MINIAODSIM/PU20bx25_POSTLS170_V5-v1/10000/06DCE7A0-F93C-E411-9DEA-002590D0B0CC.root',
+        #'root://cms-xrd-global.cern.ch//store/mc/Spring14miniaod/WWTo2L2Nu_CT10_13TeV-powheg-pythia8-tauola/MINIAODSIM/PU20bx25_POSTLS170_V5-v1/10000/0E8FABAE-F93C-E411-BE7C-00259073E4CA.root',
+        #'root://cms-xrd-global.cern.ch//store/mc/Spring14miniaod/WWTo2L2Nu_CT10_13TeV-powheg-pythia8-tauola/MINIAODSIM/PU20bx25_POSTLS170_V5-v1/10000/20F72179-F83C-E411-B119-002590D0B0CA.root',
+        #'root://cms-xrd-global.cern.ch//store/mc/Spring14miniaod/WWTo2L2Nu_CT10_13TeV-powheg-pythia8-tauola/MINIAODSIM/PU20bx25_POSTLS170_V5-v1/10000/285B065B-F83C-E411-8D53-0025907B4ECA.root',
+        #'root://cms-xrd-global.cern.ch//store/mc/Spring14miniaod/WWTo2L2Nu_CT10_13TeV-powheg-pythia8-tauola/MINIAODSIM/PU20bx25_POSTLS170_V5-v1/10000/2C3AA376-F83C-E411-A3FB-BCAEC53F6D4E.root',
+        #'root://cms-xrd-global.cern.ch//store/mc/Spring14miniaod/WWTo2L2Nu_CT10_13TeV-powheg-pythia8-tauola/MINIAODSIM/PU20bx25_POSTLS170_V5-v1/10000/34BC6B92-F83C-E411-B41A-00259074AE8A.root',
+        #'root://cms-xrd-global.cern.ch//store/mc/Spring14miniaod/WWTo2L2Nu_CT10_13TeV-powheg-pythia8-tauola/MINIAODSIM/PU20bx25_POSTLS170_V5-v1/10000/441F9D43-F83C-E411-A75C-0025907B4E18.root',
+        #'root://cms-xrd-global.cern.ch//store/mc/Spring14miniaod/WWTo2L2Nu_CT10_13TeV-powheg-pythia8-tauola/MINIAODSIM/PU20bx25_POSTLS170_V5-v1/10000/54EB3A50-F93C-E411-97B0-BCAEC53F6D4E.root',
+        #'root://cms-xrd-global.cern.ch//store/mc/Spring14miniaod/WWTo2L2Nu_CT10_13TeV-powheg-pythia8-tauola/MINIAODSIM/PU20bx25_POSTLS170_V5-v1/10000/6034FA75-F63C-E411-BF9E-002590D0B0CC.root',
+        #'root://cms-xrd-global.cern.ch//store/mc/Spring14miniaod/WWTo2L2Nu_CT10_13TeV-powheg-pythia8-tauola/MINIAODSIM/PU20bx25_POSTLS170_V5-v1/10000/6C11DD75-F83C-E411-9A20-485B3989720C.root',
+        #'root://cms-xrd-global.cern.ch//store/mc/Spring14miniaod/WWTo2L2Nu_CT10_13TeV-powheg-pythia8-tauola/MINIAODSIM/PU20bx25_POSTLS170_V5-v1/10000/7264C812-F93C-E411-AC74-002590D0AFD4.root',
+        #'root://cms-xrd-global.cern.ch//store/mc/Spring14miniaod/WWTo2L2Nu_CT10_13TeV-powheg-pythia8-tauola/MINIAODSIM/PU20bx25_POSTLS170_V5-v1/10000/7A3CB834-FD3C-E411-BE9F-0025907B4F44.root',
+        #'root://cms-xrd-global.cern.ch//store/mc/Spring14miniaod/WWTo2L2Nu_CT10_13TeV-powheg-pythia8-tauola/MINIAODSIM/PU20bx25_POSTLS170_V5-v1/10000/9486BC2A-F93C-E411-AA61-20CF305B058C.root',
+        #'root://cms-xrd-global.cern.ch//store/mc/Spring14miniaod/WWTo2L2Nu_CT10_13TeV-powheg-pythia8-tauola/MINIAODSIM/PU20bx25_POSTLS170_V5-v1/10000/981C84AB-F83C-E411-8CB5-525400CE57D5.root',
+        #'root://cms-xrd-global.cern.ch//store/mc/Spring14miniaod/WWTo2L2Nu_CT10_13TeV-powheg-pythia8-tauola/MINIAODSIM/PU20bx25_POSTLS170_V5-v1/10000/AA8A2779-F83C-E411-AF24-00259073E4EA.root',
+        #'root://cms-xrd-global.cern.ch//store/mc/Spring14miniaod/WWTo2L2Nu_CT10_13TeV-powheg-pythia8-tauola/MINIAODSIM/PU20bx25_POSTLS170_V5-v1/10000/CCFB75A5-F93C-E411-BFDC-0025907B4E18.root',
+        #'root://cms-xrd-global.cern.ch//store/mc/Spring14miniaod/WWTo2L2Nu_CT10_13TeV-powheg-pythia8-tauola/MINIAODSIM/PU20bx25_POSTLS170_V5-v1/10000/D88D8EC2-F83C-E411-848E-E0CB4E19F969.root',
+        #'root://cms-xrd-global.cern.ch//store/mc/Spring14miniaod/WWTo2L2Nu_CT10_13TeV-powheg-pythia8-tauola/MINIAODSIM/PU20bx25_POSTLS170_V5-v1/10000/DAA10D50-F93C-E411-ADBA-002590D0AFEC.root',
+        #'root://cms-xrd-global.cern.ch//store/mc/Spring14miniaod/WWTo2L2Nu_CT10_13TeV-powheg-pythia8-tauola/MINIAODSIM/PU20bx25_POSTLS170_V5-v1/10000/E64EAF05-F83C-E411-BE04-002590D0B0CC.root',
+        #'root://cms-xrd-global.cern.ch//store/mc/Spring14miniaod/WWTo2L2Nu_CT10_13TeV-powheg-pythia8-tauola/MINIAODSIM/PU20bx25_POSTLS170_V5-v1/10000/E833FC89-F93C-E411-9CAB-002590D0B056.root',
+#)
 #ttbar1
 #    fileNames  = cms.vstring(
         #'file:/eos/uscms/store/mc/Phys14DR/TT_Tune4C_13TeV-pythia8-tauola/MINIAODSIM/PU20bx25_tsg_PHYS14_25_V1-v1/00000/007B37D4-8B70-E411-BC2D-0025905A6066.root',
@@ -234,36 +234,36 @@ fileNames = cms.vstring(
 #ttbar2
 #    fileNames  = cms.vstring('/eos/uscms/store/mc/Phys14DR/TT_Tune4C_13TeV-pythia8-tauola/MINIAODSIM/PU20bx25_tsg_PHYS14_25_V1-v1/00000/F277FA56-9870-E411-B85E-0025905A612E.root')
 #DY
-#    fileNames  = cms.vstring(
-        #'/eos/uscms/store/mc/Phys14DR/DYJetsToLL_M-50_13TeV-madgraph-pythia8/MINIAODSIM/PU20bx25_PHYS14_25_V1-v1/00000/0432E62A-7A6C-E411-87BB-002590DB92A8.root',
-        #'/eos/uscms/store/mc/Phys14DR/DYJetsToLL_M-50_13TeV-madgraph-pythia8/MINIAODSIM/PU20bx25_PHYS14_25_V1-v1/00000/2A733A85-7D6C-E411-8D2B-002481E14D72.root',
-        #'/eos/uscms/store/mc/Phys14DR/DYJetsToLL_M-50_13TeV-madgraph-pythia8/MINIAODSIM/PU20bx25_PHYS14_25_V1-v1/00000/600D5785-7C6C-E411-B90E-002590DBDFE0.root',
-        #'/eos/uscms/store/mc/Phys14DR/DYJetsToLL_M-50_13TeV-madgraph-pythia8/MINIAODSIM/PU20bx25_PHYS14_25_V1-v1/00000/B6F6C960-7B6C-E411-916C-002481E0DE14.root',
-        #'/eos/uscms/store/mc/Phys14DR/DYJetsToLL_M-50_13TeV-madgraph-pythia8/MINIAODSIM/PU20bx25_PHYS14_25_V1-v1/00000/06C61714-7E6C-E411-9205-002590DB92A8.root',
-        #'/eos/uscms/store/mc/Phys14DR/DYJetsToLL_M-50_13TeV-madgraph-pythia8/MINIAODSIM/PU20bx25_PHYS14_25_V1-v1/00000/3008BB28-7D6C-E411-AAC2-002590DB91F0.root',
-        #'/eos/uscms/store/mc/Phys14DR/DYJetsToLL_M-50_13TeV-madgraph-pythia8/MINIAODSIM/PU20bx25_PHYS14_25_V1-v1/00000/629344EC-7C6C-E411-A19B-0025907DC9B0.root',
-        #'/eos/uscms/store/mc/Phys14DR/DYJetsToLL_M-50_13TeV-madgraph-pythia8/MINIAODSIM/PU20bx25_PHYS14_25_V1-v1/00000/B81F3E5F-796C-E411-9105-002590DB91CE.root',
-        #'/eos/uscms/store/mc/Phys14DR/DYJetsToLL_M-50_13TeV-madgraph-pythia8/MINIAODSIM/PU20bx25_PHYS14_25_V1-v1/00000/0EAD09A8-7C6C-E411-B903-0025901D493E.root',
-        #'/eos/uscms/store/mc/Phys14DR/DYJetsToLL_M-50_13TeV-madgraph-pythia8/MINIAODSIM/PU20bx25_PHYS14_25_V1-v1/00000/34167B14-7E6C-E411-A113-002590DB92A8.root',
-        #'/eos/uscms/store/mc/Phys14DR/DYJetsToLL_M-50_13TeV-madgraph-pythia8/MINIAODSIM/PU20bx25_PHYS14_25_V1-v1/00000/8618D633-7D6C-E411-AB2C-003048F2FE3E.root',
-        #'/eos/uscms/store/mc/Phys14DR/DYJetsToLL_M-50_13TeV-madgraph-pythia8/MINIAODSIM/PU20bx25_PHYS14_25_V1-v1/00000/C27BA5BA-7D6C-E411-BBA9-002590DB9358.root',
-        #'/eos/uscms/store/mc/Phys14DR/DYJetsToLL_M-50_13TeV-madgraph-pythia8/MINIAODSIM/PU20bx25_PHYS14_25_V1-v1/00000/1E4D0DAE-7C6C-E411-B488-002590DB923C.root',
-        #'/eos/uscms/store/mc/Phys14DR/DYJetsToLL_M-50_13TeV-madgraph-pythia8/MINIAODSIM/PU20bx25_PHYS14_25_V1-v1/00000/3A99E6A9-7B6C-E411-ADB4-00266CFFA6F8.root',
-        #'/eos/uscms/store/mc/Phys14DR/DYJetsToLL_M-50_13TeV-madgraph-pythia8/MINIAODSIM/PU20bx25_PHYS14_25_V1-v1/00000/8E36F058-7C6C-E411-8424-0025901D493E.root',
-        #'/eos/uscms/store/mc/Phys14DR/DYJetsToLL_M-50_13TeV-madgraph-pythia8/MINIAODSIM/PU20bx25_PHYS14_25_V1-v1/00000/C84D5C9B-7C6C-E411-8825-002590DB91CE.root',
-        #'/eos/uscms/store/mc/Phys14DR/DYJetsToLL_M-50_13TeV-madgraph-pythia8/MINIAODSIM/PU20bx25_PHYS14_25_V1-v1/00000/2286DCDB-796C-E411-AAB4-002481E14D72.root',
-        #'/eos/uscms/store/mc/Phys14DR/DYJetsToLL_M-50_13TeV-madgraph-pythia8/MINIAODSIM/PU20bx25_PHYS14_25_V1-v1/00000/5610D8D0-7A6C-E411-B3AA-00237DE0BED6.root',
-        #'/eos/uscms/store/mc/Phys14DR/DYJetsToLL_M-50_13TeV-madgraph-pythia8/MINIAODSIM/PU20bx25_PHYS14_25_V1-v1/00000/94708D15-7E6C-E411-BA0D-002590DB92A8.root',
-        #'/eos/uscms/store/mc/Phys14DR/DYJetsToLL_M-50_13TeV-madgraph-pythia8/MINIAODSIM/PU20bx25_PHYS14_25_V1-v1/00000/CAD84EE9-7C6C-E411-912C-003048D437A0.root',
-        #'/eos/uscms/store/mc/Phys14DR/DYJetsToLL_M-50_13TeV-madgraph-pythia8/MINIAODSIM/PU20bx25_PHYS14_25_V1-v1/00000/2683B2C5-7C6C-E411-BE0B-002590DB9214.root',
-        #'/eos/uscms/store/mc/Phys14DR/DYJetsToLL_M-50_13TeV-madgraph-pythia8/MINIAODSIM/PU20bx25_PHYS14_25_V1-v1/00000/5EC2A65C-7A6C-E411-94D2-002590DB92A8.root',
-        #'/eos/uscms/store/mc/Phys14DR/DYJetsToLL_M-50_13TeV-madgraph-pythia8/MINIAODSIM/PU20bx25_PHYS14_25_V1-v1/00000/98175E8A-796C-E411-B612-002590DB923C.root',
-        #'/eos/uscms/store/mc/Phys14DR/DYJetsToLL_M-50_13TeV-madgraph-pythia8/MINIAODSIM/PU20bx25_PHYS14_25_V1-v1/00000/F63F9E51-7D6C-E411-AFD9-002590DB92A8.root',
-        #'/eos/uscms/store/mc/Phys14DR/DYJetsToLL_M-50_13TeV-madgraph-pythia8/MINIAODSIM/PU20bx25_PHYS14_25_V1-v1/00000/28EF4E6A-7D6C-E411-A54F-0025907DCA38.root',
-        #'/eos/uscms/store/mc/Phys14DR/DYJetsToLL_M-50_13TeV-madgraph-pythia8/MINIAODSIM/PU20bx25_PHYS14_25_V1-v1/00000/5EF8B51F-7C6C-E411-B13F-0025907DC9D6.root',
-        #'/eos/uscms/store/mc/Phys14DR/DYJetsToLL_M-50_13TeV-madgraph-pythia8/MINIAODSIM/PU20bx25_PHYS14_25_V1-v1/00000/A266FB5C-796C-E411-B6EE-0025901D493E.root',
-        #'/eos/uscms/store/mc/Phys14DR/DYJetsToLL_M-50_13TeV-madgraph-pythia8/MINIAODSIM/PU20bx25_PHYS14_25_V1-v1/00000/FEE3CF68-796C-E411-ABF5-002590DB9214.root',
-#)
+    fileNames  = cms.vstring(
+        '/eos/uscms/store/mc/Phys14DR/DYJetsToLL_M-50_13TeV-madgraph-pythia8/MINIAODSIM/PU20bx25_PHYS14_25_V1-v1/00000/0432E62A-7A6C-E411-87BB-002590DB92A8.root',
+        '/eos/uscms/store/mc/Phys14DR/DYJetsToLL_M-50_13TeV-madgraph-pythia8/MINIAODSIM/PU20bx25_PHYS14_25_V1-v1/00000/2A733A85-7D6C-E411-8D2B-002481E14D72.root',
+        '/eos/uscms/store/mc/Phys14DR/DYJetsToLL_M-50_13TeV-madgraph-pythia8/MINIAODSIM/PU20bx25_PHYS14_25_V1-v1/00000/600D5785-7C6C-E411-B90E-002590DBDFE0.root',
+        '/eos/uscms/store/mc/Phys14DR/DYJetsToLL_M-50_13TeV-madgraph-pythia8/MINIAODSIM/PU20bx25_PHYS14_25_V1-v1/00000/B6F6C960-7B6C-E411-916C-002481E0DE14.root',
+        '/eos/uscms/store/mc/Phys14DR/DYJetsToLL_M-50_13TeV-madgraph-pythia8/MINIAODSIM/PU20bx25_PHYS14_25_V1-v1/00000/06C61714-7E6C-E411-9205-002590DB92A8.root',
+        '/eos/uscms/store/mc/Phys14DR/DYJetsToLL_M-50_13TeV-madgraph-pythia8/MINIAODSIM/PU20bx25_PHYS14_25_V1-v1/00000/3008BB28-7D6C-E411-AAC2-002590DB91F0.root',
+        '/eos/uscms/store/mc/Phys14DR/DYJetsToLL_M-50_13TeV-madgraph-pythia8/MINIAODSIM/PU20bx25_PHYS14_25_V1-v1/00000/629344EC-7C6C-E411-A19B-0025907DC9B0.root',
+        '/eos/uscms/store/mc/Phys14DR/DYJetsToLL_M-50_13TeV-madgraph-pythia8/MINIAODSIM/PU20bx25_PHYS14_25_V1-v1/00000/B81F3E5F-796C-E411-9105-002590DB91CE.root',
+        '/eos/uscms/store/mc/Phys14DR/DYJetsToLL_M-50_13TeV-madgraph-pythia8/MINIAODSIM/PU20bx25_PHYS14_25_V1-v1/00000/0EAD09A8-7C6C-E411-B903-0025901D493E.root',
+        '/eos/uscms/store/mc/Phys14DR/DYJetsToLL_M-50_13TeV-madgraph-pythia8/MINIAODSIM/PU20bx25_PHYS14_25_V1-v1/00000/34167B14-7E6C-E411-A113-002590DB92A8.root',
+        '/eos/uscms/store/mc/Phys14DR/DYJetsToLL_M-50_13TeV-madgraph-pythia8/MINIAODSIM/PU20bx25_PHYS14_25_V1-v1/00000/8618D633-7D6C-E411-AB2C-003048F2FE3E.root',
+        '/eos/uscms/store/mc/Phys14DR/DYJetsToLL_M-50_13TeV-madgraph-pythia8/MINIAODSIM/PU20bx25_PHYS14_25_V1-v1/00000/C27BA5BA-7D6C-E411-BBA9-002590DB9358.root',
+        '/eos/uscms/store/mc/Phys14DR/DYJetsToLL_M-50_13TeV-madgraph-pythia8/MINIAODSIM/PU20bx25_PHYS14_25_V1-v1/00000/1E4D0DAE-7C6C-E411-B488-002590DB923C.root',
+        '/eos/uscms/store/mc/Phys14DR/DYJetsToLL_M-50_13TeV-madgraph-pythia8/MINIAODSIM/PU20bx25_PHYS14_25_V1-v1/00000/3A99E6A9-7B6C-E411-ADB4-00266CFFA6F8.root',
+        '/eos/uscms/store/mc/Phys14DR/DYJetsToLL_M-50_13TeV-madgraph-pythia8/MINIAODSIM/PU20bx25_PHYS14_25_V1-v1/00000/8E36F058-7C6C-E411-8424-0025901D493E.root',
+        '/eos/uscms/store/mc/Phys14DR/DYJetsToLL_M-50_13TeV-madgraph-pythia8/MINIAODSIM/PU20bx25_PHYS14_25_V1-v1/00000/C84D5C9B-7C6C-E411-8825-002590DB91CE.root',
+        '/eos/uscms/store/mc/Phys14DR/DYJetsToLL_M-50_13TeV-madgraph-pythia8/MINIAODSIM/PU20bx25_PHYS14_25_V1-v1/00000/2286DCDB-796C-E411-AAB4-002481E14D72.root',
+        '/eos/uscms/store/mc/Phys14DR/DYJetsToLL_M-50_13TeV-madgraph-pythia8/MINIAODSIM/PU20bx25_PHYS14_25_V1-v1/00000/5610D8D0-7A6C-E411-B3AA-00237DE0BED6.root',
+        '/eos/uscms/store/mc/Phys14DR/DYJetsToLL_M-50_13TeV-madgraph-pythia8/MINIAODSIM/PU20bx25_PHYS14_25_V1-v1/00000/94708D15-7E6C-E411-BA0D-002590DB92A8.root',
+        '/eos/uscms/store/mc/Phys14DR/DYJetsToLL_M-50_13TeV-madgraph-pythia8/MINIAODSIM/PU20bx25_PHYS14_25_V1-v1/00000/CAD84EE9-7C6C-E411-912C-003048D437A0.root',
+        '/eos/uscms/store/mc/Phys14DR/DYJetsToLL_M-50_13TeV-madgraph-pythia8/MINIAODSIM/PU20bx25_PHYS14_25_V1-v1/00000/2683B2C5-7C6C-E411-BE0B-002590DB9214.root',
+        '/eos/uscms/store/mc/Phys14DR/DYJetsToLL_M-50_13TeV-madgraph-pythia8/MINIAODSIM/PU20bx25_PHYS14_25_V1-v1/00000/5EC2A65C-7A6C-E411-94D2-002590DB92A8.root',
+        '/eos/uscms/store/mc/Phys14DR/DYJetsToLL_M-50_13TeV-madgraph-pythia8/MINIAODSIM/PU20bx25_PHYS14_25_V1-v1/00000/98175E8A-796C-E411-B612-002590DB923C.root',
+        '/eos/uscms/store/mc/Phys14DR/DYJetsToLL_M-50_13TeV-madgraph-pythia8/MINIAODSIM/PU20bx25_PHYS14_25_V1-v1/00000/F63F9E51-7D6C-E411-AFD9-002590DB92A8.root',
+        '/eos/uscms/store/mc/Phys14DR/DYJetsToLL_M-50_13TeV-madgraph-pythia8/MINIAODSIM/PU20bx25_PHYS14_25_V1-v1/00000/28EF4E6A-7D6C-E411-A54F-0025907DCA38.root',
+        '/eos/uscms/store/mc/Phys14DR/DYJetsToLL_M-50_13TeV-madgraph-pythia8/MINIAODSIM/PU20bx25_PHYS14_25_V1-v1/00000/5EF8B51F-7C6C-E411-B13F-0025907DC9D6.root',
+        '/eos/uscms/store/mc/Phys14DR/DYJetsToLL_M-50_13TeV-madgraph-pythia8/MINIAODSIM/PU20bx25_PHYS14_25_V1-v1/00000/A266FB5C-796C-E411-B6EE-0025901D493E.root',
+        '/eos/uscms/store/mc/Phys14DR/DYJetsToLL_M-50_13TeV-madgraph-pythia8/MINIAODSIM/PU20bx25_PHYS14_25_V1-v1/00000/FEE3CF68-796C-E411-ABF5-002590DB9214.root',
+)
     #WZ
 #    fileNames = cms.vstring(
 #'file:/eos/uscms/store/mc/Phys14DR/WZJetsTo3LNu_Tune4C_13TeV-madgraph-tauola/MINIAODSIM/PU20bx25_PHYS14_25_V1-v1/00000/484D51C6-2673-E411-8AB0-001E67398412.root',  
@@ -367,18 +367,18 @@ fileNames = cms.vstring(
 #)
 #TTZ
 #    fileNames = cms.vstring(
-        #'file:/eos/uscms/store/mc/Phys14DR/TTZJets_Tune4C_13TeV-madgraph-tauola/MINIAODSIM/PU20bx25_PHYS14_25_V1-v1/00000/188E610D-9871-E411-BABD-002481E15008.root',
-        #'file:/eos/uscms/store/mc/Phys14DR/TTZJets_Tune4C_13TeV-madgraph-tauola/MINIAODSIM/PU20bx25_PHYS14_25_V1-v1/00000/9C990A71-9771-E411-8F63-002590200A88.root',
-        #'file:/eos/uscms/store/mc/Phys14DR/TTZJets_Tune4C_13TeV-madgraph-tauola/MINIAODSIM/PU20bx25_PHYS14_25_V1-v1/00000/C4B6F654-9B71-E411-8219-001E673972C4.root',
-        #'file:/eos/uscms/store/mc/Phys14DR/TTZJets_Tune4C_13TeV-madgraph-tauola/MINIAODSIM/PU20bx25_PHYS14_25_V1-v1/00000/F060F7F3-B171-E411-AE7A-002590200B38.root',
-        #'file:/eos/uscms/store/mc/Phys14DR/TTZJets_Tune4C_13TeV-madgraph-tauola/MINIAODSIM/PU20bx25_PHYS14_25_V1-v1/00000/76014B9F-B372-E411-B731-0025B3E0654E.root',
-        #'file:/eos/uscms/store/mc/Phys14DR/TTZJets_Tune4C_13TeV-madgraph-tauola/MINIAODSIM/PU20bx25_PHYS14_25_V1-v1/00000/BC22410E-9871-E411-A161-001E673971C5.root',
-        #'file:/eos/uscms/store/mc/Phys14DR/TTZJets_Tune4C_13TeV-madgraph-tauola/MINIAODSIM/PU20bx25_PHYS14_25_V1-v1/00000/EC29E084-5D73-E411-B97B-002590200AE0.root',
-        #'file:/eos/uscms/store/mc/Phys14DR/TTZJets_Tune4C_13TeV-madgraph-tauola/MINIAODSIM/PU20bx25_PHYS14_25_V1-v1/10000/208787DC-8D71-E411-BD05-001E6739672F.root',
-        #'file:/eos/uscms/store/mc/Phys14DR/TTZJets_Tune4C_13TeV-madgraph-tauola/MINIAODSIM/PU20bx25_PHYS14_25_V1-v1/10000/5CA9BF41-AA72-E411-A46B-002481E150EE.root',
-        #'file:/eos/uscms/store/mc/Phys14DR/TTZJets_Tune4C_13TeV-madgraph-tauola/MINIAODSIM/PU20bx25_PHYS14_25_V1-v1/10000/8A1F89D8-8D71-E411-BFDD-0025B3E06448.root',
-        #'file:/eos/uscms/store/mc/Phys14DR/TTZJets_Tune4C_13TeV-madgraph-tauola/MINIAODSIM/PU20bx25_PHYS14_25_V1-v1/10000/FCF68348-8E71-E411-BC8F-002590A37128.root',
-    #)
+#        'file:/eos/uscms/store/mc/Phys14DR/TTZJets_Tune4C_13TeV-madgraph-tauola/MINIAODSIM/PU20bx25_PHYS14_25_V1-v1/00000/188E610D-9871-E411-BABD-002481E15008.root',
+#        'file:/eos/uscms/store/mc/Phys14DR/TTZJets_Tune4C_13TeV-madgraph-tauola/MINIAODSIM/PU20bx25_PHYS14_25_V1-v1/00000/9C990A71-9771-E411-8F63-002590200A88.root',
+#        'file:/eos/uscms/store/mc/Phys14DR/TTZJets_Tune4C_13TeV-madgraph-tauola/MINIAODSIM/PU20bx25_PHYS14_25_V1-v1/00000/C4B6F654-9B71-E411-8219-001E673972C4.root',
+#        'file:/eos/uscms/store/mc/Phys14DR/TTZJets_Tune4C_13TeV-madgraph-tauola/MINIAODSIM/PU20bx25_PHYS14_25_V1-v1/00000/F060F7F3-B171-E411-AE7A-002590200B38.root',
+#        'file:/eos/uscms/store/mc/Phys14DR/TTZJets_Tune4C_13TeV-madgraph-tauola/MINIAODSIM/PU20bx25_PHYS14_25_V1-v1/00000/76014B9F-B372-E411-B731-0025B3E0654E.root',
+#        'file:/eos/uscms/store/mc/Phys14DR/TTZJets_Tune4C_13TeV-madgraph-tauola/MINIAODSIM/PU20bx25_PHYS14_25_V1-v1/00000/BC22410E-9871-E411-A161-001E673971C5.root',
+#        'file:/eos/uscms/store/mc/Phys14DR/TTZJets_Tune4C_13TeV-madgraph-tauola/MINIAODSIM/PU20bx25_PHYS14_25_V1-v1/00000/EC29E084-5D73-E411-B97B-002590200AE0.root',
+#        'file:/eos/uscms/store/mc/Phys14DR/TTZJets_Tune4C_13TeV-madgraph-tauola/MINIAODSIM/PU20bx25_PHYS14_25_V1-v1/10000/208787DC-8D71-E411-BD05-001E6739672F.root',
+#        'file:/eos/uscms/store/mc/Phys14DR/TTZJets_Tune4C_13TeV-madgraph-tauola/MINIAODSIM/PU20bx25_PHYS14_25_V1-v1/10000/5CA9BF41-AA72-E411-A46B-002481E150EE.root',
+#        'file:/eos/uscms/store/mc/Phys14DR/TTZJets_Tune4C_13TeV-madgraph-tauola/MINIAODSIM/PU20bx25_PHYS14_25_V1-v1/10000/8A1F89D8-8D71-E411-BFDD-0025B3E06448.root',
+#        'file:/eos/uscms/store/mc/Phys14DR/TTZJets_Tune4C_13TeV-madgraph-tauola/MINIAODSIM/PU20bx25_PHYS14_25_V1-v1/10000/FCF68348-8E71-E411-BC8F-002590A37128.root',
+#    )
 #TTW
 #    fileNames = cms.vstring(
 #        'file:/eos/uscms/store/mc/Phys14DR/TTWJets_Tune4C_13TeV-madgraph-tauola/MINIAODSIM/PU20bx25_PHYS14_25_V1-v1/00000/1C772C5B-DD71-E411-B64E-0025904B1370.root',
@@ -419,8 +419,8 @@ fileNames = cms.vstring(
 # Output
 #
 process.outputs = cms.PSet (
-#    outputName = cms.string('ljmet_tree_X53X53ToAll_M-1000_left'),
-    outputName = cms.string('ljmet_tree_WW'),
+#    outputName = cms.string('ljmet_tree_X53X53ToAll_M-700_right'),
+    outputName = cms.string('ljmet_tree_DYJets'),
     treeName   = cms.string('ljmet'),
 )
 
