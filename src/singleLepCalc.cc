@@ -796,7 +796,7 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
         for(size_t i = 0; i < genParticles->size(); i++){
             const reco::GenParticle & p = (*genParticles).at(i);
 
-            /*if (abs(p.pdgId())==11 || abs(p.pdgId())==13) {
+            /*if (abs(p.pdgId())==11 || abs(p.pdgId())==13 || abs(p.pdgId())==15) {
 	        std::cout << i << "\t" << p.status() << "\t" << p.mass() << "\t" << p.pt() << "\t" << p.eta() << "\t" << p.phi() << "\t" << p.pdgId() << "\t";
 	        if (!(!(p.mother()))) {
                     std::cout << p.mother()->pdgId() << "\t" << p.mother()->status() << "\t";
@@ -804,11 +804,11 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
                 }
             }*/
 
-	    if (p.status() == 1 && (abs(p.pdgId()) == 11 || abs(p.pdgId() == 13))){
+	    if (p.status() == 1 && (abs(p.pdgId()) == 11 || abs(p.pdgId()) == 13)){
 		if (!(!(p.mother()))) {
 		    if (!(p.mother()->status()==23 && (abs(p.mother()->pdgId()) == 11 || abs(p.mother()->pdgId()) == 13))) {
                         if (!(!(p.mother()->mother()))) {
-			    if (abs(p.mother()->mother()->pdgId()) == 15 && p.mother()->mother()->status() == 23) {
+			    if (abs(p.mother()->mother()->pdgId()) == 15 && abs(p.mother()->pdgId()) == 15) {
                 		genTDLPt     = p.pt();
                 		genTDLEta    = p.eta();
                 		genTDLPhi    = p.phi();
@@ -828,9 +828,9 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
 		    }
 		}
 	    }
-            /*if (abs(p.pdgId())==11 || abs(p.pdgId())==13) {
-	        std::cout << std::endl;
-            }*/
+            //if (abs(p.pdgId())==11 || abs(p.pdgId())==13 || abs(p.pdgId())==15) {
+	    //    std::cout << std::endl;
+            //}
 
             //Find status 23 particles
             if (p.status() == 23){
