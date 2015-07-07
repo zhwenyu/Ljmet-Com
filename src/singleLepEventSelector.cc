@@ -218,8 +218,8 @@ void singleLepEventSelector::BeginJob( std::map<std::string, edm::ParameterSet c
         mbPar["dump_trigger"]             = par[_key].getParameter<bool>         ("dump_trigger");
         mvsPar["trigger_path_el"]         = par[_key].getParameter<std::vector<std::string>>  ("trigger_path_el");
         mvsPar["trigger_path_mu"]         = par[_key].getParameter<std::vector<std::string>>  ("trigger_path_mu");
-        msPar["mctrigger_path_el"]        = par[_key].getParameter<std::string>  ("mctrigger_path_el");
-        msPar["mctrigger_path_mu"]        = par[_key].getParameter<std::string>  ("mctrigger_path_mu");
+        mvsPar["mctrigger_path_el"]       = par[_key].getParameter<std::vector<std::string>>  ("mctrigger_path_el");
+        mvsPar["mctrigger_path_mu"]       = par[_key].getParameter<std::vector<std::string>>  ("mctrigger_path_mu");
 
         mbPar["pv_cut"]                   = par[_key].getParameter<bool>         ("pv_cut");
         mbPar["hbhe_cut"]                 = par[_key].getParameter<bool>         ("hbhe_cut");
@@ -413,46 +413,70 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
                 } 
             }
 
-            unsigned int _tElMCIndex = trigNames.triggerIndex(msPar["mctrigger_path_el"]);
-            if ( _tElMCIndex<_tSize){
-                passTrigElMC = mhEdmTriggerResults->accept(_tElMCIndex);
-            }
+            mvSelTriggersEl.clear();
+            mvSelMCTriggersEl.clear();
+            mvSelTriggersMu.clear();
+            mvSelMCTriggersMu.clear();
 
-            unsigned int _tMuMCIndex = trigNames.triggerIndex(msPar["mctrigger_path_mu"]);
-            if ( _tMuMCIndex<_tSize){
-                passTrigMuMC = mhEdmTriggerResults->accept(_tMuMCIndex);
+            int passTrigEl = 0;
+            for (unsigned int ipath = 0; ipath < mvsPar["mctrigger_path_el"].size(); ipath++){
+                unsigned int _tIndex = trigNames.triggerIndex(mvsPar["mctrigger_path_el"].at(ipath));
+                if ( _tIndex<_tSize){
+                    if (mhEdmTriggerResults->accept(_tIndex)){
+                        passTrigEl = 1;
+                        mvSelMCTriggersEl[mvsPar["mctrigger_path_el"].at(ipath)] = 1;
+                    }
+                    else mvSelMCTriggersEl[mvsPar["mctrigger_path_el"].at(ipath)] = 0;
+                }
+                else mvSelMCTriggersEl[mvsPar["mctrigger_path_el"].at(ipath)] = 0;
             }
+            if (passTrigEl>0) passTrigElMC = true;
+
+            int passTrigMu = 0;
+            for (unsigned int ipath = 0; ipath < mvsPar["mctrigger_path_mu"].size(); ipath++){
+                unsigned int _tIndex = trigNames.triggerIndex(mvsPar["mctrigger_path_mu"].at(ipath));
+                if ( _tIndex<_tSize){
+                    if (mhEdmTriggerResults->accept(_tIndex)){
+                        passTrigMu = 1;
+                        mvSelMCTriggersMu[mvsPar["mctrigger_path_mu"].at(ipath)] = 1;
+                    }
+                    else mvSelMCTriggersMu[mvsPar["mctrigger_path_mu"].at(ipath)] = 0;
+                }
+                else mvSelMCTriggersMu[mvsPar["mctrigger_path_mu"].at(ipath)] = 0;
+            }
+            if (passTrigMu>0) passTrigMuMC = true;
 
             //Loop over each data channel separately
-            int passTrigEl = 0;
+            passTrigEl = 0;
             for (unsigned int ipath = 0; ipath < mvsPar["trigger_path_el"].size(); ipath++){
                 unsigned int _tIndex = trigNames.triggerIndex(mvsPar["trigger_path_el"].at(ipath));
                 if ( _tIndex<_tSize){
                     if (mhEdmTriggerResults->accept(_tIndex)){
-                        passTrigEl++;
-                        break;
+                        passTrigEl = 1;
+                        mvSelTriggersEl[mvsPar["trigger_path_el"].at(ipath)] = 1;
                     }
+                    else mvSelTriggersEl[mvsPar["trigger_path_el"].at(ipath)] = 0;
                 }
+                else mvSelTriggersEl[mvsPar["trigger_path_el"].at(ipath)] = 0;
             }
             if (passTrigEl>0) passTrigElData = true;
 
-            int passTrigMu = 0;
+            passTrigMu = 0;
             for (unsigned int ipath = 0; ipath < mvsPar["trigger_path_mu"].size(); ipath++){
                 unsigned int _tIndex = trigNames.triggerIndex(mvsPar["trigger_path_mu"].at(ipath));
                 if ( _tIndex<_tSize){
                     if (mhEdmTriggerResults->accept(_tIndex)){
-                        passTrigMu++;
-                        break;
+                        passTrigMu = 1;
+                        mvSelTriggersMu[mvsPar["trigger_path_mu"].at(ipath)] = 1;
                     }
+                    else mvSelTriggersMu[mvsPar["trigger_path_mu"].at(ipath)] = 0;
                 }
+                else mvSelTriggersMu[mvsPar["trigger_path_mu"].at(ipath)] = 0;
             }
             if (passTrigMu>0) passTrigMuData = true;
 
             if (mbPar["isMc"] && (passTrigMuMC||passTrigElMC) ) passTrig = true;
             if (!mbPar["isMc"] && (passTrigMuData||passTrigElData) ) passTrig = true;
-            mvSelTriggers.clear();
-            mvSelTriggers.push_back(passTrigEl);
-            mvSelTriggers.push_back(passTrigMu);
 
 
             if ( ignoreCut("Trigger") || passTrig ) passCut(ret, "Trigger");
