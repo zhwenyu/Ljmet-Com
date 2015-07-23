@@ -50,6 +50,9 @@
 //#include "Cintex/Cintex.h"
 #include "PhysicsTools/JetMCUtils/interface/combination.h"
 
+#include "DataFormats/METReco/interface/HcalNoiseSummary.h"
+#include "DataFormats/JetReco/interface/PFJetCollection.h"
+
 
 using trigger::TriggerObject;
 
@@ -515,9 +518,42 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
         if ( considerCut("HBHE noise and scraping filter") ) {
             if (mbPar["debug"]) std::cout<<"HBHE cuts..."<<std::endl;
 
-            passCut(ret, "HBHE noise and scraping filter"); // PV cuts total
+	    //taken from http://cmslxr.fnal.gov/lxr/source/CommonTools/RecoAlgos/plugins/HBHENoiseFilterResultProducer.cc?v=CMSSW_7_4_1
+	    //	and http://cmslxr.fnal.gov/lxr/source/CommonTools/RecoAlgos/python/HBHENoiseFilterResultProducer_cfi.py?v=CMSSW_7_4_1
 
-        } // end of PV cuts
+	    using namespace edm;
+
+	    edm::InputTag noiselabel ("hcalnoise");
+	    int minHPDHits = 17;
+	    int minHPDNoOtherHits = 10;
+	    int minZeros = 10;
+	    bool IgnoreTS4TS5ifJetInLowBVRegion = false;
+
+            // get the Noise summary object
+            edm::Handle<HcalNoiseSummary> summary_h;
+            event.getByLabel(noiselabel, summary_h);
+            if(!summary_h.isValid()) {
+                std::cout << "Could not find HcalNoiseSummary.\n";
+            }
+            const HcalNoiseSummary& summary(*summary_h);
+
+            bool goodJetFoundInLowBVRegion = false;
+            if (IgnoreTS4TS5ifJetInLowBVRegion) goodJetFoundInLowBVRegion = summary.goodJetFoundInLowBVRegion();
+
+            const bool failCommon = summary.maxHPDHits() >= minHPDHits || summary.maxHPDNoOtherHits() >= minHPDNoOtherHits || summary.maxZeros() >= minZeros;
+
+            //const bool failFull = failCommon || (summary.HasBadRBXTS4TS5() && !goodJetFoundInLowBVRegion);
+
+            const bool failFull = failCommon || (summary.HasBadRBXRechitR45Loose() && !goodJetFoundInLowBVRegion);
+
+            //const bool failFull = failCommon || (summary.HasBadRBXRechitR45Tight() && !goodJetFoundInLowBVRegion);
+
+            // Check isolation requirements
+            //const bool failIsolation = summary.numIsolatedNoiseChannels() >= minNumIsolatedNoiseChannels || summary.isolatedNoiseSumE() >= minIsolatedNoiseSumE || summary.isolatedNoiseSumEt() >= minIsolatedNoiseSumEt;
+
+            if (!failFull) passCut(ret, "HBHE noise and scraping filter"); // HBHE cuts total
+
+        } // end of HBHE cuts
 
 
         //======================================================
