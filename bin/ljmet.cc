@@ -78,8 +78,8 @@ int main (int argc, char* argv[]) {
     
     // log file
     std::string _logName = _outputName+".log";
-    fstream _logfile;
-    _logfile.open(_logName, fstream::out);
+    std::fstream _logfile;
+    _logfile.open(_logName, std::fstream::out);
     
     
     // usage

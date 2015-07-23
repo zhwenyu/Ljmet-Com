@@ -1,4 +1,3 @@
-<use name="rootcintex"/>
 <use name="boost"/>
 <use name="CommonTools/Utils"/>
 <use name="PhysicsTools/Utilities"/>

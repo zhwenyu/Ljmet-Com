@@ -43,10 +43,9 @@
 //#include "DataFormats/FWLite/interface/EventSetup.h"
 //#include "DataFormats/FWLite/interface/Record.h"
 
+using namespace std;
 
 using trigger::TriggerObject;
-
-
 
 class StopEventSelector : public BaseEventSelector {
     
