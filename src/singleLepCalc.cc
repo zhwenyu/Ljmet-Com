@@ -705,7 +705,7 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
         
         AK4JetBTag   . push_back(vCorrBtagJets[ii].second);
         //AK4JetRCN    . push_back(((*ijet)->chargedEmEnergy()+(*ijet)->chargedHadronEnergy()) / ((*ijet)->neutralEmEnergy()+(*ijet)->neutralHadronEnergy()));
-        AK4JetBDisc  . push_back(vSelJets[ii]->bDiscriminator( "combinedInclusiveSecondaryVertexV2BJetTags" ));
+        AK4JetBDisc  . push_back(vSelJets[ii]->bDiscriminator( "pfCombinedInclusiveSecondaryVertexV2BJetTags" ));
         AK4JetFlav   . push_back(abs(vSelJets[ii]->partonFlavour()));
  
         //HT

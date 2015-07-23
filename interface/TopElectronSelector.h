@@ -369,13 +369,16 @@ public: // interface
             Double_t phIso = electron.photonIso();
             Double_t Deta  = electron.deltaEtaSuperClusterTrackAtVtx();
             Double_t Dphi  = electron.deltaPhiSuperClusterTrackAtVtx();
-            Double_t sihih = electron.sigmaIetaIeta();
+            Double_t sihih = electron.full5x5_sigmaIetaIeta();
             Double_t HoE   = electron.hadronicOverEm();
-            Double_t D0    = electron.dB();
+            Double_t D0    = (-1.0)*electron.gsfTrack()->dxy(PVtx);
             Double_t DZ    = electron.gsfTrack()->dz(PVtx);//
             
             
-            Double_t Ooemoop = (1.0/electron.ecalEnergy() - electron.eSuperClusterOverP()/electron.ecalEnergy());
+            Double_t Ooemoop;
+            if (electron.ecalEnergy()==0) Ooemoop = 999.;
+            else if (!std::isfinite(electron.ecalEnergy())) Ooemoop = 998.;
+            else Ooemoop = (1.0/electron.ecalEnergy() - electron.eSuperClusterOverP()/electron.ecalEnergy());
             Double_t RelIso  = ( chIso + max(0.0, nhIso + phIso - rhoIso*AEff) )/ electron.ecalDrivenMomentum().pt();
             Int_t mHits   =  electron.gsfTrack()->hitPattern().numberOfHits(reco::HitPattern::MISSING_INNER_HITS);
             Bool_t vtxFitConv = electron.passConversionVeto();
@@ -393,6 +396,9 @@ public: // interface
     	        std::cout << "\tRelIso = " << RelIso << std::endl;
     	        std::cout << "\tmHits = " << mHits << std::endl;
     	        std::cout << "\tvtxFitConv = " << vtxFitConv << std::endl;
+                std::cout << "\teta = " << scEta << std::endl;
+                std::cout << "\tisEB = " << electron.isEB() << std::endl;
+                std::cout << "\tisEE = " << electron.isEE() << std::endl;
     	    }
             
             // now apply the cuts

@@ -66,10 +66,10 @@ std::string BtagHardcodedConditions::getAlgoName(const std::string & op){
     else if( op == "JP")    return "jetProbabilityBJetTags";
     else if( op == "TCHPT") return "trackCountingHighPurBJetTags";
     else if( op == "TCHP") return "trackCountingHighPurBJetTags";
-    else if( op == "CSVL")  return "combinedInclusiveSecondaryVertexV2BJetTags";
-    else if( op == "CSVM")  return "combinedInclusiveSecondaryVertexV2BJetTags";
-    else if( op == "CSVT")  return "combinedInclusiveSecondaryVertexV2BJetTags";
-    else if( op == "CSV")  return "combinedInclusiveSecondaryVertexV2BJetTags";
+    else if( op == "CSVL")  return "pfCombinedInclusiveSecondaryVertexV2BJetTags";
+    else if( op == "CSVM")  return "pfCombinedInclusiveSecondaryVertexV2BJetTags";
+    else if( op == "CSVT")  return "pfCombinedInclusiveSecondaryVertexV2BJetTags";
+    else if( op == "CSV")  return "pfCombinedInclusiveSecondaryVertexV2BJetTags";
     throw cms::Exception("InvalidInput") << "Unknown tagger/operating point: "<< op << std::endl;
 }
 
