@@ -11,15 +11,10 @@
 #include "LJMet/Com/interface/BaseCalc.h"
 #include "LJMet/Com/interface/LjmetFactory.h"
 #include "LJMet/Com/interface/LjmetEventContent.h"
-#include "TLorentzVector.h"
-#include "EgammaAnalysis/ElectronTools/interface/ElectronEffectiveArea.h"
-#include "DataFormats/HLTReco/interface/TriggerEvent.h"
-#include "DataFormats/Common/interface/TriggerResults.h"
-#include "DataFormats/PatCandidates/interface/TriggerObject.h"
-#include "FWCore/Common/interface/TriggerNames.h"
+#include "TLorentzVector.h" 
 #include "DataFormats/Math/interface/deltaR.h"
 
-#include "DataFormats/JetReco/interface/CATopJetTagInfo.h"
+#include "DataFormats/JetReco/interface/HTTTopJetTagInfo.h"
 class LjmetFactory;
 
 
@@ -31,10 +26,10 @@ public:
     virtual ~TpTpCalc(){}
 
     virtual int BeginJob(){
-
+ 
       if (mPset.exists("genParticles")) genParticles_it = mPset.getParameter<edm::InputTag>("genParticles");
       else                              genParticles_it = edm::InputTag("prunedGenParticles");
-
+ 
       return 0;
     }
 
@@ -44,7 +39,8 @@ public:
   
 private:
   
-    edm::InputTag genParticles_it;
+  edm::InputTag genParticles_it;
+ 
 };
 
 
@@ -162,7 +158,8 @@ int TpTpCalc::AnalyzeEvent(edm::EventBase const & event,
     SetValue("bosonEnergy",bosonEnergy);
 
     // Now time for some checking -- do we have the right particles? 
-    if(quarkID.size() != 2){
+    if(quarkID.size() == 0){ return 0;}
+    else if(quarkID.size() != 2){
       std::cout << "More/less than 2 quarks stored: " << quarkID.size() << std::endl;
       for(size_t i = 0; i < quarkID.size(); i++){std::cout << "quark " << i << " = " << quarkID[i] << std::endl;}
 
@@ -214,7 +211,11 @@ int TpTpCalc::AnalyzeEvent(edm::EventBase const & event,
 	std::cout << "Moved up a top, 2 --> 1" << std::endl;
       }
     }
-    if(bosonID.size() != 2) std::cout << "More/less than 2 bosons stored: " << bosonID.size() << std::endl;
+    else{}
+
+    if(bosonID.size() == 0){return 0;}
+    else if(bosonID.size() != 2) std::cout << "More/less than 2 bosons stored: " << bosonID.size() << std::endl;
+    else{}
 
     // tag the decay chains according to ID'd quarks and bosons.
     // After the fixes above there should not be errors (if we've done it right!)
@@ -258,7 +259,34 @@ int TpTpCalc::AnalyzeEvent(edm::EventBase const & event,
     SetValue("isTHTH",isTHTH);
     SetValue("isTHBW",isTHBW);
     SetValue("isBWBW",isBWBW);
-	 
+    /*
+    vector<double> genMuPt;
+    vector<double> genMuPhi;
+    vector<double> genMuEta;
+    vector<bool> genMuPrompt;
+    vector<bool> genMuHadron;
+
+    // loop over all gen particles in event
+    for(size_t i = 0; i < genParticles->size(); i++){
+      const reco::GenParticle &p = (*genParticles).at(i);
+      int id = p.pdgId();
+
+      // find Tprime particles (+/- 8)
+      if(abs(id) != 13) continue;
+
+      genMuPt.push_back(p.pt());
+      genMuPhi.push_back(p.phi());
+      genMuPhi.push_back(p.eta());
+      genMuPrompt.push_back(p.isPrompt());
+      genMuHadron.push_back(p.isDirectHadronDecayProduct());
+    }
+
+    SetValue("genMuPt",genMuPt);
+    SetValue("genMuPhi",genMuPhi);
+    SetValue("genMuEta",genMuEta);
+    SetValue("genMuHadron",genMuHadron);
+    SetValue("genMuPrompt",genMuPrompt);
+    */	  
     return 0;
 }
 
