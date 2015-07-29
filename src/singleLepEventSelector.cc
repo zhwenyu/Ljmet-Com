@@ -52,6 +52,7 @@
 
 #include "DataFormats/METReco/interface/HcalNoiseSummary.h"
 #include "DataFormats/JetReco/interface/PFJetCollection.h"
+#include "DataFormats/METReco/interface/BeamHaloSummary.h"
 
 
 using trigger::TriggerObject;
@@ -224,8 +225,10 @@ void singleLepEventSelector::BeginJob( std::map<std::string, edm::ParameterSet c
         mvsPar["mctrigger_path_el"]       = par[_key].getParameter<std::vector<std::string>>  ("mctrigger_path_el");
         mvsPar["mctrigger_path_mu"]       = par[_key].getParameter<std::vector<std::string>>  ("mctrigger_path_mu");
 
+        mtPar["flag_tag"]                 = par[_key].getParameter<edm::InputTag>("flag_tag");
         mbPar["pv_cut"]                   = par[_key].getParameter<bool>         ("pv_cut");
         mbPar["hbhe_cut"]                 = par[_key].getParameter<bool>         ("hbhe_cut");
+        mbPar["csc_cut"]                  = par[_key].getParameter<bool>         ("csc_cut");
 
         mbPar["jet_cuts"]                 = par[_key].getParameter<bool>         ("jet_cuts");
         mdPar["jet_minpt"]                = par[_key].getParameter<double>       ("jet_minpt");
@@ -234,24 +237,27 @@ void singleLepEventSelector::BeginJob( std::map<std::string, edm::ParameterSet c
         miPar["max_jet"]                  = par[_key].getParameter<int>          ("max_jet");
         mdPar["leading_jet_pt"]           = par[_key].getParameter<double>       ("leading_jet_pt");
 
-        mbPar["muon_cuts"]                = par[_key].getParameter<bool>         ("muon_cuts");
-        mbPar["muon_selector"]            = par[_key].getParameter<bool>         ("muon_selector");
-        mdPar["muon_reliso"]              = par[_key].getParameter<double>       ("muon_reliso");
-        mdPar["muon_minpt"]               = par[_key].getParameter<double>       ("muon_minpt");
-        mdPar["muon_maxeta"]              = par[_key].getParameter<double>       ("muon_maxeta");
-        mbPar["loose_muon_selector"]      = par[_key].getParameter<bool>         ("loose_muon_selector");
-        mbPar["loose_muon_selector_tight"]= par[_key].getParameter<bool>         ("loose_muon_selector_tight");
-        mdPar["loose_muon_reliso"]        = par[_key].getParameter<double>       ("loose_muon_reliso");
-        mdPar["loose_muon_minpt"]         = par[_key].getParameter<double>       ("loose_muon_minpt");
-        mdPar["loose_muon_maxeta"]        = par[_key].getParameter<double>       ("loose_muon_maxeta");
-        miPar["min_muon"]                 = par[_key].getParameter<int>          ("min_muon");
+        mbPar["muon_cuts"]                 = par[_key].getParameter<bool>         ("muon_cuts");
+        mbPar["muon_selector"]             = par[_key].getParameter<bool>         ("muon_selector");
+        mdPar["muon_reliso"]               = par[_key].getParameter<double>       ("muon_reliso");
+        mdPar["muon_minpt"]                = par[_key].getParameter<double>       ("muon_minpt");
+        mdPar["muon_maxeta"]               = par[_key].getParameter<double>       ("muon_maxeta");
+        mbPar["loose_muon_selector"]       = par[_key].getParameter<bool>         ("loose_muon_selector");
+        mbPar["loose_muon_selector_tight"] = par[_key].getParameter<bool>         ("loose_muon_selector_tight");
+        mdPar["loose_muon_reliso"]         = par[_key].getParameter<double>       ("loose_muon_reliso");
+        mdPar["loose_muon_minpt"]          = par[_key].getParameter<double>       ("loose_muon_minpt");
+        mdPar["loose_muon_maxeta"]         = par[_key].getParameter<double>       ("loose_muon_maxeta");
+        miPar["min_muon"]                  = par[_key].getParameter<int>          ("min_muon");
 
-        mbPar["electron_cuts"]            = par[_key].getParameter<bool>         ("electron_cuts");
-        mdPar["electron_minpt"]           = par[_key].getParameter<double>       ("electron_minpt");
-        mdPar["electron_maxeta"]          = par[_key].getParameter<double>       ("electron_maxeta");
-        mdPar["loose_electron_minpt"]     = par[_key].getParameter<double>       ("loose_electron_minpt");
-        mdPar["loose_electron_maxeta"]    = par[_key].getParameter<double>       ("loose_electron_maxeta");
-        miPar["min_electron"]             = par[_key].getParameter<int>          ("min_electron");
+        mbPar["electron_cuts"]                 = par[_key].getParameter<bool>         ("electron_cuts");
+        //mbPar["electron_selector"]             = par[_key].getParameter<bool>         ("electron_selector");
+        mdPar["electron_minpt"]                = par[_key].getParameter<double>       ("electron_minpt");
+        mdPar["electron_maxeta"]               = par[_key].getParameter<double>       ("electron_maxeta");
+        //mbPar["loose_electron_selector"]       = par[_key].getParameter<bool>         ("loose_electron_selector");
+        //mbPar["loose_electron_selector_tight"] = par[_key].getParameter<bool>         ("loose_electron_selector_tight");
+        mdPar["loose_electron_minpt"]          = par[_key].getParameter<double>       ("loose_electron_minpt");
+        mdPar["loose_electron_maxeta"]         = par[_key].getParameter<double>       ("loose_electron_maxeta");
+        miPar["min_electron"]                  = par[_key].getParameter<int>          ("min_electron");
 
         miPar["min_lepton"]               = par[_key].getParameter<int>          ("min_lepton");
         miPar["max_lepton"]               = par[_key].getParameter<int>          ("max_lepton");
@@ -304,6 +310,7 @@ void singleLepEventSelector::BeginJob( std::map<std::string, edm::ParameterSet c
     push_back("Trigger");
     push_back("Primary vertex");
     push_back("HBHE noise and scraping filter");
+    push_back("CSC Tight Halo filter");
     push_back("One jet or more");
     push_back("Two jets or more");
     push_back("Three jets or more");
@@ -329,6 +336,7 @@ void singleLepEventSelector::BeginJob( std::map<std::string, edm::ParameterSet c
     set("Trigger", mbPar["trigger_cut"]); 
     set("Primary vertex", mbPar["pv_cut"]);
     set("HBHE noise and scraping filter", mbPar["hbhe_cut"]); 
+    set("CSC Tight Halo filter", mbPar["csc_cut"]); 
  
     if (mbPar["jet_cuts"]){
         set("One jet or more", true);
@@ -399,7 +407,6 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
             if (mbPar["debug"]) std::cout<<"trigger cuts..."<<std::endl;
 
             event.getByLabel( mtPar["trigger_collection"], mhEdmTriggerResults );
-            //const edm::ParameterSetID ps = mhEdmTriggerResults->parameterSetID();
             const edm::TriggerNames trigNames = event.triggerNames(*mhEdmTriggerResults);
 
             bool passTrig = false;
@@ -521,12 +528,11 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
 	    //taken from http://cmslxr.fnal.gov/lxr/source/CommonTools/RecoAlgos/plugins/HBHENoiseFilterResultProducer.cc?v=CMSSW_7_4_1
 	    //	and http://cmslxr.fnal.gov/lxr/source/CommonTools/RecoAlgos/python/HBHENoiseFilterResultProducer_cfi.py?v=CMSSW_7_4_1
 
-	    using namespace edm;
-
 	    edm::InputTag noiselabel ("hcalnoise");
 	    int minHPDHits = 17;
 	    int minHPDNoOtherHits = 10;
-	    int minZeros = 10;
+	    //int minZeros = 10;
+	    int minZeros = 999999.;
 	    bool IgnoreTS4TS5ifJetInLowBVRegion = false;
 
             // get the Noise summary object
@@ -554,6 +560,20 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
             if (!failFull) passCut(ret, "HBHE noise and scraping filter"); // HBHE cuts total
 
         } // end of HBHE cuts
+        if ( considerCut("CSC Tight Halo filter") ) {
+	    
+            edm::Handle<edm::TriggerResults > PatTriggerResults;
+            event.getByLabel( mtPar["flag_tag"], PatTriggerResults );
+            const edm::TriggerNames patTrigNames = event.triggerNames(*PatTriggerResults);
+
+            bool cscpass = false;
+
+            for (unsigned int i=0; i<PatTriggerResults->size(); i++){
+                if (patTrigNames.triggerName(i) == "Flag_CSCTightHaloFilter") cscpass = PatTriggerResults->accept(patTrigNames.triggerIndex(patTrigNames.triggerName(i)));
+            }
+
+            if (cscpass) passCut(ret, "CSC Tight Halo filter"); // CSC cut
+        } // end of CSC cuts
 
 
         //======================================================
@@ -679,10 +699,26 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
 
         if ( mbPar["electron_cuts"] ) {
             //get electrons
-            event.getByLabel( mtPar["electron_collection"], mhElectrons );      
+            event.getByLabel( mtPar["electron_collection"], mhElectrons );
+
+            /*//edm::InputTag eleVetoIdMapToken_ ("egmGsfElectronIDs:cutBasedElectronID-PHYS14-PU20bx25-V2-standalone-veto");
+            edm::InputTag eleLooseIdMapToken_ ("egmGsfElectronIDs:cutBasedElectronID-PHYS14-PU20bx25-V2-standalone-loose");
+            //edm::InputTag eleMediumIdMapToken_ ("egmGsfElectronIDs:cutBasedElectronID-PHYS14-PU20bx25-V2-standalone-medium");
+            edm::InputTag eleTightIdMapToken_ ("egmGsfElectronIDs:cutBasedElectronID-PHYS14-PU20bx25-V2-standalone-tight");
+            //edm::InputTag eleHEEPIdMapToken_ ("egmGsfElectronIDs:heepElectronID-HEEPV51");
+	    //edm::Handle<edm::ValueMap<bool> > veto_id_decisions;
+	    edm::Handle<edm::ValueMap<bool> > loose_id_decisions;
+	    //edm::Handle<edm::ValueMap<bool> > medium_id_decisions;
+	    edm::Handle<edm::ValueMap<bool> > tight_id_decisions; 
+	    //edm::Handle<edm::ValueMap<bool> > heep_id_decisions;
+	    //event.getByLabel(eleVetoIdMapToken_ ,veto_id_decisions);
+	    event.getByLabel(eleLooseIdMapToken_ ,loose_id_decisions);
+	   // event.getByLabel(eleMediumIdMapToken_,medium_id_decisions);
+	    event.getByLabel(eleTightIdMapToken_,tight_id_decisions);
+	    //event.getByLabel(eleHEEPIdMapToken_ ,heep_id_decisions);*/
 
             mvSelElectrons.clear();
-	
+	    size_t j = 0;
             for (std::vector<pat::Electron>::const_iterator _iel = mhElectrons->begin(); _iel != mhElectrons->end(); _iel++){
 	        retElectron.set(false);
                 bool pass = false;
@@ -692,6 +728,16 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
 
                     if ( (*electronSel_)( *_iel, event, retElectron ) ){ }
                     else break; // fail
+		    /*if (mbPar["electron_selector"]) {
+                        if ( (*electronSel_)( *_iel, event, retElectron ) ){ }
+                        else break; // fail
+		    }
+		    else {
+                        const edm::Ptr<pat::Electron> elPtr(mhElectrons, _n_electrons);
+                        if ( (*tight_id_decisions)[elPtr] ){ }
+		        else break; // fail
+		    }*/
+
                     if (_iel->pt()>mdPar["electron_minpt"]){ }
                     else break;
 	  
@@ -718,6 +764,21 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
     
                         if ( (*looseElectronSel_)( *_iel, event, retLooseElectron ) ){ }
                         else break; // fail
+    		        /*if (mbPar["loose_electron_selector"]) {
+                            if ( (*looseElectronSel_)( *_iel, event, retLooseElectron ) ){ }
+                            else break; // fail
+    		        }
+    		        else {
+                            const edm::Ptr<pat::Electron> elPtr(mhElectrons, _n_electrons);
+    		            if (mbPar["loose_electron_selector_tight"]) {
+                        	if ( (*tight_id_decisions)[elPtr] ){ }
+    		                else break; // fail
+                            }
+    		            else {
+                        	if ( (*loose_id_decisions)[elPtr] ){ }
+    		                else break; // fail
+                            }
+			}*/
 
                         if (_iel->pt()>mdPar["loose_electron_minpt"]){ }
                         else break;
