@@ -63,11 +63,15 @@ process.event_selector = cms.PSet(
     #mctrigger_path_mu = cms.vstring('HLT_IsoMu24_eta2p1_IterTrk02_v1'),
     mctrigger_path_el = cms.vstring('HLT_Ele45_CaloIdVT_GsfTrkIdT_PFJet200_PFJet50_v1','HLT_Ele95_CaloIdVT_GsfTrkIdT_v1','HLTriggerFinalPath'),
     mctrigger_path_mu = cms.vstring('HLT_Mu40_v1','HLT_Mu40_eta2p1_PFJet200_PFJet50_v1','HLTriggerFinalPath'),
-    trigger_path_el = cms.vstring('HLT_Ele105_CaloIdVT_GsfTrkIdT_v2','HLT_Ele27_eta2p1_WPLoose_Gsf_v1','HLTriggerFinalPath'),
-    trigger_path_mu = cms.vstring('HLT_Mu50_v1','HLT_Mu45_eta2p1_v1','HLT_IsoMu24_eta2p1_v2','HLTriggerFinalPath'),
+    #trigger_path_el = cms.vstring('HLT_Ele105_CaloIdVT_GsfTrkIdT_v2','HLT_Ele27_eta2p1_WPTight_Gsf_v1','HLTriggerFinalPath'),
+    #trigger_path_mu = cms.vstring('HLT_Mu50_v1','HLT_Mu45_eta2p1_v1','HLT_IsoMu24_eta2p1_v2','HLTriggerFinalPath'),
+    trigger_path_el = cms.vstring('HLT_Ele27_eta2p1_WPTight_Gsf_v1'),
+    trigger_path_mu = cms.vstring('HLT_IsoMu24_eta2p1_v2'),
 
+    flag_tag       = cms.InputTag('TriggerResults::PAT'),
     pv_cut         = cms.bool(True),
     hbhe_cut       = cms.bool(True),
+    csc_cut        = cms.bool(True),
 
     jet_cuts                 = cms.bool(True),
     jet_minpt                = cms.double(30.0),
@@ -76,24 +80,27 @@ process.event_selector = cms.PSet(
     max_jet                  = cms.int32(4000),
     leading_jet_pt	     = cms.double(100.),
 
-    muon_cuts                = cms.bool(True),
-    muon_selector            = cms.bool(False),
-    muon_minpt               = cms.double(35.0),
-    muon_reliso              = cms.double(999999.),
-    muon_maxeta              = cms.double(2.1),
-    loose_muon_selector      = cms.bool(False),
-    loose_muon_selector_tight= cms.bool(True),
-    loose_muon_minpt         = cms.double(35.0),
-    loose_muon_reliso        = cms.double(999999.),
-    loose_muon_maxeta        = cms.double(2.1),
-    min_muon                 = cms.int32(0),
+    muon_cuts                 = cms.bool(True),
+    muon_selector             = cms.bool(False),
+    muon_minpt                = cms.double(35.0),
+    muon_reliso               = cms.double(0.12),
+    muon_maxeta               = cms.double(2.1),
+    loose_muon_selector       = cms.bool(False),
+    loose_muon_selector_tight = cms.bool(False),
+    loose_muon_minpt          = cms.double(35.0),
+    loose_muon_reliso         = cms.double(0.12),
+    loose_muon_maxeta         = cms.double(2.1),
+    min_muon                  = cms.int32(0),
 
-    electron_cuts            = cms.bool(True),
-    electron_minpt           = cms.double(35.0),
-    electron_maxeta          = cms.double(2.5),
-    loose_electron_minpt     = cms.double(35.0),
-    loose_electron_maxeta    = cms.double(2.5),
-    min_electron             = cms.int32(0),
+    electron_cuts                 = cms.bool(True),
+    #electron_selector             = cms.bool(True),
+    electron_minpt                = cms.double(35.0),
+    electron_maxeta               = cms.double(2.5),
+    #loose_electron_selector       = cms.bool(True),
+    #loose_electron_selector_tight = cms.bool(False),
+    loose_electron_minpt          = cms.double(35.0),
+    loose_electron_maxeta         = cms.double(2.5),
+    min_electron                  = cms.int32(0),
     
     min_lepton               = cms.int32(1),
     max_lepton               = cms.int32(1),
@@ -150,11 +157,11 @@ process.event_selector = cms.PSet(
 #
 
 process.inputs = cms.PSet (
-       nEvents    = cms.int32(100),
+       nEvents    = cms.int32(-1),
            skipEvents = cms.int32(0),
            lumisToProcess = CfgTypes.untracked(CfgTypes.VLuminosityBlockRange()),
            fileNames  = cms.vstring(
-			'file:SingleElectron_Run251252.root'
+			'file:SingleElectron_TEST.root'
                    )
        )
 
@@ -163,7 +170,7 @@ process.inputs = cms.PSet (
 
 # JSON
 if (not process.ljmet.isMc==cms.bool(True)):
-    JsonFile = '../data/json/json_DCSONLY_Run2015B.txt'
+    JsonFile = '../data/json/Cert_246908-251642_13TeV_PromptReco_Collisions15_JSON.txt'
     myList   = LumiList.LumiList(filename=JsonFile).getCMSSWString().split(',')
     process.inputs.lumisToProcess.extend(myList)
         
@@ -202,7 +209,7 @@ process.LoosepfMuonSelector = process.pfMuonSelector.clone()
 
 # Tight electron
 process.load('LJMet.Com.TopElectronSelector_cfi')
-process.TopElectronSelector.cutsToIgnore = cms.vstring("reliso_EB","reliso_EE")
+#process.TopElectronSelector.cutsToIgnore = cms.vstring("reliso_EB","reliso_EE")
 
 # Loose electron
 process.LooseTopElectronSelector = process.TopElectronSelector.clone()
