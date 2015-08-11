@@ -68,6 +68,10 @@ public:
     edm::Ptr<reco::PFMET> const & GetType1CorrMet() const { return mpType1CorrMet; }
     TLorentzVector const & GetCorrectedMet() const { return correctedMET_p4; }
     std::vector<unsigned int> const & GetSelectedTriggers() const { return mvSelTriggers; }
+    std::map<std::string, unsigned int> const & GetSelectedTriggersEl() const { return mvSelTriggersEl; }
+    std::map<std::string, unsigned int> const & GetSelectedTriggersMu() const { return mvSelTriggersMu; }
+    std::map<std::string, unsigned int> const & GetSelectedMCTriggersEl() const { return mvSelMCTriggersEl; }
+    std::map<std::string, unsigned int> const & GetSelectedMCTriggersMu() const { return mvSelMCTriggersMu; }
     std::vector<edm::Ptr<reco::Vertex>> const & GetSelectedPVs() const { return mvSelPVs; }
     double const & GetTestValue() const { return mTestValue; }
     void SetMc(bool isMc) { mbIsMc = isMc; }
@@ -104,6 +108,10 @@ protected:
     edm::Ptr<reco::PFMET> mpType1CorrMet;
     TLorentzVector correctedMET_p4;
     std::vector<unsigned int> mvSelTriggers;
+    std::map<std::string, unsigned int> mvSelTriggersEl;
+    std::map<std::string, unsigned int> mvSelTriggersMu;
+    std::map<std::string, unsigned int> mvSelMCTriggersEl;
+    std::map<std::string, unsigned int> mvSelMCTriggersMu;
     std::vector<edm::Ptr<reco::Vertex>> mvSelPVs;
     double mTestValue;
     

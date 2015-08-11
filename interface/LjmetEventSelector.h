@@ -53,6 +53,7 @@
 #include "LJMet/Com/interface/MuonSelectionFunctor.h"
 #include "LJMet/Com/interface/PVSelector.h"
 #include "LJMet/Com/interface/PvObjectSelector.h"
+#include "RecoEgamma/EgammaTools/interface/ConversionTools.h"
 
 using namespace std;
 

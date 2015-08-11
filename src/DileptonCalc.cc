@@ -16,7 +16,7 @@
 #include "LJMet/Com/interface/TopElectronSelector.h"
 #include "DataFormats/MuonReco/interface/MuonPFIsolation.h"
 
-#include "DataFormats/JetReco/interface/CATopJetTagInfo.h"
+#include "DataFormats/BTauReco/interface/CATopJetTagInfo.h"
 #include "FWCore/Common/interface/TriggerNames.h"
 #include "DataFormats/Common/interface/TriggerResults.h"
 #include "DataFormats/HLTReco/interface/TriggerEvent.h"

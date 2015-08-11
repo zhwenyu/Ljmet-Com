@@ -13,6 +13,8 @@
 #include "LJMet/Com/interface/LjmetPdfWeightProducer.h"
 #include "SimDataFormats/GeneratorProducts/interface/GenEventInfoProduct.h"
 
+using namespace std;
+
 class LjmetFactory;
 
 namespace LHAPDF {

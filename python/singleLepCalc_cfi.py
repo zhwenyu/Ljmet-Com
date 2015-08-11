@@ -2,6 +2,8 @@ import FWCore.ParameterSet.Config as cms
 
 singleLepCalc = cms.PSet(
                          dataType          = cms.string('All'),
+                         elTrigMatchFilters = cms.vstring('hltEle105CaloIdVTGsfTrkIdTGsfDphiFilter'),
+                         muTrigMatchFilters = cms.vstring('hltL3fL1sMu16orMu25L1f0L2f16QL3Filtered45e2p1Q'),
                          isMc              = cms.bool(True),
                          pvCollection = cms.InputTag("offlineSlimmedPrimaryVertices"),
                          genParticles = cms.InputTag("prunedGenParticles"),

@@ -5,6 +5,8 @@
 #include "CondFormats/JetMETObjects/interface/JetCorrectorParameters.h"
 #include "CondFormats/JetMETObjects/interface/FactorizedJetCorrector.h"
 
+using namespace std;
+
 BaseEventSelector::BaseEventSelector():
 mName(""),
 mLegend("")
@@ -221,7 +223,7 @@ TLorentzVector BaseEventSelector::correctJet(const pat::Jet & jet, edm::EventBas
     if (mbPar["doNewJEC"])
         correctedJet = jet.correctedJet(0);                 //copy original jet
     else
-        correctedJet = jet;                                 //copy 52x corrected jet
+        correctedJet = jet;                                 //copy default corrected jet
 
     double ptscale = 1.0;
     double unc = 1.0;
@@ -277,7 +279,7 @@ TLorentzVector BaseEventSelector::correctJet(const pat::Jet & jet, edm::EventBas
 
         }
         double factor = 0.0; // For Nominal Case
-        double theAbsJetEta = abs(jet.eta());
+        double theAbsJetEta = fabs(jet.eta());
         
         if ( theAbsJetEta < 0.5 ) {
             factor = .052;
@@ -307,7 +309,7 @@ TLorentzVector BaseEventSelector::correctJet(const pat::Jet & jet, edm::EventBas
         }
 
         const reco::GenJet * genJet = jet.genJet();
-    	if (genJet && genJet->pt()>15. && (abs(genJet->pt()/pt-1)<0.5)){
+    	if (genJet && genJet->pt()>15. && (fabs(genJet->pt()/pt-1)<0.5)){
       	    double gen_pt = genJet->pt();
       	    double reco_pt = pt;
             double deltapt = (reco_pt - gen_pt) * factor;
@@ -444,7 +446,7 @@ TLorentzVector BaseEventSelector::correctMet(const pat::MET & met, edm::EventBas
     
     // sanity check histogram
     double _orig_met = met.pt();
-    if (abs(_orig_met) < 1.e-9) {
+    if (fabs(_orig_met) < 1.e-9) {
         _orig_met = 1.e-9;
     }
     SetHistValue("met_correction", correctedMET_p4.Pt()/_orig_met);
