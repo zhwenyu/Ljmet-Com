@@ -27,6 +27,7 @@ process.ljmet.excluded_calculators = cms.vstring(
 	'PdfCalc',
 	'ChargedHiggsCalc',
 	'TprimeCalc',
+	'TpTpCalc',
 	'LjetsTopoCalc',
 	'WprimeCalc',
         'WprimeBoostedCalc'
@@ -121,7 +122,7 @@ process.event_selector = cms.PSet(
 
 
 process.inputs = cms.PSet (
-    nEvents    = cms.int32(-1),
+    nEvents    = cms.int32(100),
     skipEvents = cms.int32(0),
     lumisToProcess = CfgTypes.untracked(CfgTypes.VLuminosityBlockRange()),
 #tev left single production inclusive:
