@@ -9,7 +9,7 @@ relBase    = str('/data1/speer/tblsm/cmssw/git-transition/new-git_5_3_6/')
 #
 # FWLite application options
 process.load('LJMet.Com.ljmet_cfi')
-process.ljmet.isMc = cms.bool(True)
+process.ljmet.isMc = cms.bool(False)
 process.ljmet.excluded_calculators = cms.vstring(
 	'DileptonCalc',
 	'StopCalc',
@@ -19,7 +19,9 @@ process.ljmet.excluded_calculators = cms.vstring(
 	'LjetsTopoCalc',
 	'LjetsTopoCalcNew',
 	'WprimeCalc',
-	'JetSubCalc'
+	'JetSubCalc',
+        'TpTpCalc',
+	'BTagSFCalc'
 	) 
 
 # common calculator options
@@ -30,6 +32,7 @@ process.load('LJMet.Com.stopCalc_cfi')
 
 # singleLep calculator options
 process.load('LJMet.Com.singleLepCalc_cfi')
+process.singleLepCalc.isMc = cms.bool(False)
 
 # LjetsTopoCalc options
 #process.load('LJMet.Com.ljetsTopoCalcNew_cfi')
@@ -50,21 +53,25 @@ process.event_selector = cms.PSet(
     # cuts
     debug  = cms.bool(False),
 
-    isMc  = cms.bool(True),
+    isMc  = cms.bool(False),
     keepFullMChistory = cms.bool(True),
     
     trigger_cut  = cms.bool(True),
     dump_trigger = cms.bool(False),
     
-    mctrigger_path_el = cms.string('HLT_Ele32_eta2p1_WP85_Gsf_v1'),
-    mctrigger_path_mu = cms.string('HLT_IsoMu24_eta2p1_IterTrk02_v1'),
-    #mctrigger_path_el = cms.string('HLT_Ele45_CaloIdVT_GsfTrkIdT_PFJet200_PFJet50_v1'),
-    #mctrigger_path_mu = cms.string('HLT_Mu40_eta2p1_PFJet200_PFJet50_v1'),
-    trigger_path_el = cms.vstring('HLT_Ele27_WP80_v8','HLT_Ele27_WP80_v9','HLT_Ele27_WP80_v10','HLT_Ele27_WP80_v11'),
-    trigger_path_mu = cms.vstring('HLT_IsoMu24_eta2p1_v11','HLT_IsoMu24_eta2p1_v12','HLT_IsoMu24_eta2p1_v13','HLT_IsoMu24_eta2p1_v14','HLT_IsoMu24_eta2p1_v15'),
+    #mctrigger_path_el = cms.vstring('HLT_Ele32_eta2p1_WP85_Gsf_v1'),
+    #mctrigger_path_mu = cms.vstring('HLT_IsoMu24_eta2p1_IterTrk02_v1'),
+    mctrigger_path_el = cms.vstring('HLT_Ele45_CaloIdVT_GsfTrkIdT_PFJet200_PFJet50_v1','HLT_Ele95_CaloIdVT_GsfTrkIdT_v1','HLTriggerFinalPath'),
+    mctrigger_path_mu = cms.vstring('HLT_Mu40_v1','HLT_Mu40_eta2p1_PFJet200_PFJet50_v1','HLTriggerFinalPath'),
+    #trigger_path_el = cms.vstring('HLT_Ele105_CaloIdVT_GsfTrkIdT_v2','HLT_Ele27_eta2p1_WPTight_Gsf_v1','HLTriggerFinalPath'),
+    #trigger_path_mu = cms.vstring('HLT_Mu50_v1','HLT_Mu45_eta2p1_v1','HLT_IsoMu24_eta2p1_v2','HLTriggerFinalPath'),
+    trigger_path_el = cms.vstring('HLT_Ele27_eta2p1_WPTight_Gsf_v1'),
+    trigger_path_mu = cms.vstring('HLT_IsoMu24_eta2p1_v2'),
 
+    flag_tag       = cms.InputTag('TriggerResults::PAT'),
     pv_cut         = cms.bool(True),
     hbhe_cut       = cms.bool(True),
+    csc_cut        = cms.bool(True),
 
     jet_cuts                 = cms.bool(True),
     jet_minpt                = cms.double(30.0),
@@ -73,24 +80,27 @@ process.event_selector = cms.PSet(
     max_jet                  = cms.int32(4000),
     leading_jet_pt	     = cms.double(100.),
 
-    muon_cuts                = cms.bool(True),
-    muon_selector            = cms.bool(False),
-    muon_minpt               = cms.double(35.0),
-    muon_reliso              = cms.double(0.12),
-    muon_maxeta              = cms.double(2.1),
-    loose_muon_selector      = cms.bool(False),
-    loose_muon_selector_tight= cms.bool(False),
-    loose_muon_minpt         = cms.double(25.0),
-    loose_muon_reliso        = cms.double(0.2),
-    loose_muon_maxeta        = cms.double(2.4),
-    min_muon                 = cms.int32(0),
+    muon_cuts                 = cms.bool(True),
+    muon_selector             = cms.bool(False),
+    muon_minpt                = cms.double(35.0),
+    muon_reliso               = cms.double(0.12),
+    muon_maxeta               = cms.double(2.1),
+    loose_muon_selector       = cms.bool(False),
+    loose_muon_selector_tight = cms.bool(False),
+    loose_muon_minpt          = cms.double(35.0),
+    loose_muon_reliso         = cms.double(0.12),
+    loose_muon_maxeta         = cms.double(2.1),
+    min_muon                  = cms.int32(0),
 
-    electron_cuts            = cms.bool(True),
-    electron_minpt           = cms.double(35.0),
-    electron_maxeta          = cms.double(2.5),
-    loose_electron_minpt     = cms.double(25.0),
-    loose_electron_maxeta    = cms.double(2.5),
-    min_electron             = cms.int32(0),
+    electron_cuts                 = cms.bool(True),
+    #electron_selector             = cms.bool(True),
+    electron_minpt                = cms.double(35.0),
+    electron_maxeta               = cms.double(2.5),
+    #loose_electron_selector       = cms.bool(True),
+    #loose_electron_selector_tight = cms.bool(False),
+    loose_electron_minpt          = cms.double(35.0),
+    loose_electron_maxeta         = cms.double(2.5),
+    min_electron                  = cms.int32(0),
     
     min_lepton               = cms.int32(1),
     max_lepton               = cms.int32(1),
@@ -102,7 +112,7 @@ process.event_selector = cms.PSet(
     min_met                  = cms.double(20.0),
     
     btag_cuts                = cms.bool(False),
-    btagger                  = cms.string('combinedInclusiveSecondaryVertexV2BJetTags'),
+    btagger                  = cms.string('pfCombinedInclusiveSecondaryVertexV2BJetTags'),
     btag_min_discr           = cms.double(0.814),
     btag_1                   = cms.bool(False),
     btag_2                   = cms.bool(False),
@@ -123,7 +133,7 @@ process.event_selector = cms.PSet(
     tau_collection	     = cms.InputTag('slimmedTaus'),
     met_collection           = cms.InputTag('slimmedMETs'),
 #    type1corrmet_collection  = cms.InputTag(''),
-    doNewJEC		     = cms.bool(True),
+    doNewJEC		     = cms.bool(False),
     doLepJetCleaning	     = cms.bool(True),
 
     MCL1JetPar               = cms.string("../data/PHYS14_25_V2_L1FastJet_AK4PFchs.txt"),
@@ -147,11 +157,11 @@ process.event_selector = cms.PSet(
 #
 
 process.inputs = cms.PSet (
-       nEvents    = cms.int32(100000),
+       nEvents    = cms.int32(-1),
            skipEvents = cms.int32(0),
            lumisToProcess = CfgTypes.untracked(CfgTypes.VLuminosityBlockRange()),
            fileNames  = cms.vstring(
-			'file:///uscms_data/d3/drankin/Wprimetotb/gen/CMSSW_7_2_0/src/PHYS14_Step3/SingletopWprime_M2700.root'
+			'file:SingleElectron_TEST.root'
                    )
        )
 
@@ -160,7 +170,7 @@ process.inputs = cms.PSet (
 
 # JSON
 if (not process.ljmet.isMc==cms.bool(True)):
-    JsonFile = 'CMSSW_BASE/src/LJMet/singletPrime/json/Jan222013ReReco_json.txt'
+    JsonFile = '../data/json/Cert_246908-251642_13TeV_PromptReco_Collisions15_JSON.txt'
     myList   = LumiList.LumiList(filename=JsonFile).getCMSSWString().split(',')
     process.inputs.lumisToProcess.extend(myList)
         
@@ -170,7 +180,7 @@ if (not process.ljmet.isMc==cms.bool(True)):
 # Output
 #
 process.outputs = cms.PSet (
-    outputName = cms.string('Wprime2700Right_singleLep'),
+    outputName = cms.string('SingleElectron_singleLep_TEST'),
     treeName   = cms.string('ljmet'),
 )
 
@@ -203,4 +213,4 @@ process.load('LJMet.Com.TopElectronSelector_cfi')
 
 # Loose electron
 process.LooseTopElectronSelector = process.TopElectronSelector.clone()
-process.LooseTopElectronSelector.version = cms.string('VETO')
+#process.LooseTopElectronSelector.version = cms.string('VETO')

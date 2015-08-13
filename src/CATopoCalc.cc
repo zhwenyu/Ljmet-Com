@@ -14,6 +14,8 @@
 #include "SimDataFormats/PileupSummaryInfo/interface/PileupSummaryInfo.h"
 #include "DataFormats/PatCandidates/interface/Jet.h"
 
+using namespace std;
+
 class LjmetFactory;
 
 class CATopoCalc : public BaseCalc {

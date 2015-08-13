@@ -62,8 +62,8 @@ process.event_selector = cms.PSet(
     trigger_cut  = cms.bool(True),
     dump_trigger = cms.bool(False),
     
-    mctrigger_path_el = cms.string('HLT_Ele32_eta2p1_WP85_Gsf_v1'),
-    mctrigger_path_mu = cms.string('HLT_IsoMu24_eta2p1_IterTrk02_v1'),
+    mctrigger_path_el = cms.vstring('HLT_Ele32_eta2p1_WP85_Gsf_v1'),
+    mctrigger_path_mu = cms.vstring('HLT_IsoMu24_eta2p1_IterTrk02_v1'),
     trigger_path_el = cms.vstring('HLT_Ele27_WP80_v8','HLT_Ele27_WP80_v9','HLT_Ele27_WP80_v10','HLT_Ele27_WP80_v11'),
     trigger_path_mu = cms.vstring('HLT_IsoMu24_eta2p1_v11','HLT_IsoMu24_eta2p1_v12','HLT_IsoMu24_eta2p1_v13','HLT_IsoMu24_eta2p1_v14','HLT_IsoMu24_eta2p1_v15'),
 

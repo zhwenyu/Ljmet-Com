@@ -93,6 +93,12 @@ void LjmetEventContent::SetValue(std::string key, std::vector<double> value)
     mVectorDoubleBranch[key] = value;
 }
 
+
+void LjmetEventContent::SetValue(std::string key,std::vector<std::string> value){
+    mVectorStringBranch[key] = value;
+}
+
+
 void LjmetEventContent::SetHistValue(std::string modname, std::string histname, double value)
 {
     // Assign current hist value to hist metadata collection
@@ -210,7 +216,24 @@ int LjmetEventContent::createBranches()
             std::cout << mLegend << "Branch " << br->first << " std::vector<double> created" << std::endl;
         }
     }
-    std::cout << mLegend << "vector<double> branches created: " << mVectorDoubleBranch.size() << std::endl;
-    
+
+    std::cout << mLegend << "vector<double> branches created: "
+    << mVectorDoubleBranch.size() << std::endl;
+
+    // vector vector string branches
+    for(std::map<std::string,std::vector<std::string> >::iterator br = mVectorStringBranch.begin();
+	br != mVectorStringBranch.end();
+	++br){
+        std::string name_type = br->first+" std::vector<std::string>";
+      //      std::string type = "VVString";
+      mpTree -> Branch(br->first.c_str(),
+		       &(br->second));
+
+    if (mVerbosity>0){
+            std::cout << mLegend << "Branch " << name_type
+            << " created" << std::endl;
+        }
+    }
+
     return 0;
 }

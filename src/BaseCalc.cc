@@ -53,6 +53,12 @@ void BaseCalc::SetValue(std::string name, std::vector<double> value)
     mpEc->SetValue(_name, value);
 }
 
+void BaseCalc::SetValue(std::string name, std::vector<std::string> value)
+{
+  std::string _name = name + "_" + mName;
+  mpEc->SetValue(_name, value);
+}
+
 void BaseCalc::init()
 {
     mLegend = "[" + mName + "]: ";
