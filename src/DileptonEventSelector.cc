@@ -40,7 +40,7 @@
 #include "PhysicsTools/SelectorUtils/interface/PVSelector.h"
 #include "LJMet/Com/interface/BaseEventSelector.h"
 #include "LJMet/Com/interface/LjmetFactory.h"
-
+#include "DataFormats/METReco/interface/HcalNoiseSummary.h"
 
 
 using trigger::TriggerObject;
@@ -148,7 +148,7 @@ void DileptonEventSelector::BeginJob( std::map<std::string, edm::ParameterSet co
         
         mbPar["pv_cut"]                   = par[_key].getParameter<bool>         ("pv_cut");
         mbPar["hbhe_cut"]                 = par[_key].getParameter<bool>         ("hbhe_cut");
-        
+	mbPar["cscHalo_cut"]              = par[_key].getParameter<bool>         ("cscHalo_cut");
         mbPar["jet_cuts"]                 = par[_key].getParameter<bool>         ("jet_cuts");
         mdPar["jet_minpt"]                = par[_key].getParameter<double>       ("jet_minpt");
         mdPar["jet_maxeta"]               = par[_key].getParameter<double>       ("jet_maxeta");
@@ -195,6 +195,7 @@ void DileptonEventSelector::BeginJob( std::map<std::string, edm::ParameterSet co
     push_back("Trigger");
     push_back("Primary vertex");
     push_back("HBHE noise and scraping filter");
+    push_back("CSC Tight Halo filter");
     push_back("Min muon");
     push_back("Max muon");
     push_back("Min electron");
@@ -215,7 +216,8 @@ void DileptonEventSelector::BeginJob( std::map<std::string, edm::ParameterSet co
     set("Trigger", mbPar["trigger_cut"]);
     set("Primary vertex", mbPar["pv_cut"]);
     set("HBHE noise and scraping filter", mbPar["hbhe_cut"]);
-    
+    set("CSC Tight Halo filter", mbPar["cscHalo_cut"]);
+
     if (mbPar["muon_cuts"]){
         set("Min muon", miPar["min_muon"]);
         set("Max muon", miPar["max_muon"]);
@@ -353,9 +355,63 @@ bool DileptonEventSelector::operator()( edm::EventBase const & event, pat::strbi
         //
         if ( considerCut("HBHE noise and scraping filter") ) {
             
-            passCut(ret, "HBHE noise and scraping filter"); // PV cuts total
-            
-        } // end of PV cuts
+
+	  if (mbPar["debug"]) std::cout<<"HBHE cuts..."<<std::endl;
+
+	  //taken from http://cmslxr.fnal.gov/lxr/source/CommonTools/RecoAlgos/plugins/HBHENoiseFilterResultProducer.cc?v=CMSSW_7_4_1
+	  //and http://cmslxr.fnal.gov/lxr/source/CommonTools/RecoAlgos/python/HBHENoiseFilterResultProducer_cfi.py?v=CMSSW_7_4_1
+
+	  edm::InputTag noiselabel ("hcalnoise");
+	  int minHPDHits = 17;
+	  int minHPDNoOtherHits = 10;
+	  //int minZeros = 10;
+	  int minZeros = 999999.;
+	  bool IgnoreTS4TS5ifJetInLowBVRegion = false;
+
+	  // get the Noise summary object
+	  edm::Handle<HcalNoiseSummary> summary_h;
+	  event.getByLabel(noiselabel, summary_h);
+	  if(!summary_h.isValid()) {
+	    std::cout << "Could not find HcalNoiseSummary.\n";
+	  }
+	  const HcalNoiseSummary& summary(*summary_h);
+
+	  bool goodJetFoundInLowBVRegion = false;
+	  if (IgnoreTS4TS5ifJetInLowBVRegion) goodJetFoundInLowBVRegion = summary.goodJetFoundInLowBVRegion();
+
+	  const bool failCommon = summary.maxHPDHits() >= minHPDHits || summary.maxHPDNoOtherHits() >= minHPDNoOtherHits || summary.maxZeros() >= minZeros;
+
+	  //const bool failFull = failCommon || (summary.HasBadRBXTS4TS5() && !goodJetFoundInLowBVRegion);
+
+	  const bool failFull = failCommon || (summary.HasBadRBXRechitR45Loose() && !goodJetFoundInLowBVRegion);
+
+	  //const bool failFull = failCommon || (summary.HasBadRBXRechitR45Tight() && !goodJetFoundInLowBVRegion);
+
+	  // Check isolation requirements
+	  //const bool failIsolation = summary.numIsolatedNoiseChannels() >= minNumIsolatedNoiseChannels || summary.isolatedNoiseSumE() >= minIsolatedNoiseSumE || summary.isolatedNoiseSumEt() >= minIsolatedNoiseSumEt;
+
+	  if (!failFull) passCut(ret, "HBHE noise and scraping filter"); // HBHE cuts total
+     
+        } // end of hbhe cuts
+
+	//_________CSC Halo Filter_________
+
+	if ( considerCut("CSC Tight Halo filter") ) {
+	      
+	  edm::Handle<edm::TriggerResults > PatTriggerResults;
+	  event.getByLabel( mtPar["flag_tag"], PatTriggerResults );
+	  const edm::TriggerNames patTrigNames = event.triggerNames(*PatTriggerResults);
+
+	  bool cscpass = false;
+
+	  for (unsigned int i=0; i<PatTriggerResults->size(); i++){
+	    if (patTrigNames.triggerName(i) == "Flag_CSCTightHaloFilter") cscpass = PatTriggerResults->accept(patTrigNames.triggerIndex(patTrigNames.triggerName(i)));
+	  }
+
+	  if (cscpass) passCut(ret, "CSC Tight Halo filter"); // CSC cut
+        } // end of CSC cuts
+
+
         
         //
         //_____ Muon cuts ________________________________
