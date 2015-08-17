@@ -343,7 +343,8 @@ int TpTpCalc::AnalyzeEvent(edm::EventBase const & event,
     SetValue("bosonEnergy",bosonEnergy);
 
     // Now time for some checking -- do we have the right particles? 
-    if(quarkID.size() != 2){
+    if(quarkID.size() == 0){ return 0;}
+    else if(quarkID.size() != 2){
       std::cout << "More/less than 2 quarks stored: " << quarkID.size() << std::endl;
       for(size_t i = 0; i < quarkID.size(); i++){std::cout << "quark " << i << " = " << quarkID[i] << std::endl;}
 
