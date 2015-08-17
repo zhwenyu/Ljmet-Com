@@ -311,10 +311,10 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * s
         theTrimmedMass  = -std::numeric_limits<double>::max();
 	theFilteredMass = -std::numeric_limits<double>::max();
         theSoftDropMass = -std::numeric_limits<double>::max();
-        thePrunedMass   = (double)ijet->userFloat("ak8PFJetsCHSPrunedLinks");
-        theTrimmedMass  = (double)ijet->userFloat("ak8PFJetsCHSTrimmedLinks");
-        theFilteredMass = (double)ijet->userFloat("ak8PFJetsCHSFilteredLinks");
-        theSoftDropMass = (double)ijet->userFloat("ak8PFJetsCHSSoftDropLinks");
+        thePrunedMass   = (double)ijet->userFloat("ak8PFJetsCHSPrunedMass");
+        theTrimmedMass  = (double)ijet->userFloat("ak8PFJetsCHSTrimmedMass");
+        theFilteredMass = (double)ijet->userFloat("ak8PFJetsCHSFilteredMass");
+        theSoftDropMass = (double)ijet->userFloat("ak8PFJetsCHSSoftDropMass");
         
         theNjettinessTau1 = -std::numeric_limits<double>::max();
         theNjettinessTau2 = -std::numeric_limits<double>::max();
