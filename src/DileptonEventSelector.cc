@@ -148,6 +148,7 @@ void DileptonEventSelector::BeginJob( std::map<std::string, edm::ParameterSet co
         
         mbPar["pv_cut"]                   = par[_key].getParameter<bool>         ("pv_cut");
         mbPar["hbhe_cut"]                 = par[_key].getParameter<bool>         ("hbhe_cut");
+        msPar["hbhe_cut_value"]           = par[_key].getParameter<std::string>  ("hbhe_cut_value");
 	mbPar["cscHalo_cut"]              = par[_key].getParameter<bool>         ("cscHalo_cut");
         mbPar["jet_cuts"]                 = par[_key].getParameter<bool>         ("jet_cuts");
         mdPar["jet_minpt"]                = par[_key].getParameter<double>       ("jet_minpt");
@@ -355,6 +356,23 @@ bool DileptonEventSelector::operator()( edm::EventBase const & event, pat::strbi
         //
         if ( considerCut("HBHE noise and scraping filter") ) {
             
+	  //set cut value considered
+	  bool run1Cut=false;
+	  bool run2LooseCut=false;
+	  bool run2TightCut=false;
+	  if(msPar["hbhe_cut_value"].find("Run1")!=string::npos){
+	    run1Cut=true;
+	  }
+	  else if(msPar["hbhe_cut_value"].find("Run2Loose")!=string::npos){
+	    run2LooseCut=true;
+	  }
+	  else if(msPar["hbhe_cut_value"].find("Run2Tight")!=string::npos){
+	    run2TightCut=true;
+	  }
+	  else{
+	    std::cout<<"HBHE cut not configured correctly!...exiting..."<<std::endl;
+	    std::exit(-1);
+	  }
 
 	  if (mbPar["debug"]) std::cout<<"HBHE cuts..."<<std::endl;
 
@@ -383,15 +401,24 @@ bool DileptonEventSelector::operator()( edm::EventBase const & event, pat::strbi
 
 	  //const bool failFull = failCommon || (summary.HasBadRBXTS4TS5() && !goodJetFoundInLowBVRegion);
 
-	  const bool failFull = failCommon || (summary.HasBadRBXRechitR45Loose() && !goodJetFoundInLowBVRegion);
+	  const bool failRun1 = failCommon || (summary.HasBadRBXTS4TS5() && !goodJetFoundInLowBVRegion);
 
-	  //const bool failFull = failCommon || (summary.HasBadRBXRechitR45Tight() && !goodJetFoundInLowBVRegion);
+	  const bool failRun2Loose = failCommon || (summary.HasBadRBXRechitR45Loose() && !goodJetFoundInLowBVRegion);
+
+	  const bool failRun2Tight = failCommon || (summary.HasBadRBXRechitR45Tight() && !goodJetFoundInLowBVRegion);
 
 	  // Check isolation requirements
 	  //const bool failIsolation = summary.numIsolatedNoiseChannels() >= minNumIsolatedNoiseChannels || summary.isolatedNoiseSumE() >= minIsolatedNoiseSumE || summary.isolatedNoiseSumEt() >= minIsolatedNoiseSumEt;
-
-	  if (!failFull) passCut(ret, "HBHE noise and scraping filter"); // HBHE cuts total
-     
+	  if(run1Cut){
+	    if (!failRun1) passCut(ret, "HBHE noise and scraping filter"); // HBHE cuts total
+	  }
+	  else if(run2LooseCut){
+	    if (!failRun2Loose) passCut(ret, "HBHE noise and scraping filter"); // HBHE cuts total
+	  }
+	  else if(run2TightCut){
+	    if (!failRun2Tight) passCut(ret, "HBHE noise and scraping filter"); // HBHE cuts total
+	  }
+	  else {std::cout<<"No HBHE cut!"<<std::endl; passCut(ret, "HBHE noise and scraping filter");} // HBHE cuts total
         } // end of hbhe cuts
 
 	//_________CSC Halo Filter_________
