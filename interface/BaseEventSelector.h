@@ -122,7 +122,7 @@ protected:
     std::map<std::string, std::string> msPar;
     std::map<std::string, edm::InputTag> mtPar;
     std::map<std::string, std::vector<std::string>> mvsPar;
-    
+
     std::string mName;
     std::string mLegend;
     bool mbIsMc;
