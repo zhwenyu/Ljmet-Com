@@ -150,6 +150,7 @@ void DileptonEventSelector::BeginJob( std::map<std::string, edm::ParameterSet co
         mbPar["hbhe_cut"]                 = par[_key].getParameter<bool>         ("hbhe_cut");
         msPar["hbhe_cut_value"]           = par[_key].getParameter<std::string>  ("hbhe_cut_value");
 	mbPar["cscHalo_cut"]              = par[_key].getParameter<bool>         ("cscHalo_cut");
+	mtPar["flag_tag"]                 = par[_key].getParameter<edm::InputTag>("flag_tag");
         mbPar["jet_cuts"]                 = par[_key].getParameter<bool>         ("jet_cuts");
         mdPar["jet_minpt"]                = par[_key].getParameter<double>       ("jet_minpt");
         mdPar["jet_maxeta"]               = par[_key].getParameter<double>       ("jet_maxeta");
