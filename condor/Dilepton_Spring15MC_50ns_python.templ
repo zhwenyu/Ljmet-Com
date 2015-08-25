@@ -65,7 +65,7 @@ process.event_selector = cms.PSet(
 
     pv_cut                   = cms.bool(True),
     hbhe_cut                 = cms.bool(True),
-    hbhe_cut_value           = cms.string("Run2Loose"),
+    hbhe_cut_value           = cms.string("Run1"),
     flag_tag                 = cms.InputTag('FLAGTAG'),
     cscHalo_cut              = cms.bool(True),
     jet_cuts                 = cms.bool(False),
@@ -114,13 +114,16 @@ process.event_selector = cms.PSet(
     #new jet energy corrections
     doNewJEC                 = cms.bool(True),
 
-    MCL1JetPar               = cms.string("../data/MCRUN2_74_V9_L1FastJet_AK4PFchs.txt"),
-    MCL2JetPar               = cms.string("../data/MCRUN2_74_V9_L2Relative_AK4PFchs.txt"),
-    MCL3JetPar               = cms.string("../data/MCRUN2_74_V9_L3Absolute_AK4PFchs.txt"),
+    MCL1JetPar               = cms.string("../data/Summer15_50nsV4_MC_L1FastJet_AK4PFchs.txt"),
+    MCL2JetPar               = cms.string("../data/Summer15_50nsV4_MC_L2Relative_AK4PFchs.txt"),
+    MCL3JetPar               = cms.string("../data/Summer15_50nsV4_MC_L3Absolute_AK4PFchs.txt"),
 
-    MCL1JetParAK8            = cms.string("../data/MCRUN2_74_V9_L1FastJet_AK8PFchs.txt"),
-    MCL2JetParAK8            = cms.string("../data/MCRUN2_74_V9_L2Relative_AK8PFchs.txt"),
-    MCL3JetParAK8            = cms.string("../data/MCRUN2_74_V9_L3Absolute_AK8PFchs.txt"),
+    MCL1JetParAK8            = cms.string("../data/Summer15_50nsV4_MC_L1FastJet_AK8PFchs.txt"),
+    MCL2JetParAK8            = cms.string("../data/Summer15_50nsV4_MC_L2Relative_AK8PFchs.txt"),
+    MCL3JetParAK8            = cms.string("../data/Summer15_50nsV4_MC_L3Absolute_AK8PFchs.txt"),
+
+
+
 
     #triggerstudy info
     doTriggerStudy           = cms.bool(True),
