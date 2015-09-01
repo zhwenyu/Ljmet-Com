@@ -397,6 +397,8 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
     std::vector <int>    elMHits;
     std::vector <int>    elVtxFitConv;    
 
+    std::vector <bool> elTight;
+ 
     //Extra info about isolation
     std::vector <double> elChIso;
     std::vector <double> elNhIso;
@@ -423,7 +425,6 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
     vector<double> elMatchedPhi;
     vector<double> elMatchedEnergy;
 
- 
     edm::Handle<double> rhoHandle;
     event.getByLabel(rhoSrc_, rhoHandle);
     double rhoIso = std::max(*(rhoHandle.product()), 0.0);
@@ -441,10 +442,10 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
             }
 
             //Four vector
-            elPt     . push_back((*iel)->ecalDrivenMomentum().pt()); //Must check: why ecalDrivenMomentum?
-            elEta    . push_back((*iel)->ecalDrivenMomentum().eta());
-            elPhi    . push_back((*iel)->ecalDrivenMomentum().phi());
-            elEnergy . push_back((*iel)->ecalDrivenMomentum().energy());
+            elPt     . push_back((*iel)->pt()); //Must check: why ecalDrivenMomentum?
+            elEta    . push_back((*iel)->eta());
+            elPhi    . push_back((*iel)->phi());
+            elEnergy . push_back((*iel)->energy());
 
 
             //Isolation
@@ -462,32 +463,38 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
             elRhoIso . push_back(rhoIso);
 
             elRelIso . push_back(relIso);
-            //Conversion rejection
-            int nLostHits = (*iel)->gsfTrack()->hitPattern().numberOfLostHits(reco::HitPattern::MISSING_INNER_HITS);
-            double dist   = (*iel)->convDist();
-            double dcot   = (*iel)->convDcot();
-            int notConv   = nLostHits == 0 and (fabs(dist) > 0.02 or fabs(dcot) > 0.02);
             elCharge.push_back((*iel)->charge());
-            elNotConversion.push_back(notConv);
 
             //IP: for some reason this is with respect to the first vertex in the collection
             if(goodPVs.size() > 0){
                 elDxy.push_back((*iel)->gsfTrack()->dxy(goodPVs.at(0).position()));
+                elD0.push_back((*iel)->gsfTrack()->dxy(goodPVs.at(0).position()));
                 elDZ.push_back((*iel)->gsfTrack()->dz(goodPVs.at(0).position()));
             } else {
                 elDxy.push_back(-999);
+                elD0.push_back(-999);
                 elDZ.push_back(-999);
             }
             elChargeConsistent.push_back((*iel)->isGsfCtfScPixChargeConsistent());
             elIsEBEE.push_back(((*iel)->isEBEEGap()<<2) + ((*iel)->isEE()<<1) + (*iel)->isEB());
             elDeta.push_back((*iel)->deltaEtaSuperClusterTrackAtVtx());
             elDphi.push_back((*iel)->deltaPhiSuperClusterTrackAtVtx());
-            elSihih.push_back((*iel)->sigmaIetaIeta());
+            elSihih.push_back((*iel)->full5x5_sigmaIetaIeta());
             elHoE.push_back((*iel)->hadronicOverEm());
-            elD0.push_back((*iel)->dB());
-            elOoemoop.push_back(1.0/(*iel)->ecalEnergy() + (*iel)->eSuperClusterOverP()/(*iel)->ecalEnergy());
-            elMHits.push_back((*iel)->gsfTrack()->hitPattern().numberOfHits(reco::HitPattern::MISSING_INNER_HITS));
+            elOoemoop.push_back(fabs(1.0/(*iel)->ecalEnergy() + (*iel)->eSuperClusterOverP()/(*iel)->ecalEnergy()));
+            elMHits.push_back((*iel)->gsfTrack()->hitPattern().numberOfLostTrackerHits(reco::HitPattern::MISSING_INNER_HITS));
             elVtxFitConv.push_back((*iel)->passConversionVeto());
+            elNotConversion.push_back((*iel)->passConversionVeto());
+
+            bool pass = false;
+            if ((*iel)->isEB()) {
+                if (( fabs((*iel)->deltaEtaSuperClusterTrackAtVtx()) < 0.0095 ) && (fabs((*iel)->deltaPhiSuperClusterTrackAtVtx()) < 0.0291) && ((*iel)->full5x5_sigmaIetaIeta() < 0.0101) && ((*iel)->hadronicOverEm() < 0.0372) && (fabs((*iel)->gsfTrack()->dxy(goodPVs.at(0).position())) < 0.0144) && (fabs((*iel)->gsfTrack()->dz(goodPVs.at(0).position())) < 0.323) && (fabs(1.0/(*iel)->ecalEnergy() + (*iel)->eSuperClusterOverP()/(*iel)->ecalEnergy()) < 0.0174) && (relIso < 0.0468) && ((*iel)->gsfTrack()->hitPattern().numberOfLostTrackerHits(reco::HitPattern::MISSING_INNER_HITS) <= 2)) pass = true;
+            }
+            else {
+                if (( fabs((*iel)->deltaEtaSuperClusterTrackAtVtx()) < 0.00762 ) && (fabs((*iel)->deltaPhiSuperClusterTrackAtVtx()) < 0.0439) && ((*iel)->full5x5_sigmaIetaIeta() < 0.0287) && ((*iel)->hadronicOverEm() < 0.0544) && (fabs((*iel)->gsfTrack()->dxy(goodPVs.at(0).position())) < 0.0377) && (fabs((*iel)->gsfTrack()->dz(goodPVs.at(0).position())) < 0.571) && (fabs(1.0/(*iel)->ecalEnergy() + (*iel)->eSuperClusterOverP()/(*iel)->ecalEnergy()) < 0.01) && (relIso < 0.0759) && ((*iel)->gsfTrack()->hitPattern().numberOfLostTrackerHits(reco::HitPattern::MISSING_INNER_HITS) <= 1)) pass = true;
+            }
+            elTight.push_back(pass);
+
             if(isMc && keepFullMChistory){
                 //cout << "start\n";
                 edm::Handle<reco::GenParticleCollection> genParticles;
@@ -553,6 +560,8 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
     SetValue("elOoemoop", elOoemoop);
     SetValue("elMHits", elMHits);
     SetValue("elVtxFitConv", elVtxFitConv);
+
+    SetValue("elTight", elTight);
 
     //Extra info about isolation
     SetValue("elChIso" , elChIso);
