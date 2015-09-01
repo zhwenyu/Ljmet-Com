@@ -173,7 +173,7 @@ public: // interface
             set("reliso_EE",   0.177032);
             set("mHits_EB",    2);
             set("mHits_EE",    3);
-            set("vtxFitConv",  1);
+            set("vtxFitConv",  0);
         }
         
         if (version_ == LOOSE) {
@@ -195,7 +195,7 @@ public: // interface
             set("reliso_EE",   0.163368);
             set("mHits_EB",    1);
             set("mHits_EE",    1);
-            set("vtxFitConv",  1);
+            set("vtxFitConv",  0);
         }
         
         if (version_ == MEDIUM) {
@@ -217,7 +217,7 @@ public: // interface
             set("reliso_EE",   0.113254);
             set("mHits_EB",    1);
             set("mHits_EE",    1);
-            set("vtxFitConv",  1);
+            set("vtxFitConv",  0);
         }
         
 
@@ -240,7 +240,7 @@ public: // interface
             set("reliso_EE",   0.078265);
             set("mHits_EB",    1);
             set("mHits_EE",    1);
-            set("vtxFitConv",  1);
+            set("vtxFitConv",  0);
         }
         
         indexDphi_EB_       = index_type(&bits_, "dphi_EB"      );
@@ -376,7 +376,9 @@ public: // interface
             Double_t Deta  = electron.deltaEtaSuperClusterTrackAtVtx();
             Double_t Dphi  = electron.deltaPhiSuperClusterTrackAtVtx();
             Double_t sihih = electron.full5x5_sigmaIetaIeta();
-            Double_t HoE   = electron.hadronicOverEm();
+            Double_t HoE   = electron.hcalOverEcal();
+            //std::cout<<"-----------------"<<std::endl;
+            //std::cout<<"electron.hadronicOverEm() = "<<electron.hadronicOverEm()<<" , electron.hcalOverEcal() = "<<electron.hcalOverEcal()<<std::endl;
             Double_t D0    = (-1.0)*electron.gsfTrack()->dxy(PVtx);
             Double_t DZ    = electron.gsfTrack()->dz(PVtx);//
             
@@ -387,11 +389,13 @@ public: // interface
             else Ooemoop = (1.0/electron.ecalEnergy() - electron.eSuperClusterOverP()/electron.ecalEnergy());
             Double_t RelIso  = ( chIso + max(0.0, nhIso + phIso - rhoIso*AEff) )/ electron.ecalDrivenMomentum().pt();
             Int_t mHits   =  electron.gsfTrack()->hitPattern().numberOfHits(reco::HitPattern::MISSING_INNER_HITS);
+            //std::cout<<"numberOfHits = "<<electron.gsfTrack()->hitPattern().numberOfHits(reco::HitPattern::MISSING_INNER_HITS)<<" , numberOfLostTrackerHits = "<<electron.gsfTrack()->hitPattern().numberOfLostTrackerHits(reco::HitPattern::MISSING_INNER_HITS)<<std::endl;
             //Bool_t vtxFitConv = electron.passConversionVeto();
             const reco::BeamSpot &beamspot = *bsHandle.product();
             Bool_t vtxFitConv = ConversionTools::hasMatchedConversion(electron, conversions, beamspot.position());
+            //std::cout<<"electron.passConversionVeto() = "<<electron.passConversionVeto()<<" , ConversionTools::hasMatchedConversion = "<<ConversionTools::hasMatchedConversion(electron, conversions, beamspot.position())<<std::endl;
     
-    	    bool verbosity = false;
+    	    bool verbosity =false;
     
     	    if (verbosity) {
     	        std::cout << "\tfabs(Deta) = " << fabs(Deta) << std::endl;
@@ -478,6 +482,8 @@ public: // interface
             
             setIgnored(ret);
 	}
+	//ret.print(std::cout);
+        //std::cout<<std::endl;
         return (bool)ret;
     }
     
