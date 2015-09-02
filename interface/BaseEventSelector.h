@@ -55,6 +55,7 @@ public:
     
     std::vector<edm::Ptr<pat::Jet>> const & GetAllJets() const { return mvAllJets; }
     std::vector<edm::Ptr<pat::Jet>> const & GetSelectedJets() const { return mvSelJets; }
+    std::vector<edm::Ptr<pat::Jet>> const & GetSelectedNotCleanedJets() const { return mvSelJetsNotCleaned; }
     std::vector<edm::Ptr<pat::Jet>> const & GetLooseJets() const { return mvSelJets; }
     std::vector<edm::Ptr<pat::Jet>> const & GetSelectedBtagJets() const { return mvSelBtagJets; }
     std::vector<std::pair<TLorentzVector, bool>> const & GetCorrJetsWithBTags() const { return mvCorrJetsWithBTags; }
@@ -95,6 +96,7 @@ public:
 protected:
     std::vector<edm::Ptr<pat::Jet>> mvAllJets;
     std::vector<edm::Ptr<pat::Jet>> mvSelJets;
+    std::vector<edm::Ptr<pat::Jet>> mvSelJetsNotCleaned;
     std::vector<edm::Ptr<pat::Jet>> mvLooseJets;
     std::vector<std::pair<TLorentzVector, bool>> mvCorrJetsWithBTags;
     std::vector<edm::Ptr<pat::Jet>> mvSelBtagJets;
