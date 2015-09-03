@@ -154,11 +154,12 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
     //
     // _____ Get objects from the selector _____________________
     //
-    std::vector<edm::Ptr<pat::Muon> >     const & vSelMuons     = selector->GetSelectedMuons();
-    std::vector<edm::Ptr<pat::Electron> > const & vSelElectrons = selector->GetSelectedElectrons();
-    std::vector<edm::Ptr<pat::Jet> >      const & vSelJets      = selector->GetSelectedJets();
-    edm::Ptr<pat::MET>                    const & pMet          = selector->GetMet();
-    std::vector<unsigned int>             const & vSelTriggers  = selector->GetSelectedTriggers();
+    std::vector<edm::Ptr<pat::Muon> >     const & vSelMuons        = selector->GetSelectedMuons();
+    std::vector<edm::Ptr<pat::Electron> > const & vSelElectrons    = selector->GetSelectedElectrons();
+    std::vector<edm::Ptr<pat::Jet> >      const & vSelJets         = selector->GetSelectedJets();
+    std::vector<pat::Jet>                 const & vSelCleanedJets  = selector->GetSelectedCleanedJets();
+    edm::Ptr<pat::MET>                    const & pMet             = selector->GetMet();
+    std::vector<unsigned int>             const & vSelTriggers     = selector->GetSelectedTriggers();
     
     //
     // _____ Primary dataset (from python cfg) _____________________
@@ -872,33 +873,35 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
     //_____GenJets_____________________________
     //
 
-    edm::InputTag genJetColl = edm::InputTag("slimmedGenJets");
-    edm::Handle<std::vector<reco::GenJet> > genJets;
-
-    event.getByLabel(genJetColl,genJets);
-
-    std::vector<double> genJetPt;
-    std::vector<double> genJetEta;
-    std::vector<double> genJetPhi;
-    std::vector<double> genJetEnergy;
-    std::vector<double> genJetMass;
-
-    for(std::vector<reco::GenJet>::const_iterator ijet = genJets->begin(); ijet != genJets->end(); ijet++){
-
-      genJetPt.push_back(ijet->pt());
-      genJetEta.push_back(ijet->eta());
-      genJetPhi.push_back(ijet->phi());
-      genJetEnergy.push_back(ijet->energy());
-      genJetMass.push_back(ijet->mass());
-      //cout<<"setting gen jet info"<<endl;
-
+    if(isMc){
+      edm::InputTag genJetColl = edm::InputTag("slimmedGenJets");
+      edm::Handle<std::vector<reco::GenJet> > genJets;
+      
+      event.getByLabel(genJetColl,genJets);
+    
+      std::vector<double> genJetPt;
+      std::vector<double> genJetEta;
+      std::vector<double> genJetPhi;
+      std::vector<double> genJetEnergy;
+      std::vector<double> genJetMass;
+      
+      for(std::vector<reco::GenJet>::const_iterator ijet = genJets->begin(); ijet != genJets->end(); ijet++){
+	
+	genJetPt.push_back(ijet->pt());
+	genJetEta.push_back(ijet->eta());
+	genJetPhi.push_back(ijet->phi());
+	genJetEnergy.push_back(ijet->energy());
+	genJetMass.push_back(ijet->mass());
+	//cout<<"setting gen jet info"<<endl;
+	
+      }
+      
+      SetValue("genJetPt", genJetPt);
+      SetValue("genJetEta", genJetEta);
+      SetValue("genJetPhi", genJetPhi);
+      SetValue("genJetEnergy", genJetEnergy);
+      SetValue("genJetMass", genJetMass);
     }
-
-    SetValue("genJetPt", genJetPt);
-    SetValue("genJetEta", genJetEta);
-    SetValue("genJetPhi", genJetPhi);
-    SetValue("genJetEnergy", genJetEnergy);
-    SetValue("genJetMass", genJetMass);
 
     //
     //_____ Jets ______________________________
@@ -1167,6 +1170,39 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
     
     SetValue("AK4JetTBag"   , AK4JetTBag);
     SetValue("AK4JetRCN"    , AK4JetRCN);
+
+    //Get cleaned AK4 Jets
+    //Four vector
+    std::vector <double> cleanedAK4JetPt;
+    std::vector <double> cleanedAK4JetEta;
+    std::vector <double> cleanedAK4JetPhi;
+    std::vector <double> cleanedAK4JetEnergy;
+    
+    std::vector <int>    cleanedAK4JetTBag;
+    std::vector <double> cleanedAK4JetRCN;
+    
+    for (std::vector<pat::Jet>::const_iterator ijet = vSelCleanedJets.begin();
+         ijet != vSelCleanedJets.end(); ijet++){
+      //no need to correct so just push back quantities from jet directly
+        
+      cleanedAK4JetPt     . push_back((*ijet).pt());
+      cleanedAK4JetEta    . push_back((*ijet).eta());
+      cleanedAK4JetPhi    . push_back((*ijet).phi());
+      cleanedAK4JetEnergy . push_back((*ijet).energy());
+      
+      cleanedAK4JetTBag   . push_back(selector->isJetTagged(*ijet, event));
+      cleanedAK4JetRCN    . push_back(((*ijet).chargedEmEnergy()+(*ijet).chargedHadronEnergy()) / ((*ijet).neutralEmEnergy()+(*ijet).neutralHadronEnergy()));
+    }
+    
+    //Four vector
+    SetValue("cleanedAK4JetPt"     , cleanedAK4JetPt);
+    SetValue("cleanedAK4JetEta"    , cleanedAK4JetEta);
+    SetValue("cleanedAK4JetPhi"    , cleanedAK4JetPhi);
+    SetValue("cleanedAK4JetEnergy" , cleanedAK4JetEnergy);
+    
+    SetValue("cleanedAK4JetTBag"   , cleanedAK4JetTBag);
+    SetValue("cleanedAK4JetRCN"    , cleanedAK4JetRCN);
+
     
     // MET
     double _met = -9999.0;
