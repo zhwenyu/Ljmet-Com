@@ -32,7 +32,7 @@ process.ljmet.excluded_calculators = cms.vstring(
 	'WprimeCalc',
         'WprimeBoostedCalc'
 	'JetSubCalc',
-	'singleLeptonCalc',
+	'singleLepCalc',
         'BTagSFCalc',
         'CATopoCalc',
         'JetSubCalc',
@@ -113,6 +113,7 @@ process.event_selector = cms.PSet(
 
     #new jet energy corrections
     doNewJEC                 = cms.bool(True),
+    doLepJetCleaning         = cms.bool(True),
 
     MCL1JetPar               = cms.string("../data/Summer15_50nsV4_MC_L1FastJet_AK4PFchs.txt"),
     MCL2JetPar               = cms.string("../data/Summer15_50nsV4_MC_L2Relative_AK4PFchs.txt"),
