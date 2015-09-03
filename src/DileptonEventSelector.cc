@@ -564,7 +564,7 @@ bool DileptonEventSelector::operator()( edm::EventBase const & event, pat::strbi
         //int njetsPF = 0;
         
         mvSelJets.clear();
-	mvSelJetsNotCleaned.clear();
+	mvSelJetsCleaned.clear();
         mvAllJets.clear();
         
         event.getByLabel( mtPar["jet_collection"], mhJets );
@@ -579,17 +579,17 @@ bool DileptonEventSelector::operator()( edm::EventBase const & event, pat::strbi
 		TLorentzVector corJetP4 = correctJet(*_ijet,event);
                 if (( corJetP4.Pt()>mdPar["jet_minpt"] ) && ( fabs(corJetP4.Eta())<mdPar["jet_maxeta"] )){ 
                     ++_n_good_jets;
-                    mvSelJetsNotCleaned.push_back(edm::Ptr<pat::Jet>(mhJets, _n_jets)); 
+                    mvSelJets.push_back(edm::Ptr<pat::Jet>(mhJets, _n_jets)); 
                 }	       
             }
 	    
 	    //lepton jet cleaning
 	    bool _cleaned = false;	    
-	    pat::Jet tmpJet = *_ijet;
+	    pat::Jet cleanedJet = *_ijet;
 	    TLorentzVector jetP4;
 	    
 	    if ( mbPar["doLepJetCleaning"] ){
-	      pat::Jet tmpJet = *_ijet;
+
 	      if (mbPar["debug"]) std::cout << "Checking Overlap" << std::endl;
 	      //clean of muons
 	      for(unsigned int ilep=0; ilep < mvSelMuons.size(); ilep++){
@@ -602,8 +602,13 @@ bool DileptonEventSelector::operator()( edm::EventBase const & event, pat::strbi
 		  const std::vector<edm::Ptr<reco::Candidate> > _ijet_consts = _ijet->daughterPtrVector();
 		  for ( std::vector<edm::Ptr<reco::Candidate> >::const_iterator _i_const = _ijet_consts.begin(); _i_const != _ijet_consts.end(); ++_i_const){
 		    if ( (*_i_const).key() == mvSelMuons[ilep]->originalObjectRef().key() ) {
-		      tmpJet.setP4( _ijet->p4() - mvSelMuons[ilep]->p4() );
-		      jetP4 = correctJet(tmpJet, event);
+		      cleanedJet.setP4( _ijet->p4() - mvSelMuons[ilep]->p4() );
+		      //get the correction for the cleaned jet and apply it
+		      jetP4 = correctJet(cleanedJet, event);
+		      //annoying thing to convert our tlorentzvector to root::math::lorentzvector
+		      ROOT::Math::LorentzVector<ROOT::Math::PtEtaPhiM4D<double > > rlv;
+		      rlv.SetXYZT(jetP4.X(),jetP4.Y(),jetP4.Z(),jetP4.T());
+		      cleanedJet.setP4(rlv);
 		      if (mbPar["debug"]) std::cout << "Corrected Jet : pT = " << jetP4.Pt() << " eta = " << jetP4.Eta() << " phi = " << jetP4.Phi() << std::endl;
 		      _cleaned = true;
 		    }
@@ -622,8 +627,13 @@ bool DileptonEventSelector::operator()( edm::EventBase const & event, pat::strbi
 		  const std::vector<edm::Ptr<reco::Candidate> > _ijet_consts = _ijet->daughterPtrVector();
 		  for ( std::vector<edm::Ptr<reco::Candidate> >::const_iterator _i_const = _ijet_consts.begin(); _i_const != _ijet_consts.end(); ++_i_const){
 		    if ( (*_i_const).key() == mvSelElectrons[ilep]->originalObjectRef().key() ) {
-		      tmpJet.setP4( _ijet->p4() - mvSelElectrons[ilep]->p4() );
-		      jetP4 = correctJet(tmpJet, event);
+		      cleanedJet.setP4( _ijet->p4() - mvSelElectrons[ilep]->p4() );
+		      //get the correct 4vector
+		      jetP4 = correctJet(cleanedJet, event);
+		      //annoying thing to convert our tlorentzvector to root::math::lorentzvector
+		      ROOT::Math::LorentzVector<ROOT::Math::PtEtaPhiM4D<double > > rlv;
+		      rlv.SetXYZT(jetP4.X(),jetP4.Y(),jetP4.Z(),jetP4.T());
+		      cleanedJet.setP4(rlv);
 		      if (mbPar["debug"]) std::cout << "Corrected Jet : pT = " << jetP4.Pt() << " eta = " << jetP4.Eta() << " phi = " << jetP4.Phi() << std::endl;
 		      _cleaned = true;
 		    }
@@ -631,16 +641,22 @@ bool DileptonEventSelector::operator()( edm::EventBase const & event, pat::strbi
 		}
 	      }//end electron cleaning
 	      
-	      //if not cleaned just use first jet to get corrected four vector
-	      if (!_cleaned) jetP4 = correctJet(*_ijet, event);
+	      //if not cleaned just use first jet (remember if no cleaning then cleanedJet==*_ijet) to get corrected four vector and set the cleaned jet to have it
+	      if (!_cleaned) {
+		jetP4 = correctJet(cleanedJet, event);
+		//annoying thing to convert our tlorentzvector to root::math::lorentzvector
+		ROOT::Math::LorentzVector<ROOT::Math::PtEtaPhiM4D<double > > rlv;
+		rlv.SetXYZT(jetP4.X(),jetP4.Y(),jetP4.Z(),jetP4.T());
+		cleanedJet.setP4(rlv);
+	      }
 	      
 	      
-	      //now do kinematic cuts and save them
+	      //now do kinematic cuts and save them, cleaning and JEC could only mess up pfID so use original jet for it (though probably do nothing)
 	      if ( (*jetSel_)( *_ijet, retJet ) ){ 
 		
-                if (( jetP4.Pt()>mdPar["jet_minpt"] ) && ( fabs(jetP4.Eta())<mdPar["jet_maxeta"] )){ 
+                if (( cleanedJet.pt()>mdPar["jet_minpt"] ) && ( fabs(cleanedJet.eta())<mdPar["jet_maxeta"] )){ 
 		  ++_n_good_jets;
-		  mvSelJets.push_back(edm::Ptr<pat::Jet>(mhJets, _n_jets)); 
+		  mvSelJetsCleaned.push_back(cleanedJet);
                 }	       
 	      }
 	      
