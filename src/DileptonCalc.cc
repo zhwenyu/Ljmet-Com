@@ -200,13 +200,19 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
 
     bool HLT_DoubleEle33=false;
     bool HLT_DoubleEle33_MW=false;
+    bool HLT_Ele17_Ele12_DZ=false;
     bool HLT_Ele27WP85=false;
+    bool HLT_Mu27TkMu8=false;
     bool HLT_Mu30TkMu11=false;
+    bool HLT_Mu40TkMu11=false;
     bool HLT_Mu40=false;
     bool HLT_IsoTkMu24=false;
     bool HLT_DoubleMu33NoFiltersNoVtx=false;
+    bool HLT_Mu17Ele12=false;
+    bool HLT_Mu8Ele17=false;
     bool HLT_Mu23Ele12=false;
     bool HLT_Mu8Ele23=false;
+    bool HLT_Mu30Ele30=false;
     bool HLT_PFHT900=false;
     bool HLT_AK8PFJet360TrimMass30=false;
 
@@ -226,14 +232,20 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
 	  if(Path=="HLT_DoubleEle33_CaloIdL_GsfTrkIdVL_v1") HLT_DoubleEle33=true;
 	  if(Path=="HLT_DoubleEle33_CaloIdL_GsfTrkIdVL_MW_v1") HLT_DoubleEle33_MW=true;
 	  if(Path=="HLT_Ele27_eta2p1_WP85_Gsf_v1") HLT_Ele27WP85=true;
+	  if(Path=="HLT_Ele17_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v2")HLT_Ele17_Ele12_DZ=true;
 	  //Muon paths
+	  if(Path=="HLT_Mu27_TkMu8_v1" || Path=="HLT_Mu27_TkMu8_v2") HLT_Mu27TkMu8=true;
 	  if(Path=="HLT_Mu30_TkMu11_v1") HLT_Mu30TkMu11=true;
+	  if(Path=="HLT_Mu40_TkMu11_v1") HLT_Mu40TkMu11=true;
 	  if(Path=="HLT_M40_v1") HLT_Mu40=true;
 	  if(Path=="HLT_IsoTkMu24_IterTrk02_v1") HLT_IsoTkMu24=true;
 	  if(Path=="HLT_DoubleMu33NoFiltersNoVtx_v1") HLT_DoubleMu33NoFiltersNoVtx=true;
 	  //cross paths
+	  if(Path=="HLT_Mu17_TrkIsoVVL_Ele12_Gsf_CaloId_TrackId_Iso_MediumWP_v1") HLT_Mu17Ele12=true;
+	  if(Path=="HLT_Mu8_TrkIsoVVL_Ele17_Gsf_CaloId_TrackId_Iso_MediumWP_v1") HLT_Mu8Ele17=true;
 	  if(Path=="HLT_Mu23_TrkIsoVVL_Ele12_Gsf_CaloId_TrackId_Iso_MediumWP_v1") HLT_Mu23Ele12=true;
 	  if(Path=="HLT_Mu8_TrkIsoVVL_Ele23_Gsf_CaloId_TrackId_Iso_MediumWP_v1") HLT_Mu8Ele23=true;
+	  if(Path=="HLT_Mu30_Ele30_CaloIdL_GsfTrkIdVL_v1") HLT_Mu30Ele30=true;
 	  //HT/Jet
 	  if(Path=="HLT_PFHT900_v1") HLT_PFHT900=true;
 	  if(Path=="HLT_AK8PFJet360TrimMod_Mass30_v1") HLT_AK8PFJet360TrimMass30=true;
@@ -244,13 +256,19 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
 
     SetValue("HLT_DoubleEle33",HLT_DoubleEle33);
     SetValue("HLT_DoubleEle33_MW",HLT_DoubleEle33_MW);
+    SetValue("HLT_Ele17_Ele12_DZ",HLT_Ele17_Ele12_DZ);
     SetValue("HLT_Ele27WP85",HLT_Ele27WP85);
+    SetValue("HLT_Mu27TkMu8",HLT_Mu27TkMu8);
     SetValue("HLT_Mu30TkMu11",HLT_Mu30TkMu11);
+    SetValue("HLT_Mu40TkMu11",HLT_Mu40TkMu11);
     SetValue("HLT_Mu40",HLT_Mu40);
     SetValue("HLT_IsoTkMu24",HLT_IsoTkMu24);
     SetValue("HLT_DoubleMu33NoFiltersNoVtx",HLT_DoubleMu33NoFiltersNoVtx);
+    SetValue("HLT_Mu17Ele12",HLT_Mu17Ele12);
+    SetValue("HLT_Mu8Ele17",HLT_Mu8Ele17);
     SetValue("HLT_Mu23Ele12",HLT_Mu23Ele12);
     SetValue("HLT_Mu8Ele23",HLT_Mu8Ele23);
+    SetValue("HLT_Mu30Ele30",HLT_Mu30Ele30);
     SetValue("HLT_PFHT900",HLT_PFHT900);
     SetValue("HLT_AK8PFJet360TrimMass30",HLT_AK8PFJet360TrimMass30);
 
