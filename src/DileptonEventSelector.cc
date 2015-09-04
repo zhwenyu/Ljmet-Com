@@ -697,6 +697,11 @@ bool DileptonEventSelector::operator()( edm::EventBase const & event, pat::strbi
 	      if (mbPar["debug"]) std::cout << "Checking Overlap" << std::endl;
 	      //clean of muons
 	      for(unsigned int ilep=0; ilep < mvSelMuons.size(); ilep++){
+		bool looseMuon; //bool to loop over only loose muons can easily do here since loose muon id so easy to implement
+		if(!(mvSelMuons[ilep]->isPFMuon())) looseMuon=false;
+		else if(!( mvSelMuons[ilep]->isGlobalMuon() || mvSelMuons[ilep]->isTrackerMuon())) looseMuon=false;
+		else looseMuon=true;
+		if(!looseMuon) continue;
 		if ( deltaR(mvSelMuons[ilep]->p4(),_ijet->p4()) < 0.4 ){
 		  if (mbPar["debug"]) {
 		    std::cout << "Jet Overlaps with the Muon... Cleaning jet..." << std::endl;
