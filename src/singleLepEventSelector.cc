@@ -506,7 +506,6 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
             if ( (*pvSel_)(event) ){
                 passCut(ret, "Primary vertex"); // PV cuts total
             }
-	    else break;
 
             event.getByLabel( mtPar["pv_collection"], h_primVtx );
             int _n_pvs = 0;
@@ -559,7 +558,6 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
             //const bool failIsolation = summary.numIsolatedNoiseChannels() >= minNumIsolatedNoiseChannels || summary.isolatedNoiseSumE() >= minIsolatedNoiseSumE || summary.isolatedNoiseSumEt() >= minIsolatedNoiseSumEt;
 
             if (!failFull) passCut(ret, "HBHE noise and scraping filter"); // HBHE cuts total
-	    else break;
 
         } // end of HBHE cuts
         if ( considerCut("CSC Tight Halo filter") ) {
@@ -575,7 +573,6 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
             }
 
             if (cscpass) passCut(ret, "CSC Tight Halo filter"); // CSC cut
-	    else break;
         } // end of CSC cuts
 
 
@@ -1026,7 +1023,6 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
             if ( mpMet.isNonnull() && mpMet.isAvailable() ) {
                 pat::MET const & met = mhMet->at(0);
                 if ( ignoreCut("Min MET") ||met.et()>cut("Min MET", double()) ) passCut(ret, "Min MET");
-		else break;
             }
         } // end of MET cuts
         if (mbPar["debug"]) std::cout<<"finish met cuts..."<<std::endl;
