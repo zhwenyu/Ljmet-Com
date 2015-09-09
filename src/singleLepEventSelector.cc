@@ -228,6 +228,7 @@ void singleLepEventSelector::BeginJob( std::map<std::string, edm::ParameterSet c
         mtPar["flag_tag"]                 = par[_key].getParameter<edm::InputTag>("flag_tag");
         mbPar["pv_cut"]                   = par[_key].getParameter<bool>         ("pv_cut");
         mbPar["hbhe_cut"]                 = par[_key].getParameter<bool>         ("hbhe_cut");
+        msPar["hbhe_cut_value"]           = par[_key].getParameter<std::string>  ("hbhe_cut_value");
         mbPar["csc_cut"]                  = par[_key].getParameter<bool>         ("csc_cut");
 
         mbPar["jet_cuts"]                 = par[_key].getParameter<bool>         ("jet_cuts");
@@ -506,7 +507,6 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
             if ( (*pvSel_)(event) ){
                 passCut(ret, "Primary vertex"); // PV cuts total
             }
-	    else break;
 
             event.getByLabel( mtPar["pv_collection"], h_primVtx );
             int _n_pvs = 0;
@@ -524,44 +524,72 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
         //_____ HBHE noise and scraping filter________________________
         //
         if ( considerCut("HBHE noise and scraping filter") ) {
-            if (mbPar["debug"]) std::cout<<"HBHE cuts..."<<std::endl;
+            
+	  //set cut value considered
+	  bool run1Cut=false;
+	  bool run2LooseCut=false;
+	  bool run2TightCut=false;
+	  if(msPar["hbhe_cut_value"].find("Run1")!=string::npos){
+	    run1Cut=true;
+	  }
+	  else if(msPar["hbhe_cut_value"].find("Run2Loose")!=string::npos){
+	    run2LooseCut=true;
+	  }
+	  else if(msPar["hbhe_cut_value"].find("Run2Tight")!=string::npos){
+	    run2TightCut=true;
+	  }
+	  else{
+	    std::cout<<"HBHE cut not configured correctly!...exiting..."<<std::endl;
+	    std::exit(-1);
+	  }
 
-	    //taken from http://cmslxr.fnal.gov/lxr/source/CommonTools/RecoAlgos/plugins/HBHENoiseFilterResultProducer.cc?v=CMSSW_7_4_1
-	    //	and http://cmslxr.fnal.gov/lxr/source/CommonTools/RecoAlgos/python/HBHENoiseFilterResultProducer_cfi.py?v=CMSSW_7_4_1
+	  if (mbPar["debug"]) std::cout<<"HBHE cuts..."<<std::endl;
 
-	    edm::InputTag noiselabel ("hcalnoise");
-	    int minHPDHits = 17;
-	    int minHPDNoOtherHits = 10;
-	    //int minZeros = 10;
-	    int minZeros = 999999.;
-	    bool IgnoreTS4TS5ifJetInLowBVRegion = false;
+	  //taken from http://cmslxr.fnal.gov/lxr/source/CommonTools/RecoAlgos/plugins/HBHENoiseFilterResultProducer.cc?v=CMSSW_7_4_1
+	  //and http://cmslxr.fnal.gov/lxr/source/CommonTools/RecoAlgos/python/HBHENoiseFilterResultProducer_cfi.py?v=CMSSW_7_4_1
 
-            // get the Noise summary object
-            edm::Handle<HcalNoiseSummary> summary_h;
-            event.getByLabel(noiselabel, summary_h);
-            if(!summary_h.isValid()) {
-                std::cout << "Could not find HcalNoiseSummary.\n";
-            }
-            const HcalNoiseSummary& summary(*summary_h);
+	  edm::InputTag noiselabel ("hcalnoise");
+	  int minHPDHits = 17;
+	  int minHPDNoOtherHits = 10;
+	  //int minZeros = 10;
+	  int minZeros = 999999.;
+	  bool IgnoreTS4TS5ifJetInLowBVRegion = false;
 
-            bool goodJetFoundInLowBVRegion = false;
-            if (IgnoreTS4TS5ifJetInLowBVRegion) goodJetFoundInLowBVRegion = summary.goodJetFoundInLowBVRegion();
+	  // get the Noise summary object
+	  edm::Handle<HcalNoiseSummary> summary_h;
+	  event.getByLabel(noiselabel, summary_h);
+	  if(!summary_h.isValid()) {
+	    std::cout << "Could not find HcalNoiseSummary.\n";
+	  }
+	  const HcalNoiseSummary& summary(*summary_h);
 
-            const bool failCommon = summary.maxHPDHits() >= minHPDHits || summary.maxHPDNoOtherHits() >= minHPDNoOtherHits || summary.maxZeros() >= minZeros;
+	  bool goodJetFoundInLowBVRegion = false;
+	  if (IgnoreTS4TS5ifJetInLowBVRegion) goodJetFoundInLowBVRegion = summary.goodJetFoundInLowBVRegion();
 
-            //const bool failFull = failCommon || (summary.HasBadRBXTS4TS5() && !goodJetFoundInLowBVRegion);
+	  const bool failCommon = summary.maxHPDHits() >= minHPDHits || summary.maxHPDNoOtherHits() >= minHPDNoOtherHits || summary.maxZeros() >= minZeros;
 
-            const bool failFull = failCommon || (summary.HasBadRBXRechitR45Loose() && !goodJetFoundInLowBVRegion);
+	  //const bool failFull = failCommon || (summary.HasBadRBXTS4TS5() && !goodJetFoundInLowBVRegion);
 
-            //const bool failFull = failCommon || (summary.HasBadRBXRechitR45Tight() && !goodJetFoundInLowBVRegion);
+	  const bool failRun1 = failCommon || (summary.HasBadRBXTS4TS5() && !goodJetFoundInLowBVRegion);
 
-            // Check isolation requirements
-            //const bool failIsolation = summary.numIsolatedNoiseChannels() >= minNumIsolatedNoiseChannels || summary.isolatedNoiseSumE() >= minIsolatedNoiseSumE || summary.isolatedNoiseSumEt() >= minIsolatedNoiseSumEt;
+	  const bool failRun2Loose = failCommon || (summary.HasBadRBXRechitR45Loose() && !goodJetFoundInLowBVRegion);
 
-            if (!failFull) passCut(ret, "HBHE noise and scraping filter"); // HBHE cuts total
-	    else break;
+	  const bool failRun2Tight = failCommon || (summary.HasBadRBXRechitR45Tight() && !goodJetFoundInLowBVRegion);
 
-        } // end of HBHE cuts
+	  // Check isolation requirements
+	  //const bool failIsolation = summary.numIsolatedNoiseChannels() >= minNumIsolatedNoiseChannels || summary.isolatedNoiseSumE() >= minIsolatedNoiseSumE || summary.isolatedNoiseSumEt() >= minIsolatedNoiseSumEt;
+	  if(run1Cut){
+	    if (!failRun1) passCut(ret, "HBHE noise and scraping filter"); // HBHE cuts total
+	  }
+	  else if(run2LooseCut){
+	    if (!failRun2Loose) passCut(ret, "HBHE noise and scraping filter"); // HBHE cuts total
+	  }
+	  else if(run2TightCut){
+	    if (!failRun2Tight) passCut(ret, "HBHE noise and scraping filter"); // HBHE cuts total
+	  }
+	  else {std::cout<<"No HBHE cut!"<<std::endl; passCut(ret, "HBHE noise and scraping filter");} // HBHE cuts total
+        } // end of hbhe cuts
+
         if ( considerCut("CSC Tight Halo filter") ) {
 	    
             edm::Handle<edm::TriggerResults > PatTriggerResults;
@@ -575,7 +603,6 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
             }
 
             if (cscpass) passCut(ret, "CSC Tight Halo filter"); // CSC cut
-	    else break;
         } // end of CSC cuts
 
 
@@ -729,6 +756,126 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
                 //electron cuts
                 while(1){
 
+                    /*Double_t scEta = (*_iel).superCluster()->eta();
+                    Double_t AEff  = ElectronEffectiveArea::GetElectronEffectiveArea(ElectronEffectiveArea::kEleGammaAndNeutralHadronIso03, scEta, ElectronEffectiveArea::kEleEAData2012);
+                    
+                    Double_t chIso = (*_iel).chargedHadronIso();
+                    Double_t nhIso = (*_iel).neutralHadronIso();
+                    Double_t phIso = (*_iel).photonIso();
+                    Double_t Deta  = (*_iel).deltaEtaSuperClusterTrackAtVtx();
+                    Double_t Dphi  = (*_iel).deltaPhiSuperClusterTrackAtVtx();
+                    Double_t sihih = (*_iel).full5x5_sigmaIetaIeta();
+                    Double_t HoE   = (*_iel).hadronicOverEm();
+                    Double_t D0    = (-1.0)*(*_iel).gsfTrack()->dxy(h_primVtx->at(0).position());
+                    Double_t DZ    = (*_iel).gsfTrack()->dz(h_primVtx->at(0).position());//
+                    
+                    edm::InputTag rhoSrc_("fixedGridRhoAll");
+                    edm::Handle<double> rhoHandle;
+                    event.getByLabel(rhoSrc_, rhoHandle);
+                    double rhoIso = std::max(*(rhoHandle.product()), 0.0);
+                    
+                    Double_t Ooemoop;
+                    if ((*_iel).ecalEnergy()==0) Ooemoop = 999.;
+                    else if (!std::isfinite((*_iel).ecalEnergy())) Ooemoop = 998.;
+                    else Ooemoop = (1.0/(*_iel).ecalEnergy() - (*_iel).eSuperClusterOverP()/(*_iel).ecalEnergy());
+                    Double_t RelIso  = ( chIso + max(0.0, nhIso + phIso - rhoIso*AEff) )/ (*_iel).ecalDrivenMomentum().pt();
+                    Int_t mHits   =  (*_iel).gsfTrack()->hitPattern().numberOfLostTrackerHits(reco::HitPattern::MISSING_INNER_HITS);
+        
+            	    edm::InputTag convLabel_ ("reducedEgamma:reducedConversions");
+                    edm::Handle<reco::ConversionCollection> conversions;
+               	    event.getByLabel(convLabel_, conversions);
+                    edm::InputTag bsLabel_ ("offlineBeamSpot");
+                    edm::Handle<reco::BeamSpot> bsHandle;
+            	    event.getByLabel(bsLabel_, bsHandle);
+                    const reco::BeamSpot &beamspot = *bsHandle.product();
+                    Bool_t vtxFitConv = ConversionTools::hasMatchedConversion(*_iel, conversions, beamspot.position());
+    
+        	    std::cout << "\tfabs(Deta) = " << fabs(Deta) << std::endl;
+        	    std::cout << "\tfabs(Dphi) = " << fabs(Dphi) << std::endl;
+        	    std::cout << "\tsihih = " << sihih << std::endl;
+        	    std::cout << "\tHoE = " << HoE << std::endl;
+        	    std::cout << "\tfabs(D0) = " << fabs(D0) << std::endl;
+        	    std::cout << "\tfabs(DZ) = " << fabs(DZ) << std::endl;
+        	    std::cout << "\tfabs(Ooemoop) = " << fabs(Ooemoop) << std::endl;
+        	    std::cout << "\tRelIso = " << RelIso << std::endl;
+        	    std::cout << "\tmHits = " << mHits << std::endl;
+        	    std::cout << "\tvtxFitConv = " << vtxFitConv << std::endl;
+                    std::cout << "\teta = " << scEta << std::endl;
+                    std::cout << "\tisEB = " << (*_iel).isEB() << std::endl;
+                    std::cout << "\tisEE = " << (*_iel).isEE() << std::endl;
+                    if((*_iel).isEB()){
+                        if (fabs(D0) <  0.008790 ) std::cout<<"     d0_EB =      1"<<std::endl;
+                        else std::cout<<"     d0_EB =      0"<<std::endl;
+                        std::cout<<"     d0_EE =      1"<<std::endl;
+                        if (fabs(DZ) <  0.021226 ) std::cout<<"     dZ_EB =      1"<<std::endl;
+                        else std::cout<<"     dZ_EB =      0"<<std::endl;
+                        std::cout<<"     dZ_EE =      1"<<std::endl;
+                        if (fabs(Deta) <  0.006046 ) std::cout<<"   deta_EB =      1"<<std::endl;
+                        else std::cout<<"   deta_EB =      0"<<std::endl;
+                        std::cout<<"   deta_EE =      1"<<std::endl;
+                        if (fabs(Dphi) <  0.028092 ) std::cout<<"   dphi_EB =      1"<<std::endl;
+                        else std::cout<<"   dphi_EB =      0"<<std::endl;
+                        std::cout<<"   dphi_EE =      1"<<std::endl;
+                        if (HoE <  0.045772 ) std::cout<<"    hoe_EB =      1"<<std::endl;
+                        else std::cout<<"    hoe_EB =      0"<<std::endl;
+                        std::cout<<"    hoe_EE =      1"<<std::endl;
+                        if (mHits <= 1) std::cout<<"  mHits_EB =      1"<<std::endl;
+                        else std::cout<<"  mHits_EB =      0"<<std::endl;
+                        std::cout<<"  mHits_EE =      1"<<std::endl;
+                        if (fabs(Ooemoop) < 0.020118) std::cout<<"ooemoop_EB =      1"<<std::endl;
+                        else std::cout<<"ooemoop_EB =      0"<<std::endl;
+                        std::cout<<"ooemoop_EE =      1"<<std::endl;
+                        if (RelIso < 0.069537) std::cout<<" reliso_EB =      1"<<std::endl;
+                        else std::cout<<" reliso_EB =      0"<<std::endl;
+                        std::cout<<" reliso_EE =      1"<<std::endl;
+                        if (sihih < 0.009947) std::cout<<"  sihih_EB =      1"<<std::endl;
+                        else std::cout<<"  sihih_EB =      0"<<std::endl;
+                        std::cout<<"  sihih_EE =      1"<<std::endl;
+                        if (!vtxFitConv) std::cout<<"vtxFitConv =      1"<<std::endl;
+                        else std::cout<<"vtxFitConv =      0"<<std::endl;
+                    }
+                    else {
+                        std::cout<<"     d0_EB =      1"<<std::endl;
+                        if (fabs(D0) <  0.027984 ) std::cout<<"     d0_EE =      1"<<std::endl;
+                        else std::cout<<"     d0_EE =      0"<<std::endl;
+                        std::cout<<"     dZ_EB =      1"<<std::endl;
+                        if (fabs(DZ) <  0.133431 ) std::cout<<"     dZ_EE =      1"<<std::endl;
+                        else std::cout<<"     dZ_EE =      0"<<std::endl;
+                        std::cout<<"   deta_EB =      1"<<std::endl;
+                        if (fabs(Deta) <  0.007057 ) std::cout<<"   deta_EE =      1"<<std::endl;
+                        else std::cout<<"   deta_EE =      0"<<std::endl;
+                        std::cout<<"   dphi_EB =      1"<<std::endl;
+                        if (fabs(Dphi) <  0.030159 ) std::cout<<"   dphi_EE =      1"<<std::endl;
+                        else std::cout<<"   dphi_EE =      0"<<std::endl;
+                        std::cout<<"    hoe_EB =      1"<<std::endl;
+                        if (HoE <  0.067778 ) std::cout<<"    hoe_EE =      1"<<std::endl;
+                        else std::cout<<"    hoe_EE =      0"<<std::endl;
+                        std::cout<<"  mHits_EB =      1"<<std::endl;
+                        if (mHits <= 1) std::cout<<"  mHits_EE =      1"<<std::endl;
+                        else std::cout<<"  mHits_EE =      0"<<std::endl;
+                        std::cout<<"ooemoop_EB =      1"<<std::endl;
+                        if (fabs(Ooemoop) < 0.098919) std::cout<<"ooemoop_EE =      1"<<std::endl;
+                        else std::cout<<"ooemoop_EE =      0"<<std::endl;
+                        std::cout<<" reliso_EB =      1"<<std::endl;
+                        if (RelIso < 0.078265) std::cout<<" reliso_EE =      1"<<std::endl;
+                        else std::cout<<" reliso_EE =      0"<<std::endl;
+                        std::cout<<"  sihih_EB =      1"<<std::endl;
+                        if (sihih < 0.028237) std::cout<<"  sihih_EE =      1"<<std::endl;
+                        else std::cout<<"  sihih_EE =      0"<<std::endl;
+                        if (!vtxFitConv) std::cout<<"vtxFitConv =      1"<<std::endl;
+                        else std::cout<<"vtxFitConv =      0"<<std::endl;
+                    }
+                    std::cout<<std::endl;
+
+                    if((*_iel).isEB()){
+                        if ((fabs(Deta) <  0.006046 ) && (fabs(Dphi) <  0.028092 ) && (sihih <  0.009947 ) && (HoE <  0.045772 ) && (fabs(D0) <  0.008790 ) && (fabs(DZ) <  0.021226 ) && (fabs(Ooemoop) <  0.020118 ) && (RelIso <  0.069537 ) && !vtxFitConv && (mHits <= 1)) {}
+                        else break;
+                    }
+                    else{
+                        if ((fabs(Deta) <  0.007057 ) && (fabs(Dphi) <  0.030159 ) && (sihih <  0.028237 ) && (HoE <  0.067778 ) && (fabs(D0) <  0.027984 ) && (fabs(DZ) <  0.133431 ) && (fabs(Ooemoop) <  0.098919 ) && (RelIso <  0.078265 ) && !vtxFitConv && (mHits <= 1)) {}
+                        else break;
+                    }*/
+
                     if ( (*electronSel_)( *_iel, event, retElectron ) ){ }
                     else break; // fail
 		    /*if (mbPar["electron_selector"]) {
@@ -765,6 +912,49 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
                     //electron cuts
                     while(1){
     
+                        /*Double_t scEta = (*_iel).superCluster()->eta();
+                        Double_t AEff  = ElectronEffectiveArea::GetElectronEffectiveArea(ElectronEffectiveArea::kEleGammaAndNeutralHadronIso03, scEta, ElectronEffectiveArea::kEleEAData2012);
+                        
+                        Double_t chIso = (*_iel).chargedHadronIso();
+                        Double_t nhIso = (*_iel).neutralHadronIso();
+                        Double_t phIso = (*_iel).photonIso();
+                        Double_t Deta  = (*_iel).deltaEtaSuperClusterTrackAtVtx();
+                        Double_t Dphi  = (*_iel).deltaPhiSuperClusterTrackAtVtx();
+                        Double_t sihih = (*_iel).full5x5_sigmaIetaIeta();
+                        Double_t HoE   = (*_iel).hadronicOverEm();
+                        Double_t D0    = (-1.0)*(*_iel).gsfTrack()->dxy(h_primVtx->at(0).position());
+                        Double_t DZ    = (*_iel).gsfTrack()->dz(h_primVtx->at(0).position());//
+                        
+                        edm::InputTag rhoSrc_("fixedGridRhoAll");
+                        edm::Handle<double> rhoHandle;
+                        event.getByLabel(rhoSrc_, rhoHandle);
+                        double rhoIso = std::max(*(rhoHandle.product()), 0.0);
+                        
+                        Double_t Ooemoop;
+                        if ((*_iel).ecalEnergy()==0) Ooemoop = 999.;
+                        else if (!std::isfinite((*_iel).ecalEnergy())) Ooemoop = 998.;
+                        else Ooemoop = (1.0/(*_iel).ecalEnergy() - (*_iel).eSuperClusterOverP()/(*_iel).ecalEnergy());
+                        Double_t RelIso  = ( chIso + max(0.0, nhIso + phIso - rhoIso*AEff) )/ (*_iel).ecalDrivenMomentum().pt();
+                        Int_t mHits   =  (*_iel).gsfTrack()->hitPattern().numberOfLostTrackerHits(reco::HitPattern::MISSING_INNER_HITS);
+            
+                	edm::InputTag convLabel_ ("reducedEgamma:reducedConversions");
+                        edm::Handle<reco::ConversionCollection> conversions;
+                   	event.getByLabel(convLabel_, conversions);
+                        edm::InputTag bsLabel_ ("offlineBeamSpot");
+                        edm::Handle<reco::BeamSpot> bsHandle;
+                	event.getByLabel(bsLabel_, bsHandle);
+                        const reco::BeamSpot &beamspot = *bsHandle.product();
+                        Bool_t vtxFitConv = ConversionTools::hasMatchedConversion(*_iel, conversions, beamspot.position());
+    
+                        if((*_iel).isEB()){
+                            if ((fabs(Deta) <  0.006046 ) && (fabs(Dphi) <  0.028092 ) && (sihih <  0.009947 ) && (HoE <  0.045772 ) && (fabs(D0) <  0.008790 ) && (fabs(DZ) <  0.021226 ) && (fabs(Ooemoop) <  0.020118 ) && (RelIso <  0.069537 ) && !vtxFitConv && (mHits <= 1)) {}
+                            else break;
+                        }
+                        else{
+                            if ((fabs(Deta) <  0.007057 ) && (fabs(Dphi) <  0.030159 ) && (sihih <  0.028237 ) && (HoE <  0.067778 ) && (fabs(D0) <  0.027984 ) && (fabs(DZ) <  0.133431 ) && (fabs(Ooemoop) <  0.098919 ) && (RelIso <  0.078265 ) && !vtxFitConv && (mHits <= 1)) {}
+                            else break;
+                        }*/
+
                         if ( (*looseElectronSel_)( *_iel, event, retLooseElectron ) ){ }
                         else break; // fail
     		        /*if (mbPar["loose_electron_selector"]) {
@@ -1026,7 +1216,6 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
             if ( mpMet.isNonnull() && mpMet.isAvailable() ) {
                 pat::MET const & met = mhMet->at(0);
                 if ( ignoreCut("Min MET") ||met.et()>cut("Min MET", double()) ) passCut(ret, "Min MET");
-		else break;
             }
         } // end of MET cuts
         if (mbPar["debug"]) std::cout<<"finish met cuts..."<<std::endl;

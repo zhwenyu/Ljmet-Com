@@ -19,11 +19,9 @@
 #include "DataFormats/BTauReco/interface/CATopJetTagInfo.h"
 #include "FWCore/Common/interface/TriggerNames.h"
 #include "DataFormats/Common/interface/TriggerResults.h"
-#include "DataFormats/HLTReco/interface/TriggerEvent.h"
 #include "DataFormats/PatCandidates/interface/TriggerObjectStandAlone.h"
 #include "DataFormats/PatCandidates/interface/PackedTriggerPrescales.h"
 #include "DataFormats/EgammaCandidates/interface/GsfElectron.h"
-#include "HLTrigger/HLTcore/interface/HLTConfigProvider.h"
 //#include "LJMet/Com/interface/VVString.h"
 
 using std::cout;
@@ -37,15 +35,13 @@ class DileptonCalc : public BaseCalc {
     
 public:
     
-  DileptonCalc();
-  virtual ~DileptonCalc(){}
-  
-  virtual int BeginJob();
-  virtual int AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * selector);
-
-  virtual int EndJob(){return 0;}
-
-
+    DileptonCalc();
+    virtual ~DileptonCalc(){}
+    
+    virtual int BeginJob();
+    virtual int AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * selector);
+    virtual int EndJob(){return 0;}
+    
 private:
     
     bool                      isMc;
@@ -60,7 +56,7 @@ private:
     bool keepFullMChistory;
     bool doTriggerStudy_; 
     double rhoIso;
-  // HLTConfigProvider hltConfig_;
+
     boost::shared_ptr<TopElectronSelector>     electronSelL_, electronSelM_, electronSelT_;
     std::vector<reco::Vertex> goodPVs;
     int findMatch(const reco::GenParticleCollection & genParticles, int idToMatch, double eta, double phi);
@@ -139,9 +135,6 @@ int DileptonCalc::BeginJob()
         std::exit(-1);
     }
     
-
-
-    
     return 0;
 }
 
@@ -195,64 +188,7 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
     SetValue("trigEE", passEE);
     SetValue("trigEM", passEM);
     SetValue("trigMM", passMM);
-
-
-    bool HLT_DoubleEle33=false;
-    bool HLT_DoubleEle33_MW=false;
-    bool HLT_Ele27WP85=false;
-    bool HLT_Mu30TkMu11=false;
-    bool HLT_Mu40=false;
-    bool HLT_IsoTkMu24=false;
-    bool HLT_DoubleMu33NoFiltersNoVtx=false;
-    bool HLT_Mu23Ele12=false;
-    bool HLT_Mu8Ele23=false;
-    bool HLT_PFHT900=false;
-    bool HLT_AK8PFJet360TrimMass30=false;
-
-    if(doTriggerStudy_){
-
-      edm::Handle<edm::TriggerResults> triggerBits;
-      event.getByLabel(triggerBits_,triggerBits);
-      const edm::TriggerNames &names = event.triggerNames(*triggerBits);
-      
-      
-      for (unsigned int i=0; i!=triggerBits->size(); ++i) {
-	string Path = names.triggerName(i);
-	
-	const unsigned int triggerIndex(i);
-	if(triggerBits->accept(triggerIndex)){
-	  //electron paths
-	  if(Path=="HLT_DoubleEle33_CaloIdL_GsfTrkIdVL_v1") HLT_DoubleEle33=true;
-	  if(Path=="HLT_DoubleEle33_CaloIdL_GsfTrkIdVL_MW_v1") HLT_DoubleEle33_MW=true;
-	  if(Path=="HLT_Ele27_eta2p1_WP85_Gsf_v1") HLT_Ele27WP85=true;
-	  //Muon paths
-	  if(Path=="HLT_Mu30_TkMu11_v1") HLT_Mu30TkMu11=true;
-	  if(Path=="HLT_M40_v1") HLT_Mu40=true;
-	  if(Path=="HLT_IsoTkMu24_IterTrk02_v1") HLT_IsoTkMu24=true;
-	  if(Path=="HLT_DoubleMu33NoFiltersNoVtx_v1") HLT_DoubleMu33NoFiltersNoVtx=true;
-	  //cross paths
-	  if(Path=="HLT_Mu23_TrkIsoVVL_Ele12_Gsf_CaloId_TrackId_Iso_MediumWP_v1") HLT_Mu23Ele12=true;
-	  if(Path=="HLT_Mu8_TrkIsoVVL_Ele23_Gsf_CaloId_TrackId_Iso_MediumWP_v1") HLT_Mu8Ele23=true;
-	  //HT/Jet
-	  if(Path=="HLT_PFHT900_v1") HLT_PFHT900=true;
-	  if(Path=="HLT_AK8PFJet360TrimMod_Mass30_v1") HLT_AK8PFJet360TrimMass30=true;
-	}
-      }
-    }
-
-
-    SetValue("HLT_DoubleEle33",HLT_DoubleEle33);
-    SetValue("HLT_DoubleEle33_MW",HLT_DoubleEle33_MW);
-    SetValue("HLT_Ele27WP85",HLT_Ele27WP85);
-    SetValue("HLT_Mu30TkMu11",HLT_Mu30TkMu11);
-    SetValue("HLT_Mu40",HLT_Mu40);
-    SetValue("HLT_IsoTkMu24",HLT_IsoTkMu24);
-    SetValue("HLT_DoubleMu33NoFiltersNoVtx",HLT_DoubleMu33NoFiltersNoVtx);
-    SetValue("HLT_Mu23Ele12",HLT_Mu23Ele12);
-    SetValue("HLT_Mu8Ele23",HLT_Mu8Ele23);
-    SetValue("HLT_PFHT900",HLT_PFHT900);
-    SetValue("HLT_AK8PFJet360TrimMass30",HLT_AK8PFJet360TrimMass30);
-
+    
 
     //
     //_____ Event kinematics __________________
@@ -435,9 +371,8 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
 	elVtxFitConv.push_back((*iel)->passConversionVeto());
         
 	//Trigger Matching - store 4-vector and filter information for all trigger objects deltaR matched to electrons
-	/* RIGHT NOW JUST SAVE SOME BOOLS FOR PATHS SO COMMENT OUT BELOW
 	if(doTriggerStudy_){
-
+	  
 	  //read in trigger objects
 	  edm::Handle<pat::TriggerObjectStandAloneCollection> triggerObjects;
 	  event.getByLabel(triggerObjects_,triggerObjects);
@@ -482,7 +417,7 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
 	    TriggerElectronEnergies.push_back(-9999);
 	  }
 	  
-	}*/
+	}
 	
 	if(isMc && keepFullMChistory){
 	  //cout << "start\n";
@@ -717,8 +652,8 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
             muNTrackerLayers   . push_back((*imu)->innerTrack()->hitPattern().trackerLayersWithMeasurement());
 
 	   
-	    //Trigger Matching - store 4-vector and filter information for all trigger objects deltaR matched to muons
-	    /*	    if(doTriggerStudy_){
+	    //Trigger Matching - store 4-vector and filter information for all trigger objects deltaR matched to electrons
+	    if(doTriggerStudy_){
 	  
 	      //read in trigger objects
 	      edm::Handle<pat::TriggerObjectStandAloneCollection> triggerObjects;
@@ -765,7 +700,7 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
 	      }
 	      
 	    }
-	    */
+
             
             if(isMc && keepFullMChistory){
                 edm::Handle<reco::GenParticleCollection> genParticles;
@@ -1215,35 +1150,56 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
         
         for(size_t i = 0; i < genParticles->size(); i++){
             const reco::GenParticle & p = (*genParticles).at(i);
-	    bool keep=false;
-            //Find particles from hard scattering/stable
-            if (p.status() >=20 && p.status()<=29) keep=true;
-	    else if(p.status()==1 && ( fabs(p.pdgId())>10 && fabs(p.pdgId())<19) ){
-	      //since we know it's a status 1 lepton, only keep if it's mother is a W and either status 22 or 52
-	      if(p.mother()){
-		reco::Candidate* mother = (reco::Candidate*) p.mother();
-		genMotherID      . push_back(mother->pdgId());
-		if( fabs(mother->pdgId())==24 && ( (mother->status()>=20 && mother->status()<=29) || (mother->status()>=50 && mother->status()<=59)) ) keep=true;
-	      }
-	      else{
-		genMotherID      . push_back(-999);
-	      }
-	    }
-
-            if(!keep) continue;    
-	    //Four vector
-	    genPt     . push_back(p.pt());
-	    genEta    . push_back(p.eta());
-	    genPhi    . push_back(p.phi());
-	    genEnergy . push_back(p.energy());
             
-	    //Identity
-	    genID            . push_back(p.pdgId());
-	    genIndex         . push_back((int) i);
-	    genStatus        . push_back(p.status());
-	    //genMotherIndex   . push_back(mInd);
-	
-	}//End loop over gen particles
+            //Find status 3 particles
+            if (p.status() == 23){
+                reco::Candidate* mother = (reco::Candidate*) p.mother();
+                if (not mother)            continue;
+                
+                bool bKeep = false;
+                for (unsigned int uk = 0; uk < keepMomPDGID.size(); uk++){
+                    if (abs(mother->pdgId()) == (int) keepMomPDGID.at(uk)){
+                        bKeep = true;
+                        break;
+                    }
+                }
+                
+                if (not bKeep){
+                    for (unsigned int uk = 0; uk < keepPDGID.size(); uk++){
+                        if (abs(p.pdgId()) == (int) keepPDGID.at(uk)){
+                            bKeep = true;
+                            break;
+                        }
+                    }
+                }
+                
+                if (not bKeep) continue;
+                
+                //Find index of mother
+                int mInd = 0;
+                for(size_t j = 0; j < genParticles->size(); j++){
+                    const reco::GenParticle & q = (*genParticles).at(j);
+                    if (q.status() != 3) continue;
+                    if (mother->pdgId() == q.pdgId() and fabs(mother->eta() - q.eta()) < 0.01 and fabs(mother->pt() - q.pt()) < 0.01){
+                        mInd = (int) j;
+                        break;
+                    }
+                }
+                
+                //Four vector
+                genPt     . push_back(p.pt());
+                genEta    . push_back(p.eta());
+                genPhi    . push_back(p.phi());
+                genEnergy . push_back(p.energy());
+                
+                //Identity
+                genID            . push_back(p.pdgId());
+                genIndex         . push_back((int) i);
+                genStatus        . push_back(p.status());
+                genMotherID      . push_back(mother->pdgId());
+                genMotherIndex   . push_back(mInd);
+            }
+        }//End loop over gen particles
     }  //End MC-only if
     
     // Four vector
