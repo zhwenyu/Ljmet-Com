@@ -24,6 +24,7 @@
 #include "DataFormats/PatCandidates/interface/PackedTriggerPrescales.h"
 #include "DataFormats/EgammaCandidates/interface/GsfElectron.h"
 #include "HLTrigger/HLTcore/interface/HLTConfigProvider.h"
+#include "SimDataFormats/GeneratorProducts/interface/GenEventInfoProduct.h"
 //#include "LJMet/Com/interface/VVString.h"
 
 using std::cout;
@@ -1262,10 +1263,26 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
     std::vector <int> genStatus;
     std::vector <int> genMotherID;
     std::vector <int> genMotherIndex;
-    
+
+    //event weights
+    std::vector<double> evtWeightsMC;
+    float MCWeight=1;
+
     if (isMc){
-        edm::Handle<reco::GenParticleCollection> genParticles;
-        event.getByLabel(genParticles_it, genParticles);
+      //load info for event weight
+      edm::Handle<GenEventInfoProduct> genEvtInfo;
+      edm::InputTag gen_it("generator");
+      event.getByLabel(gen_it, genEvtInfo );
+
+      std::vector<double> evtWeights = genEvtInfo->weights();
+      double theWeight = genEvtInfo->weight();
+      
+      evtWeightsMC=evtWeights;
+      MCWeight = theWeight;
+   
+      //load genparticles collection
+      edm::Handle<reco::GenParticleCollection> genParticles;
+      event.getByLabel(genParticles_it, genParticles);
         
         for(size_t i = 0; i < genParticles->size(); i++){
             const reco::GenParticle & p = (*genParticles).at(i);
@@ -1313,6 +1330,9 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
     SetValue("genMotherID"   , genMotherID);
     SetValue("genMotherIndex", genMotherIndex);
     
+    SetValue("evtWeightsMC", evtWeightsMC);
+    SetValue("MCWeight",MCWeight);
+
     return 0;
 }
 
