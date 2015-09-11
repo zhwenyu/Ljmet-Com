@@ -55,6 +55,7 @@ public:
     
     std::vector<edm::Ptr<pat::Jet>> const & GetAllJets() const { return mvAllJets; }
     std::vector<edm::Ptr<pat::Jet>> const & GetSelectedJets() const { return mvSelJets; }
+    std::vector<pat::Jet> const & GetSelectedCleanedJets() const { return mvSelJetsCleaned; }
     std::vector<edm::Ptr<pat::Jet>> const & GetLooseJets() const { return mvSelJets; }
     std::vector<edm::Ptr<pat::Jet>> const & GetSelectedBtagJets() const { return mvSelBtagJets; }
     std::vector<std::pair<TLorentzVector, bool>> const & GetCorrJetsWithBTags() const { return mvCorrJetsWithBTags; }
@@ -95,6 +96,7 @@ public:
 protected:
     std::vector<edm::Ptr<pat::Jet>> mvAllJets;
     std::vector<edm::Ptr<pat::Jet>> mvSelJets;
+    std::vector<pat::Jet> mvSelJetsCleaned;
     std::vector<edm::Ptr<pat::Jet>> mvLooseJets;
     std::vector<std::pair<TLorentzVector, bool>> mvCorrJetsWithBTags;
     std::vector<edm::Ptr<pat::Jet>> mvSelBtagJets;
@@ -122,7 +124,7 @@ protected:
     std::map<std::string, std::string> msPar;
     std::map<std::string, edm::InputTag> mtPar;
     std::map<std::string, std::vector<std::string>> mvsPar;
-    
+
     std::string mName;
     std::string mLegend;
     bool mbIsMc;
