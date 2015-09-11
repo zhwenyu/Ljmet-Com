@@ -1293,11 +1293,7 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
 	      //since we know it's a status 1 lepton, only keep if it's mother is a W and either status 22 or 52
 	      if(p.mother()){
 		reco::Candidate* mother = (reco::Candidate*) p.mother();
-		genMotherID      . push_back(mother->pdgId());
 		if( fabs(mother->pdgId())==24 && ( (mother->status()>=20 && mother->status()<=29) || (mother->status()>=50 && mother->status()<=59)) ) keep=true;
-	      }
-	      else{
-		genMotherID      . push_back(-999);
 	      }
 	    }
 
@@ -1312,6 +1308,10 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
 	    genID            . push_back(p.pdgId());
 	    genIndex         . push_back((int) i);
 	    genStatus        . push_back(p.status());
+	    
+	    //mother info - stores mother pdgID if mother exists or -999 if mother doesn't exist. This way the entries will always be aligned with main gen particle entries
+	    if(p.mother()) genMotherID.push_back((p.mother())->pdgId());
+	    else genMotherID.push_back(-999);
 	    //genMotherIndex   . push_back(mInd);
 	
 	}//End loop over gen particles
