@@ -14,7 +14,7 @@ singleLepCalc = cms.PSet(
                          cleanGenJets = cms.bool(True),
                          keepPDGID    = cms.vuint32(1, 2, 3, 4, 5, 21, 11, 12, 13, 14, 15, 16),
                          keepMomPDGID = cms.vuint32(6, 24),
-                         rhoSrc            = cms.InputTag("fixedGridRhoAll"),
+                         rhoSrc            = cms.InputTag("fixedGridRhoFastjetAll"),
                          isWJets           = cms.bool(False),
                          isTB              = cms.bool(False),
                          )
