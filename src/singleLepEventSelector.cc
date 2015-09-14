@@ -3,7 +3,7 @@
 // FWLite PAT analyzer-selector for a generic single lepton analysis
 //
 // Adapted from WprimeEventSelector
-// Joshua Swanson, April 2014 TEST
+// Joshua Swanson, April 2014
 //
 #ifndef LJMet_Com_interface_singleLepEventSelector_h
 #define LJMet_Com_interface_singleLepEventSelector_h
