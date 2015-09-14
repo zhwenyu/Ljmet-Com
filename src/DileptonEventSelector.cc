@@ -40,7 +40,7 @@
 #include "PhysicsTools/SelectorUtils/interface/PVSelector.h"
 #include "LJMet/Com/interface/BaseEventSelector.h"
 #include "LJMet/Com/interface/LjmetFactory.h"
-
+#include "DataFormats/METReco/interface/HcalNoiseSummary.h"
 
 
 using trigger::TriggerObject;
@@ -148,7 +148,9 @@ void DileptonEventSelector::BeginJob( std::map<std::string, edm::ParameterSet co
         
         mbPar["pv_cut"]                   = par[_key].getParameter<bool>         ("pv_cut");
         mbPar["hbhe_cut"]                 = par[_key].getParameter<bool>         ("hbhe_cut");
-        
+        msPar["hbhe_cut_value"]           = par[_key].getParameter<std::string>  ("hbhe_cut_value");
+	mbPar["cscHalo_cut"]              = par[_key].getParameter<bool>         ("cscHalo_cut");
+	mtPar["flag_tag"]                 = par[_key].getParameter<edm::InputTag>("flag_tag");
         mbPar["jet_cuts"]                 = par[_key].getParameter<bool>         ("jet_cuts");
         mdPar["jet_minpt"]                = par[_key].getParameter<double>       ("jet_minpt");
         mdPar["jet_maxeta"]               = par[_key].getParameter<double>       ("jet_maxeta");
@@ -177,6 +179,9 @@ void DileptonEventSelector::BeginJob( std::map<std::string, edm::ParameterSet co
         mtPar["muon_collection"]          = par[_key].getParameter<edm::InputTag>("muon_collection");
         mtPar["electron_collection"]      = par[_key].getParameter<edm::InputTag>("electron_collection");
         mtPar["met_collection"]           = par[_key].getParameter<edm::InputTag>("met_collection");
+	mbPar["doLepJetCleaning"]         = par[_key].getParameter<bool>         ("doLepJetCleaning");
+        mbPar["doNewJEC"]                 = par[_key].getParameter<bool>         ("doNewJEC");
+	mbPar["isMc"]                     = par[_key].getParameter<bool>         ("isMc");
     }
     else {
         std::cout << mLegend << "event selector not configured, exiting"
@@ -195,6 +200,7 @@ void DileptonEventSelector::BeginJob( std::map<std::string, edm::ParameterSet co
     push_back("Trigger");
     push_back("Primary vertex");
     push_back("HBHE noise and scraping filter");
+    push_back("CSC Tight Halo filter");
     push_back("Min muon");
     push_back("Max muon");
     push_back("Min electron");
@@ -215,7 +221,8 @@ void DileptonEventSelector::BeginJob( std::map<std::string, edm::ParameterSet co
     set("Trigger", mbPar["trigger_cut"]);
     set("Primary vertex", mbPar["pv_cut"]);
     set("HBHE noise and scraping filter", mbPar["hbhe_cut"]);
-    
+    set("CSC Tight Halo filter", mbPar["cscHalo_cut"]);
+
     if (mbPar["muon_cuts"]){
         set("Min muon", miPar["min_muon"]);
         set("Max muon", miPar["max_muon"]);
@@ -353,9 +360,89 @@ bool DileptonEventSelector::operator()( edm::EventBase const & event, pat::strbi
         //
         if ( considerCut("HBHE noise and scraping filter") ) {
             
-            passCut(ret, "HBHE noise and scraping filter"); // PV cuts total
-            
-        } // end of PV cuts
+	  //set cut value considered
+	  bool run1Cut=false;
+	  bool run2LooseCut=false;
+	  bool run2TightCut=false;
+	  if(msPar["hbhe_cut_value"].find("Run1")!=string::npos){
+	    run1Cut=true;
+	  }
+	  else if(msPar["hbhe_cut_value"].find("Run2Loose")!=string::npos){
+	    run2LooseCut=true;
+	  }
+	  else if(msPar["hbhe_cut_value"].find("Run2Tight")!=string::npos){
+	    run2TightCut=true;
+	  }
+	  else{
+	    std::cout<<"HBHE cut not configured correctly!...exiting..."<<std::endl;
+	    std::exit(-1);
+	  }
+
+	  if (mbPar["debug"]) std::cout<<"HBHE cuts..."<<std::endl;
+
+	  //taken from http://cmslxr.fnal.gov/lxr/source/CommonTools/RecoAlgos/plugins/HBHENoiseFilterResultProducer.cc?v=CMSSW_7_4_1
+	  //and http://cmslxr.fnal.gov/lxr/source/CommonTools/RecoAlgos/python/HBHENoiseFilterResultProducer_cfi.py?v=CMSSW_7_4_1
+
+	  edm::InputTag noiselabel ("hcalnoise");
+	  int minHPDHits = 17;
+	  int minHPDNoOtherHits = 10;
+	  //int minZeros = 10;
+	  int minZeros = 999999.;
+	  bool IgnoreTS4TS5ifJetInLowBVRegion = false;
+
+	  // get the Noise summary object
+	  edm::Handle<HcalNoiseSummary> summary_h;
+	  event.getByLabel(noiselabel, summary_h);
+	  if(!summary_h.isValid()) {
+	    std::cout << "Could not find HcalNoiseSummary.\n";
+	  }
+	  const HcalNoiseSummary& summary(*summary_h);
+
+	  bool goodJetFoundInLowBVRegion = false;
+	  if (IgnoreTS4TS5ifJetInLowBVRegion) goodJetFoundInLowBVRegion = summary.goodJetFoundInLowBVRegion();
+
+	  const bool failCommon = summary.maxHPDHits() >= minHPDHits || summary.maxHPDNoOtherHits() >= minHPDNoOtherHits || summary.maxZeros() >= minZeros;
+
+	  //const bool failFull = failCommon || (summary.HasBadRBXTS4TS5() && !goodJetFoundInLowBVRegion);
+
+	  const bool failRun1 = failCommon || (summary.HasBadRBXTS4TS5() && !goodJetFoundInLowBVRegion);
+
+	  const bool failRun2Loose = failCommon || (summary.HasBadRBXRechitR45Loose() && !goodJetFoundInLowBVRegion);
+
+	  const bool failRun2Tight = failCommon || (summary.HasBadRBXRechitR45Tight() && !goodJetFoundInLowBVRegion);
+
+	  // Check isolation requirements
+	  //const bool failIsolation = summary.numIsolatedNoiseChannels() >= minNumIsolatedNoiseChannels || summary.isolatedNoiseSumE() >= minIsolatedNoiseSumE || summary.isolatedNoiseSumEt() >= minIsolatedNoiseSumEt;
+	  if(run1Cut){
+	    if (!failRun1) passCut(ret, "HBHE noise and scraping filter"); // HBHE cuts total
+	  }
+	  else if(run2LooseCut){
+	    if (!failRun2Loose) passCut(ret, "HBHE noise and scraping filter"); // HBHE cuts total
+	  }
+	  else if(run2TightCut){
+	    if (!failRun2Tight) passCut(ret, "HBHE noise and scraping filter"); // HBHE cuts total
+	  }
+	  else {std::cout<<"No HBHE cut!"<<std::endl; passCut(ret, "HBHE noise and scraping filter");} // HBHE cuts total
+        } // end of hbhe cuts
+
+	//_________CSC Halo Filter_________
+
+	if ( considerCut("CSC Tight Halo filter") ) {
+	      
+	  edm::Handle<edm::TriggerResults > PatTriggerResults;
+	  event.getByLabel( mtPar["flag_tag"], PatTriggerResults );
+	  const edm::TriggerNames patTrigNames = event.triggerNames(*PatTriggerResults);
+
+	  bool cscpass = false;
+
+	  for (unsigned int i=0; i<PatTriggerResults->size(); i++){
+	    if (patTrigNames.triggerName(i) == "Flag_CSCTightHaloFilter") cscpass = PatTriggerResults->accept(patTrigNames.triggerIndex(patTrigNames.triggerName(i)));
+	  }
+
+	  if (cscpass) passCut(ret, "CSC Tight Halo filter"); // CSC cut
+        } // end of CSC cuts
+
+
         
         //
         //_____ Muon cuts ________________________________
@@ -415,7 +502,14 @@ bool DileptonEventSelector::operator()( edm::EventBase const & event, pat::strbi
         
         int _n_electrons  = 0;
         int nSelElectrons = 0;
-        
+        //collection of electrons for cleaning
+	std::vector<pat::Electron> electronsForCleaning;
+	//read in pvs which we will need for dZ calculation:
+	std::vector<reco::Vertex> goodPVs;
+	edm::Handle<std::vector<reco::Vertex> > pvHandle;
+	event.getByLabel(mtPar["pv_collection"], pvHandle);
+	goodPVs = *(pvHandle.product());
+
         if ( mbPar["electron_cuts"] ) {
             
             //get electrons
@@ -426,10 +520,102 @@ bool DileptonEventSelector::operator()( edm::EventBase const & event, pat::strbi
             for ( std::vector<pat::Electron>::const_iterator _iel = mhElectrons->begin(); _iel != mhElectrons->end(); _iel++){
                 
                 bool pass = false;
-                
+		bool passLoose=false;
                 while(1){
                     if (not _iel->gsfTrack().isNonnull() or not _iel->gsfTrack().isAvailable()) break;
-                    
+		    
+		    //get effective area to do pu correction for iso
+		    double AEff;
+		    if(fabs(_iel->ecalDrivenMomentum().eta()) >2.2) AEff = 0.1530;
+		    else if(fabs(_iel->ecalDrivenMomentum().eta()) >2.0) AEff = 0.0842;
+		    else if(fabs(_iel->ecalDrivenMomentum().eta()) >1.3) AEff = 0.0572;
+		    else if(fabs(_iel->ecalDrivenMomentum().eta()) >0.8) AEff = 0.0988;
+		    else if(fabs(_iel->ecalDrivenMomentum().eta()) >0.0) AEff = 0.1013;
+		    //calculate relIso
+		    reco::GsfElectron::PflowIsolationVariables pfIso = _iel->pfIsolationVariables();
+		    double chIso = pfIso.sumChargedHadronPt;
+		    double nhIso = pfIso.sumNeutralHadronEt;
+		    double phIso = pfIso.sumPhotonEt;
+		    double PUIso = pfIso.sumPUPt;
+		    double relIso = ( chIso + max(0.0, nhIso + phIso - PUIso*AEff) ) / _iel->pt();
+
+		    //get d0 and dZ
+		    double d0=_iel->dB();
+		    double dZ;
+		    if(goodPVs.size() > 0){
+		      dZ=_iel->gsfTrack()->dz(goodPVs.at(0).position());
+		    } 
+		    else {dZ=-999;}
+		    //get 1/e -1/1p
+		    float ooEmooP = 1.0/_iel->ecalEnergy() - _iel->eSuperClusterOverP()/_iel->ecalEnergy();
+
+		    //check to see if it passes loose id for lepton jet cleaning, unfortunately one ID for mc, one for data
+		    if(mbPar["isMc"]){
+		        //Barrel
+		      if(fabs(_iel->ecalDrivenMomentum().eta()) <= 1.479){
+			if(_iel->full5x5_sigmaIetaIeta() >= 0.0103) {passLoose= false; }
+			else if(fabs(_iel->deltaEtaSuperClusterTrackAtVtx()) >= 0.0105)    {passLoose= false; }
+			else if(fabs(_iel->deltaPhiSuperClusterTrackAtVtx()) >= 0.115)    {passLoose= false; }
+			else if(_iel->hcalOverEcal() >= 0.104)         {passLoose= false; }
+			else if(relIso >= 0.0893)          {passLoose= false; }
+			else if(ooEmooP >= 0.102) {passLoose= false; }
+			else if(fabs(d0) >= 0.0261)      {passLoose= false; }
+			else if(fabs(dZ) >= 0.41)     {passLoose= false; }
+			else if(_iel->gsfTrack()->hitPattern().numberOfHits(reco::HitPattern::MISSING_INNER_HITS) > 2)              {passLoose= false; }
+			else if(_iel->isGsfCtfScPixChargeConsistent() < 1)  {passLoose= false; }
+			else if(!_iel->passConversionVeto())        {passLoose= false; }
+			else passLoose=true;
+		      }
+		      
+		      //Endcap
+		      else{
+			if(_iel->full5x5_sigmaIetaIeta() >= 0.0301)  {passLoose= false; }
+			else if(fabs(_iel->deltaEtaSuperClusterTrackAtVtx()) >= 0.00814)    {passLoose= false; }
+			else if(fabs(_iel->deltaPhiSuperClusterTrackAtVtx()) >= 0.182)    {passLoose= false; }
+			else if(_iel->hcalOverEcal() >= 0.0897)        {passLoose= false; }
+			else if(relIso >= 0.121)        {passLoose= false; }
+			else if(ooEmooP >= 0.126) {passLoose= false; }
+			else if(fabs(d0) >= 0.118)       {passLoose= false; }
+			else if(fabs(dZ) >= 0.822)      {passLoose= false; }
+			else if(_iel->gsfTrack()->hitPattern().numberOfHits(reco::HitPattern::MISSING_INNER_HITS) > 1)              {passLoose= false; }
+			else if(_iel->isGsfCtfScPixChargeConsistent() < 1)  {passLoose= false; }
+			else if(!_iel->passConversionVeto())        {passLoose= false; }
+			else passLoose=true;
+		      }
+		    }
+                    else{//not mc, implement 50ns data cut
+		      //Barrel
+		      if(fabs(_iel->ecalDrivenMomentum().eta()) <= 1.479){
+			if(_iel->full5x5_sigmaIetaIeta() >= 0.0105) {passLoose= false; }
+			else if(fabs(_iel->deltaEtaSuperClusterTrackAtVtx()) >= 0.00976)    {passLoose= false; }
+			else if(fabs(_iel->deltaPhiSuperClusterTrackAtVtx()) >= 0.0929)    {passLoose= false; }
+			else if(_iel->hcalOverEcal() >= 0.0765)         {passLoose= false; }
+			else if(relIso >= 0.118)          {passLoose= false; }
+			else if(ooEmooP >= 0.184) {passLoose= false; }
+			else if(fabs(d0) >= 0.0227)      {passLoose= false; }
+			else if(fabs(dZ) >= 0.379)     {passLoose= false; }
+			else if(_iel->gsfTrack()->hitPattern().numberOfHits(reco::HitPattern::MISSING_INNER_HITS) > 2)              {passLoose= false; }
+			else if(_iel->isGsfCtfScPixChargeConsistent() < 1)  {passLoose= false; }
+			else if(!_iel->passConversionVeto())        {passLoose= false; }
+			else passLoose=true;
+		      }
+		      
+		      //Endcap
+		      else{
+			if(_iel->full5x5_sigmaIetaIeta() >= 0.0318)  {passLoose= false; }
+			else if(fabs(_iel->deltaEtaSuperClusterTrackAtVtx()) >= 0.00952)    {passLoose= false; }
+			else if(fabs(_iel->deltaPhiSuperClusterTrackAtVtx()) >= 0.181)    {passLoose= false; }
+			else if(_iel->hcalOverEcal() >= 0.0824)        {passLoose= false; }
+			else if(relIso >= 0.118)        {passLoose= false; }
+			else if(ooEmooP >= 0.125) {passLoose= false; }
+			else if(fabs(d0) >= 0.242)       {passLoose= false; }
+			else if(fabs(dZ) >= 0.921)      {passLoose= false; }
+			else if(_iel->gsfTrack()->hitPattern().numberOfHits(reco::HitPattern::MISSING_INNER_HITS) > 1)              {passLoose= false; }
+			else if(_iel->isGsfCtfScPixChargeConsistent() < 1)  {passLoose= false; }
+			else if(!_iel->passConversionVeto())        {passLoose= false; }
+			else passLoose=true;
+		      }
+		    }
                     // electron Et cut
                     if (_iel->pt()>mdPar["electron_minpt"]){ }
                     else break;
@@ -441,13 +627,17 @@ bool DileptonEventSelector::operator()( edm::EventBase const & event, pat::strbi
                     pass = true;
                     break;
                 }
+		//store loose electron for lepton-jet cleaning
+		if(passLoose){
+		  electronsForCleaning.push_back(*_iel);
+		}
                 
                 if ( pass ){
                     ++nSelElectrons;
                     
                     // save every good electron
                     mvSelElectrons.push_back( edm::Ptr<pat::Electron>( mhElectrons, _n_electrons) );
-                    
+
                 }
                 _n_electrons++;
             } // end of the electron loop
@@ -478,6 +668,7 @@ bool DileptonEventSelector::operator()( edm::EventBase const & event, pat::strbi
         //int njetsPF = 0;
         
         mvSelJets.clear();
+	mvSelJetsCleaned.clear();
         mvAllJets.clear();
         
         event.getByLabel( mtPar["jet_collection"], mhJets );
@@ -485,16 +676,102 @@ bool DileptonEventSelector::operator()( edm::EventBase const & event, pat::strbi
              _ijet != mhJets->end(); ++_ijet){
             
             retJet.set(false);
-            // jet cuts
+            // jet cuts for uncleaned jets
             if ( (*jetSel_)( *_ijet, retJet ) ){ 
-                mvAllJets.push_back(edm::Ptr<pat::Jet>(mhJets, _n_jets)); 
-                if (( _ijet->pt()>mdPar["jet_minpt"] ) && ( fabs(_ijet->eta())<mdPar["jet_maxeta"] )){ 
+                mvAllJets.push_back(edm::Ptr<pat::Jet>(mhJets, _n_jets)); 		
+		//cut on corrected jet quantities
+		TLorentzVector corJetP4 = correctJet(*_ijet,event);
+                if (( corJetP4.Pt()>mdPar["jet_minpt"] ) && ( fabs(corJetP4.Eta())<mdPar["jet_maxeta"] )){ 
                     ++_n_good_jets;
                     mvSelJets.push_back(edm::Ptr<pat::Jet>(mhJets, _n_jets)); 
-                }
+                }	       
             }
-            ++_n_jets;
-        } // end of loop over jets
+	    
+	    //lepton jet cleaning
+	    bool _cleaned = false;	    
+	    pat::Jet cleanedJet = *_ijet;
+	    TLorentzVector jetP4;
+	    
+	    if ( mbPar["doLepJetCleaning"] ){
+
+	      if (mbPar["debug"]) std::cout << "Checking Overlap" << std::endl;
+	      //clean of muons
+	      for(unsigned int ilep=0; ilep < mvSelMuons.size(); ilep++){
+		bool looseMuon; //bool to loop over only loose muons can easily do here since loose muon id so easy to implement
+		if(!(mvSelMuons[ilep]->isPFMuon())) looseMuon=false;
+		else if(!( mvSelMuons[ilep]->isGlobalMuon() || mvSelMuons[ilep]->isTrackerMuon())) looseMuon=false;
+		else looseMuon=true;
+		if(!looseMuon) continue;
+		if ( deltaR(mvSelMuons[ilep]->p4(),_ijet->p4()) < 0.4 ){
+		  if (mbPar["debug"]) {
+		    std::cout << "Jet Overlaps with the Muon... Cleaning jet..." << std::endl;
+		    std::cout << "Lepton : pT = " << mvSelMuons[ilep]->pt() << " eta = " << mvSelMuons[ilep]->eta() << " phi = " << mvSelMuons[ilep]->phi() << std::endl;
+		    std::cout << "      Raw Jet : pT = " << _ijet->pt() << " eta = " << _ijet->eta() << " phi = " << _ijet->phi() << std::endl;
+		  }
+		  const std::vector<edm::Ptr<reco::Candidate> > _ijet_consts = _ijet->daughterPtrVector();
+		  for ( std::vector<edm::Ptr<reco::Candidate> >::const_iterator _i_const = _ijet_consts.begin(); _i_const != _ijet_consts.end(); ++_i_const){
+		    if ( (*_i_const).key() == mvSelMuons[ilep]->originalObjectRef().key() ) {
+		      cleanedJet.setP4( _ijet->p4() - mvSelMuons[ilep]->p4() );
+		      //get the correction for the cleaned jet and apply it
+		      jetP4 = correctJet(cleanedJet, event);
+		      //annoying thing to convert our tlorentzvector to root::math::lorentzvector
+		      ROOT::Math::LorentzVector<ROOT::Math::PtEtaPhiM4D<double > > rlv;
+		      rlv.SetXYZT(jetP4.X(),jetP4.Y(),jetP4.Z(),jetP4.T());
+		      cleanedJet.setP4(rlv);
+		      if (mbPar["debug"]) std::cout << "Corrected Jet : pT = " << jetP4.Pt() << " eta = " << jetP4.Eta() << " phi = " << jetP4.Phi() << std::endl;
+		      _cleaned = true;
+		    }
+		  }
+		}
+	      }//end muon cleaning
+	      
+	      //clean for electrons
+	      for (unsigned int ilep=0; ilep <electronsForCleaning.size();ilep++){
+		if ( deltaR(electronsForCleaning.at(ilep).p4(),_ijet->p4()) < 0.4 ){
+		  if (mbPar["debug"]) {
+		    std::cout << "Jet Overlaps with the Electron... Cleaning jet..." << std::endl;
+		    std::cout << "Lepton : pT = " << electronsForCleaning.at(ilep).pt() << " eta = " << electronsForCleaning.at(ilep).eta() << " phi = " << electronsForCleaning.at(ilep).phi() << std::endl;
+		    std::cout << "      Raw Jet : pT = " << _ijet->pt() << " eta = " << _ijet->eta() << " phi = " << _ijet->phi() << std::endl;
+		  }
+		  const std::vector<edm::Ptr<reco::Candidate> > _ijet_consts = _ijet->daughterPtrVector();
+		  for ( std::vector<edm::Ptr<reco::Candidate> >::const_iterator _i_const = _ijet_consts.begin(); _i_const != _ijet_consts.end(); ++_i_const){
+		    if ( (*_i_const).key() == electronsForCleaning.at(ilep).originalObjectRef().key() ) {
+		      cleanedJet.setP4( _ijet->p4() - electronsForCleaning.at(ilep).p4() );
+		      //get the correct 4vector
+		      jetP4 = correctJet(cleanedJet, event);
+		      //annoying thing to convert our tlorentzvector to root::math::lorentzvector
+		      ROOT::Math::LorentzVector<ROOT::Math::PtEtaPhiM4D<double > > rlv;
+		      rlv.SetXYZT(jetP4.X(),jetP4.Y(),jetP4.Z(),jetP4.T());
+		      cleanedJet.setP4(rlv);
+		      if (mbPar["debug"]) std::cout << "Corrected Jet : pT = " << jetP4.Pt() << " eta = " << jetP4.Eta() << " phi = " << jetP4.Phi() << std::endl;
+		      _cleaned = true;
+		    }
+		  }
+		}
+	      }//end electron cleaning
+	      
+	      //if not cleaned just use first jet (remember if no cleaning then cleanedJet==*_ijet) to get corrected four vector and set the cleaned jet to have it
+	      if (!_cleaned) {
+		jetP4 = correctJet(cleanedJet, event);
+		//annoying thing to convert our tlorentzvector to root::math::lorentzvector
+		ROOT::Math::LorentzVector<ROOT::Math::PtEtaPhiM4D<double > > rlv;
+		rlv.SetXYZT(jetP4.X(),jetP4.Y(),jetP4.Z(),jetP4.T());
+		cleanedJet.setP4(rlv);
+	      }
+	      
+	      
+	      //now do kinematic cuts and save them, cleaning and JEC could only mess up pfID so use original jet for it (though probably do nothing)
+	      if ( (*jetSel_)( *_ijet, retJet ) ){ 
+		
+                if (( cleanedJet.pt()>mdPar["jet_minpt"] ) && ( fabs(cleanedJet.eta())<mdPar["jet_maxeta"] )){ 
+		  ++_n_good_jets;
+		  mvSelJetsCleaned.push_back(cleanedJet);
+                }	       
+	      }
+	      
+	    }//end lepton jet cleaning 
+	    ++_n_jets;
+	} // end of loop over jets
         
         if ( mbPar["jet_cuts"] ) {
             
