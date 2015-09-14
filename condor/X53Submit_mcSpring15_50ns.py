@@ -8,7 +8,7 @@ files_per_job = 1
 
 rel_base = os.environ['CMSSW_BASE']
 
-outdir = '/eos/uscms/store/user/lpctlbsm/clint/Spring15/'
+outdir = '/eos/uscms/store/user/lpctlbsm/clint/Spring15/50ns/'
 
 ### What is the name of your FWLite Analyzer
 FWLiteAnalyzer = 'ljmet'
@@ -41,7 +41,7 @@ prefix = []
 
 if DONOMINAL=='True':
     prefix.extend([
-            'DYJets',
+ #           'DYJets',
             'TTJets',
             'WJets',
             'WZ',
@@ -63,7 +63,7 @@ for i in prefix:
 list = [] 
 
 listnom = [
-    'Samples_Spring15MC/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_RunIISpring15DR74-Asympt50ns_MCRUN2_74_V9A-v2.txt',
+#    'Samples_Spring15MC/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_RunIISpring15DR74-Asympt50ns_MCRUN2_74_V9A-v2.txt',
     'Samples_Spring15MC/TTJets_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_RunIISpring15DR74_Asympt50ns_MCRUN2_74_V9-v1.txt',
     'Samples_Spring15MC/WJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_RunIISpring15DR74-Asympt50ns_MCRUN2_74_V9A-v1.txt',
     'Samples_Spring15MC/WZTo3LNu_TuneCUETP8M1_13TeV-powheg-pythia8_RunIISpring15DR74-Asympt50ns_MCRUN2_74_V9A-v2.txt',
@@ -123,7 +123,7 @@ for i in range(len(prefix)):
 
     while ( nfiles <= count ):    
 
-        py_templ_file = open(rel_base+"/src/LJMet/Com/condor/Dilepton_Spring15MC_python.templ")
+        py_templ_file = open(rel_base+"/src/LJMet/Com/condor/Dilepton_Spring15MC_50ns_python.templ")
         condor_templ_file = open(rel_base+"/src/LJMet/Com/condor/X53condor.templ")
         csh_templ_file    = open(rel_base+"/src/LJMet/Com/condor/X53csh.templ")
 
