@@ -443,17 +443,23 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
 
             //Four vector
             elPt     . push_back((*iel)->pt()); //Must check: why ecalDrivenMomentum?
-            elEta    . push_back((*iel)->eta());
-            elPhi    . push_back((*iel)->phi());
+            elEta    . push_back((*iel)->superCluster()->eta());
+            elPhi    . push_back((*iel)->superCluster()->phi());
             elEnergy . push_back((*iel)->energy());
 
 
             //Isolation
-            double AEff  = ElectronEffectiveArea::GetElectronEffectiveArea(ElectronEffectiveArea::kEleGammaAndNeutralHadronIso03,
-                                                                           (*iel)->superCluster()->eta(), ElectronEffectiveArea::kEleEAData2012);
-            double chIso = (*iel)->chargedHadronIso();
-            double nhIso = (*iel)->neutralHadronIso();
-            double phIso = (*iel)->photonIso();
+            double scEta = (*iel)->superCluster()->eta();
+            double AEff;
+            if(fabs(scEta) >2.2) AEff = 0.1530;
+            else if(fabs(scEta) >2.0) AEff = 0.0842;
+            else if(fabs(scEta) >1.3) AEff = 0.0572;
+            else if(fabs(scEta) >0.8) AEff = 0.0988;
+            else if(fabs(scEta) >0.0) AEff = 0.1013;
+  
+            double chIso = ((*iel)->pfIsolationVariables()).sumChargedHadronPt;
+            double nhIso = ((*iel)->pfIsolationVariables()).sumNeutralHadronEt;
+            double phIso = ((*iel)->pfIsolationVariables()).sumPhotonEt;
             double relIso = ( chIso + max(0.0, nhIso + phIso - rhoIso*AEff) ) / (*iel)->pt();
 
             elChIso  . push_back(chIso);
@@ -467,8 +473,8 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
 
             //IP: for some reason this is with respect to the first vertex in the collection
             if(goodPVs.size() > 0){
-                elDxy.push_back((*iel)->gsfTrack()->dxy(goodPVs.at(0).position()));
-                elD0.push_back((*iel)->gsfTrack()->dxy(goodPVs.at(0).position()));
+                elDxy.push_back((-1.0)*(*iel)->gsfTrack()->dxy(goodPVs.at(0).position()));
+                elD0.push_back((-1.0)*(*iel)->gsfTrack()->dxy(goodPVs.at(0).position()));
                 elDZ.push_back((*iel)->gsfTrack()->dz(goodPVs.at(0).position()));
             } else {
                 elDxy.push_back(-999);
@@ -480,9 +486,9 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
             elDeta.push_back((*iel)->deltaEtaSuperClusterTrackAtVtx());
             elDphi.push_back((*iel)->deltaPhiSuperClusterTrackAtVtx());
             elSihih.push_back((*iel)->full5x5_sigmaIetaIeta());
-            elHoE.push_back((*iel)->hadronicOverEm());
-            elOoemoop.push_back(fabs(1.0/(*iel)->ecalEnergy() + (*iel)->eSuperClusterOverP()/(*iel)->ecalEnergy()));
-            elMHits.push_back((*iel)->gsfTrack()->hitPattern().numberOfLostTrackerHits(reco::HitPattern::MISSING_INNER_HITS));
+            elHoE.push_back((*iel)->hcalOverEcal());
+            elOoemoop.push_back(fabs(1.0/(*iel)->ecalEnergy() - (*iel)->eSuperClusterOverP()/(*iel)->ecalEnergy()));
+            elMHits.push_back((*iel)->gsfTrack()->hitPattern().numberOfHits(reco::HitPattern::MISSING_INNER_HITS));
             elVtxFitConv.push_back((*iel)->passConversionVeto());
             elNotConversion.push_back((*iel)->passConversionVeto());
 

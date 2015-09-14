@@ -251,11 +251,8 @@ void singleLepEventSelector::BeginJob( std::map<std::string, edm::ParameterSet c
         miPar["min_muon"]                  = par[_key].getParameter<int>          ("min_muon");
 
         mbPar["electron_cuts"]                 = par[_key].getParameter<bool>         ("electron_cuts");
-        //mbPar["electron_selector"]             = par[_key].getParameter<bool>         ("electron_selector");
         mdPar["electron_minpt"]                = par[_key].getParameter<double>       ("electron_minpt");
         mdPar["electron_maxeta"]               = par[_key].getParameter<double>       ("electron_maxeta");
-        //mbPar["loose_electron_selector"]       = par[_key].getParameter<bool>         ("loose_electron_selector");
-        //mbPar["loose_electron_selector_tight"] = par[_key].getParameter<bool>         ("loose_electron_selector_tight");
         mdPar["loose_electron_minpt"]          = par[_key].getParameter<double>       ("loose_electron_minpt");
         mdPar["loose_electron_maxeta"]         = par[_key].getParameter<double>       ("loose_electron_maxeta");
         miPar["min_electron"]                  = par[_key].getParameter<int>          ("min_electron");
@@ -638,10 +635,11 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
                         if ( (*_imu).isTightMuon(*mvSelPVs[0]) ){ }
 		        else break; // fail
 
-		        double chIso = (*_imu).userIsolation(pat::PfChargedHadronIso);
-		        double nhIso = (*_imu).userIsolation(pat::PfNeutralHadronIso);
-		        double gIso  = (*_imu).userIsolation(pat::PfGammaIso);
-		        double puIso = (*_imu).userIsolation(pat::PfPUChargedHadronIso);
+                        double chIso = (*_imu).pfIsolationR04().sumChargedHadronPt;
+                        double nhIso = (*_imu).pfIsolationR04().sumNeutralHadronEt;
+                        double gIso  = (*_imu).pfIsolationR04().sumPhotonEt;
+                        double puIso = (*_imu).pfIsolationR04().sumPUPt;
+
 		        double pt    = (*_imu).pt() ;
 
 		        double pfIso = (chIso + std::max(0.,nhIso + gIso - 0.5*puIso))/pt;
@@ -686,10 +684,10 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
                                 if ( (*_imu).isLooseMuon() ){ }
     		                else break; // fail
                             }
-    		            double chIso = (*_imu).userIsolation(pat::PfChargedHadronIso);
-    		            double nhIso = (*_imu).userIsolation(pat::PfNeutralHadronIso);
-    		            double gIso  = (*_imu).userIsolation(pat::PfGammaIso);
-    		            double puIso = (*_imu).userIsolation(pat::PfPUChargedHadronIso);
+                            double chIso = (*_imu).pfIsolationR04().sumChargedHadronPt;
+                            double nhIso = (*_imu).pfIsolationR04().sumNeutralHadronEt;
+                            double gIso  = (*_imu).pfIsolationR04().sumPhotonEt;
+                            double puIso = (*_imu).pfIsolationR04().sumPUPt;
     		            double pt    = (*_imu).pt() ;
     
     		            double pfIso = (chIso + std::max(0.,nhIso + gIso - 0.5*puIso))/pt;
@@ -731,22 +729,6 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
             //get electrons
             event.getByLabel( mtPar["electron_collection"], mhElectrons );
 
-            /*//edm::InputTag eleVetoIdMapToken_ ("egmGsfElectronIDs:cutBasedElectronID-PHYS14-PU20bx25-V2-standalone-veto");
-            edm::InputTag eleLooseIdMapToken_ ("egmGsfElectronIDs:cutBasedElectronID-PHYS14-PU20bx25-V2-standalone-loose");
-            //edm::InputTag eleMediumIdMapToken_ ("egmGsfElectronIDs:cutBasedElectronID-PHYS14-PU20bx25-V2-standalone-medium");
-            edm::InputTag eleTightIdMapToken_ ("egmGsfElectronIDs:cutBasedElectronID-PHYS14-PU20bx25-V2-standalone-tight");
-            //edm::InputTag eleHEEPIdMapToken_ ("egmGsfElectronIDs:heepElectronID-HEEPV51");
-	    //edm::Handle<edm::ValueMap<bool> > veto_id_decisions;
-	    edm::Handle<edm::ValueMap<bool> > loose_id_decisions;
-	    //edm::Handle<edm::ValueMap<bool> > medium_id_decisions;
-	    edm::Handle<edm::ValueMap<bool> > tight_id_decisions; 
-	    //edm::Handle<edm::ValueMap<bool> > heep_id_decisions;
-	    //event.getByLabel(eleVetoIdMapToken_ ,veto_id_decisions);
-	    event.getByLabel(eleLooseIdMapToken_ ,loose_id_decisions);
-	   // event.getByLabel(eleMediumIdMapToken_,medium_id_decisions);
-	    event.getByLabel(eleTightIdMapToken_,tight_id_decisions);
-	    //event.getByLabel(eleHEEPIdMapToken_ ,heep_id_decisions);*/
-
             mvSelElectrons.clear();
 	    size_t j = 0;
             for (std::vector<pat::Electron>::const_iterator _iel = mhElectrons->begin(); _iel != mhElectrons->end(); _iel++){
@@ -756,143 +738,18 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
                 //electron cuts
                 while(1){
 
-                    /*Double_t scEta = (*_iel).superCluster()->eta();
-                    Double_t AEff  = ElectronEffectiveArea::GetElectronEffectiveArea(ElectronEffectiveArea::kEleGammaAndNeutralHadronIso03, scEta, ElectronEffectiveArea::kEleEAData2012);
-                    
-                    Double_t chIso = (*_iel).chargedHadronIso();
-                    Double_t nhIso = (*_iel).neutralHadronIso();
-                    Double_t phIso = (*_iel).photonIso();
-                    Double_t Deta  = (*_iel).deltaEtaSuperClusterTrackAtVtx();
-                    Double_t Dphi  = (*_iel).deltaPhiSuperClusterTrackAtVtx();
-                    Double_t sihih = (*_iel).full5x5_sigmaIetaIeta();
-                    Double_t HoE   = (*_iel).hadronicOverEm();
-                    Double_t D0    = (-1.0)*(*_iel).gsfTrack()->dxy(h_primVtx->at(0).position());
-                    Double_t DZ    = (*_iel).gsfTrack()->dz(h_primVtx->at(0).position());//
-                    
-                    edm::InputTag rhoSrc_("fixedGridRhoAll");
-                    edm::Handle<double> rhoHandle;
-                    event.getByLabel(rhoSrc_, rhoHandle);
-                    double rhoIso = std::max(*(rhoHandle.product()), 0.0);
-                    
-                    Double_t Ooemoop;
-                    if ((*_iel).ecalEnergy()==0) Ooemoop = 999.;
-                    else if (!std::isfinite((*_iel).ecalEnergy())) Ooemoop = 998.;
-                    else Ooemoop = (1.0/(*_iel).ecalEnergy() - (*_iel).eSuperClusterOverP()/(*_iel).ecalEnergy());
-                    Double_t RelIso  = ( chIso + max(0.0, nhIso + phIso - rhoIso*AEff) )/ (*_iel).ecalDrivenMomentum().pt();
-                    Int_t mHits   =  (*_iel).gsfTrack()->hitPattern().numberOfLostTrackerHits(reco::HitPattern::MISSING_INNER_HITS);
-        
-            	    edm::InputTag convLabel_ ("reducedEgamma:reducedConversions");
-                    edm::Handle<reco::ConversionCollection> conversions;
-               	    event.getByLabel(convLabel_, conversions);
-                    edm::InputTag bsLabel_ ("offlineBeamSpot");
-                    edm::Handle<reco::BeamSpot> bsHandle;
-            	    event.getByLabel(bsLabel_, bsHandle);
-                    const reco::BeamSpot &beamspot = *bsHandle.product();
-                    Bool_t vtxFitConv = ConversionTools::hasMatchedConversion(*_iel, conversions, beamspot.position());
-    
-        	    std::cout << "\tfabs(Deta) = " << fabs(Deta) << std::endl;
-        	    std::cout << "\tfabs(Dphi) = " << fabs(Dphi) << std::endl;
-        	    std::cout << "\tsihih = " << sihih << std::endl;
-        	    std::cout << "\tHoE = " << HoE << std::endl;
-        	    std::cout << "\tfabs(D0) = " << fabs(D0) << std::endl;
-        	    std::cout << "\tfabs(DZ) = " << fabs(DZ) << std::endl;
-        	    std::cout << "\tfabs(Ooemoop) = " << fabs(Ooemoop) << std::endl;
-        	    std::cout << "\tRelIso = " << RelIso << std::endl;
-        	    std::cout << "\tmHits = " << mHits << std::endl;
-        	    std::cout << "\tvtxFitConv = " << vtxFitConv << std::endl;
-                    std::cout << "\teta = " << scEta << std::endl;
-                    std::cout << "\tisEB = " << (*_iel).isEB() << std::endl;
-                    std::cout << "\tisEE = " << (*_iel).isEE() << std::endl;
-                    if((*_iel).isEB()){
-                        if (fabs(D0) <  0.008790 ) std::cout<<"     d0_EB =      1"<<std::endl;
-                        else std::cout<<"     d0_EB =      0"<<std::endl;
-                        std::cout<<"     d0_EE =      1"<<std::endl;
-                        if (fabs(DZ) <  0.021226 ) std::cout<<"     dZ_EB =      1"<<std::endl;
-                        else std::cout<<"     dZ_EB =      0"<<std::endl;
-                        std::cout<<"     dZ_EE =      1"<<std::endl;
-                        if (fabs(Deta) <  0.006046 ) std::cout<<"   deta_EB =      1"<<std::endl;
-                        else std::cout<<"   deta_EB =      0"<<std::endl;
-                        std::cout<<"   deta_EE =      1"<<std::endl;
-                        if (fabs(Dphi) <  0.028092 ) std::cout<<"   dphi_EB =      1"<<std::endl;
-                        else std::cout<<"   dphi_EB =      0"<<std::endl;
-                        std::cout<<"   dphi_EE =      1"<<std::endl;
-                        if (HoE <  0.045772 ) std::cout<<"    hoe_EB =      1"<<std::endl;
-                        else std::cout<<"    hoe_EB =      0"<<std::endl;
-                        std::cout<<"    hoe_EE =      1"<<std::endl;
-                        if (mHits <= 1) std::cout<<"  mHits_EB =      1"<<std::endl;
-                        else std::cout<<"  mHits_EB =      0"<<std::endl;
-                        std::cout<<"  mHits_EE =      1"<<std::endl;
-                        if (fabs(Ooemoop) < 0.020118) std::cout<<"ooemoop_EB =      1"<<std::endl;
-                        else std::cout<<"ooemoop_EB =      0"<<std::endl;
-                        std::cout<<"ooemoop_EE =      1"<<std::endl;
-                        if (RelIso < 0.069537) std::cout<<" reliso_EB =      1"<<std::endl;
-                        else std::cout<<" reliso_EB =      0"<<std::endl;
-                        std::cout<<" reliso_EE =      1"<<std::endl;
-                        if (sihih < 0.009947) std::cout<<"  sihih_EB =      1"<<std::endl;
-                        else std::cout<<"  sihih_EB =      0"<<std::endl;
-                        std::cout<<"  sihih_EE =      1"<<std::endl;
-                        if (!vtxFitConv) std::cout<<"vtxFitConv =      1"<<std::endl;
-                        else std::cout<<"vtxFitConv =      0"<<std::endl;
-                    }
-                    else {
-                        std::cout<<"     d0_EB =      1"<<std::endl;
-                        if (fabs(D0) <  0.027984 ) std::cout<<"     d0_EE =      1"<<std::endl;
-                        else std::cout<<"     d0_EE =      0"<<std::endl;
-                        std::cout<<"     dZ_EB =      1"<<std::endl;
-                        if (fabs(DZ) <  0.133431 ) std::cout<<"     dZ_EE =      1"<<std::endl;
-                        else std::cout<<"     dZ_EE =      0"<<std::endl;
-                        std::cout<<"   deta_EB =      1"<<std::endl;
-                        if (fabs(Deta) <  0.007057 ) std::cout<<"   deta_EE =      1"<<std::endl;
-                        else std::cout<<"   deta_EE =      0"<<std::endl;
-                        std::cout<<"   dphi_EB =      1"<<std::endl;
-                        if (fabs(Dphi) <  0.030159 ) std::cout<<"   dphi_EE =      1"<<std::endl;
-                        else std::cout<<"   dphi_EE =      0"<<std::endl;
-                        std::cout<<"    hoe_EB =      1"<<std::endl;
-                        if (HoE <  0.067778 ) std::cout<<"    hoe_EE =      1"<<std::endl;
-                        else std::cout<<"    hoe_EE =      0"<<std::endl;
-                        std::cout<<"  mHits_EB =      1"<<std::endl;
-                        if (mHits <= 1) std::cout<<"  mHits_EE =      1"<<std::endl;
-                        else std::cout<<"  mHits_EE =      0"<<std::endl;
-                        std::cout<<"ooemoop_EB =      1"<<std::endl;
-                        if (fabs(Ooemoop) < 0.098919) std::cout<<"ooemoop_EE =      1"<<std::endl;
-                        else std::cout<<"ooemoop_EE =      0"<<std::endl;
-                        std::cout<<" reliso_EB =      1"<<std::endl;
-                        if (RelIso < 0.078265) std::cout<<" reliso_EE =      1"<<std::endl;
-                        else std::cout<<" reliso_EE =      0"<<std::endl;
-                        std::cout<<"  sihih_EB =      1"<<std::endl;
-                        if (sihih < 0.028237) std::cout<<"  sihih_EE =      1"<<std::endl;
-                        else std::cout<<"  sihih_EE =      0"<<std::endl;
-                        if (!vtxFitConv) std::cout<<"vtxFitConv =      1"<<std::endl;
-                        else std::cout<<"vtxFitConv =      0"<<std::endl;
-                    }
-                    std::cout<<std::endl;
-
-                    if((*_iel).isEB()){
-                        if ((fabs(Deta) <  0.006046 ) && (fabs(Dphi) <  0.028092 ) && (sihih <  0.009947 ) && (HoE <  0.045772 ) && (fabs(D0) <  0.008790 ) && (fabs(DZ) <  0.021226 ) && (fabs(Ooemoop) <  0.020118 ) && (RelIso <  0.069537 ) && !vtxFitConv && (mHits <= 1)) {}
-                        else break;
-                    }
-                    else{
-                        if ((fabs(Deta) <  0.007057 ) && (fabs(Dphi) <  0.030159 ) && (sihih <  0.028237 ) && (HoE <  0.067778 ) && (fabs(D0) <  0.027984 ) && (fabs(DZ) <  0.133431 ) && (fabs(Ooemoop) <  0.098919 ) && (RelIso <  0.078265 ) && !vtxFitConv && (mHits <= 1)) {}
-                        else break;
-                    }*/
-
                     if ( (*electronSel_)( *_iel, event, retElectron ) ){ }
                     else break; // fail
-		    /*if (mbPar["electron_selector"]) {
-                        if ( (*electronSel_)( *_iel, event, retElectron ) ){ }
-                        else break; // fail
-		    }
-		    else {
-                        const edm::Ptr<pat::Electron> elPtr(mhElectrons, _n_electrons);
-                        if ( (*tight_id_decisions)[elPtr] ){ }
-		        else break; // fail
-		    }*/
 
                     if (_iel->pt()>mdPar["electron_minpt"]){ }
                     else break;
 	  
                     if ( fabs(_iel->eta())<mdPar["electron_maxeta"] ){ }
                     else break;
+
+                    if (!((*_iel).isEBEEGap())){ }
+                    else break;
+
 
                     pass = true; // success
                     break;

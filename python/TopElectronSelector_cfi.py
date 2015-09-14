@@ -37,9 +37,9 @@ TopElectronSelector = cms.PSet(version            = cms.string("TIGHT"),
 #                   	       reliso_EE	  = cms.double(999999.),
 #			       mHits_EB		  = cms.int32(9999),
 #			       mHits_EE		  = cms.int32(9999),
-			       vtxFitConv	  = cms.bool(True),
+			       vtxFitConv	  = cms.bool(False),
         		       pvSrc  		  = cms.InputTag("offlineSlimmedPrimaryVertices"),
-        		       rhoSrc 		  = cms.InputTag("fixedGridRhoAll"),
+        		       rhoSrc 		  = cms.InputTag("fixedGridRhoFastjetAll"),
                                #cutsToIgnore       = cms.vstring("reliso_EB","reliso_EE")
                                #cutsToIgnore       = cms.vstring("vtxFitConv")
 )
