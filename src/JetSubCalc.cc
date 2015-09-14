@@ -68,8 +68,12 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * s
     int CSVL, CSVM, CSVT;
 
     // I think these are AK4
-    edm::Handle<std::vector<pat::Jet> > theJets;
-    event.getByLabel(slimmedJetColl_it, theJets);
+    //    edm::Handle<std::vector<pat::Jet> > theJets;
+    //    event.getByLabel(slimmedJetColl_it, theJets);
+    // ----- Get AK4 jet objects from the selector -----
+    // This is updated -- original version used all AK4 jets without selection 
+    std::vector<edm::Ptr<pat::Jet> >            const & theJets = selector->GetSelectedJets();
+    std::vector<std::pair<TLorentzVector,bool>> const & theCorrBtagJets = selector->GetCorrJetsWithBTags();
     
     // Available variables
     std::vector<double> theJetPt;
@@ -106,9 +110,57 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * s
     std::vector<int> theJetCSVLSubJets;
     std::vector<int> theJetCSVMSubJets;
     std::vector<int> theJetCSVTSubJets;
+
+    std::vector<int> theJetFlav;
+    std::vector<int> theJetBTag;
     
     double theVtxMass, theVtxNtracks, theVtx3DVal, theVtx3DSig, thePileupJetId;
+    double theJetHT = 0;
     
+    for (unsigned int ii = 0; ii < theCorrBtagJets.size(); ii++){
+      int index = ii;
+      
+      theVtxNtracks  = -std::numeric_limits<double>::max();
+      theVtxNtracks  = (double)theJets[ii]->userFloat("vtxNtracks");
+				
+      if (theVtxNtracks > 0) {
+	theVtxMass     = -std::numeric_limits<double>::max();
+	theVtx3DVal    = -std::numeric_limits<double>::max();
+	theVtx3DSig    = -std::numeric_limits<double>::max();
+	
+	theVtxMass     = (double)theJets[ii]->userFloat("vtxMass");
+	theVtx3DVal    = (double)theJets[ii]->userFloat("vtx3DVal");
+	theVtx3DSig    = (double)theJets[ii]->userFloat("vtx3DSig");
+        
+	theJetVtxNtracks.push_back(theVtxNtracks);
+	theJetVtxMass.push_back(theVtxMass);
+	theJetVtx3DVal.push_back(theVtx3DVal);
+	theJetVtx3DSig.push_back(theVtx3DSig);
+      }
+      
+      thePileupJetId = -std::numeric_limits<double>::max();
+      thePileupJetId = (double)theJets[ii]->userFloat("pileupJetId:fullDiscriminant");
+      theJetPileupJetId.push_back(thePileupJetId);
+
+      //Four vector
+      TLorentzVector lv = theCorrBtagJets[ii].first;
+
+      theJetPt     . push_back(lv.Pt());
+      theJetEta    . push_back(lv.Eta());
+      theJetPhi    . push_back(lv.Phi());
+      theJetEnergy . push_back(lv.Energy());
+      
+      theJetCSV.push_back(theJets[ii]->bDiscriminator( bDiscriminant ));
+      theJetBTag.push_back(theCorrBtagJets[ii].second);
+      theJetFlav.push_back(abs(theJets[ii]->partonFlavour()));
+      
+      theJetIndex.push_back(index);
+      theJetnDaughters.push_back((int)theJets[ii]->numberOfDaughters());
+ 
+      //HT
+      theJetHT += lv.Pt(); 
+    }
+    /*
     for (std::vector<pat::Jet>::const_iterator ijet = theJets->begin(); ijet != theJets->end(); ijet++) {
         int index = (int)(ijet-theJets->begin());
         
@@ -175,12 +227,15 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * s
         theJetCSVMSubJets.push_back(CSVM);
         theJetCSVTSubJets.push_back(CSVT);
     }
-    
+    */
     SetValue("theJetPt",     theJetPt);
+    SetValue("theJetHT",     theJetHT);
     SetValue("theJetEta",    theJetEta);
     SetValue("theJetPhi",    theJetPhi);
     SetValue("theJetEnergy", theJetEnergy);
     SetValue("theJetCSV",    theJetCSV);
+    SetValue("theJetBTag",   theJetBTag);
+    SetValue("theJetFlav",   theJetFlav);
     
     SetValue("theJetVtxMass",     theJetVtxMass);
     SetValue("theJetVtxNtracks",  theJetVtxNtracks);
@@ -190,7 +245,7 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * s
     
     SetValue("theJetIndex",      theJetIndex);
     SetValue("theJetnDaughters", theJetnDaughters);
-    
+    /*   
     SetValue("theJetDaughterPt",     theJetDaughterPt);
     SetValue("theJetDaughterEta",    theJetDaughterEta);
     SetValue("theJetDaughterPhi",    theJetDaughterPhi);
@@ -201,7 +256,7 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * s
     SetValue("theJetCSVLSubJets", theJetCSVLSubJets);
     SetValue("theJetCSVMSubJets", theJetCSVMSubJets);
     SetValue("theJetCSVTSubJets", theJetCSVTSubJets);
-    
+    */
     // I think these are AK8 jets so topMass, minMass and nSubJets make sense
     edm::Handle<std::vector<pat::Jet> > theAK8Jets;
     event.getByLabel(slimmedJetsAK8Coll_it, theAK8Jets);
@@ -217,6 +272,7 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * s
     std::vector<double> theJetAK8PrunedMass;
     std::vector<double> theJetAK8TrimmedMass;
     std::vector<double> theJetAK8FilteredMass;
+    std::vector<double> theJetAK8SoftDropMass;
     
     // n-subjettiness variables tau1, tau2, and tau3 available
     std::vector<double> theJetAK8NjettinessTau1;
@@ -245,7 +301,7 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * s
     
     double topMass, minMass;
     int nSubJets;
-    double thePrunedMass, theTrimmedMass, theFilteredMass;
+    double thePrunedMass, theTrimmedMass, theFilteredMass, theSoftDropMass;
     double theNjettinessTau1, theNjettinessTau2, theNjettinessTau3;
     
     for (std::vector<pat::Jet>::const_iterator ijet = theAK8Jets->begin(); ijet != theAK8Jets->end(); ijet++) {
@@ -253,10 +309,12 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * s
         
         thePrunedMass   = -std::numeric_limits<double>::max();
         theTrimmedMass  = -std::numeric_limits<double>::max();
-        theFilteredMass = -std::numeric_limits<double>::max();
-        thePrunedMass   = (double)ijet->userFloat("ak8PFJetsCHSPrunedLinks");
-        theTrimmedMass  = (double)ijet->userFloat("ak8PFJetsCHSTrimmedLinks");
-        theFilteredMass = (double)ijet->userFloat("ak8PFJetsCHSFilteredLinks");
+	theFilteredMass = -std::numeric_limits<double>::max();
+        theSoftDropMass = -std::numeric_limits<double>::max();
+        thePrunedMass   = (double)ijet->userFloat("ak8PFJetsCHSPrunedMass");
+        theTrimmedMass  = (double)ijet->userFloat("ak8PFJetsCHSTrimmedMass");
+        theFilteredMass = (double)ijet->userFloat("ak8PFJetsCHSFilteredMass");
+        theSoftDropMass = (double)ijet->userFloat("ak8PFJetsCHSSoftDropMass");
         
         theNjettinessTau1 = -std::numeric_limits<double>::max();
         theNjettinessTau2 = -std::numeric_limits<double>::max();
@@ -274,6 +332,7 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * s
         theJetAK8PrunedMass  .push_back(thePrunedMass);
         theJetAK8TrimmedMass .push_back(theTrimmedMass);
         theJetAK8FilteredMass.push_back(theFilteredMass);
+        theJetAK8SoftDropMass.push_back(theSoftDropMass);
         
         theJetAK8NjettinessTau1.push_back(theNjettinessTau1);
         theJetAK8NjettinessTau2.push_back(theNjettinessTau2);
@@ -305,7 +364,7 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * s
         CSVM = 0;
         CSVT = 0;
 
-	/*        
+	/* // this gives seg faults in 74X that we need to fix        
         for (size_t ui = 0; ui < ijet->numberOfDaughters(); ui++) {
             pat::PackedCandidate const * theDaughter = dynamic_cast<pat::PackedCandidate const *>(ijet->daughter(ui));
             theJetAK8DaughterPt    .push_back(theDaughter->pt());
@@ -341,6 +400,7 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * s
     SetValue("theJetAK8PrunedMass",   theJetAK8PrunedMass);
     SetValue("theJetAK8TrimmedMass",  theJetAK8TrimmedMass);
     SetValue("theJetAK8FilteredMass", theJetAK8FilteredMass);
+    SetValue("theJetAK8SoftDropMass", theJetAK8SoftDropMass);
     
     SetValue("theJetAK8NjettinessTau1", theJetAK8NjettinessTau1);
     SetValue("theJetAK8NjettinessTau2", theJetAK8NjettinessTau2);
@@ -354,7 +414,7 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * s
     SetValue("theJetAK8caTopTopMass", theJetAK8caTopTopMass);
     SetValue("theJetAK8caTopMinMass", theJetAK8caTopMinMass);
     SetValue("theJetAK8caTopnSubJets", theJetAK8caTopnSubJets);
-    
+    /*
     SetValue("theJetAK8DaughterPt",     theJetAK8DaughterPt);
     SetValue("theJetAK8DaughterEta",    theJetAK8DaughterEta);
     SetValue("theJetAK8DaughterPhi",    theJetAK8DaughterPhi);
@@ -365,7 +425,7 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * s
     SetValue("theJetAK8CSVLSubJets", theJetAK8CSVLSubJets);
     SetValue("theJetAK8CSVMSubJets", theJetAK8CSVMSubJets);
     SetValue("theJetAK8CSVTSubJets", theJetAK8CSVTSubJets);
-    
+    */
     return 0;
 }
 
