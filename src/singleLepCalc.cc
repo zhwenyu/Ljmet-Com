@@ -19,6 +19,7 @@
 #include "DataFormats/Math/interface/deltaR.h"
 #include "EgammaAnalysis/ElectronTools/interface/ElectronEffectiveArea.h"
 #include "LJMet/Com/interface/TopElectronSelector.h"
+#include "SimDataFormats/GeneratorProducts/interface/GenEventInfoProduct.h"
 
 #include "DataFormats/BTauReco/interface/CATopJetTagInfo.h"
 
@@ -777,6 +778,9 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
     std::vector <int> genMotherID;
     std::vector <int> genMotherIndex;
 
+   //event weights
+   std::vector<double> evtWeightsMC;
+   float MCWeight=1;
 
     std::vector <double> genJetPt;
     std::vector <double> genJetEta;
@@ -798,6 +802,18 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
     std::vector <int> genBSLID;
 
     if (isMc){
+        //load info for event weight
+        edm::Handle<GenEventInfoProduct> genEvtInfo;
+        edm::InputTag gen_it("generator");
+        event.getByLabel(gen_it, genEvtInfo );
+
+        std::vector<double> evtWeights = genEvtInfo->weights();
+        double theWeight = genEvtInfo->weight();
+      
+        evtWeightsMC=evtWeights;
+        MCWeight = theWeight;
+   
+        //load genparticles collection
         edm::Handle<reco::GenParticleCollection> genParticles;
         event.getByLabel(genParticles_it, genParticles);
 
@@ -964,6 +980,9 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
     SetValue("genTDLEnergy", genTDLEnergy);
     SetValue("genTDLID"    , genTDLID);
 
+    SetValue("evtWeightsMC", evtWeightsMC);
+    SetValue("MCWeight", MCWeight);
+
     return 0;
 }
 
@@ -1003,8 +1022,3 @@ void singleLepCalc::fillMotherInfo(const reco::Candidate *mother, int i, vector 
 
 
 }
-
-
-
-
-
