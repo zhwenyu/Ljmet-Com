@@ -304,7 +304,8 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * s
         CSVL = 0;
         CSVM = 0;
         CSVT = 0;
-        
+
+	/*        
         for (size_t ui = 0; ui < ijet->numberOfDaughters(); ui++) {
             pat::PackedCandidate const * theDaughter = dynamic_cast<pat::PackedCandidate const *>(ijet->daughter(ui));
             theJetAK8DaughterPt    .push_back(theDaughter->pt());
@@ -328,6 +329,7 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * s
         theJetAK8CSVLSubJets.push_back(CSVL);
         theJetAK8CSVMSubJets.push_back(CSVM);
         theJetAK8CSVTSubJets.push_back(CSVT);
+	*/
     }
     
     SetValue("theJetAK8Pt",     theJetAK8Pt);
