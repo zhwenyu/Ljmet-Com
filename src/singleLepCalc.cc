@@ -1,7 +1,7 @@
 /*
  Calculator for a generic single lepton analysis
  
- Author: Joshua Swanson, 2014 TEST
+ Author: Joshua Swanson, 2014
  */
 
 #include <iostream>
