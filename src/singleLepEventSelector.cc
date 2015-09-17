@@ -738,18 +738,17 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
                 //electron cuts
                 while(1){
 
-                    if ( (*electronSel_)( *_iel, event, retElectron ) ){ }
-                    else break; // fail
-
                     if (_iel->pt()>mdPar["electron_minpt"]){ }
                     else break;
 	  
-                    if ( fabs(_iel->eta())<mdPar["electron_maxeta"] ){ }
+                    if ( fabs(_iel->superCluster()->eta())<mdPar["electron_maxeta"] ){ }
                     else break;
 
                     if (!((*_iel).isEBEEGap())){ }
                     else break;
 
+                    if ( (*electronSel_)( *_iel, event, retElectron ) ){ }
+                    else break; // fail
 
                     pass = true; // success
                     break;
@@ -769,73 +768,18 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
                     //electron cuts
                     while(1){
     
-                        /*Double_t scEta = (*_iel).superCluster()->eta();
-                        Double_t AEff  = ElectronEffectiveArea::GetElectronEffectiveArea(ElectronEffectiveArea::kEleGammaAndNeutralHadronIso03, scEta, ElectronEffectiveArea::kEleEAData2012);
-                        
-                        Double_t chIso = (*_iel).chargedHadronIso();
-                        Double_t nhIso = (*_iel).neutralHadronIso();
-                        Double_t phIso = (*_iel).photonIso();
-                        Double_t Deta  = (*_iel).deltaEtaSuperClusterTrackAtVtx();
-                        Double_t Dphi  = (*_iel).deltaPhiSuperClusterTrackAtVtx();
-                        Double_t sihih = (*_iel).full5x5_sigmaIetaIeta();
-                        Double_t HoE   = (*_iel).hadronicOverEm();
-                        Double_t D0    = (-1.0)*(*_iel).gsfTrack()->dxy(h_primVtx->at(0).position());
-                        Double_t DZ    = (*_iel).gsfTrack()->dz(h_primVtx->at(0).position());//
-                        
-                        edm::InputTag rhoSrc_("fixedGridRhoAll");
-                        edm::Handle<double> rhoHandle;
-                        event.getByLabel(rhoSrc_, rhoHandle);
-                        double rhoIso = std::max(*(rhoHandle.product()), 0.0);
-                        
-                        Double_t Ooemoop;
-                        if ((*_iel).ecalEnergy()==0) Ooemoop = 999.;
-                        else if (!std::isfinite((*_iel).ecalEnergy())) Ooemoop = 998.;
-                        else Ooemoop = (1.0/(*_iel).ecalEnergy() - (*_iel).eSuperClusterOverP()/(*_iel).ecalEnergy());
-                        Double_t RelIso  = ( chIso + max(0.0, nhIso + phIso - rhoIso*AEff) )/ (*_iel).ecalDrivenMomentum().pt();
-                        Int_t mHits   =  (*_iel).gsfTrack()->hitPattern().numberOfLostTrackerHits(reco::HitPattern::MISSING_INNER_HITS);
-            
-                	edm::InputTag convLabel_ ("reducedEgamma:reducedConversions");
-                        edm::Handle<reco::ConversionCollection> conversions;
-                   	event.getByLabel(convLabel_, conversions);
-                        edm::InputTag bsLabel_ ("offlineBeamSpot");
-                        edm::Handle<reco::BeamSpot> bsHandle;
-                	event.getByLabel(bsLabel_, bsHandle);
-                        const reco::BeamSpot &beamspot = *bsHandle.product();
-                        Bool_t vtxFitConv = ConversionTools::hasMatchedConversion(*_iel, conversions, beamspot.position());
-    
-                        if((*_iel).isEB()){
-                            if ((fabs(Deta) <  0.006046 ) && (fabs(Dphi) <  0.028092 ) && (sihih <  0.009947 ) && (HoE <  0.045772 ) && (fabs(D0) <  0.008790 ) && (fabs(DZ) <  0.021226 ) && (fabs(Ooemoop) <  0.020118 ) && (RelIso <  0.069537 ) && !vtxFitConv && (mHits <= 1)) {}
-                            else break;
-                        }
-                        else{
-                            if ((fabs(Deta) <  0.007057 ) && (fabs(Dphi) <  0.030159 ) && (sihih <  0.028237 ) && (HoE <  0.067778 ) && (fabs(D0) <  0.027984 ) && (fabs(DZ) <  0.133431 ) && (fabs(Ooemoop) <  0.098919 ) && (RelIso <  0.078265 ) && !vtxFitConv && (mHits <= 1)) {}
-                            else break;
-                        }*/
-
-                        if ( (*looseElectronSel_)( *_iel, event, retLooseElectron ) ){ }
-                        else break; // fail
-    		        /*if (mbPar["loose_electron_selector"]) {
-                            if ( (*looseElectronSel_)( *_iel, event, retLooseElectron ) ){ }
-                            else break; // fail
-    		        }
-    		        else {
-                            const edm::Ptr<pat::Electron> elPtr(mhElectrons, _n_electrons);
-    		            if (mbPar["loose_electron_selector_tight"]) {
-                        	if ( (*tight_id_decisions)[elPtr] ){ }
-    		                else break; // fail
-                            }
-    		            else {
-                        	if ( (*loose_id_decisions)[elPtr] ){ }
-    		                else break; // fail
-                            }
-			}*/
-
                         if (_iel->pt()>mdPar["loose_electron_minpt"]){ }
                         else break;
     	  
-                        if ( fabs(_iel->eta())<mdPar["loose_electron_maxeta"] ){ }
+                        if ( fabs(_iel->superCluster()->eta())<mdPar["loose_electron_maxeta"] ){ }
                         else break;
     
+                        if (!((*_iel).isEBEEGap())){ }
+                        else break;
+
+                        if ( (*looseElectronSel_)( *_iel, event, retLooseElectron ) ){ }
+                        else break; // fail
+
                         pass_loose = true; // success
                         break;
                     }
