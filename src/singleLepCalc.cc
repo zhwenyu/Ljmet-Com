@@ -22,6 +22,7 @@
 #include "SimDataFormats/GeneratorProducts/interface/GenEventInfoProduct.h"
 
 #include "DataFormats/BTauReco/interface/CATopJetTagInfo.h"
+#include "LJMet/Com/interface/MiniIsolation.h"
 
 using std::cout;
 using std::endl;
@@ -48,6 +49,7 @@ private:
     edm::InputTag             triggerCollection_;
     edm::InputTag             pvCollection_it;
     edm::InputTag             genParticles_it;
+    edm::InputTag             packedPFCandsLabel_;
     edm::InputTag             genJets_it;
     std::vector<unsigned int> keepPDGID;
     std::vector<unsigned int> keepMomPDGID;
@@ -104,6 +106,9 @@ int singleLepCalc::BeginJob()
 
     if (mPset.exists("genJets"))      genJets_it = mPset.getParameter<edm::InputTag>("genJets");
     else                              genJets_it = edm::InputTag("slimmedGenJets");
+
+    if (mPset.exists("packedPFCands"))	packedPFCandsLabel_ = mPset.getParameter<edm::InputTag>("packedPFCands");
+    else                              	packedPFCandsLabel_ = edm::InputTag("packedPFCandidates");
 
     if (mPset.exists("keepPDGID"))    keepPDGID = mPset.getParameter<std::vector<unsigned int> >("keepPDGID");
     else                              keepPDGID.clear();
@@ -212,6 +217,7 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
     std::vector <double> muDxy;
     std::vector <double> muDz;
     std::vector <double> muRelIso;
+    std::vector <double> muMiniIso;
 
     std::vector <int> muNValMuHits;
     std::vector <int> muNMatchedStations;
@@ -274,7 +280,13 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
             double gIso   = (*imu)->userIsolation(pat::PfGammaIso);
             double puIso  = (*imu)->userIsolation(pat::PfPUChargedHadronIso);
             double relIso = (chIso + std::max(0.,nhIso + gIso - 0.5*puIso)) / (*imu)->pt();
+
+            edm::Handle<pat::PackedCandidateCollection> packedPFCands;
+            event.getByLabel(packedPFCandsLabel_, packedPFCands);
+            double miniIso = getPFMiniIsolation(packedPFCands, dynamic_cast<const reco::Candidate *>(imu->get()), 0.05, 0.2, 10., false);
+
             muRelIso . push_back(relIso);
+            muMiniIso . push_back(miniIso);
 
             muChIso . push_back(chIso);
             muNhIso . push_back(nhIso);
@@ -342,6 +354,7 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
     SetValue("muDxy"    , muDxy);
     SetValue("muDz"     , muDz);
     SetValue("muRelIso" , muRelIso);
+    SetValue("muMiniIso", muMiniIso);
 
     SetValue("muNValMuHits"       , muNValMuHits);
     SetValue("muNMatchedStations" , muNMatchedStations);
@@ -381,6 +394,7 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
 
     //Quality criteria
     std::vector <double> elRelIso;
+    std::vector <double> elMiniIso;
     std::vector <double> elDxy;
     std::vector <int>    elNotConversion;
     std::vector <int>    elChargeConsistent;
@@ -469,7 +483,12 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
             elAEff   . push_back(AEff);
             elRhoIso . push_back(rhoIso);
 
+            edm::Handle<pat::PackedCandidateCollection> packedPFCands;
+            event.getByLabel(packedPFCandsLabel_, packedPFCands);
+            double miniIso = getPFMiniIsolation(packedPFCands, dynamic_cast<const reco::Candidate *>(iel->get()), 0.05, 0.2, 10., false);
+
             elRelIso . push_back(relIso);
+            elMiniIso . push_back(miniIso);
             elCharge.push_back((*iel)->charge());
 
             //IP: for some reason this is with respect to the first vertex in the collection
@@ -552,6 +571,7 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
     SetValue("elCharge", elCharge);
     //Quality requirements
     SetValue("elRelIso" , elRelIso); //Isolation
+    SetValue("elMiniIso" , elMiniIso); //Mini Isolation
     SetValue("elDxy"    , elDxy);    //Dxy
     SetValue("elNotConversion" , elNotConversion);  //Conversion rejection
     SetValue("elChargeConsistent", elChargeConsistent);
