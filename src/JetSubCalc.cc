@@ -79,6 +79,8 @@ int JetSubCalc::BeginJob()
     else kappa = 0.5;
 
     if(useHTT){
+      cout << " JetSubCalc is using HTT -- have you installed HEPTopTagger v2?" << endl;
+
       if (mPset.exists("httTagInfo")) httTagInfo_it = mPset.getParameter<edm::InputTag>("httTagInfo");
       else httTagInfo_it = edm::InputTag("HTT");
   
@@ -604,6 +606,15 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * s
     SetValue("theJetAK8caTopSubjetNCSVM",theJetAK8caTopSubjetNCSVM);
 
     if(useHTT){
+
+      ///////////////////////////////////////////////////////////////////////
+      ///  
+      ///   NOTE: You must install HTT to load the HTTTopJetTagInfo object!
+      ///   In your CMSSW_X_X_X/src/ directory:
+      ///   git cms-merge-topic gkasieczka:htt-v2-74X
+      ///   scramv1 b -r -j 8
+      ///   
+      ///////////////////////////////////////////////////////////////////////
     
       std::vector<double> theJetCA15Pt;
       std::vector<double> theJetCA15Eta;
@@ -639,9 +650,11 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * s
       edm::Handle<std::vector<pat::Jet> > theCA15Jets;
       event.getByLabel(selectedPatJetsCA15Coll_it, theCA15Jets);
 
+      cout << "Created CA15 Jets, getting HTT" << endl;
       edm::Handle<std::vector<reco::HTTTopJetTagInfo> > httTagInfo;
+      cout << "Created HTT handle" << endl;
       event.getByLabel(httTagInfo_it, httTagInfo);
-
+      cout << "Got HTT collection" << endl;
       for (std::vector<pat::Jet>::const_iterator ijet = theCA15Jets->begin(); ijet != theCA15Jets->end(); ijet++){
 
 	theJetCA15Pt.push_back(ijet->pt());
@@ -685,17 +698,17 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * s
 	  }
 	}
 	
- 	theHTTTopMass = -std::numeric_limits<double>::max();
-	theHTTfRec = -std::numeric_limits<double>::max();
-	theHTTRopt = -std::numeric_limits<double>::max();
-	theHTTRoptCalc = -std::numeric_limits<double>::max();
-	theHTTRoptCalcPt = -std::numeric_limits<double>::max();
-	theNjettinessTau1 = -std::numeric_limits<double>::max();
-	theNjettinessTau2 = -std::numeric_limits<double>::max();
-	theNjettinessTau3 = -std::numeric_limits<double>::max();
-	NjettinessTau1 = -std::numeric_limits<double>::max();
-	NjettinessTau2 = -std::numeric_limits<double>::max();
-	NjettinessTau3 = -std::numeric_limits<double>::max();
+ 	theHTTTopMass = -99.99;
+	theHTTfRec = -99.99;
+	theHTTRopt = -99.99;
+	theHTTRoptCalc = -99.99;
+	theHTTRoptCalcPt = -99.99;
+	theNjettinessTau1 = -99.99;
+	theNjettinessTau2 = -99.99;
+	theNjettinessTau3 = -99.99;
+	NjettinessTau1 = -99.99;
+	NjettinessTau2 = -99.99;
+	NjettinessTau3 = -99.99;
 
 	if(minDR < 1.5){
 	  theHTTTopMass = CA15HTTProperties.topMass;    // mass of the top quark candidate
