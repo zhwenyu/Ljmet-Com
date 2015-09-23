@@ -104,7 +104,12 @@ int TpTpCalc::AnalyzeEvent(edm::EventBase const & event,
     std::vector<double> bosonEnergy;
 
     int Nlepdecays = 0;
-    std::vector<int> lepPDGId;
+    std::vector<int> lepID;
+    std::vector<int> lepParentID;
+    std::vector<double> lepPt;
+    std::vector<double> lepEta;
+    std::vector<double> lepPhi;
+    std::vector<double> lepEnergy;
 
     // Get the generated particle collection
     edm::Handle<reco::GenParticleCollection> genParticles;
@@ -226,14 +231,24 @@ int TpTpCalc::AnalyzeEvent(edm::EventBase const & event,
 
 			  if(abs(W2daughterID) == 11 || abs(W2daughterID) == 13 || abs(W2daughterID) == 15){
 			    Nlepdecays++;
-			    lepPDGId.push_back(W2daughterID);
+			    lepID.push_back(W2daughterID);
+			    lepParentID.push_back(dauId);
+			    lepPt.push_back(W2daughter->pt());
+			    lepEta.push_back(W2daughter->eta());
+			    lepPhi.push_back(W2daughter->phi());
+			    lepEnergy.push_back(W2daughter->energy());
 			  }
 			}
 		      }
 		      // W direct decay
 		      if(abs(WdaughterID) == 11 || abs(WdaughterID) == 13 || abs(WdaughterID) == 15){
 			Nlepdecays++;
-			lepPDGId.push_back(WdaughterID);
+			lepID.push_back(WdaughterID);
+			lepParentID.push_back(dauId);
+			lepPt.push_back(Wdaughter->pt());
+			lepEta.push_back(Wdaughter->eta());
+			lepPhi.push_back(Wdaughter->phi());
+			lepEnergy.push_back(Wdaughter->energy());
 		      }
 		    }
 		  }
@@ -254,14 +269,24 @@ int TpTpCalc::AnalyzeEvent(edm::EventBase const & event,
 		      int W2daughterID = W2daughter->pdgId();
 		      if(abs(W2daughterID) == 11 || abs(W2daughterID) == 13 || abs(W2daughterID) == 15){
 			Nlepdecays++;
-			lepPDGId.push_back(W2daughterID);
+			lepID.push_back(W2daughterID);
+			lepParentID.push_back(dauId);
+			lepPt.push_back(W2daughter->pt());
+			lepEta.push_back(W2daughter->eta());
+			lepPhi.push_back(W2daughter->phi());
+			lepEnergy.push_back(W2daughter->energy());			
 		      }
 		    }
 		  }
 		  // W direct decay
 		  if(abs(WdaughterID) == 11 || abs(WdaughterID) == 13 || abs(WdaughterID) == 15){
 		    Nlepdecays++;
-		    lepPDGId.push_back(WdaughterID);
+		    lepID.push_back(WdaughterID);
+		    lepParentID.push_back(dauId);
+		    lepPt.push_back(Wdaughter->pt());
+		    lepEta.push_back(Wdaughter->eta());
+		    lepPhi.push_back(Wdaughter->phi());
+		    lepEnergy.push_back(Wdaughter->energy());		   
 		  }
 		}
 	      }
@@ -294,14 +319,24 @@ int TpTpCalc::AnalyzeEvent(edm::EventBase const & event,
 
 		  if(abs(W2daughterID) == 11 || abs(W2daughterID) == 13 || abs(W2daughterID) == 15){
 		    Nlepdecays++;
-		    lepPDGId.push_back(W2daughterID);
+		    lepID.push_back(W2daughterID);
+		    lepParentID.push_back(dauId);
+		    lepPt.push_back(W2daughter->pt());
+		    lepEta.push_back(W2daughter->eta());
+		    lepPhi.push_back(W2daughter->phi());
+		    lepEnergy.push_back(W2daughter->energy());
 		  }
 		}
 	      }
 	      // W direct decay
 	      if(abs(WdaughterID) == 11 || abs(WdaughterID) == 13 || abs(WdaughterID) == 15){
 		Nlepdecays++;
-		lepPDGId.push_back(WdaughterID);
+		lepID.push_back(WdaughterID);
+		lepParentID.push_back(dauId);
+		lepPt.push_back(Wdaughter->pt());
+		lepEta.push_back(Wdaughter->eta());
+		lepPhi.push_back(Wdaughter->phi());
+		lepEnergy.push_back(Wdaughter->energy());
 	      }
 	    }
 	  }
@@ -311,7 +346,12 @@ int TpTpCalc::AnalyzeEvent(edm::EventBase const & event,
     }
 
     SetValue("NLeptonDecays", Nlepdecays);
-    SetValue("LeptonPDGId", lepPDGId);
+    SetValue("LeptonID", lepID);
+    SetValue("LeptonParentID", lepParentID);
+    SetValue("LeptonPt", lepPt);
+    SetValue("LeptonEta", lepEta);
+    SetValue("LeptonPhi", lepPhi);
+    SetValue("LeptonEnergy", lepEnergy);
 
     // Safeguard for non-T',B' files. Skip storage if there are no particles
     if(tPrimeID.size() == 0 && bPrimeID.size() == 0) return 0;
