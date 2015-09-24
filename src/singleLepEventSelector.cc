@@ -292,6 +292,7 @@ void singleLepEventSelector::BeginJob( std::map<std::string, edm::ParameterSet c
         msPar["JEC_txtfile"]              = par[_key].getParameter<std::string>  ("JEC_txtfile");
         mbPar["doNewJEC"]                 = par[_key].getParameter<bool>         ("doNewJEC");
         mbPar["doLepJetCleaning"]         = par[_key].getParameter<bool>         ("doLepJetCleaning");
+        mbPar["UseElMVA"]                 = par[_key].getParameter<bool>         ("UseElMVA");
       
 
         std::cout << mLegend << "config parameters loaded..."
@@ -753,10 +754,11 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
                     else break;
 
                     if ( mbPar["UseElMVA"] ) {
-                        if ( fabs(_iel->superCluster()->eta())<=0.8 && mvaValue( *_iel, event) > mvdPar["tight_electron_mva_cuts"].at(0) ) {}
-                        else if ( fabs(_iel->superCluster()->eta())<=1.479 && fabs(_iel->superCluster()->eta())>0.8 && mvaValue( *_iel, event) > mvdPar["tight_electron_mva_cuts"].at(1) ) {}
-                        else if ( fabs(_iel->superCluster()->eta())>1.479 && mvaValue( *_iel, event) > mvdPar["tight_electron_mva_cuts"].at(2) ) {}
-                        else break;
+                        bool mvapass = false;
+                        if ( fabs(_iel->superCluster()->eta())<=0.8) mvapass = mvaValue( *_iel, event) > mvdPar["tight_electron_mva_cuts"].at(0);
+                        else if ( fabs(_iel->superCluster()->eta())<=1.479 && fabs(_iel->superCluster()->eta())>0.8) mvapass = mvaValue( *_iel, event) > mvdPar["tight_electron_mva_cuts"].at(2);
+                        else mvapass = mvaValue( *_iel, event) > mvdPar["tight_electron_mva_cuts"].at(2);
+                        if (!mvapass) break;
                     }
                     else {
                         if ( (*electronSel_)( *_iel, event, retElectron ) ){ }
@@ -791,10 +793,11 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
                         else break;
 
                         if ( mbPar["UseElMVA"] ) {
-                            if ( fabs(_iel->superCluster()->eta())<=0.8 && mvaValue( *_iel, event) > mvdPar["loose_electron_mva_cuts"].at(0) ) {}
-                            else if ( fabs(_iel->superCluster()->eta())<=1.479 && fabs(_iel->superCluster()->eta())>0.8 && mvaValue( *_iel, event) > mvdPar["loose_electron_mva_cuts"].at(1) ) {}
-                            else if ( fabs(_iel->superCluster()->eta())>1.479 && mvaValue( *_iel, event) > mvdPar["loose_electron_mva_cuts"].at(2) ) {}
-                            else break;
+                            bool mvapass = false;
+                            if ( fabs(_iel->superCluster()->eta())<=0.8) mvapass = mvaValue( *_iel, event) > mvdPar["tight_electron_mva_cuts"].at(0);
+                            else if ( fabs(_iel->superCluster()->eta())<=1.479 && fabs(_iel->superCluster()->eta())>0.8) mvapass = mvaValue( *_iel, event) > mvdPar["tight_electron_mva_cuts"].at(2);
+                            else if ( fabs(_iel->superCluster()->eta())>1.479) mvapass = mvaValue( *_iel, event) > mvdPar["tight_electron_mva_cuts"].at(2);
+                            if (!mvapass) break;
                         }
                         else {
                             if ( (*looseElectronSel_)( *_iel, event, retLooseElectron ) ){ }

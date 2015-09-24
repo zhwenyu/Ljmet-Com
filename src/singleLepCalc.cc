@@ -55,6 +55,7 @@ private:
     std::vector<unsigned int> keepMomPDGID;
     bool keepFullMChistory;
     bool cleanGenJets;
+    bool UseElMVA;
 
     double rhoIso;
 
@@ -122,6 +123,9 @@ int singleLepCalc::BeginJob()
  
     if (mPset.exists("cleanGenJets")) cleanGenJets = mPset.getParameter<bool>("cleanGenJets");
     else                              cleanGenJets = false;
+
+    if (mPset.exists("UseElMVA")) UseElMVA = mPset.getParameter<bool>("UseElMVA");
+    else                          UseElMVA = false;
 
     return 0;
 }
@@ -412,7 +416,7 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
     std::vector <int>    elMHits;
     std::vector <int>    elVtxFitConv;    
 
-    std::vector <bool> elTight;
+    std::vector <double> elMVAValue;
  
     //Extra info about isolation
     std::vector <double> elChIso;
@@ -512,14 +516,7 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
             elVtxFitConv.push_back((*iel)->passConversionVeto());
             elNotConversion.push_back((*iel)->passConversionVeto());
 
-            bool pass = false;
-            if ((*iel)->isEB()) {
-                if (( fabs((*iel)->deltaEtaSuperClusterTrackAtVtx()) < 0.0095 ) && (fabs((*iel)->deltaPhiSuperClusterTrackAtVtx()) < 0.0291) && ((*iel)->full5x5_sigmaIetaIeta() < 0.0101) && ((*iel)->hadronicOverEm() < 0.0372) && (fabs((*iel)->gsfTrack()->dxy(goodPVs.at(0).position())) < 0.0144) && (fabs((*iel)->gsfTrack()->dz(goodPVs.at(0).position())) < 0.323) && (fabs(1.0/(*iel)->ecalEnergy() + (*iel)->eSuperClusterOverP()/(*iel)->ecalEnergy()) < 0.0174) && (relIso < 0.0468) && ((*iel)->gsfTrack()->hitPattern().numberOfLostTrackerHits(reco::HitPattern::MISSING_INNER_HITS) <= 2)) pass = true;
-            }
-            else {
-                if (( fabs((*iel)->deltaEtaSuperClusterTrackAtVtx()) < 0.00762 ) && (fabs((*iel)->deltaPhiSuperClusterTrackAtVtx()) < 0.0439) && ((*iel)->full5x5_sigmaIetaIeta() < 0.0287) && ((*iel)->hadronicOverEm() < 0.0544) && (fabs((*iel)->gsfTrack()->dxy(goodPVs.at(0).position())) < 0.0377) && (fabs((*iel)->gsfTrack()->dz(goodPVs.at(0).position())) < 0.571) && (fabs(1.0/(*iel)->ecalEnergy() + (*iel)->eSuperClusterOverP()/(*iel)->ecalEnergy()) < 0.01) && (relIso < 0.0759) && ((*iel)->gsfTrack()->hitPattern().numberOfLostTrackerHits(reco::HitPattern::MISSING_INNER_HITS) <= 1)) pass = true;
-            }
-            elTight.push_back(pass);
+            if (UseElMVA) elMVAValue.push_back( selector->mvaValue(iel->operator*(),event) );
 
             if(isMc && keepFullMChistory){
                 //cout << "start\n";
@@ -588,7 +585,7 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
     SetValue("elMHits", elMHits);
     SetValue("elVtxFitConv", elVtxFitConv);
 
-    SetValue("elTight", elTight);
+    SetValue("elMVAValue", elMVAValue);
 
     //Extra info about isolation
     SetValue("elChIso" , elChIso);
