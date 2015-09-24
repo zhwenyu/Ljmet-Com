@@ -1,5 +1,5 @@
 /*
- Contact:        Sadia Khalil (skhalil@fnal.gov)
+ Contact:        Dylan Rankin (drankin@bu.edu)
  */
 #ifndef LJMet_Com_interface_MVAElectronSelector_h
 #define LJMet_Com_interface_MVAElectronSelector_h
@@ -71,6 +71,10 @@ public: // interface
             weightFiles.push_back("../weights/EIDmva_EB2_10_oldNonTrigSpring15_ConvVarCwoBoolean_TMVA412_FullStatLowPt_PairNegWeightsGlobal_BDT.weights.xml");
             weightFiles.push_back("../weights/EIDmva_EE_10_oldNonTrigSpring15_ConvVarCwoBoolean_TMVA412_FullStatLowPt_PairNegWeightsGlobal_BDT.weights.xml");
         }
+        // these are for 25ns, and are up-to-date as of Sep 24 2015
+        // this needs to be checked periodically, as well as the list of variables for the MVA
+        // look here: https://github.com/cms-sw/cmssw/blob/CMSSW_7_4_X/RecoEgamma/ElectronIdentification/plugins/ElectronMVAEstimatorRun2Spring15NonTrig.cc
+        // and here: https://github.com/cms-sw/cmssw/blob/CMSSW_7_4_X/RecoEgamma/ElectronIdentification/python/Identification/mvaElectronID_Spring15_25ns_nonTrig_V1_cff.py
         retInternal_ = getBitTemplate();
         pvSrc_  = parameters.getParameter<edm::InputTag>("pvSrc");
         rhoSrc_ = parameters.getParameter<edm::InputTag>("rhoSrc");
