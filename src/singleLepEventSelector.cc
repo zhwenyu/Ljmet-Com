@@ -886,7 +886,7 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
 				jetP4 = correctJet(tmpJet, event);
 				if (mbPar["debug"]) std::cout << "Corrected Jet : pT = " << jetP4.Pt() << " eta = " << jetP4.Eta() << " phi = " << jetP4.Phi() << std::endl;
 			        _cleaned = true;
-			    }*/
+			    }*///old ref mathcing method, appears to be depreciated in CMSSW_7_4_X(?) 
                             for (unsigned int muI = 0; muI < muDaughters.size(); muI++) {
 			        if ( (*_i_const).key() == muDaughters[muI].key() ) {
 				    tmpJet.setP4( tmpJet.p4() - muDaughters[muI]->p4() );
@@ -935,12 +935,6 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
 			}
 			const std::vector<edm::Ptr<reco::Candidate> > _ijet_consts = _ijet->daughterPtrVector();
         		for ( std::vector<edm::Ptr<reco::Candidate> >::const_iterator _i_const = _ijet_consts.begin(); _i_const != _ijet_consts.end(); ++_i_const){
-			    /*if ( (*_i_const).key() == mvSelElectrons[0]->originalObjectRef().key() ) {
-				tmpJet.setP4( _ijet->p4() - mvSelElectrons[0]->p4() );
-				jetP4 = correctJet(tmpJet, event);
-				if (mbPar["debug"]) std::cout << "Corrected Jet : pT = " << jetP4.Pt() << " eta = " << jetP4.Eta() << " phi = " << jetP4.Phi() << std::endl;
-			        _cleaned = true;
-			    }*/
                             for (unsigned int elI = 0; elI < elDaughters.size(); elI++) {
 			        if ( (*_i_const).key() == elDaughters[elI].key() ) {
 				    tmpJet.setP4( tmpJet.p4() - elDaughters[elI]->p4() );
