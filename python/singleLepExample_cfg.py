@@ -103,6 +103,8 @@ process.event_selector = cms.PSet(
     min_electron             = cms.int32(0),
     loose_electron_minpt     = cms.double(20.0),
     loose_electron_maxeta    = cms.double(2.5),
+    tight_electron_mva_cuts   = cms.vdouble(0.913286,0.805013,0.358969),
+    loose_electron_mva_cuts   = cms.vdouble(0.913286,0.805013,0.358969),
     
     # more lepton cuts
     min_lepton               = cms.int32(1),
@@ -139,6 +141,7 @@ process.event_selector = cms.PSet(
     JEC_txtfile = cms.string(relBase+'/src/LJMet/Com/data/Summer15_50nsV5_DATA_UncertaintySources_AK4PFchs.txt'),
     doNewJEC                 = cms.bool(True),
     doLepJetCleaning         = cms.bool(True),
+    UseElMVA                 = cms.bool(True),
 
     MCL1JetPar               = cms.string(relBase+'/src/LJMet/Com/data/Summer15_50nsV5_MC_L1FastJet_AK4PFchs.txt'),
     MCL2JetPar               = cms.string(relBase+'/src/LJMet/Com/data/Summer15_50nsV5_MC_L2Relative_AK4PFchs.txt'),
