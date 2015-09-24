@@ -16,4 +16,5 @@ singleLepCalc = cms.PSet(
                          keepPDGID    = cms.vuint32(1, 2, 3, 4, 5, 21, 11, 12, 13, 14, 15, 16),
                          keepMomPDGID = cms.vuint32(6, 24),
                          rhoSrc            = cms.InputTag("fixedGridRhoFastjetAll"),
+                         UseElMVA = cms.bool(True),
                          )

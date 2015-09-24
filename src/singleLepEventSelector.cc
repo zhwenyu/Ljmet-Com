@@ -251,12 +251,16 @@ void singleLepEventSelector::BeginJob( std::map<std::string, edm::ParameterSet c
         mdPar["loose_muon_maxeta"]         = par[_key].getParameter<double>       ("loose_muon_maxeta");
         miPar["min_muon"]                  = par[_key].getParameter<int>          ("min_muon");
 
-        mbPar["electron_cuts"]                 = par[_key].getParameter<bool>         ("electron_cuts");
-        mdPar["electron_minpt"]                = par[_key].getParameter<double>       ("electron_minpt");
-        mdPar["electron_maxeta"]               = par[_key].getParameter<double>       ("electron_maxeta");
-        mdPar["loose_electron_minpt"]          = par[_key].getParameter<double>       ("loose_electron_minpt");
-        mdPar["loose_electron_maxeta"]         = par[_key].getParameter<double>       ("loose_electron_maxeta");
-        miPar["min_electron"]                  = par[_key].getParameter<int>          ("min_electron");
+        mbPar["electron_cuts"]             = par[_key].getParameter<bool>         ("electron_cuts");
+        mdPar["electron_minpt"]            = par[_key].getParameter<double>       ("electron_minpt");
+        mdPar["electron_maxeta"]           = par[_key].getParameter<double>       ("electron_maxeta");
+        mdPar["loose_electron_minpt"]      = par[_key].getParameter<double>       ("loose_electron_minpt");
+        mdPar["loose_electron_maxeta"]     = par[_key].getParameter<double>       ("loose_electron_maxeta");
+        miPar["min_electron"]              = par[_key].getParameter<int>          ("min_electron");
+        if (par[_key].exists("UseElMVA")) {
+            mvdPar["tight_electron_mva_cuts"] = par[_key].getParameter<std::vector<double>> ("tight_electron_mva_cuts");
+            mvdPar["loose_electron_mva_cuts"] = par[_key].getParameter<std::vector<double>> ("tight_electron_mva_cuts");
+        }
 
         miPar["min_lepton"]               = par[_key].getParameter<int>          ("min_lepton");
         miPar["max_lepton"]               = par[_key].getParameter<int>          ("max_lepton");
@@ -288,6 +292,7 @@ void singleLepEventSelector::BeginJob( std::map<std::string, edm::ParameterSet c
         msPar["JEC_txtfile"]              = par[_key].getParameter<std::string>  ("JEC_txtfile");
         mbPar["doNewJEC"]                 = par[_key].getParameter<bool>         ("doNewJEC");
         mbPar["doLepJetCleaning"]         = par[_key].getParameter<bool>         ("doLepJetCleaning");
+        mbPar["UseElMVA"]                 = par[_key].getParameter<bool>         ("UseElMVA");
       
 
         std::cout << mLegend << "config parameters loaded..."
@@ -748,8 +753,17 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
                     if (!((*_iel).isEBEEGap())){ }
                     else break;
 
-                    if ( (*electronSel_)( *_iel, event, retElectron ) ){ }
-                    else break; // fail
+                    if ( mbPar["UseElMVA"] ) {
+                        bool mvapass = false;
+                        if ( fabs(_iel->superCluster()->eta())<=0.8) mvapass = mvaValue( *_iel, event) > mvdPar["tight_electron_mva_cuts"].at(0);
+                        else if ( fabs(_iel->superCluster()->eta())<=1.479 && fabs(_iel->superCluster()->eta())>0.8) mvapass = mvaValue( *_iel, event) > mvdPar["tight_electron_mva_cuts"].at(2);
+                        else mvapass = mvaValue( *_iel, event) > mvdPar["tight_electron_mva_cuts"].at(2);
+                        if (!mvapass) break;
+                    }
+                    else {
+                        if ( (*electronSel_)( *_iel, event, retElectron ) ){ }
+                        else break; // fail
+                    }
 
                     pass = true; // success
                     break;
@@ -778,8 +792,17 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
                         if (!((*_iel).isEBEEGap())){ }
                         else break;
 
-                        if ( (*looseElectronSel_)( *_iel, event, retLooseElectron ) ){ }
-                        else break; // fail
+                        if ( mbPar["UseElMVA"] ) {
+                            bool mvapass = false;
+                            if ( fabs(_iel->superCluster()->eta())<=0.8) mvapass = mvaValue( *_iel, event) > mvdPar["tight_electron_mva_cuts"].at(0);
+                            else if ( fabs(_iel->superCluster()->eta())<=1.479 && fabs(_iel->superCluster()->eta())>0.8) mvapass = mvaValue( *_iel, event) > mvdPar["tight_electron_mva_cuts"].at(2);
+                            else if ( fabs(_iel->superCluster()->eta())>1.479) mvapass = mvaValue( *_iel, event) > mvdPar["tight_electron_mva_cuts"].at(2);
+                            if (!mvapass) break;
+                        }
+                        else {
+                            if ( (*looseElectronSel_)( *_iel, event, retLooseElectron ) ){ }
+                            else break; // fail
+                        }
 
                         pass_loose = true; // success
                         break;
