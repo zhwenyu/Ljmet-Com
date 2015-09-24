@@ -28,7 +28,7 @@ public:
 	// normalize both histograms first
 	Data_distr_->Scale( 1.0/ Data_distr_->Integral() );
 	MC_distr_->Scale( 1.0/ MC_distr_->Integral() );
-	std::cout << Data_distr_->Integral()<<" "<<MC_distr_->Integral()<<std::endl;
+	//std::cout << Data_distr_->Integral()<<" "<<MC_distr_->Integral()<<std::endl;
 
 	weights_ =  static_cast<TH1*>(Data_distr_->Clone()) ;
 
@@ -37,17 +37,17 @@ public:
 	TH1* den = dynamic_cast<TH1*>(MC_distr_->Clone());
 
 	//den->Scale(1.0/ den->Integral());
-	std::cout << weights_->Integral()<<" "<<den->Integral()<<std::endl;
+	//std::cout << weights_->Integral()<<" "<<den->Integral()<<std::endl;
 
 	weights_->Divide( den );  // so now the average weight should be 1.0
-	std::cout << weights_->Integral()<<" "<<den->Integral()<<std::endl;
+	//std::cout << weights_->Integral()<<" "<<den->Integral()<<std::endl;
 
-	std::cout << " Lumi/Pileup Reweighting: Computed Weights per In-Time Nint " << std::endl;
+	//std::cout << " Lumi/Pileup Reweighting: Computed Weights per In-Time Nint " << std::endl;
 
 	int NBins = weights_->GetNbinsX();
 
 	for(int ibin = 1; ibin<NBins+1; ++ibin){
-	  std::cout << "   " << ibin-1 << " " << weights_->GetBinContent(ibin) << std::endl;
+	  //std::cout << "   " << ibin-1 << " " << weights_->GetBinContent(ibin) << std::endl;
 	}
 };
 
