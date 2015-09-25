@@ -72,16 +72,16 @@ int BTagSFCalc::BeginJob()
 int BTagSFCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * selector)
 {    // ----- Get objects from the selector -----
     std::vector<edm::Ptr<pat::Jet> > const & vSelJets = selector->GetSelectedJets();
-    
-    std::string tagger_ciscv2 = "combinedInclusiveSecondaryVertexV2BJetTags";
-    std::string tagger_cmva   = "combinedMVABJetTags";
-    std::string tagger_jBp    = "jetBProbabilityBJetTags";
-    std::string tagger_jp     = "jetProbabilityBJetTags";
-    std::string tagger_pfcsv  = "pfCombinedSecondaryVertexBJetTags";
-    std::string tagger_ssv_he = "simpleSecondaryVertexHighEffBJetTags";
-    std::string tagger_tchp   = "trackCountingHighPurBJetTags";
-    std::string tagger_tche   = "trackCountingHighEffBJetTags";
-    std::string tagger_ssv_hp = "simpleSecondaryVertexHighPurBJetTags";
+
+    std::string tagger_ciscv2 = "pfCombinedInclusiveSecondaryVertexV2BJetTags";
+    std::string tagger_cmva   = "pfCombinedMVABJetTags";
+    std::string tagger_jBp    = "pfJetBProbabilityBJetTags";
+    std::string tagger_jp     = "pfJetProbabilityBJetTags";
+    std::string tagger_pfcsv  = "pfCombinedSecondaryVertexV2BJetTags";
+    std::string tagger_ssv_he = "pfSimpleSecondaryVertexHighEffBJetTags";
+    std::string tagger_tchp   = "pfTrackCountingHighPurBJetTags";
+    std::string tagger_tche   = "pfTrackCountingHighEffBJetTags";
+    std::string tagger_ssv_hp = "pfSimpleSecondaryVertexHighPurBJetTags";
     
     std::vector<std::string> tagger;
     tagger.push_back(tagger_ciscv2);
@@ -93,28 +93,30 @@ int BTagSFCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * s
     tagger.push_back(tagger_tchp);
     tagger.push_back(tagger_tche);
     tagger.push_back(tagger_ssv_hp);
-
     std::map<std::string, std::vector<double> > Discrims;
     
-    int _nJets = 8;
+    int _nJets = 1;
     for (int jetcount = 0; jetcount < _nJets; ++jetcount) {
-        for(std::vector<std::string>::iterator st  = tagger.begin(); st != tagger.end(); ++st) {
-            Discrims[*st].push_back(-std::numeric_limits<double>::max());
-        }
+      for(std::vector<std::string>::iterator st  = tagger.begin(); st != tagger.end(); ++st) {
+	Discrims[*st].push_back(-std::numeric_limits<double>::max());
+      }
     }
     
-    int jetNum = 0;
+    int _jetCount = 0;
     for (std::vector<edm::Ptr<pat::Jet> >::const_iterator jet = vSelJets.begin(); jet != vSelJets.end(); ++jet) {
-        for (std::vector<std::string>::iterator st  = tagger.begin(); st != tagger.end(); ++st) {
-            Discrims[*st][jetNum] = (*jet)->bDiscriminator(*st);
-        }
-        if (jetNum == (_nJets - 1)) break;
-        jetNum++;
+      for (std::vector<std::string>::iterator st  = tagger.begin(); st != tagger.end(); ++st) {
+	if (_jetCount == 0){ Discrims[*st][_jetCount] = (*jet)->bDiscriminator(*st);}
+	else {Discrims[*st].push_back((*jet)->bDiscriminator(*st));}
+      }
+      _jetCount++;
     }
+    //    std::cout << _jetCount << " " << vSelJets.size();
     
     for(std::vector<std::string>::iterator st  = tagger.begin(); st != tagger.end(); ++st) {
-        SetValue(*st, Discrims[*st]);
+      //      std::cout << " " << Discrims[*st].size();
+      SetValue(*st, Discrims[*st]);
     }
+    //    std::cout << std::endl;
     
     return 0;
 }
