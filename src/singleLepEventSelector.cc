@@ -292,7 +292,8 @@ void singleLepEventSelector::BeginJob( std::map<std::string, edm::ParameterSet c
         msPar["JEC_txtfile"]              = par[_key].getParameter<std::string>  ("JEC_txtfile");
         mbPar["doNewJEC"]                 = par[_key].getParameter<bool>         ("doNewJEC");
         mbPar["doLepJetCleaning"]         = par[_key].getParameter<bool>         ("doLepJetCleaning");
-        mbPar["UseElMVA"]                 = par[_key].getParameter<bool>         ("UseElMVA");
+        if (par[_key].exists("UseElMVA")) mbPar["UseElMVA"]                 = par[_key].getParameter<bool>         ("UseElMVA");
+        else                              mbPar["UseElMVA"]                 = false;
       
 
         std::cout << mLegend << "config parameters loaded..."
