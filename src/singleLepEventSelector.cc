@@ -231,6 +231,7 @@ void singleLepEventSelector::BeginJob( std::map<std::string, edm::ParameterSet c
         mbPar["hbhe_cut"]                 = par[_key].getParameter<bool>         ("hbhe_cut");
         msPar["hbhe_cut_value"]           = par[_key].getParameter<std::string>  ("hbhe_cut_value");
         mbPar["csc_cut"]                  = par[_key].getParameter<bool>         ("csc_cut");
+        mbPar["eesc_cut"]                 = par[_key].getParameter<bool>         ("eesc_cut");
 
         mbPar["jet_cuts"]                 = par[_key].getParameter<bool>         ("jet_cuts");
         mdPar["jet_minpt"]                = par[_key].getParameter<double>       ("jet_minpt");
@@ -316,6 +317,7 @@ void singleLepEventSelector::BeginJob( std::map<std::string, edm::ParameterSet c
     push_back("Primary vertex");
     push_back("HBHE noise and scraping filter");
     push_back("CSC Tight Halo filter");
+    push_back("EE Bad SC filter");
     push_back("One jet or more");
     push_back("Two jets or more");
     push_back("Three jets or more");
@@ -342,6 +344,7 @@ void singleLepEventSelector::BeginJob( std::map<std::string, edm::ParameterSet c
     set("Primary vertex", mbPar["pv_cut"]);
     set("HBHE noise and scraping filter", mbPar["hbhe_cut"]); 
     set("CSC Tight Halo filter", mbPar["csc_cut"]); 
+    set("EE Bad SC filter", mbPar["eesc_cut"]); 
  
     if (mbPar["jet_cuts"]){
         set("One jet or more", true);
@@ -511,6 +514,7 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
             if ( (*pvSel_)(event) ){
                 passCut(ret, "Primary vertex"); // PV cuts total
             }
+            else break;
 
             event.getByLabel( mtPar["pv_collection"], h_primVtx );
             int _n_pvs = 0;
@@ -584,30 +588,47 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
 	  //const bool failIsolation = summary.numIsolatedNoiseChannels() >= minNumIsolatedNoiseChannels || summary.isolatedNoiseSumE() >= minIsolatedNoiseSumE || summary.isolatedNoiseSumEt() >= minIsolatedNoiseSumEt;
 	  if(run1Cut){
 	    if (!failRun1) passCut(ret, "HBHE noise and scraping filter"); // HBHE cuts total
+            else break;
 	  }
 	  else if(run2LooseCut){
 	    if (!failRun2Loose) passCut(ret, "HBHE noise and scraping filter"); // HBHE cuts total
+            else break;
 	  }
 	  else if(run2TightCut){
 	    if (!failRun2Tight) passCut(ret, "HBHE noise and scraping filter"); // HBHE cuts total
+            else break;
 	  }
 	  else {std::cout<<"No HBHE cut!"<<std::endl; passCut(ret, "HBHE noise and scraping filter");} // HBHE cuts total
         } // end of hbhe cuts
 
-        if ( considerCut("CSC Tight Halo filter") ) {
-	    
+        if ( considerCut("CSC Tight Halo filter") || considerCut("EE Bad SC filter") ) {
             edm::Handle<edm::TriggerResults > PatTriggerResults;
             event.getByLabel( mtPar["flag_tag"], PatTriggerResults );
             const edm::TriggerNames patTrigNames = event.triggerNames(*PatTriggerResults);
-
-            bool cscpass = false;
-
-            for (unsigned int i=0; i<PatTriggerResults->size(); i++){
-                if (patTrigNames.triggerName(i) == "Flag_CSCTightHaloFilter") cscpass = PatTriggerResults->accept(patTrigNames.triggerIndex(patTrigNames.triggerName(i)));
-            }
-
-            if (cscpass) passCut(ret, "CSC Tight Halo filter"); // CSC cut
-        } // end of CSC cuts
+            if ( considerCut("CSC Tight Halo filter") ) {
+    	    
+                bool cscpass = false;
+    
+                for (unsigned int i=0; i<PatTriggerResults->size(); i++){
+                    if (patTrigNames.triggerName(i) == "Flag_CSCTightHaloFilter") cscpass = PatTriggerResults->accept(patTrigNames.triggerIndex(patTrigNames.triggerName(i)));
+                }
+    
+                if (cscpass) passCut(ret, "CSC Tight Halo filter"); // CSC cut
+                else break;
+            } // end of CSC cuts
+    
+            if ( considerCut("EE Bad SC filter") ) {
+    	    
+                bool eescpass = false;
+    
+                for (unsigned int i=0; i<PatTriggerResults->size(); i++){
+                    if (patTrigNames.triggerName(i) == "Flag_eeBadScFilter") eescpass = PatTriggerResults->accept(patTrigNames.triggerIndex(patTrigNames.triggerName(i)));
+                }
+    
+                if (eescpass) passCut(ret, "EE Bad SC filter"); // EE Bad SC cut
+                else break;
+            } // end of EE Bad SC cuts
+        }
 
 
         //======================================================
@@ -1064,6 +1085,7 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
             if ( mpMet.isNonnull() && mpMet.isAvailable() ) {
                 pat::MET const & met = mhMet->at(0);
                 if ( ignoreCut("Min MET") ||met.et()>cut("Min MET", double()) ) passCut(ret, "Min MET");
+                else break;
             }
         } // end of MET cuts
         if (mbPar["debug"]) std::cout<<"finish met cuts..."<<std::endl;
