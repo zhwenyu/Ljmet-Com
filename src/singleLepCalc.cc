@@ -234,6 +234,7 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
     std::vector <double> muPuIso;
     //ID info
     std::vector <int> muIsTight;
+    std::vector <int> muIsMedium;
     std::vector<int> muIsLoose;
 
     //Generator level information -- MC matching
@@ -273,6 +274,7 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
             muEnergy . push_back((*imu)->energy());
 
             muIsTight.push_back((*imu)->isTightMuon(goodPVs.at(0)));
+            muIsMedium.push_back((*imu)->isMediumMuon());
             muIsLoose.push_back((*imu)->isLooseMuon());
 
             muGlobal.push_back(((*imu)->isGlobalMuon()<<2)+(*imu)->isTrackerMuon());
@@ -352,6 +354,7 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
     SetValue("muPhi"    , muPhi);
     SetValue("muEnergy" , muEnergy);
     SetValue("muIsTight", muIsTight);
+    SetValue("muIsMedium", muIsMedium);
     SetValue("muIsLoose",muIsLoose); 
     //Quality criteria
     SetValue("muChi2"   , muChi2);
