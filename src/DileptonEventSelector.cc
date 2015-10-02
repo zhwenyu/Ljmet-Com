@@ -182,6 +182,10 @@ void DileptonEventSelector::BeginJob( std::map<std::string, edm::ParameterSet co
 	mbPar["doLepJetCleaning"]         = par[_key].getParameter<bool>         ("doLepJetCleaning");
         mbPar["doNewJEC"]                 = par[_key].getParameter<bool>         ("doNewJEC");
 	mbPar["isMc"]                     = par[_key].getParameter<bool>         ("isMc");
+
+	//mva value
+	mbPar["UseElMVA"]                 = par[_key].getParameter<bool>         ("UseElMVA");
+
     }
     else {
         std::cout << mLegend << "event selector not configured, exiting"
