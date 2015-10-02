@@ -31,8 +31,17 @@
 #include "CondFormats/JetMETObjects/interface/JetCorrectionUncertainty.h"
 #include "CondFormats/JetMETObjects/interface/FactorizedJetCorrector.h"
 
+#include "RecoEgamma/EgammaTools/interface/ConversionTools.h"
+#include "TMath.h"
+#include "TMVA/Reader.h"
+#include "TMVA/MethodBDT.h"
+
 //#include "TROOT.h"
 //#include "TVector3.h"
+
+struct MVAElectronVars {
+    Float_t see, spp, OneMinusE1x5E5x5, R9, etawidth, phiwidth, HoE, PreShowerOverRaw, kfhits, kfchi2, gsfchi2, fbrem, convVtxFitProbability, EoP, eleEoPout, IoEmIoP, deta, dphi, detacalo, gsfhits, expectedMissingInnerHits, pt, isBarrel, isEndcap, SCeta, eClass, pfRelIso, expectedInnerHits, vtxconv, mcEventWeight, mcCBmatchingCategory;
+};
 
 class BaseEventSelector : public EventSelector {
     //
@@ -92,6 +101,7 @@ public:
     bool isJetTagged(const pat::Jet &jet, edm::EventBase const & event, bool applySF = true);
     TLorentzVector correctJet(const pat::Jet & jet, edm::EventBase const & event, bool doAK8Corr = false);
     TLorentzVector correctMet(const pat::MET & met, edm::EventBase const & event);
+    double mvaValue(const pat::Electron & electron, edm::EventBase const & event);
     
 protected:
     std::vector<edm::Ptr<pat::Jet>> mvAllJets;
@@ -121,6 +131,7 @@ protected:
     std::map<std::string, bool> mbPar;
     std::map<std::string, int> miPar;
     std::map<std::string, double> mdPar;
+    std::map<std::string, std::vector<double>> mvdPar;
     std::map<std::string, std::string> msPar;
     std::map<std::string, edm::InputTag> mtPar;
     std::map<std::string, std::vector<std::string>> mvsPar;
@@ -139,6 +150,10 @@ private:
     FactorizedJetCorrector *JetCorrector;
     FactorizedJetCorrector *JetCorrectorAK8;
     LjmetEventContent * mpEc;
+    MVAElectronVars allMVAVars;
+    TMVA::Reader tmpTMVAReader_EB;
+    TMVA::Reader tmpTMVAReader_EE;
+    
     
     /// Private init method to be called by LjmetFactory when registering the selector
     void init() { mLegend = "[" + mName + "]: "; std::cout << mLegend << "registering " << mName << std::endl; }

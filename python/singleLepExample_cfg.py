@@ -6,7 +6,7 @@ import FWCore.ParameterSet.Types as CfgTypes
 process = cms.Process("LJMetCom")
 
 # Save the working area to a variable -- EDIT USER DIRECTORY HERE
-relBase    = str('/uscms/home/jmanagan/work/CMSSW_7_3_0/')
+relBase    = str('/uscms_data/d3/jmanagan/CleanLJMet74X')
 ############################################################
 #
 # FWLite application options
@@ -15,6 +15,7 @@ process.ljmet.isMc = cms.bool(True)
 
 # Exclude some unnecessary calculators from the process
 process.ljmet.excluded_calculators = cms.vstring(
+        'TpTpCalc',
 	'DileptonCalc',
 	'StopCalc',
 	'PdfCalc',
@@ -62,20 +63,18 @@ process.event_selector = cms.PSet(
     trigger_cut  = cms.bool(True),
     dump_trigger = cms.bool(False),
     
-    mctrigger_path_el = cms.vstring('HLT_Ele32_eta2p1_WP85_Gsf_v1'),
-    mctrigger_path_mu = cms.vstring('HLT_IsoMu24_eta2p1_IterTrk02_v1'),
-    trigger_path_el = cms.vstring('HLT_Ele27_WP80_v8','HLT_Ele27_WP80_v9','HLT_Ele27_WP80_v10','HLT_Ele27_WP80_v11'),
-    trigger_path_mu = cms.vstring('HLT_IsoMu24_eta2p1_v11','HLT_IsoMu24_eta2p1_v12','HLT_IsoMu24_eta2p1_v13','HLT_IsoMu24_eta2p1_v14','HLT_IsoMu24_eta2p1_v15'),
-
-    #testing muons 
-    #mctrigger_path_el = cms.string('HLT_Mu40_v12'), 
-    #mctrigger_path_mu = cms.string('HLT_Mu40_v12'), 
-    #trigger_path_el = cms.vstring('HLT_Mu40_v12'), 
-    #trigger_path_mu = cms.vstring('HLT_Mu40_v12'),
+    mctrigger_path_el = cms.vstring('HLT_Ele32_eta2p1_WP75_Gsf_v1'),
+    mctrigger_path_mu = cms.vstring('HLT_IsoMu24_eta2p1_v1'),
+    trigger_path_el = cms.vstring('HLT_Ele32_eta2p1_WPLoose_Gsf_v1','HLT_Ele32_eta2p1_WPLoose_Gsf_v2'),
+    trigger_path_mu = cms.vstring('HLT_IsoMu24_eta2p1_v1','HLT_IsoMu24_eta2p1_v2'),
 
     # PV cuts
     pv_cut         = cms.bool(True),
     hbhe_cut       = cms.bool(True),
+    hbhe_cut_value = cms.string('Run1'),
+    csc_cut        = cms.bool(True),
+    eesc_cut       = cms.bool(True),
+    flag_tag       = cms.InputTag('TriggerResults::PAT'),
 
     # Jet cuts
     jet_cuts                 = cms.bool(True),
@@ -105,6 +104,8 @@ process.event_selector = cms.PSet(
     min_electron             = cms.int32(0),
     loose_electron_minpt     = cms.double(20.0),
     loose_electron_maxeta    = cms.double(2.5),
+    tight_electron_mva_cuts   = cms.vdouble(0.913286,0.805013,0.358969),
+    loose_electron_mva_cuts   = cms.vdouble(0.913286,0.805013,0.358969),
     
     # more lepton cuts
     min_lepton               = cms.int32(1),
@@ -138,18 +139,28 @@ process.event_selector = cms.PSet(
     JECdown                  = cms.bool(False),
     JERup                    = cms.bool(False),
     JERdown                  = cms.bool(False),
-    JEC_txtfile = cms.string('CMSSW_BASE/src/LJMet/singleLepton/JEC/Summer13_V5_DATA_UncertaintySources_AK5PF.txt'),
-    doNewJEC                 = cms.bool(False),
-    doLepJetCleaning         = cms.bool(False),
+    JEC_txtfile = cms.string(relBase+'/src/LJMet/Com/data/Summer15_50nsV5_DATA_UncertaintySources_AK4PFchs.txt'),
+    doNewJEC                 = cms.bool(True),
+    doLepJetCleaning         = cms.bool(True),
+    UseElMVA                 = cms.bool(True),
 
-    MCL1JetPar               = cms.string('CMSSW_BASE/src/LJMet/Com/data/PHYS14_25_V2_L1FastJet_AK4PFchs.txt'),
-    MCL2JetPar               = cms.string('CMSSW_BASE/src/LJMet/Com/data/PHYS14_25_V2_L2Relative_AK4PFchs.txt'),
-    MCL3JetPar               = cms.string('CMSSW_BASE/src/LJMet/Com/data/PHYS14_25_V2_L3Absolute_AK4PFchs.txt'),
+    MCL1JetPar               = cms.string(relBase+'/src/LJMet/Com/data/Summer15_50nsV5_MC_L1FastJet_AK4PFchs.txt'),
+    MCL2JetPar               = cms.string(relBase+'/src/LJMet/Com/data/Summer15_50nsV5_MC_L2Relative_AK4PFchs.txt'),
+    MCL3JetPar               = cms.string(relBase+'/src/LJMet/Com/data/Summer15_50nsV5_MC_L3Absolute_AK4PFchs.txt'),
 
-    DataL1JetPar             = cms.string('CMSSW_BASE/src/LJMet/singleLepton/JEC/Summer13_V4_DATA_L1FastJet_AK5PFchs.txt'),
-    DataL2JetPar             = cms.string('CMSSW_BASE/src/LJMet/singleLepton/JEC/Summer13_V4_DATA_L2Relative_AK5PFchs.txt'),
-    DataL3JetPar             = cms.string('CMSSW_BASE/src/LJMet/singleLepton/JEC/Summer13_V4_DATA_L3Absolute_AK5PFchs.txt'),
-    DataResJetPar            = cms.string('CMSSW_BASE/src/LJMet/singleLepton/JEC/Summer13_V4_DATA_L2L3Residual_AK5PFchs.txt')
+    MCL1JetParAK8            = cms.string(relBase+'/src/LJMet/Com/data/Summer15_50nsV5_MC_L1FastJet_AK8PFchs.txt'),
+    MCL2JetParAK8            = cms.string(relBase+'/src/LJMet/Com/data/Summer15_50nsV5_MC_L2Relative_AK8PFchs.txt'),
+    MCL3JetParAK8            = cms.string(relBase+'/src/LJMet/Com/data/Summer15_50nsV5_MC_L3Absolute_AK8PFchs.txt'),
+
+    DataL1JetPar             = cms.string(relBase+'/src/LJMet/Com/data/Summer15_50nsV5_DATA_L1FastJet_AK4PFchs.txt'),
+    DataL2JetPar             = cms.string(relBase+'/src/LJMet/Com/data/Summer15_50nsV5_DATA_L2Relative_AK4PFchs.txt'),
+    DataL3JetPar             = cms.string(relBase+'/src/LJMet/Com/data/Summer15_50nsV5_DATA_L3Absolute_AK4PFchs.txt'),
+    DataResJetPar            = cms.string(relBase+'/src/LJMet/Com/data/Summer15_50nsV5_DATA_L2L3Residual_AK4PFchs.txt'),
+
+    DataL1JetParAK8          = cms.string(relBase+'/src/LJMet/Com/data/Summer15_50nsV5_DATA_L1FastJet_AK8PFchs.txt'),
+    DataL2JetParAK8          = cms.string(relBase+'/src/LJMet/Com/data/Summer15_50nsV5_DATA_L2Relative_AK8PFchs.txt'),
+    DataL3JetParAK8          = cms.string(relBase+'/src/LJMet/Com/data/Summer15_50nsV5_DATA_L3Absolute_AK8PFchs.txt'),
+    DataResJetParAK8         = cms.string(relBase+'/src/LJMet/Com/data/Summer15_50nsV5_DATA_L2L3Residual_AK8PFchs.txt')
     )
 
 
@@ -164,12 +175,11 @@ process.inputs = cms.PSet (
     lumisToProcess = CfgTypes.untracked(CfgTypes.VLuminosityBlockRange()),
     
     # files can be read locally or from the grid, in which case you need a proxy to run.
-    fileNames  = cms.vstring('root://cmsxrootd-site.fnal.gov//store/mc/Phys14DR/TTJets_MSDecaysCKM_central_Tune4C_13TeV-madgraph-tauola/MINIAODSIM/PU20bx25_PHYS14_25_V1-v1/00000/00C90EFC-3074-E411-A845-002590DB9262.root')
-    )
-
+    fileNames  = cms.vstring('root://xrootd.unl.edu//store/mc/RunIISpring15DR74/TTJets_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/MINIAODSIM/Asympt50ns_MCRUN2_74_V9A-v1/60000/262BAE9C-E7FE-E411-8B48-1CC1DE1D16E6.root')
+)
 # JSON
 if (not process.ljmet.isMc==cms.bool(True)):
-    JsonFile = 'CMSSW_BASE/src/LJMet/singleLepton/json/Jan222013ReReco_json.txt'
+    JsonFile = relBase+'/src/LJMet/Com/data/json/Cert_246908-251883_13TeV_PromptReco_Collisions15_JSON_v2.txt'
     myList   = LumiList.LumiList(filename=JsonFile).getCMSSWString().split(',')
     process.inputs.lumisToProcess.extend(myList)
         
@@ -214,3 +224,4 @@ process.load('LJMet.Com.TopElectronSelector_cfi')
 # Loose electron -- this overrides the default "TIGHT" setting in TopElectronSelector
 process.LooseTopElectronSelector = process.TopElectronSelector.clone()
 process.LooseTopElectronSelector.version = cms.string('VETO')
+
