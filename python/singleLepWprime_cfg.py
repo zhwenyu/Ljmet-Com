@@ -56,7 +56,7 @@ process.event_selector = cms.PSet(
     isMc  = cms.bool(False),
     keepFullMChistory = cms.bool(True),
     
-    trigger_cut  = cms.bool(True),
+    trigger_cut  = cms.bool(False),
     dump_trigger = cms.bool(False),
     
     #mctrigger_path_el = cms.vstring('HLT_Ele32_eta2p1_WP85_Gsf_v1'),
@@ -65,15 +65,18 @@ process.event_selector = cms.PSet(
     mctrigger_path_mu = cms.vstring('HLT_Mu40_v1','HLT_Mu40_eta2p1_PFJet200_PFJet50_v1','HLTriggerFinalPath'),
     #trigger_path_el = cms.vstring('HLT_Ele105_CaloIdVT_GsfTrkIdT_v2','HLT_Ele27_eta2p1_WPTight_Gsf_v1','HLTriggerFinalPath'),
     #trigger_path_mu = cms.vstring('HLT_Mu50_v1','HLT_Mu45_eta2p1_v1','HLT_IsoMu24_eta2p1_v2','HLTriggerFinalPath'),
-    trigger_path_el = cms.vstring('HLT_Ele27_eta2p1_WPTight_Gsf_v1'),
+    trigger_path_el = cms.vstring('HLT_Ele27_eta2p1_WPLoose_Gsf_v1'),
     trigger_path_mu = cms.vstring('HLT_IsoMu24_eta2p1_v2'),
 
     flag_tag       = cms.InputTag('TriggerResults::PAT'),
     pv_cut         = cms.bool(True),
     hbhe_cut       = cms.bool(True),
+    hbhe_cut_value = cms.string("Run1"),
+    #hbhe_cut_value = cms.string("Run2Loose"),
+    #hbhe_cut_value = cms.string("Run2Tight"),
     csc_cut        = cms.bool(True),
 
-    jet_cuts                 = cms.bool(True),
+    jet_cuts                 = cms.bool(False),
     jet_minpt                = cms.double(30.0),
     jet_maxeta               = cms.double(2.4),
     min_jet                  = cms.int32(2),
@@ -157,7 +160,7 @@ process.event_selector = cms.PSet(
 #
 
 process.inputs = cms.PSet (
-       nEvents    = cms.int32(-1),
+       nEvents    = cms.int32(50),
            skipEvents = cms.int32(0),
            lumisToProcess = CfgTypes.untracked(CfgTypes.VLuminosityBlockRange()),
            fileNames  = cms.vstring(
@@ -170,7 +173,7 @@ process.inputs = cms.PSet (
 
 # JSON
 if (not process.ljmet.isMc==cms.bool(True)):
-    JsonFile = '../data/json/Cert_246908-251642_13TeV_PromptReco_Collisions15_JSON.txt'
+    JsonFile = '../data/json/Cert_246908-251883_13TeV_PromptReco_Collisions15_JSON_v2.txt'
     myList   = LumiList.LumiList(filename=JsonFile).getCMSSWString().split(',')
     process.inputs.lumisToProcess.extend(myList)
         

@@ -38,15 +38,13 @@ class DileptonCalc : public BaseCalc {
     
 public:
     
-  DileptonCalc();
-  virtual ~DileptonCalc(){}
-  
-  virtual int BeginJob();
-  virtual int AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * selector);
-
-  virtual int EndJob(){return 0;}
-
-
+    DileptonCalc();
+    virtual ~DileptonCalc(){}
+    
+    virtual int BeginJob();
+    virtual int AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * selector);
+    virtual int EndJob(){return 0;}
+    
 private:
     
     bool                      isMc;
@@ -61,7 +59,7 @@ private:
     bool keepFullMChistory;
     bool doTriggerStudy_; 
     double rhoIso;
-  // HLTConfigProvider hltConfig_;
+
     boost::shared_ptr<TopElectronSelector>     electronSelL_, electronSelM_, electronSelT_;
     std::vector<reco::Vertex> goodPVs;
     int findMatch(const reco::GenParticleCollection & genParticles, int idToMatch, double eta, double phi);
@@ -139,9 +137,6 @@ int DileptonCalc::BeginJob()
         << std::endl;
         std::exit(-1);
     }
-    
-
-
     
     return 0;
 }
@@ -455,9 +450,8 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
 	elVtxFitConv.push_back((*iel)->passConversionVeto());
         
 	//Trigger Matching - store 4-vector and filter information for all trigger objects deltaR matched to electrons
-	/* RIGHT NOW JUST SAVE SOME BOOLS FOR PATHS SO COMMENT OUT BELOW
-	if(doTriggerStudy_){
-
+	/*if(doTriggerStudy_){
+	  
 	  //read in trigger objects
 	  edm::Handle<pat::TriggerObjectStandAloneCollection> triggerObjects;
 	  event.getByLabel(triggerObjects_,triggerObjects);
@@ -501,9 +495,9 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
 	    TriggerElectronPhis.push_back(-9999);
 	    TriggerElectronEnergies.push_back(-9999);
 	  }
-	  
-	}*/
-	
+	  }
+	*/
+
 	if(isMc && keepFullMChistory){
 	  //cout << "start\n";
 	  edm::Handle<reco::GenParticleCollection> genParticles;
@@ -737,8 +731,8 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
             muNTrackerLayers   . push_back((*imu)->innerTrack()->hitPattern().trackerLayersWithMeasurement());
 
 	   
-	    //Trigger Matching - store 4-vector and filter information for all trigger objects deltaR matched to muons
-	    /*	    if(doTriggerStudy_){
+	    //Trigger Matching - store 4-vector and filter information for all trigger objects deltaR matched to electrons
+	    /*if(doTriggerStudy_){
 	  
 	      //read in trigger objects
 	      edm::Handle<pat::TriggerObjectStandAloneCollection> triggerObjects;
@@ -784,8 +778,8 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
 		TriggerMuonEnergies.push_back(-9999);
 	      }
 	      
-	    }
-	    */
+	    }*/
+
             
             if(isMc && keepFullMChistory){
                 edm::Handle<reco::GenParticleCollection> genParticles;
@@ -1286,6 +1280,7 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
         
         for(size_t i = 0; i < genParticles->size(); i++){
             const reco::GenParticle & p = (*genParticles).at(i);
+
 	    bool keep=false;
             //Find particles from hard scattering/stable
             if (p.status() >=20 && p.status()<=29) keep=true;

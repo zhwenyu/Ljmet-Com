@@ -56,6 +56,7 @@
 
 
 using trigger::TriggerObject;
+using namespace std;
 
 
 class singleLepEventSelector : public BaseEventSelector {
@@ -228,7 +229,9 @@ void singleLepEventSelector::BeginJob( std::map<std::string, edm::ParameterSet c
         mtPar["flag_tag"]                 = par[_key].getParameter<edm::InputTag>("flag_tag");
         mbPar["pv_cut"]                   = par[_key].getParameter<bool>         ("pv_cut");
         mbPar["hbhe_cut"]                 = par[_key].getParameter<bool>         ("hbhe_cut");
+        msPar["hbhe_cut_value"]           = par[_key].getParameter<std::string>  ("hbhe_cut_value");
         mbPar["csc_cut"]                  = par[_key].getParameter<bool>         ("csc_cut");
+        mbPar["eesc_cut"]                 = par[_key].getParameter<bool>         ("eesc_cut");
 
         mbPar["jet_cuts"]                 = par[_key].getParameter<bool>         ("jet_cuts");
         mdPar["jet_minpt"]                = par[_key].getParameter<double>       ("jet_minpt");
@@ -249,15 +252,16 @@ void singleLepEventSelector::BeginJob( std::map<std::string, edm::ParameterSet c
         mdPar["loose_muon_maxeta"]         = par[_key].getParameter<double>       ("loose_muon_maxeta");
         miPar["min_muon"]                  = par[_key].getParameter<int>          ("min_muon");
 
-        mbPar["electron_cuts"]                 = par[_key].getParameter<bool>         ("electron_cuts");
-        //mbPar["electron_selector"]             = par[_key].getParameter<bool>         ("electron_selector");
-        mdPar["electron_minpt"]                = par[_key].getParameter<double>       ("electron_minpt");
-        mdPar["electron_maxeta"]               = par[_key].getParameter<double>       ("electron_maxeta");
-        //mbPar["loose_electron_selector"]       = par[_key].getParameter<bool>         ("loose_electron_selector");
-        //mbPar["loose_electron_selector_tight"] = par[_key].getParameter<bool>         ("loose_electron_selector_tight");
-        mdPar["loose_electron_minpt"]          = par[_key].getParameter<double>       ("loose_electron_minpt");
-        mdPar["loose_electron_maxeta"]         = par[_key].getParameter<double>       ("loose_electron_maxeta");
-        miPar["min_electron"]                  = par[_key].getParameter<int>          ("min_electron");
+        mbPar["electron_cuts"]             = par[_key].getParameter<bool>         ("electron_cuts");
+        mdPar["electron_minpt"]            = par[_key].getParameter<double>       ("electron_minpt");
+        mdPar["electron_maxeta"]           = par[_key].getParameter<double>       ("electron_maxeta");
+        mdPar["loose_electron_minpt"]      = par[_key].getParameter<double>       ("loose_electron_minpt");
+        mdPar["loose_electron_maxeta"]     = par[_key].getParameter<double>       ("loose_electron_maxeta");
+        miPar["min_electron"]              = par[_key].getParameter<int>          ("min_electron");
+        if (par[_key].exists("UseElMVA")) {
+            mvdPar["tight_electron_mva_cuts"] = par[_key].getParameter<std::vector<double>> ("tight_electron_mva_cuts");
+            mvdPar["loose_electron_mva_cuts"] = par[_key].getParameter<std::vector<double>> ("tight_electron_mva_cuts");
+        }
 
         miPar["min_lepton"]               = par[_key].getParameter<int>          ("min_lepton");
         miPar["max_lepton"]               = par[_key].getParameter<int>          ("max_lepton");
@@ -289,6 +293,8 @@ void singleLepEventSelector::BeginJob( std::map<std::string, edm::ParameterSet c
         msPar["JEC_txtfile"]              = par[_key].getParameter<std::string>  ("JEC_txtfile");
         mbPar["doNewJEC"]                 = par[_key].getParameter<bool>         ("doNewJEC");
         mbPar["doLepJetCleaning"]         = par[_key].getParameter<bool>         ("doLepJetCleaning");
+        if (par[_key].exists("UseElMVA")) mbPar["UseElMVA"]                 = par[_key].getParameter<bool>         ("UseElMVA");
+        else                              mbPar["UseElMVA"]                 = false;
       
 
         std::cout << mLegend << "config parameters loaded..."
@@ -311,6 +317,7 @@ void singleLepEventSelector::BeginJob( std::map<std::string, edm::ParameterSet c
     push_back("Primary vertex");
     push_back("HBHE noise and scraping filter");
     push_back("CSC Tight Halo filter");
+    push_back("EE Bad SC filter");
     push_back("One jet or more");
     push_back("Two jets or more");
     push_back("Three jets or more");
@@ -337,6 +344,7 @@ void singleLepEventSelector::BeginJob( std::map<std::string, edm::ParameterSet c
     set("Primary vertex", mbPar["pv_cut"]);
     set("HBHE noise and scraping filter", mbPar["hbhe_cut"]); 
     set("CSC Tight Halo filter", mbPar["csc_cut"]); 
+    set("EE Bad SC filter", mbPar["eesc_cut"]); 
  
     if (mbPar["jet_cuts"]){
         set("One jet or more", true);
@@ -506,6 +514,7 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
             if ( (*pvSel_)(event) ){
                 passCut(ret, "Primary vertex"); // PV cuts total
             }
+            else break;
 
             event.getByLabel( mtPar["pv_collection"], h_primVtx );
             int _n_pvs = 0;
@@ -523,57 +532,103 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
         //_____ HBHE noise and scraping filter________________________
         //
         if ( considerCut("HBHE noise and scraping filter") ) {
-            if (mbPar["debug"]) std::cout<<"HBHE cuts..."<<std::endl;
+            
+	  //set cut value considered
+	  bool run1Cut=false;
+	  bool run2LooseCut=false;
+	  bool run2TightCut=false;
+	  if(msPar["hbhe_cut_value"].find("Run1")!=string::npos){
+	    run1Cut=true;
+	  }
+	  else if(msPar["hbhe_cut_value"].find("Run2Loose")!=string::npos){
+	    run2LooseCut=true;
+	  }
+	  else if(msPar["hbhe_cut_value"].find("Run2Tight")!=string::npos){
+	    run2TightCut=true;
+	  }
+	  else{
+	    std::cout<<"HBHE cut not configured correctly!...exiting..."<<std::endl;
+	    std::exit(-1);
+	  }
 
-	    //taken from http://cmslxr.fnal.gov/lxr/source/CommonTools/RecoAlgos/plugins/HBHENoiseFilterResultProducer.cc?v=CMSSW_7_4_1
-	    //	and http://cmslxr.fnal.gov/lxr/source/CommonTools/RecoAlgos/python/HBHENoiseFilterResultProducer_cfi.py?v=CMSSW_7_4_1
+	  if (mbPar["debug"]) std::cout<<"HBHE cuts..."<<std::endl;
 
-	    edm::InputTag noiselabel ("hcalnoise");
-	    int minHPDHits = 17;
-	    int minHPDNoOtherHits = 10;
-	    //int minZeros = 10;
-	    int minZeros = 999999.;
-	    bool IgnoreTS4TS5ifJetInLowBVRegion = false;
+	  //taken from http://cmslxr.fnal.gov/lxr/source/CommonTools/RecoAlgos/plugins/HBHENoiseFilterResultProducer.cc?v=CMSSW_7_4_1
+	  //and http://cmslxr.fnal.gov/lxr/source/CommonTools/RecoAlgos/python/HBHENoiseFilterResultProducer_cfi.py?v=CMSSW_7_4_1
 
-            // get the Noise summary object
-            edm::Handle<HcalNoiseSummary> summary_h;
-            event.getByLabel(noiselabel, summary_h);
-            if(!summary_h.isValid()) {
-                std::cout << "Could not find HcalNoiseSummary.\n";
-            }
-            const HcalNoiseSummary& summary(*summary_h);
+	  edm::InputTag noiselabel ("hcalnoise");
+	  int minHPDHits = 17;
+	  int minHPDNoOtherHits = 10;
+	  //int minZeros = 10;
+	  int minZeros = 999999.;
+	  bool IgnoreTS4TS5ifJetInLowBVRegion = false;
 
-            bool goodJetFoundInLowBVRegion = false;
-            if (IgnoreTS4TS5ifJetInLowBVRegion) goodJetFoundInLowBVRegion = summary.goodJetFoundInLowBVRegion();
+	  // get the Noise summary object
+	  edm::Handle<HcalNoiseSummary> summary_h;
+	  event.getByLabel(noiselabel, summary_h);
+	  if(!summary_h.isValid()) {
+	    std::cout << "Could not find HcalNoiseSummary.\n";
+	  }
+	  const HcalNoiseSummary& summary(*summary_h);
 
-            const bool failCommon = summary.maxHPDHits() >= minHPDHits || summary.maxHPDNoOtherHits() >= minHPDNoOtherHits || summary.maxZeros() >= minZeros;
+	  bool goodJetFoundInLowBVRegion = false;
+	  if (IgnoreTS4TS5ifJetInLowBVRegion) goodJetFoundInLowBVRegion = summary.goodJetFoundInLowBVRegion();
 
-            //const bool failFull = failCommon || (summary.HasBadRBXTS4TS5() && !goodJetFoundInLowBVRegion);
+	  const bool failCommon = summary.maxHPDHits() >= minHPDHits || summary.maxHPDNoOtherHits() >= minHPDNoOtherHits || summary.maxZeros() >= minZeros;
 
-            const bool failFull = failCommon || (summary.HasBadRBXRechitR45Loose() && !goodJetFoundInLowBVRegion);
+	  //const bool failFull = failCommon || (summary.HasBadRBXTS4TS5() && !goodJetFoundInLowBVRegion);
 
-            //const bool failFull = failCommon || (summary.HasBadRBXRechitR45Tight() && !goodJetFoundInLowBVRegion);
+	  const bool failRun1 = failCommon || (summary.HasBadRBXTS4TS5() && !goodJetFoundInLowBVRegion);
 
-            // Check isolation requirements
-            //const bool failIsolation = summary.numIsolatedNoiseChannels() >= minNumIsolatedNoiseChannels || summary.isolatedNoiseSumE() >= minIsolatedNoiseSumE || summary.isolatedNoiseSumEt() >= minIsolatedNoiseSumEt;
+	  const bool failRun2Loose = failCommon || (summary.HasBadRBXRechitR45Loose() && !goodJetFoundInLowBVRegion);
 
-            if (!failFull) passCut(ret, "HBHE noise and scraping filter"); // HBHE cuts total
+	  const bool failRun2Tight = failCommon || (summary.HasBadRBXRechitR45Tight() && !goodJetFoundInLowBVRegion);
 
-        } // end of HBHE cuts
-        if ( considerCut("CSC Tight Halo filter") ) {
-	    
+	  // Check isolation requirements
+	  //const bool failIsolation = summary.numIsolatedNoiseChannels() >= minNumIsolatedNoiseChannels || summary.isolatedNoiseSumE() >= minIsolatedNoiseSumE || summary.isolatedNoiseSumEt() >= minIsolatedNoiseSumEt;
+	  if(run1Cut){
+	    if (!failRun1) passCut(ret, "HBHE noise and scraping filter"); // HBHE cuts total
+            else break;
+	  }
+	  else if(run2LooseCut){
+	    if (!failRun2Loose) passCut(ret, "HBHE noise and scraping filter"); // HBHE cuts total
+            else break;
+	  }
+	  else if(run2TightCut){
+	    if (!failRun2Tight) passCut(ret, "HBHE noise and scraping filter"); // HBHE cuts total
+            else break;
+	  }
+	  else {std::cout<<"No HBHE cut!"<<std::endl; passCut(ret, "HBHE noise and scraping filter");} // HBHE cuts total
+        } // end of hbhe cuts
+
+        if ( considerCut("CSC Tight Halo filter") || considerCut("EE Bad SC filter") ) {
             edm::Handle<edm::TriggerResults > PatTriggerResults;
             event.getByLabel( mtPar["flag_tag"], PatTriggerResults );
             const edm::TriggerNames patTrigNames = event.triggerNames(*PatTriggerResults);
-
-            bool cscpass = false;
-
-            for (unsigned int i=0; i<PatTriggerResults->size(); i++){
-                if (patTrigNames.triggerName(i) == "Flag_CSCTightHaloFilter") cscpass = PatTriggerResults->accept(patTrigNames.triggerIndex(patTrigNames.triggerName(i)));
-            }
-
-            if (cscpass) passCut(ret, "CSC Tight Halo filter"); // CSC cut
-        } // end of CSC cuts
+            if ( considerCut("CSC Tight Halo filter") ) {
+    	    
+                bool cscpass = false;
+    
+                for (unsigned int i=0; i<PatTriggerResults->size(); i++){
+                    if (patTrigNames.triggerName(i) == "Flag_CSCTightHaloFilter") cscpass = PatTriggerResults->accept(patTrigNames.triggerIndex(patTrigNames.triggerName(i)));
+                }
+    
+                if (cscpass) passCut(ret, "CSC Tight Halo filter"); // CSC cut
+                else break;
+            } // end of CSC cuts
+    
+            if ( considerCut("EE Bad SC filter") ) {
+    	    
+                bool eescpass = false;
+    
+                for (unsigned int i=0; i<PatTriggerResults->size(); i++){
+                    if (patTrigNames.triggerName(i) == "Flag_eeBadScFilter") eescpass = PatTriggerResults->accept(patTrigNames.triggerIndex(patTrigNames.triggerName(i)));
+                }
+    
+                if (eescpass) passCut(ret, "EE Bad SC filter"); // EE Bad SC cut
+                else break;
+            } // end of EE Bad SC cuts
+        }
 
 
         //======================================================
@@ -608,10 +663,11 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
                         if ( (*_imu).isTightMuon(*mvSelPVs[0]) ){ }
 		        else break; // fail
 
-		        double chIso = (*_imu).userIsolation(pat::PfChargedHadronIso);
-		        double nhIso = (*_imu).userIsolation(pat::PfNeutralHadronIso);
-		        double gIso  = (*_imu).userIsolation(pat::PfGammaIso);
-		        double puIso = (*_imu).userIsolation(pat::PfPUChargedHadronIso);
+                        double chIso = (*_imu).pfIsolationR04().sumChargedHadronPt;
+                        double nhIso = (*_imu).pfIsolationR04().sumNeutralHadronEt;
+                        double gIso  = (*_imu).pfIsolationR04().sumPhotonEt;
+                        double puIso = (*_imu).pfIsolationR04().sumPUPt;
+
 		        double pt    = (*_imu).pt() ;
 
 		        double pfIso = (chIso + std::max(0.,nhIso + gIso - 0.5*puIso))/pt;
@@ -656,10 +712,10 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
                                 if ( (*_imu).isLooseMuon() ){ }
     		                else break; // fail
                             }
-    		            double chIso = (*_imu).userIsolation(pat::PfChargedHadronIso);
-    		            double nhIso = (*_imu).userIsolation(pat::PfNeutralHadronIso);
-    		            double gIso  = (*_imu).userIsolation(pat::PfGammaIso);
-    		            double puIso = (*_imu).userIsolation(pat::PfPUChargedHadronIso);
+                            double chIso = (*_imu).pfIsolationR04().sumChargedHadronPt;
+                            double nhIso = (*_imu).pfIsolationR04().sumNeutralHadronEt;
+                            double gIso  = (*_imu).pfIsolationR04().sumPhotonEt;
+                            double puIso = (*_imu).pfIsolationR04().sumPUPt;
     		            double pt    = (*_imu).pt() ;
     
     		            double pfIso = (chIso + std::max(0.,nhIso + gIso - 0.5*puIso))/pt;
@@ -701,22 +757,6 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
             //get electrons
             event.getByLabel( mtPar["electron_collection"], mhElectrons );
 
-            /*//edm::InputTag eleVetoIdMapToken_ ("egmGsfElectronIDs:cutBasedElectronID-PHYS14-PU20bx25-V2-standalone-veto");
-            edm::InputTag eleLooseIdMapToken_ ("egmGsfElectronIDs:cutBasedElectronID-PHYS14-PU20bx25-V2-standalone-loose");
-            //edm::InputTag eleMediumIdMapToken_ ("egmGsfElectronIDs:cutBasedElectronID-PHYS14-PU20bx25-V2-standalone-medium");
-            edm::InputTag eleTightIdMapToken_ ("egmGsfElectronIDs:cutBasedElectronID-PHYS14-PU20bx25-V2-standalone-tight");
-            //edm::InputTag eleHEEPIdMapToken_ ("egmGsfElectronIDs:heepElectronID-HEEPV51");
-	    //edm::Handle<edm::ValueMap<bool> > veto_id_decisions;
-	    edm::Handle<edm::ValueMap<bool> > loose_id_decisions;
-	    //edm::Handle<edm::ValueMap<bool> > medium_id_decisions;
-	    edm::Handle<edm::ValueMap<bool> > tight_id_decisions; 
-	    //edm::Handle<edm::ValueMap<bool> > heep_id_decisions;
-	    //event.getByLabel(eleVetoIdMapToken_ ,veto_id_decisions);
-	    event.getByLabel(eleLooseIdMapToken_ ,loose_id_decisions);
-	   // event.getByLabel(eleMediumIdMapToken_,medium_id_decisions);
-	    event.getByLabel(eleTightIdMapToken_,tight_id_decisions);
-	    //event.getByLabel(eleHEEPIdMapToken_ ,heep_id_decisions);*/
-
             mvSelElectrons.clear();
 	    size_t j = 0;
             for (std::vector<pat::Electron>::const_iterator _iel = mhElectrons->begin(); _iel != mhElectrons->end(); _iel++){
@@ -726,23 +766,26 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
                 //electron cuts
                 while(1){
 
-                    if ( (*electronSel_)( *_iel, event, retElectron ) ){ }
-                    else break; // fail
-		    /*if (mbPar["electron_selector"]) {
-                        if ( (*electronSel_)( *_iel, event, retElectron ) ){ }
-                        else break; // fail
-		    }
-		    else {
-                        const edm::Ptr<pat::Electron> elPtr(mhElectrons, _n_electrons);
-                        if ( (*tight_id_decisions)[elPtr] ){ }
-		        else break; // fail
-		    }*/
-
                     if (_iel->pt()>mdPar["electron_minpt"]){ }
                     else break;
 	  
-                    if ( fabs(_iel->eta())<mdPar["electron_maxeta"] ){ }
+                    if ( fabs(_iel->superCluster()->eta())<mdPar["electron_maxeta"] ){ }
                     else break;
+
+                    if (!((*_iel).isEBEEGap())){ }
+                    else break;
+
+                    if ( mbPar["UseElMVA"] ) {
+                        bool mvapass = false;
+                        if ( fabs(_iel->superCluster()->eta())<=0.8) mvapass = mvaValue( *_iel, event) > mvdPar["tight_electron_mva_cuts"].at(0);
+                        else if ( fabs(_iel->superCluster()->eta())<=1.479 && fabs(_iel->superCluster()->eta())>0.8) mvapass = mvaValue( *_iel, event) > mvdPar["tight_electron_mva_cuts"].at(2);
+                        else mvapass = mvaValue( *_iel, event) > mvdPar["tight_electron_mva_cuts"].at(2);
+                        if (!mvapass) break;
+                    }
+                    else {
+                        if ( (*electronSel_)( *_iel, event, retElectron ) ){ }
+                        else break; // fail
+                    }
 
                     pass = true; // success
                     break;
@@ -762,30 +805,27 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
                     //electron cuts
                     while(1){
     
-                        if ( (*looseElectronSel_)( *_iel, event, retLooseElectron ) ){ }
-                        else break; // fail
-    		        /*if (mbPar["loose_electron_selector"]) {
-                            if ( (*looseElectronSel_)( *_iel, event, retLooseElectron ) ){ }
-                            else break; // fail
-    		        }
-    		        else {
-                            const edm::Ptr<pat::Electron> elPtr(mhElectrons, _n_electrons);
-    		            if (mbPar["loose_electron_selector_tight"]) {
-                        	if ( (*tight_id_decisions)[elPtr] ){ }
-    		                else break; // fail
-                            }
-    		            else {
-                        	if ( (*loose_id_decisions)[elPtr] ){ }
-    		                else break; // fail
-                            }
-			}*/
-
                         if (_iel->pt()>mdPar["loose_electron_minpt"]){ }
                         else break;
     	  
-                        if ( fabs(_iel->eta())<mdPar["loose_electron_maxeta"] ){ }
+                        if ( fabs(_iel->superCluster()->eta())<mdPar["loose_electron_maxeta"] ){ }
                         else break;
     
+                        if (!((*_iel).isEBEEGap())){ }
+                        else break;
+
+                        if ( mbPar["UseElMVA"] ) {
+                            bool mvapass = false;
+                            if ( fabs(_iel->superCluster()->eta())<=0.8) mvapass = mvaValue( *_iel, event) > mvdPar["tight_electron_mva_cuts"].at(0);
+                            else if ( fabs(_iel->superCluster()->eta())<=1.479 && fabs(_iel->superCluster()->eta())>0.8) mvapass = mvaValue( *_iel, event) > mvdPar["tight_electron_mva_cuts"].at(2);
+                            else if ( fabs(_iel->superCluster()->eta())>1.479) mvapass = mvaValue( *_iel, event) > mvdPar["tight_electron_mva_cuts"].at(2);
+                            if (!mvapass) break;
+                        }
+                        else {
+                            if ( (*looseElectronSel_)( *_iel, event, retLooseElectron ) ){ }
+                            else break; // fail
+                        }
+
                         pass_loose = true; // success
                         break;
                     }
@@ -874,7 +914,11 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
 	        pat::Jet tmpJet = *_ijet;
 		if (mbPar["debug"]) std::cout << "Checking Overlap" << std::endl;
                 if (mvSelMuons.size()>0){
-	            if ( deltaR(mvSelMuons[0]->p4(),_ijet->p4()) < 0.4 ){
+	            if ( deltaR(mvSelMuons[0]->p4(),_ijet->p4()) < 0.8 ){
+                        std::vector<reco::CandidatePtr> muDaughters;
+                        for ( unsigned int isrc = 0; isrc < mvSelMuons[0]->numberOfSourceCandidatePtrs(); ++isrc ){
+                            if (mvSelMuons[0]->sourceCandidatePtr(isrc).isAvailable()) muDaughters.push_back( mvSelMuons[0]->sourceCandidatePtr(isrc) );
+                        }
             	        if (mbPar["debug"]) {
 			    std::cout << "Jet Overlaps with the Muon... Cleaning jet..." << std::endl;
             	            std::cout << "Lepton : pT = " << mvSelMuons[0]->pt() << " eta = " << mvSelMuons[0]->eta() << " phi = " << mvSelMuons[0]->phi() << std::endl;
@@ -882,11 +926,21 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
 			}
 			const std::vector<edm::Ptr<reco::Candidate> > _ijet_consts = _ijet->daughterPtrVector();
         		for ( std::vector<edm::Ptr<reco::Candidate> >::const_iterator _i_const = _ijet_consts.begin(); _i_const != _ijet_consts.end(); ++_i_const){
-			    if ( (*_i_const).key() == mvSelMuons[0]->originalObjectRef().key() ) {
+			    /*if ( (*_i_const).key() == mvSelMuons[0]->originalObjectRef().key() ) {
 				tmpJet.setP4( _ijet->p4() - mvSelMuons[0]->p4() );
 				jetP4 = correctJet(tmpJet, event);
 				if (mbPar["debug"]) std::cout << "Corrected Jet : pT = " << jetP4.Pt() << " eta = " << jetP4.Eta() << " phi = " << jetP4.Phi() << std::endl;
 			        _cleaned = true;
+			    }*///old ref mathcing method, appears to be depreciated in CMSSW_7_4_X(?) 
+                            for (unsigned int muI = 0; muI < muDaughters.size(); muI++) {
+			        if ( (*_i_const).key() == muDaughters[muI].key() ) {
+				    tmpJet.setP4( tmpJet.p4() - muDaughters[muI]->p4() );
+				    jetP4 = correctJet(tmpJet, event);
+				    if (mbPar["debug"]) std::cout << "Corrected Jet : pT = " << jetP4.Pt() << " eta = " << jetP4.Eta() << " phi = " << jetP4.Phi() << std::endl;
+			            _cleaned = true;
+                                    muDaughters.erase( muDaughters.begin()+muI );
+                                    break;
+			        }
 			    }
 			}
 			// zprime method (gives same results as far as i can tell)
@@ -914,7 +968,11 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
             	}
             
                 if (mvSelElectrons.size()>0){
-	            if ( deltaR(mvSelElectrons[0]->p4(),_ijet->p4()) < 0.4 ){
+	            if ( deltaR(mvSelElectrons[0]->p4(),_ijet->p4()) < 0.8 ){
+                        std::vector<reco::CandidatePtr> elDaughters;
+                        for ( unsigned int isrc = 0; isrc < mvSelElectrons[0]->numberOfSourceCandidatePtrs(); ++isrc ){
+                            if (mvSelElectrons[0]->sourceCandidatePtr(isrc).isAvailable()) elDaughters.push_back( mvSelElectrons[0]->sourceCandidatePtr(isrc) );
+                        }
             	        if (mbPar["debug"]) {
 			    std::cout << "Jet Overlaps with the Electron... Cleaning jet..." << std::endl;
             	            std::cout << "Lepton : pT = " << mvSelElectrons[0]->pt() << " eta = " << mvSelElectrons[0]->eta() << " phi = " << mvSelElectrons[0]->phi() << std::endl;
@@ -922,11 +980,15 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
 			}
 			const std::vector<edm::Ptr<reco::Candidate> > _ijet_consts = _ijet->daughterPtrVector();
         		for ( std::vector<edm::Ptr<reco::Candidate> >::const_iterator _i_const = _ijet_consts.begin(); _i_const != _ijet_consts.end(); ++_i_const){
-			    if ( (*_i_const).key() == mvSelElectrons[0]->originalObjectRef().key() ) {
-				tmpJet.setP4( _ijet->p4() - mvSelElectrons[0]->p4() );
-				jetP4 = correctJet(tmpJet, event);
-				if (mbPar["debug"]) std::cout << "Corrected Jet : pT = " << jetP4.Pt() << " eta = " << jetP4.Eta() << " phi = " << jetP4.Phi() << std::endl;
-			        _cleaned = true;
+                            for (unsigned int elI = 0; elI < elDaughters.size(); elI++) {
+			        if ( (*_i_const).key() == elDaughters[elI].key() ) {
+				    tmpJet.setP4( tmpJet.p4() - elDaughters[elI]->p4() );
+				    jetP4 = correctJet(tmpJet, event);
+				    if (mbPar["debug"]) std::cout << "Corrected Jet : pT = " << jetP4.Pt() << " eta = " << jetP4.Eta() << " phi = " << jetP4.Phi() << std::endl;
+			            _cleaned = true;
+                                    elDaughters.erase( elDaughters.begin()+elI );
+                                    break;
+			        }
 			    }
 			}
 		    }
@@ -1023,6 +1085,7 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
             if ( mpMet.isNonnull() && mpMet.isAvailable() ) {
                 pat::MET const & met = mhMet->at(0);
                 if ( ignoreCut("Min MET") ||met.et()>cut("Min MET", double()) ) passCut(ret, "Min MET");
+                else break;
             }
         } // end of MET cuts
         if (mbPar["debug"]) std::cout<<"finish met cuts..."<<std::endl;

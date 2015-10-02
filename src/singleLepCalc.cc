@@ -18,9 +18,11 @@
 #include "FWCore/Common/interface/TriggerNames.h"
 #include "DataFormats/Math/interface/deltaR.h"
 #include "EgammaAnalysis/ElectronTools/interface/ElectronEffectiveArea.h"
-#include "LJMet/Com/interface/TopElectronSelector.h"
+#include "LJMet/Com/interface/MVAElectronSelector.h"
+#include "SimDataFormats/GeneratorProducts/interface/GenEventInfoProduct.h"
 
 #include "DataFormats/BTauReco/interface/CATopJetTagInfo.h"
+#include "LJMet/Com/interface/MiniIsolation.h"
 
 using std::cout;
 using std::endl;
@@ -47,11 +49,13 @@ private:
     edm::InputTag             triggerCollection_;
     edm::InputTag             pvCollection_it;
     edm::InputTag             genParticles_it;
+    edm::InputTag             packedPFCandsLabel_;
     edm::InputTag             genJets_it;
     std::vector<unsigned int> keepPDGID;
     std::vector<unsigned int> keepMomPDGID;
     bool keepFullMChistory;
     bool cleanGenJets;
+    bool UseElMVA;
 
     double rhoIso;
 
@@ -104,6 +108,9 @@ int singleLepCalc::BeginJob()
     if (mPset.exists("genJets"))      genJets_it = mPset.getParameter<edm::InputTag>("genJets");
     else                              genJets_it = edm::InputTag("slimmedGenJets");
 
+    if (mPset.exists("packedPFCands"))	packedPFCandsLabel_ = mPset.getParameter<edm::InputTag>("packedPFCands");
+    else                              	packedPFCandsLabel_ = edm::InputTag("packedPFCandidates");
+
     if (mPset.exists("keepPDGID"))    keepPDGID = mPset.getParameter<std::vector<unsigned int> >("keepPDGID");
     else                              keepPDGID.clear();
 
@@ -116,6 +123,9 @@ int singleLepCalc::BeginJob()
  
     if (mPset.exists("cleanGenJets")) cleanGenJets = mPset.getParameter<bool>("cleanGenJets");
     else                              cleanGenJets = false;
+
+    if (mPset.exists("UseElMVA")) UseElMVA = mPset.getParameter<bool>("UseElMVA");
+    else                          UseElMVA = false;
 
     return 0;
 }
@@ -211,6 +221,7 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
     std::vector <double> muDxy;
     std::vector <double> muDz;
     std::vector <double> muRelIso;
+    std::vector <double> muMiniIso;
 
     std::vector <int> muNValMuHits;
     std::vector <int> muNMatchedStations;
@@ -273,7 +284,13 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
             double gIso   = (*imu)->userIsolation(pat::PfGammaIso);
             double puIso  = (*imu)->userIsolation(pat::PfPUChargedHadronIso);
             double relIso = (chIso + std::max(0.,nhIso + gIso - 0.5*puIso)) / (*imu)->pt();
+
+            edm::Handle<pat::PackedCandidateCollection> packedPFCands;
+            event.getByLabel(packedPFCandsLabel_, packedPFCands);
+            double miniIso = getPFMiniIsolation(packedPFCands, dynamic_cast<const reco::Candidate *>(imu->get()), 0.05, 0.2, 10., false);
+
             muRelIso . push_back(relIso);
+            muMiniIso . push_back(miniIso);
 
             muChIso . push_back(chIso);
             muNhIso . push_back(nhIso);
@@ -341,6 +358,7 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
     SetValue("muDxy"    , muDxy);
     SetValue("muDz"     , muDz);
     SetValue("muRelIso" , muRelIso);
+    SetValue("muMiniIso", muMiniIso);
 
     SetValue("muNValMuHits"       , muNValMuHits);
     SetValue("muNMatchedStations" , muNMatchedStations);
@@ -380,6 +398,7 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
 
     //Quality criteria
     std::vector <double> elRelIso;
+    std::vector <double> elMiniIso;
     std::vector <double> elDxy;
     std::vector <int>    elNotConversion;
     std::vector <int>    elChargeConsistent;
@@ -397,6 +416,8 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
     std::vector <int>    elMHits;
     std::vector <int>    elVtxFitConv;    
 
+    std::vector <double> elMVAValue;
+ 
     //Extra info about isolation
     std::vector <double> elChIso;
     std::vector <double> elNhIso;
@@ -423,7 +444,6 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
     vector<double> elMatchedPhi;
     vector<double> elMatchedEnergy;
 
- 
     edm::Handle<double> rhoHandle;
     event.getByLabel(rhoSrc_, rhoHandle);
     double rhoIso = std::max(*(rhoHandle.product()), 0.0);
@@ -441,18 +461,24 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
             }
 
             //Four vector
-            elPt     . push_back((*iel)->ecalDrivenMomentum().pt()); //Must check: why ecalDrivenMomentum?
-            elEta    . push_back((*iel)->ecalDrivenMomentum().eta());
-            elPhi    . push_back((*iel)->ecalDrivenMomentum().phi());
-            elEnergy . push_back((*iel)->ecalDrivenMomentum().energy());
+            elPt     . push_back((*iel)->pt()); //Must check: why ecalDrivenMomentum?
+            elEta    . push_back((*iel)->superCluster()->eta());
+            elPhi    . push_back((*iel)->superCluster()->phi());
+            elEnergy . push_back((*iel)->energy());
 
 
             //Isolation
-            double AEff  = ElectronEffectiveArea::GetElectronEffectiveArea(ElectronEffectiveArea::kEleGammaAndNeutralHadronIso03,
-                                                                           (*iel)->superCluster()->eta(), ElectronEffectiveArea::kEleEAData2012);
-            double chIso = (*iel)->chargedHadronIso();
-            double nhIso = (*iel)->neutralHadronIso();
-            double phIso = (*iel)->photonIso();
+            double scEta = (*iel)->superCluster()->eta();
+            double AEff;
+            if(fabs(scEta) >2.2) AEff = 0.1530;
+            else if(fabs(scEta) >2.0) AEff = 0.0842;
+            else if(fabs(scEta) >1.3) AEff = 0.0572;
+            else if(fabs(scEta) >0.8) AEff = 0.0988;
+            else if(fabs(scEta) >0.0) AEff = 0.1013;
+  
+            double chIso = ((*iel)->pfIsolationVariables()).sumChargedHadronPt;
+            double nhIso = ((*iel)->pfIsolationVariables()).sumNeutralHadronEt;
+            double phIso = ((*iel)->pfIsolationVariables()).sumPhotonEt;
             double relIso = ( chIso + max(0.0, nhIso + phIso - rhoIso*AEff) ) / (*iel)->pt();
 
             elChIso  . push_back(chIso);
@@ -461,33 +487,37 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
             elAEff   . push_back(AEff);
             elRhoIso . push_back(rhoIso);
 
+            edm::Handle<pat::PackedCandidateCollection> packedPFCands;
+            event.getByLabel(packedPFCandsLabel_, packedPFCands);
+            double miniIso = getPFMiniIsolation(packedPFCands, dynamic_cast<const reco::Candidate *>(iel->get()), 0.05, 0.2, 10., false);
+
             elRelIso . push_back(relIso);
-            //Conversion rejection
-            int nLostHits = (*iel)->gsfTrack()->hitPattern().numberOfLostHits(reco::HitPattern::MISSING_INNER_HITS);
-            double dist   = (*iel)->convDist();
-            double dcot   = (*iel)->convDcot();
-            int notConv   = nLostHits == 0 and (fabs(dist) > 0.02 or fabs(dcot) > 0.02);
+            elMiniIso . push_back(miniIso);
             elCharge.push_back((*iel)->charge());
-            elNotConversion.push_back(notConv);
 
             //IP: for some reason this is with respect to the first vertex in the collection
             if(goodPVs.size() > 0){
-                elDxy.push_back((*iel)->gsfTrack()->dxy(goodPVs.at(0).position()));
+                elDxy.push_back((-1.0)*(*iel)->gsfTrack()->dxy(goodPVs.at(0).position()));
+                elD0.push_back((-1.0)*(*iel)->gsfTrack()->dxy(goodPVs.at(0).position()));
                 elDZ.push_back((*iel)->gsfTrack()->dz(goodPVs.at(0).position()));
             } else {
                 elDxy.push_back(-999);
+                elD0.push_back(-999);
                 elDZ.push_back(-999);
             }
             elChargeConsistent.push_back((*iel)->isGsfCtfScPixChargeConsistent());
             elIsEBEE.push_back(((*iel)->isEBEEGap()<<2) + ((*iel)->isEE()<<1) + (*iel)->isEB());
             elDeta.push_back((*iel)->deltaEtaSuperClusterTrackAtVtx());
             elDphi.push_back((*iel)->deltaPhiSuperClusterTrackAtVtx());
-            elSihih.push_back((*iel)->sigmaIetaIeta());
-            elHoE.push_back((*iel)->hadronicOverEm());
-            elD0.push_back((*iel)->dB());
-            elOoemoop.push_back(1.0/(*iel)->ecalEnergy() + (*iel)->eSuperClusterOverP()/(*iel)->ecalEnergy());
+            elSihih.push_back((*iel)->full5x5_sigmaIetaIeta());
+            elHoE.push_back((*iel)->hcalOverEcal());
+            elOoemoop.push_back(fabs(1.0/(*iel)->ecalEnergy() - (*iel)->eSuperClusterOverP()/(*iel)->ecalEnergy()));
             elMHits.push_back((*iel)->gsfTrack()->hitPattern().numberOfHits(reco::HitPattern::MISSING_INNER_HITS));
             elVtxFitConv.push_back((*iel)->passConversionVeto());
+            elNotConversion.push_back((*iel)->passConversionVeto());
+
+            if (UseElMVA) elMVAValue.push_back( selector->mvaValue(iel->operator*(),event) );
+
             if(isMc && keepFullMChistory){
                 //cout << "start\n";
                 edm::Handle<reco::GenParticleCollection> genParticles;
@@ -538,6 +568,7 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
     SetValue("elCharge", elCharge);
     //Quality requirements
     SetValue("elRelIso" , elRelIso); //Isolation
+    SetValue("elMiniIso" , elMiniIso); //Mini Isolation
     SetValue("elDxy"    , elDxy);    //Dxy
     SetValue("elNotConversion" , elNotConversion);  //Conversion rejection
     SetValue("elChargeConsistent", elChargeConsistent);
@@ -553,6 +584,8 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
     SetValue("elOoemoop", elOoemoop);
     SetValue("elMHits", elMHits);
     SetValue("elVtxFitConv", elVtxFitConv);
+
+    SetValue("elMVAValue", elMVAValue);
 
     //Extra info about isolation
     SetValue("elChIso" , elChIso);
@@ -762,6 +795,9 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
     std::vector <int> genMotherID;
     std::vector <int> genMotherIndex;
 
+   //event weights
+   std::vector<double> evtWeightsMC;
+   float MCWeight=1;
 
     std::vector <double> genJetPt;
     std::vector <double> genJetEta;
@@ -783,6 +819,18 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
     std::vector <int> genBSLID;
 
     if (isMc){
+        //load info for event weight
+        edm::Handle<GenEventInfoProduct> genEvtInfo;
+        edm::InputTag gen_it("generator");
+        event.getByLabel(gen_it, genEvtInfo );
+
+        std::vector<double> evtWeights = genEvtInfo->weights();
+        double theWeight = genEvtInfo->weight();
+      
+        evtWeightsMC=evtWeights;
+        MCWeight = theWeight;
+   
+        //load genparticles collection
         edm::Handle<reco::GenParticleCollection> genParticles;
         event.getByLabel(genParticles_it, genParticles);
 
@@ -949,6 +997,9 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
     SetValue("genTDLEnergy", genTDLEnergy);
     SetValue("genTDLID"    , genTDLID);
 
+    SetValue("evtWeightsMC", evtWeightsMC);
+    SetValue("MCWeight", MCWeight);
+
     return 0;
 }
 
@@ -988,8 +1039,3 @@ void singleLepCalc::fillMotherInfo(const reco::Candidate *mother, int i, vector 
 
 
 }
-
-
-
-
-

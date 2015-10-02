@@ -29,6 +29,63 @@ public:
         
         // Distribution used for Summer2012 MC.
         // https://twiki.cern.ch/twiki/bin/view/CMS/Pileup_MC_Gen_Scenarios
+        // //https://github.com/cms-sw/cmssw/blob/CMSSW_7_6_X/SimGeneral/MixingModule/python/mix_2015_50ns_Startup_PoissonOOTPU_cfi.py
+        Double_t MCDist_Spring15_50ns_Startup[60] = {
+            4.71E-09,
+            2.86E-06,
+            4.85E-06,
+            1.53E-05,
+            3.14E-05,
+            6.28E-05,
+            1.26E-04,
+            3.93E-04,
+            1.42E-03,
+            6.13E-03,
+            1.40E-02,
+            2.18E-02,
+            2.94E-02,
+            4.00E-02,
+            5.31E-02,
+            6.53E-02,
+            7.64E-02,
+            8.42E-02,
+            8.43E-02,
+            7.68E-02,
+            6.64E-02,
+            5.69E-02,
+            4.94E-02,
+            4.35E-02,
+            3.84E-02,
+            3.37E-02,
+            2.92E-02,
+            2.49E-02,
+            2.10E-02,
+            1.74E-02,
+            1.43E-02,
+            1.16E-02,
+            9.33E-03,
+            7.41E-03,
+            5.81E-03,
+            4.49E-03,
+            3.43E-03,
+            2.58E-03,
+            1.91E-03,
+            1.39E-03,
+            1.00E-03,
+            7.09E-04,
+            4.93E-04,
+            3.38E-04,
+            2.28E-04,
+            1.51E-04,
+            9.83E-05,
+            6.29E-05,
+            3.96E-05,
+            2.45E-05,
+            1.49E-05,
+            4.71E-06,
+            2.36E-06
+        };
+
         Double_t MCDist_Summer2012_S10[60] = {
             2.560E-06,
             5.239E-06,
@@ -92,6 +149,10 @@ public:
             5.005E-06
         };
         
+        // User generated Data distribution
+        Double_t DataDist_Jul2015[60] = {
+        };
+
         // User generated Data distribution
         Double_t DataDist_Oct2012[60] = {
             12238.2,
@@ -422,6 +483,7 @@ public:
             DataDistABCD.push_back(DataDist_2012ABCD[i]);
             DataDistABCD735.push_back(DataDist_2012ABCD735[i]);
             MCDist.push_back(MCDist_Summer2012_S10[i]);
+            //MCDist.push_back(MCDist_Spring15_50ns_Startup[i]);
         }
         LumiWeightsOct_ = edm::LumiReWeighting(MCDist, DataDistOct);
         LumiWeightsABC_ = edm::LumiReWeighting(MCDist, DataDistABC);

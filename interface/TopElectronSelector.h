@@ -173,7 +173,7 @@ public: // interface
             set("reliso_EE",   0.177032);
             set("mHits_EB",    2);
             set("mHits_EE",    3);
-            set("vtxFitConv",  1);
+            set("vtxFitConv",  0);
         }
         
         if (version_ == LOOSE) {
@@ -195,7 +195,7 @@ public: // interface
             set("reliso_EE",   0.163368);
             set("mHits_EB",    1);
             set("mHits_EE",    1);
-            set("vtxFitConv",  1);
+            set("vtxFitConv",  0);
         }
         
         if (version_ == MEDIUM) {
@@ -217,7 +217,7 @@ public: // interface
             set("reliso_EE",   0.113254);
             set("mHits_EB",    1);
             set("mHits_EE",    1);
-            set("vtxFitConv",  1);
+            set("vtxFitConv",  0);
         }
         
 
@@ -240,7 +240,7 @@ public: // interface
             set("reliso_EE",   0.078265);
             set("mHits_EB",    1);
             set("mHits_EE",    1);
-            set("vtxFitConv",  1);
+            set("vtxFitConv",  0);
         }
         
         indexDphi_EB_       = index_type(&bits_, "dphi_EB"      );
@@ -368,30 +368,32 @@ public: // interface
 	}
 	else {       
             Double_t scEta = electron.superCluster()->eta();
-            Double_t AEff  = ElectronEffectiveArea::GetElectronEffectiveArea(ElectronEffectiveArea::kEleGammaAndNeutralHadronIso03, scEta, ElectronEffectiveArea::kEleEAData2012);
+            Double_t AEff;
+            if(fabs(scEta) >2.2) AEff = 0.1337;
+            else if(fabs(scEta) >2.0) AEff = 0.0727;
+            else if(fabs(scEta) >1.3) AEff = 0.0632;
+            else if(fabs(scEta) >0.8) AEff = 0.0954;
+            else if(fabs(scEta) >=0.0) AEff = 0.0973;
+
             
-            Double_t chIso = electron.chargedHadronIso();
-            Double_t nhIso = electron.neutralHadronIso();
-            Double_t phIso = electron.photonIso();
             Double_t Deta  = electron.deltaEtaSuperClusterTrackAtVtx();
             Double_t Dphi  = electron.deltaPhiSuperClusterTrackAtVtx();
             Double_t sihih = electron.full5x5_sigmaIetaIeta();
-            Double_t HoE   = electron.hadronicOverEm();
+            Double_t HoE   = electron.hcalOverEcal();
             Double_t D0    = (-1.0)*electron.gsfTrack()->dxy(PVtx);
             Double_t DZ    = electron.gsfTrack()->dz(PVtx);//
-            
             
             Double_t Ooemoop;
             if (electron.ecalEnergy()==0) Ooemoop = 999.;
             else if (!std::isfinite(electron.ecalEnergy())) Ooemoop = 998.;
             else Ooemoop = (1.0/electron.ecalEnergy() - electron.eSuperClusterOverP()/electron.ecalEnergy());
-            Double_t RelIso  = ( chIso + max(0.0, nhIso + phIso - rhoIso*AEff) )/ electron.ecalDrivenMomentum().pt();
             Int_t mHits   =  electron.gsfTrack()->hitPattern().numberOfHits(reco::HitPattern::MISSING_INNER_HITS);
             //Bool_t vtxFitConv = electron.passConversionVeto();
             const reco::BeamSpot &beamspot = *bsHandle.product();
             Bool_t vtxFitConv = ConversionTools::hasMatchedConversion(electron, conversions, beamspot.position());
-    
-    	    bool verbosity = false;
+            reco::GsfElectron::PflowIsolationVariables pfIso = electron.pfIsolationVariables();
+            Double_t RelIso = ( pfIso.sumChargedHadronPt + max(0.0, pfIso.sumNeutralHadronEt + pfIso.sumPhotonEt - rhoIso*AEff) ) / electron.pt();
+    	    bool verbosity =false;
     
     	    if (verbosity) {
     	        std::cout << "\tfabs(Deta) = " << fabs(Deta) << std::endl;
@@ -478,6 +480,8 @@ public: // interface
             
             setIgnored(ret);
 	}
+	//ret.print(std::cout);
+        //std::cout<<std::endl;
         return (bool)ret;
     }
     
