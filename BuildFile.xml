@@ -26,6 +26,7 @@
 <use name="CondFormats/JetMETObjects"/>
 <use name="RecoEgamma/EgammaTools"/>
 <use name="DataFormats/METReco"/>
+<use name="SimDataFormats/GeneratorProducts"/>
 <use name="lhapdf"/>
 
 <export>

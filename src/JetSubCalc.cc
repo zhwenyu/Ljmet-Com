@@ -443,9 +443,9 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * s
       // CMSTopTagger information
       bool Run1CMStopTagged = false;
       reco::CATopJetTagInfo const * jetInfo = dynamic_cast<reco::CATopJetTagInfo const *>( ijet->tagInfo( tagInfo ));
-      topMass   = -std::numeric_limits<double>::max();
-      minMass   = -std::numeric_limits<double>::max();
-      nSubJets  = std::numeric_limits<int>::min();
+      topMass   = -99.99;
+      minMass   = -99.99;
+      nSubJets  = -9;
 
       if(jetInfo != 0){
 	topMass = jetInfo->properties().topMass;
@@ -454,16 +454,12 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * s
 	
 	if (nSubJets > 2 && minMass > 50.0 && topMass > 140.0 && topMass < 250.0) Run1CMStopTagged = true; 	
 	
-	theJetAK8caTopTopMass.push_back(topMass);
-	theJetAK8caTopMinMass.push_back(minMass);
-	theJetAK8caTopnSubJets.push_back(nSubJets);
-	theJetAK8caTopRun1Tag.push_back(Run1CMStopTagged);
-      }else{
-	theJetAK8caTopTopMass.push_back(topMass);
-	theJetAK8caTopMinMass.push_back(minMass);
-	theJetAK8caTopnSubJets.push_back(nSubJets);
-	theJetAK8caTopRun1Tag.push_back(Run1CMStopTagged);
       }
+
+      theJetAK8caTopTopMass.push_back(topMass);
+      theJetAK8caTopMinMass.push_back(minMass);
+      theJetAK8caTopnSubJets.push_back(nSubJets);
+      theJetAK8caTopRun1Tag.push_back(Run1CMStopTagged);
 
       // Get Soft drop subjets for subjet b-tagging
       SDSubJetIndex = (int)theJetAK8SDSubjetPt.size();
@@ -650,11 +646,8 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * s
       edm::Handle<std::vector<pat::Jet> > theCA15Jets;
       event.getByLabel(selectedPatJetsCA15Coll_it, theCA15Jets);
 
-      cout << "Created CA15 Jets, getting HTT" << endl;
       edm::Handle<std::vector<reco::HTTTopJetTagInfo> > httTagInfo;
-      cout << "Created HTT handle" << endl;
       event.getByLabel(httTagInfo_it, httTagInfo);
-      cout << "Got HTT collection" << endl;
       for (std::vector<pat::Jet>::const_iterator ijet = theCA15Jets->begin(); ijet != theCA15Jets->end(); ijet++){
 
 	theJetCA15Pt.push_back(ijet->pt());
