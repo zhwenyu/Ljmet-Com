@@ -3,7 +3,7 @@
 // FWLite PAT analyzer-selector for dilepton analyses
 //
 // Adapted from StopEventSelector
-// Aram Avetisyan, September 2012
+// Aram Avetisyan, September 2012 - TEST
 //
 #ifndef LJMet_Com_interface_DileptonEventSelector_h
 #define LJMet_Com_interface_DileptonEventSelector_h

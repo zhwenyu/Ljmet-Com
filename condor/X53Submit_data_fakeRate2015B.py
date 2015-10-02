@@ -8,7 +8,7 @@ files_per_job = 1
 
 rel_base = os.environ['CMSSW_BASE']
 
-outdir = '/eos/uscms/store/user/lpctlbsm/clint/Spring15/25ns/'
+outdir = '/eos/uscms/store/user/lpctlbsm/clint/Run2015B/FakeRateTrees/'
 
 ### What is the name of your FWLite Analyzer
 FWLiteAnalyzer = 'ljmet'
@@ -22,7 +22,7 @@ DOQCDMC = 'False'
 DOTTBARSYS = 'False'
 
 ### JSON file to use
-MYJSON = "''"
+MYJSON = "'../data/json/Cert_246908-254349_13TeV_PromptReco_Collisions15_JSON.txt'"
 
 ### Systematics flags
 BTAGUNCERTUP = 'False'
@@ -41,13 +41,10 @@ prefix = []
 
 if DONOMINAL=='True':
     prefix.extend([
-#            'DYJets',
-#            'TTJets',
-#            'WJets',
-#            'WZ',
-            'ZZ',
-            'TTW',
-            'TTZ',
+            'DoubleMuon_Run2015B_PromptReco',
+            'DoubleEG_Run2015B_PromptReco',
+
+
     ])
 
 
@@ -65,13 +62,8 @@ for i in prefix:
 list = [] 
 
 listnom = [
- #   'Samples_Spring15MC/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v3.txt',
- #   'Samples_Spring15MC/TTJets_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_RunIISpring15DR74_Asympt25ns_MCRUN2_74_V9-v1.txt',
- #   'Samples_Spring15MC/WJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1.txt',
- #   'Samples_Spring15MC/WZTo3LNu_TuneCUETP8M1_13TeV-powheg-pythia8_RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1.txt',
-    'Samples_Spring15MC/ZZTo4L_13TeV_powheg_pythia8_RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1.txt',
-    'Samples_Spring15MC/TTWJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-madspin-pythia8_RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1.txt',
-    'Samples_Spring15MC/TTZToLLNuNu_M-10_TuneCUETP8M1_13TeV-amcatnlo-pythia8_RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1.txt',
+    'Samples_Run2015B/DoubleMuon_Run2015B_PromptReco.txt',
+    'Samples_Run2015B/DoubleEG_Run2015B_PromptReco.txt',
     ]
 
 if DONOMINAL=='True':
@@ -108,7 +100,7 @@ for i in range(len(prefix)):
     nfiles = 1
 
         
-    FLAGTAG = 'TriggerResults::PAT'
+    FLAGTAG = 'TriggerResults::RECO'
     
     print 'CONDOR work dir: '+dir[i]
     #os.system('rm -rf '+dir[i])
@@ -127,7 +119,7 @@ for i in range(len(prefix)):
 
     while ( nfiles <= count ):    
 
-        py_templ_file = open(rel_base+"/src/LJMet/Com/condor/Dilepton_Spring15MC_25ns_python.templ")
+        py_templ_file = open(rel_base+"/src/LJMet/Com/condor/Dilepton_Data_FakeRate_Run2015B_python.templ")
         condor_templ_file = open(rel_base+"/src/LJMet/Com/condor/X53condor.templ")
         csh_templ_file    = open(rel_base+"/src/LJMet/Com/condor/X53csh.templ")
 

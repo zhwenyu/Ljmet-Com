@@ -8,35 +8,21 @@ files_per_job = 1
 
 rel_base = os.environ['CMSSW_BASE']
 
-###########################################
-### Where to save your output root files to
-###########################################
-outdir = '/uscms_data/d3/drankin/13TeV/Samples/13Aug_NoIso/'
+outdir = '/eos/uscms/store/user/lpctlbsm/clint/Run2015B/'
 
 ### What is the name of your FWLite Analyzer
 FWLiteAnalyzer = 'ljmet'
 
-### Selection to run
-SELECTOR = "'singleLepSelector'"
-
-### Is this sample MC?
-ISMCSAMPLE = 'False'
-
-###Is WJets?
-ISWJETS = 'False'
-
-###53x JEC?
-DONEWJEC = 'False'
-
-###Is TB?
-ISTB = 'False'
-ISTT = 'False'
-
-### Use best top for neutrino pz solution?
-USEBESTTOP = 'True'
+### Which Systematics to do
+DONOMINAL = 'True'
+DOJES = 'False'
+DOJER = 'False'
+DOBTAG = 'False'
+DOQCDMC = 'False'
+DOTTBARSYS = 'False'
 
 ### JSON file to use
-MYJSON = "''"
+MYJSON = "'../data/json/Cert_246908-254349_13TeV_PromptReco_Collisions15_JSON.txt'"
 
 ### Systematics flags
 BTAGUNCERTUP = 'False'
@@ -46,38 +32,47 @@ JECUNCERTDOWN = 'False'
 JERUNCERTUP = 'False'
 JERUNCERTDOWN = 'False'
 
+
 #################################################
 ### Names to give to your output root files
 #################################################
 
-prefix = [
-'SingleMuon_Run2015B_PromptReco',
-'SingleMuon_Run2015B_17Jul2015',
-'SingleElectron_Run2015B_PromptReco',
-'SingleElectron_Run2015B_17Jul2015',
-]
+prefix = []
 
-dir = [
-outdir+'SingleMuon_Run2015B_PromptReco',
-outdir+'SingleMuon_Run2015B_17Jul2015',
-outdir+'SingleElectron_Run2015B_PromptReco',
-outdir+'SingleElectron_Run2015B_17Jul2015',
-]
+if DONOMINAL=='True':
+    prefix.extend([
+            'DoubleMuon_Run2015B_PromptReco',
+#            'DoubleEG_Run2015B_PromptReco',
+            'MuonEG_Run2015B_PromptReco',            
 
+    ])
+
+
+###########################################
+### Where to save your output root files to
+###########################################
+dir = []
+for i in prefix:
+    outdiri = outdir+i
+    dir.extend([outdiri])
 
 ################################################
 ### Where is your list of root files to run over
 ################################################
-list = [ 
-'Samples_2015/SingleMuon_Run2015B_PromptReco.txt',
-'Samples_2015/SingleMuon_Run2015B_17Jul2015.txt',
-'Samples_2015/SingleElectron_Run2015B_PromptReco.txt',
-'Samples_2015/SingleElectron_Run2015B_17Jul2015.txt',
-] 
+list = [] 
+
+listnom = [
+    'Samples_Run2015B/DoubleMuon_Run2015B_PromptReco.txt',
+#    'Samples_Run2015B/DoubleEG_Run2015B_PromptReco.txt',
+    'Samples_Run2015B/MuonEG_Run2015B_PromptReco.txt',
+    ]
+
+if DONOMINAL=='True':
+    list.extend(listnom)
+   
 
 for i in range(len(prefix)):
     print i,' ',prefix[i],' ',dir[i],' ',list[i]
-        
 
 ### Write the files you wish to run over for each job    
 def get_input(num, list):
@@ -88,10 +83,11 @@ def get_input(num, list):
         if line.find('root')>0:
             file_count=file_count+1
             if file_count>(num-1) and file_count<(num+files_per_job):
-                f_name=re.search('.+\'(.+\.root)',line)
+                f_name=line.split('.root')[0]
+                f_name=f_name+'.root'
                 #result=result+'                 \'' + f_name.group(1)+'\',\n'
                 #result=result+'                 \'dcap:///pnfs/cms/WAX/11' + f_name.group(1)+'\',\n'
-                result=result+'                 \'root://cmsxrootd.fnal.gov/' + f_name.group(1)+'\',\n'
+                result=result+'                 \'root://cmsxrootd.fnal.gov/' + f_name +'\',\n'
     file_list.close()
     #result = result + '                 )\n'
     return result
@@ -104,25 +100,8 @@ for i in range(len(prefix)):
     j = 1
     nfiles = 1
 
-    #MYJSON = "''"
-    #MYJSON = "'../data/json/json_DCSONLY_Run2015B.txt'"
-    MYJSON = "'../data/json/Cert_246908-251883_13TeV_PromptReco_Collisions15_JSON_v2.txt'"
-    #if (prefix[i].find('13Jul2012')>0):
-    #    MYJSON = "'../data/json/Cert_190456-196531_8TeV_13Jul2012ReReco_Collisions12_JSON_v2.txt'"
-    #if (prefix[i].find('06Aug2012')>0):
-    #    MYJSON = "'../data/json/Cert_190782-190949_8TeV_06Aug2012ReReco_Collisions12_JSON.txt'"
-    #if (prefix[i].find('24Aug2012')>0):
-    #    MYJSON = "'../data/json/Cert_198022-198523_8TeV_24Aug2012ReReco_Collisions12_JSON.txt'"
-    #if (prefix[i].find('Prompt2012C')>0):
-    #    MYJSON = "'../data/json/Cert_190456-208686_8TeV_PromptReco_Collisions12_JSON_198941-203709.txt'"
-    #if (prefix[i].find('Prompt2012D')>0):
-    #    MYJSON = "'../data/json/Cert_190456-208686_8TeV_PromptReco_Collisions12_JSON_203894-208686.txt'"
-    #if (prefix[i].find('11Dec2012')>0):
-    #    MYJSON = "'../data/json/Cert_201191-201191_8TeV_11Dec2012ReReco-recover_Collisions12_JSON.txt'"
-
+        
     FLAGTAG = 'TriggerResults::RECO'
-    if (prefix[i].find('17Jul2015')>0):
-        FLAGTAG = 'TriggerResults::PAT'
     
     print 'CONDOR work dir: '+dir[i]
     #os.system('rm -rf '+dir[i])
@@ -141,19 +120,9 @@ for i in range(len(prefix)):
 
     while ( nfiles <= count ):    
 
-        #if (prefix[i].startswith('SingleElectron') and j <= 24):
-        #    j = j + 1
-        #    nfiles = nfiles + files_per_job
-        #    continue
-        #if (prefix[i].startswith('SingleMuon') and j <= 16):
-        #    j = j + 1
-        #    nfiles = nfiles + files_per_job
-        #    continue
-
-        #py_templ_file = open(rel_base+"/src/LJMet/Com/condor/Wprimepython.templ")
-        py_templ_file = open(rel_base+"/src/LJMet/Com/condor/Wprimepython.templ.data")
-        condor_templ_file = open(rel_base+"/src/LJMet/Com/condor/Wprimecondor.templ")
-        csh_templ_file    = open(rel_base+"/src/LJMet/Com/condor/Wprimecsh.templ")
+        py_templ_file = open(rel_base+"/src/LJMet/Com/condor/Dilepton_Data_Run2015B_python.templ")
+        condor_templ_file = open(rel_base+"/src/LJMet/Com/condor/X53condor.templ")
+        csh_templ_file    = open(rel_base+"/src/LJMet/Com/condor/X53csh.templ")
 
         py_file = open(dir[i]+"/"+prefix[i]+"_"+str(j)+".py","w")
         for line in py_templ_file:
@@ -199,5 +168,5 @@ for i in range(len(prefix)):
         condor_templ_file.close()
         csh_templ_file.close()
 
-    print  str(j-1)+' jobs submitted'
+    #print  str(j-1)+' jobs submitted'
     

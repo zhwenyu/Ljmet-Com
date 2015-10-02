@@ -49,7 +49,7 @@ process.event_selector = cms.PSet(
 
     # HLT
     trigger_cut              = cms.bool(True),
-    dump_trigger             = cms.bool(False),
+    dump_trigger             = cms.bool(True),
 
     # Can use same trigger paths for data and MC since MC is always one of the data versions
     trigger_path_ee          = cms.vstring('HLT_Ele23_Ele12_CaloId_TrackId_Iso_v1', 'HLT_Ele17_Ele12_Ele10_CaloId_TrackId_v1',
@@ -77,7 +77,8 @@ process.event_selector = cms.PSet(
     # PV related cuts
     pv_cut                   = cms.bool(True),
     hbhe_cut                 = cms.bool(True),
-
+    hbhe_cut_value           = cms.string('Run1'),
+    flag_tag                 = cms.InputTag('TriggerResults'),
     # Jet related cuts
     jet_cuts                 = cms.bool(False),
     jet_minpt                = cms.double(20.0),
@@ -91,7 +92,7 @@ process.event_selector = cms.PSet(
     muon_minpt               = cms.double(10.0),
     muon_maxeta              = cms.double(2.5),
     max_muon                 = cms.int32(20),
-
+    cscHalo_cut              = cms.bool(True),
     # Electron related cuts
     electron_cuts            = cms.bool(True),
     min_electron             = cms.int32(0),
@@ -143,13 +144,13 @@ process.event_selector = cms.PSet(
 #
 
 process.inputs = cms.PSet (
-    nEvents    = cms.int32(100),
+    nEvents    = cms.int32(1),
     skipEvents = cms.int32(0),
     useHcalLaserEventFilter = cms.bool(True),
     lumisToProcess = CfgTypes.untracked(CfgTypes.VLuminosityBlockRange()),
 
     # files can be local or accessed from the grid, in which case you need a proxy
-    fileNames = cms.vstring('root://cmsxrootd-site.fnal.gov//store/mc/Phys14DR/TT_Tune4C_13TeV-pythia8-tauola/MINIAODSIM/PU20bx25_tsg_PHYS14_25_V1-v1/00000/52DA156A-8470-E411-A8BF-0025905A60AA.root',)
+    fileNames = cms.vstring('file:test_DYJets.root'),
 )
 
 # JSON
