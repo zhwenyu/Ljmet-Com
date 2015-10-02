@@ -450,7 +450,7 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
 	elVtxFitConv.push_back((*iel)->passConversionVeto());
         
 	//Trigger Matching - store 4-vector and filter information for all trigger objects deltaR matched to electrons
-	if(doTriggerStudy_){
+	/*if(doTriggerStudy_){
 	  
 	  //read in trigger objects
 	  edm::Handle<pat::TriggerObjectStandAloneCollection> triggerObjects;
@@ -495,9 +495,9 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
 	    TriggerElectronPhis.push_back(-9999);
 	    TriggerElectronEnergies.push_back(-9999);
 	  }
-	  
-	}
-	
+	  }
+	*/
+
 	if(isMc && keepFullMChistory){
 	  //cout << "start\n";
 	  edm::Handle<reco::GenParticleCollection> genParticles;
@@ -732,7 +732,7 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
 
 	   
 	    //Trigger Matching - store 4-vector and filter information for all trigger objects deltaR matched to electrons
-	    if(doTriggerStudy_){
+	    /*if(doTriggerStudy_){
 	  
 	      //read in trigger objects
 	      edm::Handle<pat::TriggerObjectStandAloneCollection> triggerObjects;
@@ -778,7 +778,7 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
 		TriggerMuonEnergies.push_back(-9999);
 	      }
 	      
-	    }
+	    }*/
 
             
             if(isMc && keepFullMChistory){
