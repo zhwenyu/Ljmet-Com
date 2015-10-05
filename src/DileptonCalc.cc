@@ -414,7 +414,7 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
 	double nhIso = pfIso.sumNeutralHadronEt;
 	double phIso = pfIso.sumPhotonEt;
 	double PUIso = pfIso.sumPUPt;
-	double relIso = ( chIso + max(0.0, nhIso + phIso - PUIso*AEff) ) / (*iel)->pt();
+	double relIso = ( chIso + max(0.0, nhIso + phIso - rhoIso*AEff) ) / (*iel)->pt();
 	
 	elChIso  . push_back(chIso);
 	elNhIso  . push_back(nhIso);
