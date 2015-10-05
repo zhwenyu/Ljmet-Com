@@ -401,12 +401,14 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
 
 	//implement effective area: up-to-date as of PHYS14
 	double AEff;
-	if(fabs((*iel)->ecalDrivenMomentum().eta()) >2.2) AEff = 0.1530;
-	else if(fabs((*iel)->ecalDrivenMomentum().eta()) >2.0) AEff = 0.0842;
-	else if(fabs((*iel)->ecalDrivenMomentum().eta()) >1.3) AEff = 0.0572;
-	else if(fabs((*iel)->ecalDrivenMomentum().eta()) >0.8) AEff = 0.0988;
-	else if(fabs((*iel)->ecalDrivenMomentum().eta()) >0.0) AEff = 0.1013;
-
+	if( fabs((*iel)->ecalDrivenMomentum().eta())<1.0) AEff=0.1752;
+	else if(fabs((*iel)->ecalDrivenMomentum().eta())<1.479) AEff=0.1862;
+	else if(fabs((*iel)->ecalDrivenMomentum().eta())<2.0) AEff=0.1411;
+	else if(fabs((*iel)->ecalDrivenMomentum().eta())<2.2) AEff=0.1534;
+	else if(fabs((*iel)->ecalDrivenMomentum().eta())<2.3) AEff=0.1903;
+	else if(fabs((*iel)->ecalDrivenMomentum().eta())<2.4) AEff=0.2243;
+	else if(fabs((*iel)->ecalDrivenMomentum().eta())<2.5) AEff=0.2687;
+	
 	reco::GsfElectron::PflowIsolationVariables pfIso = (*iel)->pfIsolationVariables();
 	double chIso = pfIso.sumChargedHadronPt;
 	double nhIso = pfIso.sumNeutralHadronEt;

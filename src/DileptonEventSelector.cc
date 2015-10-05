@@ -530,11 +530,14 @@ bool DileptonEventSelector::operator()( edm::EventBase const & event, pat::strbi
 		    
 		    //get effective area to do pu correction for iso
 		    double AEff;
-		    if(fabs(_iel->ecalDrivenMomentum().eta()) >2.2) AEff = 0.1530;
-		    else if(fabs(_iel->ecalDrivenMomentum().eta()) >2.0) AEff = 0.0842;
-		    else if(fabs(_iel->ecalDrivenMomentum().eta()) >1.3) AEff = 0.0572;
-		    else if(fabs(_iel->ecalDrivenMomentum().eta()) >0.8) AEff = 0.0988;
-		    else if(fabs(_iel->ecalDrivenMomentum().eta()) >0.0) AEff = 0.1013;
+		    if( fabs(_iel->ecalDrivenMomentum().eta())<1.0) AEff=0.1752;
+		    else if(fabs(_iel->ecalDrivenMomentum().eta())<1.479) AEff=0.1862;
+		    else if(fabs(_iel->ecalDrivenMomentum().eta())<2.0) AEff=0.1411;
+		    else if(fabs(_iel->ecalDrivenMomentum().eta())<2.2) AEff=0.1534;
+		    else if(fabs(_iel->ecalDrivenMomentum().eta())<2.3) AEff=0.1903;
+		    else if(fabs(_iel->ecalDrivenMomentum().eta())<2.4) AEff=0.2243;
+		    else if(fabs(_iel->ecalDrivenMomentum().eta())<2.5) AEff=0.2687;
+
 		    //calculate relIso
 		    reco::GsfElectron::PflowIsolationVariables pfIso = _iel->pfIsolationVariables();
 		    double chIso = pfIso.sumChargedHadronPt;
@@ -712,9 +715,14 @@ bool DileptonEventSelector::operator()( edm::EventBase const & event, pat::strbi
 		    std::cout << "Lepton : pT = " << mvSelMuons[ilep]->pt() << " eta = " << mvSelMuons[ilep]->eta() << " phi = " << mvSelMuons[ilep]->phi() << std::endl;
 		    std::cout << "      Raw Jet : pT = " << _ijet->pt() << " eta = " << _ijet->eta() << " phi = " << _ijet->phi() << std::endl;
 		  }
+		  //get the daughters of the muons
+		  std::vector<reco::CandidatePtr> muDaughters;
+		  for ( unsigned int isrc = 0; isrc < mvSelMuons[0]->numberOfSourceCandidatePtrs(); ++isrc ){
+		    if (mvSelMuons[0]->sourceCandidatePtr(isrc).isAvailable()) muDaughters.push_back( mvSelMuons[0]->sourceCandidatePtr(isrc) );
+		  }
 		  const std::vector<edm::Ptr<reco::Candidate> > _ijet_consts = _ijet->daughterPtrVector();
 		  for ( std::vector<edm::Ptr<reco::Candidate> >::const_iterator _i_const = _ijet_consts.begin(); _i_const != _ijet_consts.end(); ++_i_const){
-		    if ( (*_i_const).key() == mvSelMuons[ilep]->originalObjectRef().key() ) {
+		    /*if ( (*_i_const).key() == mvSelMuons[ilep]->originalObjectRef().key() ) {
 		      cleanedJet.setP4( _ijet->p4() - mvSelMuons[ilep]->p4() );
 		      //get the correction for the cleaned jet and apply it
 		      jetP4 = correctJet(cleanedJet, event);
@@ -724,6 +732,21 @@ bool DileptonEventSelector::operator()( edm::EventBase const & event, pat::strbi
 		      cleanedJet.setP4(rlv);
 		      if (mbPar["debug"]) std::cout << "Corrected Jet : pT = " << jetP4.Pt() << " eta = " << jetP4.Eta() << " phi = " << jetP4.Phi() << std::endl;
 		      _cleaned = true;
+		      }*/ //switching to new lep-jet cleaning from dylan
+		    for (unsigned int muI = 0; muI < muDaughters.size(); muI++) {
+		      if ( (*_i_const).key() == muDaughters[muI].key() ) {
+			cleanedJet.setP4( cleanedJet.p4() - muDaughters[muI]->p4() );
+			jetP4 = correctJet(cleanedJet, event);
+			//annoying thing to convert our tlorentzvector to root::math::lorentzvector
+			ROOT::Math::LorentzVector<ROOT::Math::PtEtaPhiM4D<double > > rlv;
+			rlv.SetXYZT(jetP4.X(),jetP4.Y(),jetP4.Z(),jetP4.T());
+			cleanedJet.setP4(rlv);
+			
+			if (mbPar["debug"]) std::cout << "Corrected Jet : pT = " << jetP4.Pt() << " eta = " << jetP4.Eta() << " phi = " << jetP4.Phi() << std::endl;
+			_cleaned = true;
+			muDaughters.erase( muDaughters.begin()+muI );
+			break;
+		      }
 		    }
 		  }
 		}
@@ -732,6 +755,11 @@ bool DileptonEventSelector::operator()( edm::EventBase const & event, pat::strbi
 	      //clean for electrons
 	      for (unsigned int ilep=0; ilep <electronsForCleaning.size();ilep++){
 		if ( deltaR(electronsForCleaning.at(ilep).p4(),_ijet->p4()) < 0.4 ){
+		  //get the daughters of the electron
+		  std::vector<reco::CandidatePtr> elDaughters;
+		  for ( unsigned int isrc = 0; isrc < mvSelElectrons[0]->numberOfSourceCandidatePtrs(); ++isrc ){
+		    if (mvSelElectrons[0]->sourceCandidatePtr(isrc).isAvailable()) elDaughters.push_back( mvSelElectrons[0]->sourceCandidatePtr(isrc) );
+		  }
 		  if (mbPar["debug"]) {
 		    std::cout << "Jet Overlaps with the Electron... Cleaning jet..." << std::endl;
 		    std::cout << "Lepton : pT = " << electronsForCleaning.at(ilep).pt() << " eta = " << electronsForCleaning.at(ilep).eta() << " phi = " << electronsForCleaning.at(ilep).phi() << std::endl;
@@ -739,7 +767,7 @@ bool DileptonEventSelector::operator()( edm::EventBase const & event, pat::strbi
 		  }
 		  const std::vector<edm::Ptr<reco::Candidate> > _ijet_consts = _ijet->daughterPtrVector();
 		  for ( std::vector<edm::Ptr<reco::Candidate> >::const_iterator _i_const = _ijet_consts.begin(); _i_const != _ijet_consts.end(); ++_i_const){
-		    if ( (*_i_const).key() == electronsForCleaning.at(ilep).originalObjectRef().key() ) {
+		    /*if ( (*_i_const).key() == electronsForCleaning.at(ilep).originalObjectRef().key() ) {
 		      cleanedJet.setP4( _ijet->p4() - electronsForCleaning.at(ilep).p4() );
 		      //get the correct 4vector
 		      jetP4 = correctJet(cleanedJet, event);
@@ -749,6 +777,21 @@ bool DileptonEventSelector::operator()( edm::EventBase const & event, pat::strbi
 		      cleanedJet.setP4(rlv);
 		      if (mbPar["debug"]) std::cout << "Corrected Jet : pT = " << jetP4.Pt() << " eta = " << jetP4.Eta() << " phi = " << jetP4.Phi() << std::endl;
 		      _cleaned = true;
+		      }*/
+		    for (unsigned int elI = 0; elI < elDaughters.size(); elI++) {
+		      if ( (*_i_const).key() == elDaughters[elI].key() ) {
+			cleanedJet.setP4( _ijet->p4() - elDaughters[elI]->p4() );
+			//get the correct 4vector
+			jetP4 = correctJet(cleanedJet, event);
+			//annoying thing to convert our tlorentzvector to root::math::lorentzvector
+			ROOT::Math::LorentzVector<ROOT::Math::PtEtaPhiM4D<double > > rlv;
+			rlv.SetXYZT(jetP4.X(),jetP4.Y(),jetP4.Z(),jetP4.T());
+			cleanedJet.setP4(rlv);
+			if (mbPar["debug"]) std::cout << "Corrected Jet : pT = " << jetP4.Pt() << " eta = " << jetP4.Eta() << " phi = " << jetP4.Phi() << std::endl;
+			_cleaned = true;
+			elDaughters.erase( elDaughters.begin()+elI );
+			break;
+		      }
 		    }
 		  }
 		}
