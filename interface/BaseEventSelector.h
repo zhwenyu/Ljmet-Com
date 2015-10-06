@@ -127,8 +127,6 @@ protected:
     std::map<std::string, unsigned int> mvSelTriggersMu;
     std::map<std::string, unsigned int> mvSelMCTriggersEl;
     std::map<std::string, unsigned int> mvSelMCTriggersMu;
-    std::map<std::string, int> mvSelPrescalesEl;
-    std::map<std::string, int> mvSelPrescalesMu;
     std::vector<edm::Ptr<reco::Vertex>> mvSelPVs;
     double mTestValue;
     
