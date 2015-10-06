@@ -18,6 +18,8 @@ JetSubCalc = cms.PSet(
                       tagInfo            = cms.string("caTop"),
                       kappa              = cms.double(0.5),
                       useHTT             = cms.bool(False),
+                      killHF             = cms.bool(False),
+                      doNewJEC           = cms.bool(False),
                       selectedJetsCA15Coll = cms.InputTag("selectedPatJetsCA15PFCHSNoHF")
                       )
 
