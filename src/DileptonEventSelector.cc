@@ -182,6 +182,10 @@ void DileptonEventSelector::BeginJob( std::map<std::string, edm::ParameterSet co
 	mbPar["doLepJetCleaning"]         = par[_key].getParameter<bool>         ("doLepJetCleaning");
         mbPar["doNewJEC"]                 = par[_key].getParameter<bool>         ("doNewJEC");
 	mbPar["isMc"]                     = par[_key].getParameter<bool>         ("isMc");
+
+	//mva value
+	mbPar["UseElMVA"]                 = par[_key].getParameter<bool>         ("UseElMVA");
+
     }
     else {
         std::cout << mLegend << "event selector not configured, exiting"
@@ -511,143 +515,153 @@ bool DileptonEventSelector::operator()( edm::EventBase const & event, pat::strbi
 	goodPVs = *(pvHandle.product());
 
         if ( mbPar["electron_cuts"] ) {
-            
-            //get electrons
-            event.getByLabel( mtPar["electron_collection"], mhElectrons );
-            
-            mvSelElectrons.clear();
-            
-            for ( std::vector<pat::Electron>::const_iterator _iel = mhElectrons->begin(); _iel != mhElectrons->end(); _iel++){
-                
-                bool pass = false;
-		bool passLoose=false;
-                while(1){
-                    if (not _iel->gsfTrack().isNonnull() or not _iel->gsfTrack().isAvailable()) break;
-		    
-		    //get effective area to do pu correction for iso
-		    double AEff;
-		    if(fabs(_iel->ecalDrivenMomentum().eta()) >2.2) AEff = 0.1530;
-		    else if(fabs(_iel->ecalDrivenMomentum().eta()) >2.0) AEff = 0.0842;
-		    else if(fabs(_iel->ecalDrivenMomentum().eta()) >1.3) AEff = 0.0572;
-		    else if(fabs(_iel->ecalDrivenMomentum().eta()) >0.8) AEff = 0.0988;
-		    else if(fabs(_iel->ecalDrivenMomentum().eta()) >0.0) AEff = 0.1013;
-		    //calculate relIso
-		    reco::GsfElectron::PflowIsolationVariables pfIso = _iel->pfIsolationVariables();
-		    double chIso = pfIso.sumChargedHadronPt;
-		    double nhIso = pfIso.sumNeutralHadronEt;
-		    double phIso = pfIso.sumPhotonEt;
-		    double PUIso = pfIso.sumPUPt;
-		    double relIso = ( chIso + max(0.0, nhIso + phIso - PUIso*AEff) ) / _iel->pt();
 
-		    //get d0 and dZ
-		    double d0=_iel->dB();
-		    double dZ;
-		    if(goodPVs.size() > 0){
-		      dZ=_iel->gsfTrack()->dz(goodPVs.at(0).position());
-		    } 
-		    else {dZ=-999;}
-		    //get 1/e -1/1p
-		    float ooEmooP = 1.0/_iel->ecalEnergy() - _iel->eSuperClusterOverP()/_iel->ecalEnergy();
+	  //get rho src
+	  edm::InputTag rhoSrc_it("fixedGridRhoAll");
+	  edm::Handle<double> rhoHandle;
+	  event.getByLabel(rhoSrc_it, rhoHandle);
+	  double rhoIso = std::max(*(rhoHandle.product()), 0.0);
 
-		    //check to see if it passes loose id for lepton jet cleaning, unfortunately one ID for mc, one for data
-		    if(mbPar["isMc"]){
-		        //Barrel
-		      if(fabs(_iel->ecalDrivenMomentum().eta()) <= 1.479){
-			if(_iel->full5x5_sigmaIetaIeta() >= 0.0103) {passLoose= false; }
-			else if(fabs(_iel->deltaEtaSuperClusterTrackAtVtx()) >= 0.0105)    {passLoose= false; }
-			else if(fabs(_iel->deltaPhiSuperClusterTrackAtVtx()) >= 0.115)    {passLoose= false; }
-			else if(_iel->hcalOverEcal() >= 0.104)         {passLoose= false; }
-			else if(relIso >= 0.0893)          {passLoose= false; }
-			else if(ooEmooP >= 0.102) {passLoose= false; }
-			else if(fabs(d0) >= 0.0261)      {passLoose= false; }
-			else if(fabs(dZ) >= 0.41)     {passLoose= false; }
-			else if(_iel->gsfTrack()->hitPattern().numberOfHits(reco::HitPattern::MISSING_INNER_HITS) > 2)              {passLoose= false; }
-			else if(_iel->isGsfCtfScPixChargeConsistent() < 1)  {passLoose= false; }
-			else if(!_iel->passConversionVeto())        {passLoose= false; }
-			else passLoose=true;
-		      }
-		      
-		      //Endcap
-		      else{
-			if(_iel->full5x5_sigmaIetaIeta() >= 0.0301)  {passLoose= false; }
-			else if(fabs(_iel->deltaEtaSuperClusterTrackAtVtx()) >= 0.00814)    {passLoose= false; }
-			else if(fabs(_iel->deltaPhiSuperClusterTrackAtVtx()) >= 0.182)    {passLoose= false; }
-			else if(_iel->hcalOverEcal() >= 0.0897)        {passLoose= false; }
-			else if(relIso >= 0.121)        {passLoose= false; }
-			else if(ooEmooP >= 0.126) {passLoose= false; }
-			else if(fabs(d0) >= 0.118)       {passLoose= false; }
-			else if(fabs(dZ) >= 0.822)      {passLoose= false; }
-			else if(_iel->gsfTrack()->hitPattern().numberOfHits(reco::HitPattern::MISSING_INNER_HITS) > 1)              {passLoose= false; }
-			else if(_iel->isGsfCtfScPixChargeConsistent() < 1)  {passLoose= false; }
-			else if(!_iel->passConversionVeto())        {passLoose= false; }
-			else passLoose=true;
-		      }
-		    }
-                    else{//not mc, implement 50ns data cut
-		      //Barrel
-		      if(fabs(_iel->ecalDrivenMomentum().eta()) <= 1.479){
-			if(_iel->full5x5_sigmaIetaIeta() >= 0.0105) {passLoose= false; }
-			else if(fabs(_iel->deltaEtaSuperClusterTrackAtVtx()) >= 0.00976)    {passLoose= false; }
-			else if(fabs(_iel->deltaPhiSuperClusterTrackAtVtx()) >= 0.0929)    {passLoose= false; }
-			else if(_iel->hcalOverEcal() >= 0.0765)         {passLoose= false; }
-			else if(relIso >= 0.118)          {passLoose= false; }
-			else if(ooEmooP >= 0.184) {passLoose= false; }
-			else if(fabs(d0) >= 0.0227)      {passLoose= false; }
-			else if(fabs(dZ) >= 0.379)     {passLoose= false; }
-			else if(_iel->gsfTrack()->hitPattern().numberOfHits(reco::HitPattern::MISSING_INNER_HITS) > 2)              {passLoose= false; }
-			else if(_iel->isGsfCtfScPixChargeConsistent() < 1)  {passLoose= false; }
-			else if(!_iel->passConversionVeto())        {passLoose= false; }
-			else passLoose=true;
-		      }
-		      
-		      //Endcap
-		      else{
-			if(_iel->full5x5_sigmaIetaIeta() >= 0.0318)  {passLoose= false; }
-			else if(fabs(_iel->deltaEtaSuperClusterTrackAtVtx()) >= 0.00952)    {passLoose= false; }
-			else if(fabs(_iel->deltaPhiSuperClusterTrackAtVtx()) >= 0.181)    {passLoose= false; }
-			else if(_iel->hcalOverEcal() >= 0.0824)        {passLoose= false; }
-			else if(relIso >= 0.118)        {passLoose= false; }
-			else if(ooEmooP >= 0.125) {passLoose= false; }
-			else if(fabs(d0) >= 0.242)       {passLoose= false; }
-			else if(fabs(dZ) >= 0.921)      {passLoose= false; }
-			else if(_iel->gsfTrack()->hitPattern().numberOfHits(reco::HitPattern::MISSING_INNER_HITS) > 1)              {passLoose= false; }
-			else if(_iel->isGsfCtfScPixChargeConsistent() < 1)  {passLoose= false; }
-			else if(!_iel->passConversionVeto())        {passLoose= false; }
-			else passLoose=true;
-		      }
-		    }
-                    // electron Et cut
-                    if (_iel->pt()>mdPar["electron_minpt"]){ }
-                    else break;
-                    
-                    // electron eta cut
-                    if ( fabs(_iel->eta())<mdPar["electron_maxeta"] ){ }
-                    else break;
-                    
-                    pass = true;
-                    break;
-                }
-		//store loose electron for lepton-jet cleaning
-		if(passLoose){
-		  electronsForCleaning.push_back(*_iel);
+            
+	  //get electrons
+	  event.getByLabel( mtPar["electron_collection"], mhElectrons );
+          
+	  mvSelElectrons.clear();
+          
+	  for ( std::vector<pat::Electron>::const_iterator _iel = mhElectrons->begin(); _iel != mhElectrons->end(); _iel++){
+	    
+	    bool pass = false;
+	    bool passLoose=false;
+	    while(1){
+	      if (not _iel->gsfTrack().isNonnull() or not _iel->gsfTrack().isAvailable()) break;
+	      //skip if in barrel-endcap gap; doing it here means I never have to worry about it downstream since both electrons for analysis and those for cleaning are made here
+	      if (_iel->isEBEEGap()) break;
+	      //get effective area to do pu correction for iso
+	      double AEff;
+	      if( fabs(_iel->ecalDrivenMomentum().eta())<1.0) AEff=0.1752;
+	      else if(fabs(_iel->ecalDrivenMomentum().eta())<1.479) AEff=0.1862;
+	      else if(fabs(_iel->ecalDrivenMomentum().eta())<2.0) AEff=0.1411;
+	      else if(fabs(_iel->ecalDrivenMomentum().eta())<2.2) AEff=0.1534;
+	      else if(fabs(_iel->ecalDrivenMomentum().eta())<2.3) AEff=0.1903;
+	      else if(fabs(_iel->ecalDrivenMomentum().eta())<2.4) AEff=0.2243;
+	      else if(fabs(_iel->ecalDrivenMomentum().eta())<2.5) AEff=0.2687;
+	      
+	      //calculate relIso
+	      reco::GsfElectron::PflowIsolationVariables pfIso = _iel->pfIsolationVariables();
+	      double chIso = pfIso.sumChargedHadronPt;
+	      double nhIso = pfIso.sumNeutralHadronEt;
+	      double phIso = pfIso.sumPhotonEt;
+	      double PUIso = pfIso.sumPUPt;
+	      double relIso = ( chIso + max(0.0, nhIso + phIso - rhoIso*AEff) ) / _iel->pt();
+	      
+	      //get d0 and dZ
+	      double d0=_iel->dB();
+	      double dZ;
+	      if(goodPVs.size() > 0){
+		dZ=_iel->gsfTrack()->dz(goodPVs.at(0).position());
+	      } 
+	      else {dZ=-999;}
+	      //get 1/e -1/1p
+	      float ooEmooP = 1.0/_iel->ecalEnergy() - _iel->eSuperClusterOverP()/_iel->ecalEnergy();
+	      
+	      //check to see if it passes loose id for lepton jet cleaning, unfortunately one ID for mc, one for data
+	      if(mbPar["isMc"]){
+		//Barrel
+		if(fabs(_iel->ecalDrivenMomentum().eta()) <= 1.479){
+		  if(_iel->full5x5_sigmaIetaIeta() >= 0.0103) {passLoose= false; }
+		  else if(fabs(_iel->deltaEtaSuperClusterTrackAtVtx()) >= 0.0105)    {passLoose= false; }
+		  else if(fabs(_iel->deltaPhiSuperClusterTrackAtVtx()) >= 0.115)    {passLoose= false; }
+		  else if(_iel->hcalOverEcal() >= 0.104)         {passLoose= false; }
+		  else if(relIso >= 0.0893)          {passLoose= false; }
+		  else if(ooEmooP >= 0.102) {passLoose= false; }
+		  else if(fabs(d0) >= 0.0261)      {passLoose= false; }
+		  else if(fabs(dZ) >= 0.41)     {passLoose= false; }
+		  else if(_iel->gsfTrack()->hitPattern().numberOfHits(reco::HitPattern::MISSING_INNER_HITS) > 2)              {passLoose= false; }
+		  else if(_iel->isGsfCtfScPixChargeConsistent() < 1)  {passLoose= false; }
+		  else if(!_iel->passConversionVeto())        {passLoose= false; }
+		  else passLoose=true;
 		}
-                
-                if ( pass ){
-                    ++nSelElectrons;
-                    
-                    // save every good electron
-                    mvSelElectrons.push_back( edm::Ptr<pat::Electron>( mhElectrons, _n_electrons) );
-
-                }
-                _n_electrons++;
-            } // end of the electron loop
+		
+		//Endcap
+		else{
+		  if(_iel->full5x5_sigmaIetaIeta() >= 0.0301)  {passLoose= false; }
+		  else if(fabs(_iel->deltaEtaSuperClusterTrackAtVtx()) >= 0.00814)    {passLoose= false; }
+		  else if(fabs(_iel->deltaPhiSuperClusterTrackAtVtx()) >= 0.182)    {passLoose= false; }
+		  else if(_iel->hcalOverEcal() >= 0.0897)        {passLoose= false; }
+		  else if(relIso >= 0.121)        {passLoose= false; }
+		  else if(ooEmooP >= 0.126) {passLoose= false; }
+		  else if(fabs(d0) >= 0.118)       {passLoose= false; }
+		  else if(fabs(dZ) >= 0.822)      {passLoose= false; }
+		  else if(_iel->gsfTrack()->hitPattern().numberOfHits(reco::HitPattern::MISSING_INNER_HITS) > 1)              {passLoose= false; }
+		  else if(_iel->isGsfCtfScPixChargeConsistent() < 1)  {passLoose= false; }
+		  else if(!_iel->passConversionVeto())        {passLoose= false; }
+		  else passLoose=true;
+		}
+	      }
+	      else{//not mc, implement 50ns data cut
+		//Barrel
+		if(fabs(_iel->ecalDrivenMomentum().eta()) <= 1.479){
+		  if(_iel->full5x5_sigmaIetaIeta() >= 0.0105) {passLoose= false; }
+		  else if(fabs(_iel->deltaEtaSuperClusterTrackAtVtx()) >= 0.00976)    {passLoose= false; }
+		  else if(fabs(_iel->deltaPhiSuperClusterTrackAtVtx()) >= 0.0929)    {passLoose= false; }
+		  else if(_iel->hcalOverEcal() >= 0.0765)         {passLoose= false; }
+		  else if(relIso >= 0.118)          {passLoose= false; }
+		  else if(ooEmooP >= 0.184) {passLoose= false; }
+		  else if(fabs(d0) >= 0.0227)      {passLoose= false; }
+		  else if(fabs(dZ) >= 0.379)     {passLoose= false; }
+		  else if(_iel->gsfTrack()->hitPattern().numberOfHits(reco::HitPattern::MISSING_INNER_HITS) > 2)              {passLoose= false; }
+		  else if(_iel->isGsfCtfScPixChargeConsistent() < 1)  {passLoose= false; }
+		  else if(!_iel->passConversionVeto())        {passLoose= false; }
+		  else passLoose=true;
+		}
+		
+		//Endcap
+		else{
+		  if(_iel->full5x5_sigmaIetaIeta() >= 0.0318)  {passLoose= false; }
+		  else if(fabs(_iel->deltaEtaSuperClusterTrackAtVtx()) >= 0.00952)    {passLoose= false; }
+		  else if(fabs(_iel->deltaPhiSuperClusterTrackAtVtx()) >= 0.181)    {passLoose= false; }
+		  else if(_iel->hcalOverEcal() >= 0.0824)        {passLoose= false; }
+		  else if(relIso >= 0.118)        {passLoose= false; }
+		  else if(ooEmooP >= 0.125) {passLoose= false; }
+		  else if(fabs(d0) >= 0.242)       {passLoose= false; }
+		  else if(fabs(dZ) >= 0.921)      {passLoose= false; }
+		  else if(_iel->gsfTrack()->hitPattern().numberOfHits(reco::HitPattern::MISSING_INNER_HITS) > 1)              {passLoose= false; }
+		  else if(_iel->isGsfCtfScPixChargeConsistent() < 1)  {passLoose= false; }
+		  else if(!_iel->passConversionVeto())        {passLoose= false; }
+		  else passLoose=true;
+		}
+	      }
+	      // electron Et cut
+	      if (_iel->pt()>mdPar["electron_minpt"]){ }
+	      else break;
+              
+	      // electron eta cut
+	      if ( fabs(_iel->eta())<mdPar["electron_maxeta"] ){ }
+	      else break;
+              
+	      pass = true;
+	      break;
+	    }
+	    //store loose electron for lepton-jet cleaning
+	    if(passLoose){
+	      electronsForCleaning.push_back(*_iel);
+	    }
             
-            if( nSelElectrons >= cut("Min electron", int()) || ignoreCut("Min electron") ) passCut(ret, "Min electron");
-            else break;
-            
-            if( nSelElectrons <= cut("Max electron", int()) || ignoreCut("Max electron") ) passCut(ret, "Max electron");
-            else break;
-            
+	    if ( pass ){
+	      ++nSelElectrons;              
+	      // save every good electron
+	      mvSelElectrons.push_back( edm::Ptr<pat::Electron>( mhElectrons, _n_electrons) );
+	      
+	    }
+	    _n_electrons++;
+	  } // end of the electron loop
+          
+	  if( nSelElectrons >= cut("Min electron", int()) || ignoreCut("Min electron") ) passCut(ret, "Min electron");
+	  else break;
+          
+	  if( nSelElectrons <= cut("Max electron", int()) || ignoreCut("Max electron") ) passCut(ret, "Max electron");
+	  else break;
+          
         } // end of electron cuts
         
         int nSelLeptons = nSelElectrons + nSelMuons;
@@ -664,6 +678,7 @@ bool DileptonEventSelector::operator()( edm::EventBase const & event, pat::strbi
         //
         
         int _n_good_jets = 0;
+	int _n_good_uncleaned_jets=0;
         int _n_jets = 0;
         //int njetsPF = 0;
         
@@ -682,7 +697,7 @@ bool DileptonEventSelector::operator()( edm::EventBase const & event, pat::strbi
 		//cut on corrected jet quantities
 		TLorentzVector corJetP4 = correctJet(*_ijet,event);
                 if (( corJetP4.Pt()>mdPar["jet_minpt"] ) && ( fabs(corJetP4.Eta())<mdPar["jet_maxeta"] )){ 
-                    ++_n_good_jets;
+                    ++_n_good_uncleaned_jets;
                     mvSelJets.push_back(edm::Ptr<pat::Jet>(mhJets, _n_jets)); 
                 }	       
             }
@@ -708,9 +723,14 @@ bool DileptonEventSelector::operator()( edm::EventBase const & event, pat::strbi
 		    std::cout << "Lepton : pT = " << mvSelMuons[ilep]->pt() << " eta = " << mvSelMuons[ilep]->eta() << " phi = " << mvSelMuons[ilep]->phi() << std::endl;
 		    std::cout << "      Raw Jet : pT = " << _ijet->pt() << " eta = " << _ijet->eta() << " phi = " << _ijet->phi() << std::endl;
 		  }
+		  //get the daughters of the muons
+		  std::vector<reco::CandidatePtr> muDaughters;
+		  for ( unsigned int isrc = 0; isrc < mvSelMuons[ilep]->numberOfSourceCandidatePtrs(); ++isrc ){
+		    if (mvSelMuons[ilep]->sourceCandidatePtr(isrc).isAvailable()) muDaughters.push_back( mvSelMuons[ilep]->sourceCandidatePtr(isrc) );
+		  }
 		  const std::vector<edm::Ptr<reco::Candidate> > _ijet_consts = _ijet->daughterPtrVector();
 		  for ( std::vector<edm::Ptr<reco::Candidate> >::const_iterator _i_const = _ijet_consts.begin(); _i_const != _ijet_consts.end(); ++_i_const){
-		    if ( (*_i_const).key() == mvSelMuons[ilep]->originalObjectRef().key() ) {
+		    /*if ( (*_i_const).key() == mvSelMuons[ilep]->originalObjectRef().key() ) {
 		      cleanedJet.setP4( _ijet->p4() - mvSelMuons[ilep]->p4() );
 		      //get the correction for the cleaned jet and apply it
 		      jetP4 = correctJet(cleanedJet, event);
@@ -720,6 +740,21 @@ bool DileptonEventSelector::operator()( edm::EventBase const & event, pat::strbi
 		      cleanedJet.setP4(rlv);
 		      if (mbPar["debug"]) std::cout << "Corrected Jet : pT = " << jetP4.Pt() << " eta = " << jetP4.Eta() << " phi = " << jetP4.Phi() << std::endl;
 		      _cleaned = true;
+		      }*/ //switching to new lep-jet cleaning from dylan
+		    for (unsigned int muI = 0; muI < muDaughters.size(); muI++) {
+		      if ( (*_i_const).key() == muDaughters[muI].key() ) {
+			cleanedJet.setP4( cleanedJet.p4() - muDaughters[muI]->p4() );
+			jetP4 = correctJet(cleanedJet, event);
+			//annoying thing to convert our tlorentzvector to root::math::lorentzvector
+			ROOT::Math::LorentzVector<ROOT::Math::PtEtaPhiM4D<double > > rlv;
+			rlv.SetXYZT(jetP4.X(),jetP4.Y(),jetP4.Z(),jetP4.T());
+			cleanedJet.setP4(rlv);
+			
+			if (mbPar["debug"]) std::cout << "Corrected Jet : pT = " << jetP4.Pt() << " eta = " << jetP4.Eta() << " phi = " << jetP4.Phi() << std::endl;
+			_cleaned = true;
+			muDaughters.erase( muDaughters.begin()+muI );
+			break;
+		      }
 		    }
 		  }
 		}
@@ -728,6 +763,11 @@ bool DileptonEventSelector::operator()( edm::EventBase const & event, pat::strbi
 	      //clean for electrons
 	      for (unsigned int ilep=0; ilep <electronsForCleaning.size();ilep++){
 		if ( deltaR(electronsForCleaning.at(ilep).p4(),_ijet->p4()) < 0.4 ){
+		  //get the daughters of the electron
+		  std::vector<reco::CandidatePtr> elDaughters;
+		  for ( unsigned int isrc = 0; isrc < electronsForCleaning.at(ilep).numberOfSourceCandidatePtrs(); ++isrc ){
+		    if (electronsForCleaning.at(ilep).sourceCandidatePtr(isrc).isAvailable()) elDaughters.push_back( electronsForCleaning.at(ilep).sourceCandidatePtr(isrc) );
+		  }
 		  if (mbPar["debug"]) {
 		    std::cout << "Jet Overlaps with the Electron... Cleaning jet..." << std::endl;
 		    std::cout << "Lepton : pT = " << electronsForCleaning.at(ilep).pt() << " eta = " << electronsForCleaning.at(ilep).eta() << " phi = " << electronsForCleaning.at(ilep).phi() << std::endl;
@@ -735,7 +775,7 @@ bool DileptonEventSelector::operator()( edm::EventBase const & event, pat::strbi
 		  }
 		  const std::vector<edm::Ptr<reco::Candidate> > _ijet_consts = _ijet->daughterPtrVector();
 		  for ( std::vector<edm::Ptr<reco::Candidate> >::const_iterator _i_const = _ijet_consts.begin(); _i_const != _ijet_consts.end(); ++_i_const){
-		    if ( (*_i_const).key() == electronsForCleaning.at(ilep).originalObjectRef().key() ) {
+		    /*if ( (*_i_const).key() == electronsForCleaning.at(ilep).originalObjectRef().key() ) {
 		      cleanedJet.setP4( _ijet->p4() - electronsForCleaning.at(ilep).p4() );
 		      //get the correct 4vector
 		      jetP4 = correctJet(cleanedJet, event);
@@ -745,6 +785,21 @@ bool DileptonEventSelector::operator()( edm::EventBase const & event, pat::strbi
 		      cleanedJet.setP4(rlv);
 		      if (mbPar["debug"]) std::cout << "Corrected Jet : pT = " << jetP4.Pt() << " eta = " << jetP4.Eta() << " phi = " << jetP4.Phi() << std::endl;
 		      _cleaned = true;
+		      }*/
+		    for (unsigned int elI = 0; elI < elDaughters.size(); elI++) {
+		      if ( (*_i_const).key() == elDaughters[elI].key() ) {
+			cleanedJet.setP4( _ijet->p4() - elDaughters[elI]->p4() );
+			//get the correct 4vector
+			jetP4 = correctJet(cleanedJet, event);
+			//annoying thing to convert our tlorentzvector to root::math::lorentzvector
+			ROOT::Math::LorentzVector<ROOT::Math::PtEtaPhiM4D<double > > rlv;
+			rlv.SetXYZT(jetP4.X(),jetP4.Y(),jetP4.Z(),jetP4.T());
+			cleanedJet.setP4(rlv);
+			if (mbPar["debug"]) std::cout << "Corrected Jet : pT = " << jetP4.Pt() << " eta = " << jetP4.Eta() << " phi = " << jetP4.Phi() << std::endl;
+			_cleaned = true;
+			elDaughters.erase( elDaughters.begin()+elI );
+			break;
+		      }
 		    }
 		  }
 		}

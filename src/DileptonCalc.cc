@@ -25,7 +25,7 @@
 #include "DataFormats/EgammaCandidates/interface/GsfElectron.h"
 #include "HLTrigger/HLTcore/interface/HLTConfigProvider.h"
 #include "SimDataFormats/GeneratorProducts/interface/GenEventInfoProduct.h"
-//#include "LJMet/Com/interface/VVString.h"
+#include "LJMet/Com/interface/MiniIsolation.h"
 
 using std::cout;
 using std::endl;
@@ -52,6 +52,7 @@ private:
     edm::InputTag             rhoSrc_it;
     edm::InputTag             pvCollection_it;
     edm::InputTag             genParticles_it;
+    edm::InputTag             packedPFCandsLabel_;
     edm::InputTag             triggerObjects_;
     edm::InputTag             triggerBits_;
     std::vector<unsigned int> keepPDGID;
@@ -89,6 +90,9 @@ int DileptonCalc::BeginJob()
     
     if (mPset.exists("genParticles")) genParticles_it = mPset.getParameter<edm::InputTag>("genParticles");
     else                              genParticles_it = edm::InputTag("prunedGenParticles");
+
+    if (mPset.exists("packedPFCands"))	packedPFCandsLabel_ = mPset.getParameter<edm::InputTag>("packedPFCands");
+    else                              	packedPFCandsLabel_ = edm::InputTag("packedPFCandidates");
 
     if (mPset.exists("keepPDGID"))    keepPDGID = mPset.getParameter<std::vector<unsigned int> >("keepPDGID");
     else                              keepPDGID.clear();
@@ -138,6 +142,7 @@ int DileptonCalc::BeginJob()
         std::exit(-1);
     }
     
+   
     return 0;
 }
 
@@ -292,6 +297,7 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
     
     //Quality criteria
     std::vector <double> elRelIso;
+    std::vector <double> elMiniIso;
     std::vector <double> elDxy;
     std::vector <int>    elNotConversion;
     std::vector <int>    elChargeConsistent;
@@ -309,6 +315,7 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
     std::vector <double> elOoemoop;
     std::vector <int>    elMHits;
     std::vector <int>    elVtxFitConv;
+    std::vector<double>  elMVA;
 
     //added CMSDAS variables
     std::vector <double> diElMass;
@@ -394,18 +401,20 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
 
 	//implement effective area: up-to-date as of PHYS14
 	double AEff;
-	if(fabs((*iel)->ecalDrivenMomentum().eta()) >2.2) AEff = 0.1530;
-	else if(fabs((*iel)->ecalDrivenMomentum().eta()) >2.0) AEff = 0.0842;
-	else if(fabs((*iel)->ecalDrivenMomentum().eta()) >1.3) AEff = 0.0572;
-	else if(fabs((*iel)->ecalDrivenMomentum().eta()) >0.8) AEff = 0.0988;
-	else if(fabs((*iel)->ecalDrivenMomentum().eta()) >0.0) AEff = 0.1013;
-
+	if( fabs((*iel)->ecalDrivenMomentum().eta())<1.0) AEff=0.1752;
+	else if(fabs((*iel)->ecalDrivenMomentum().eta())<1.479) AEff=0.1862;
+	else if(fabs((*iel)->ecalDrivenMomentum().eta())<2.0) AEff=0.1411;
+	else if(fabs((*iel)->ecalDrivenMomentum().eta())<2.2) AEff=0.1534;
+	else if(fabs((*iel)->ecalDrivenMomentum().eta())<2.3) AEff=0.1903;
+	else if(fabs((*iel)->ecalDrivenMomentum().eta())<2.4) AEff=0.2243;
+	else if(fabs((*iel)->ecalDrivenMomentum().eta())<2.5) AEff=0.2687;
+	
 	reco::GsfElectron::PflowIsolationVariables pfIso = (*iel)->pfIsolationVariables();
 	double chIso = pfIso.sumChargedHadronPt;
 	double nhIso = pfIso.sumNeutralHadronEt;
 	double phIso = pfIso.sumPhotonEt;
 	double PUIso = pfIso.sumPUPt;
-	double relIso = ( chIso + max(0.0, nhIso + phIso - PUIso*AEff) ) / (*iel)->pt();
+	double relIso = ( chIso + max(0.0, nhIso + phIso - rhoIso*AEff) ) / (*iel)->pt();
 	
 	elChIso  . push_back(chIso);
 	elNhIso  . push_back(nhIso);
@@ -448,7 +457,12 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
 	elOoemoop.push_back(1.0/(*iel)->ecalEnergy() - (*iel)->eSuperClusterOverP()/(*iel)->ecalEnergy());
 	elMHits.push_back((*iel)->gsfTrack()->hitPattern().numberOfHits(reco::HitPattern::MISSING_INNER_HITS));
 	elVtxFitConv.push_back((*iel)->passConversionVeto());
-        
+        //add mva
+	elMVA.push_back( selector->mvaValue( *(iel->get()), event) );
+	//add miniIso
+	edm::Handle<pat::PackedCandidateCollection> packedPFCands;
+	event.getByLabel(packedPFCandsLabel_, packedPFCands);
+	elMiniIso.push_back(getPFMiniIsolation(packedPFCands, dynamic_cast<const reco::Candidate *>(iel->get()), 0.05, 0.2, 10., false));
 	//Trigger Matching - store 4-vector and filter information for all trigger objects deltaR matched to electrons
 	/*if(doTriggerStudy_){
 	  
@@ -569,7 +583,8 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
     SetValue("elChargeConsistent", elChargeConsistent);
     SetValue("elIsEBEE", elIsEBEE);
     SetValue("elQuality", elQuality);
-    
+    SetValue("elMiniIso",elMiniIso);
+
     //ID cuts
     SetValue("elDeta", elDeta);
     SetValue("elDphi", elDphi);
@@ -580,7 +595,8 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
     SetValue("elOoemoop", elOoemoop);
     SetValue("elMHits", elMHits);
     SetValue("elVtxFitConv", elVtxFitConv);
-    
+    SetValue("elMVA",elMVA);
+
     //Extra info about isolation
     SetValue("elChIso" , elChIso);
     SetValue("elNhIso" , elNhIso);
@@ -627,6 +643,7 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
     std::vector <double> muDxy;
     std::vector <double> muDz;
     std::vector <double> muRelIso;
+    std::vector <double> muMiniIso;
     
     std::vector <int> muNValMuHits;
     std::vector <int> muNMatchedStations;
@@ -709,11 +726,16 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
             double puIso  = pfIsolationR04.sumPUPt;
             double relIso = (chIso + std::max(0.,nhIso + gIso - 0.5*puIso)) / (*imu)->pt();
             muRelIso . push_back(relIso);
-            
+
             muChIso . push_back(chIso);
             muNhIso . push_back(nhIso);
             muGIso  . push_back(gIso);
             muPuIso . push_back(puIso);
+
+            //get miniIso
+            edm::Handle<pat::PackedCandidateCollection> packedPFCands;
+            event.getByLabel(packedPFCandsLabel_, packedPFCands);
+	    muMiniIso.push_back(getPFMiniIsolation(packedPFCands, dynamic_cast<const reco::Candidate *>(imu->get()), 0.05, 0.2, 10., false));
             
             //IP: for some reason this is with respect to the first vertex in the collection
             if (goodPVs.size() > 0){
@@ -851,7 +873,8 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
     SetValue("muDxy"    , muDxy);
     SetValue("muDz"     , muDz);
     SetValue("muRelIso" , muRelIso);
-    
+    SetValue("muMiniIso", muMiniIso);
+
     SetValue("muNValMuHits"       , muNValMuHits);
     SetValue("muNMatchedStations" , muNMatchedStations);
     SetValue("muNValPixelHits"    , muNValPixelHits);
@@ -1228,7 +1251,7 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
         _met = pMet->p4().pt();
         _met_phi = pMet->p4().phi();
         
-        TLorentzVector corrMET = selector->correctMet(*pMet, event);
+        TLorentzVector corrMET = selector->correctMet(*pMet, event, vSelCleanedJets);
         if(corrMET.Pt()>0) {
             _corr_met = corrMET.Pt();
             _corr_met_phi = corrMET.Phi();
