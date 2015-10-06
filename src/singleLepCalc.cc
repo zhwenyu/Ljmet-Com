@@ -234,6 +234,7 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
     std::vector <double> muPuIso;
     //ID info
     std::vector <int> muIsTight;
+    std::vector <int> muIsMedium;
     std::vector<int> muIsLoose;
 
     //Generator level information -- MC matching
@@ -273,6 +274,7 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
             muEnergy . push_back((*imu)->energy());
 
             muIsTight.push_back((*imu)->isTightMuon(goodPVs.at(0)));
+            muIsMedium.push_back((*imu)->isMediumMuon());
             muIsLoose.push_back((*imu)->isLooseMuon());
 
             muGlobal.push_back(((*imu)->isGlobalMuon()<<2)+(*imu)->isTrackerMuon());
@@ -352,6 +354,7 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
     SetValue("muPhi"    , muPhi);
     SetValue("muEnergy" , muEnergy);
     SetValue("muIsTight", muIsTight);
+    SetValue("muIsMedium", muIsMedium);
     SetValue("muIsLoose",muIsLoose); 
     //Quality criteria
     SetValue("muChi2"   , muChi2);
@@ -470,11 +473,13 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
             //Isolation
             double scEta = (*iel)->superCluster()->eta();
             double AEff;
-            if(fabs(scEta) >2.2) AEff = 0.1530;
-            else if(fabs(scEta) >2.0) AEff = 0.0842;
-            else if(fabs(scEta) >1.3) AEff = 0.0572;
-            else if(fabs(scEta) >0.8) AEff = 0.0988;
-            else if(fabs(scEta) >0.0) AEff = 0.1013;
+            if(fabs(scEta) >2.4) AEff = 0.2687;
+            else if(fabs(scEta) >2.3) AEff = 0.2243;
+            else if(fabs(scEta) >2.2) AEff = 0.1903;
+            else if(fabs(scEta) >2.0) AEff = 0.1534;
+            else if(fabs(scEta) >1.479) AEff = 0.1411;
+            else if(fabs(scEta) >0.1) AEff = 0.1862;
+            else AEff = 0.1752;
   
             double chIso = ((*iel)->pfIsolationVariables()).sumChargedHadronPt;
             double nhIso = ((*iel)->pfIsolationVariables()).sumNeutralHadronEt;
@@ -627,7 +632,7 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
     std::vector<int> _muon_1_hltmatched;
 
     bool trigmatched;
-    if ( _nSelElectrons>0 ){
+    if ( elEta.size()>0 ){
         for (unsigned int iel = 0; iel < elTrigMatchFilters.size(); iel++) {
             trigmatched = false;
             for(pat::TriggerObjectStandAlone obj : *mhEdmTriggerObjectColl){       
@@ -647,7 +652,7 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
             if (!trigmatched) _electron_1_hltmatched.push_back(0);
         }
     }
-    if ( _nSelMuons>0 ){
+    if ( muEta.size()>0 ){
         for (unsigned int imu = 0; imu < muTrigMatchFilters.size(); imu++) {
             trigmatched = false;
             for(pat::TriggerObjectStandAlone obj : *mhEdmTriggerObjectColl){       
@@ -766,7 +771,7 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
     if(pMet.isNonnull() && pMet.isAvailable()) {
         _met = pMet->p4().pt();
         _met_phi = pMet->p4().phi();
-
+            
         TLorentzVector corrMET = selector->correctMet(*pMet, event);
         if(corrMET.Pt()>0) {
             _corr_met = corrMET.Pt();
