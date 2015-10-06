@@ -467,29 +467,48 @@ TLorentzVector BaseEventSelector::correctJet(const pat::Jet & jet, edm::EventBas
     }
     else if (!mbPar["isMc"]) {
       
-        if (mbPar["doNewJEC"]) {
-	
-            // We need to undo the default corrections and then apply the new ones
+      if (mbPar["doNewJEC"]) {
 
-            double pt_raw = jet.correctedJet(0).pt();
-            JetCorrector->setJetEta(jet.eta());
-            JetCorrector->setJetPt(pt_raw);
-            JetCorrector->setJetA(jet.jetArea());
-            JetCorrector->setRho(rho); 
+	double pt_raw = jet.correctedJet(0).pt();	
+	// We need to undo the default corrections and then apply the new ones
 	
-	    try{
-	        correction = JetCorrector->getCorrection();
-	    }
-	    catch(...){
-	        std::cout << mLegend << "WARNING! Exception thrown by JetCorrectionUncertainty!" << std::endl;
-	        std::cout << mLegend << "WARNING! Possibly, trying to correct a jet/MET outside correction range." << std::endl;
-	        std::cout << mLegend << "WARNING! Jet/MET will remain uncorrected." << std::endl;
-	    }
+	if (doAK8Corr){
+	  JetCorrectorAK8->setJetEta(jet.eta());
+	  JetCorrectorAK8->setJetPt(pt_raw);
+	  JetCorrectorAK8->setJetA(jet.jetArea());
+	  JetCorrectorAK8->setRho(rho); 
 	  
-            correctedJet.scaleEnergy(correction);
-            pt = correctedJet.pt();
-
-        }
+	  try{
+	    correction = JetCorrectorAK8->getCorrection();
+	  }
+	  catch(...){
+	    std::cout << mLegend << "WARNING! Exception thrown by JetCorrectionUncertainty!" << std::endl;
+	    std::cout << mLegend << "WARNING! Possibly, trying to correct a jet/MET outside correction range." << std::endl;
+	    std::cout << mLegend << "WARNING! Jet/MET will remain uncorrected." << std::endl;
+	  }
+	}
+	
+	else{
+	  double pt_raw = jet.correctedJet(0).pt();
+	  JetCorrector->setJetEta(jet.eta());
+	  JetCorrector->setJetPt(pt_raw);
+	  JetCorrector->setJetA(jet.jetArea());
+	  JetCorrector->setRho(rho); 
+	  
+	  try{
+	    correction = JetCorrector->getCorrection();
+	  }
+	  catch(...){
+	    std::cout << mLegend << "WARNING! Exception thrown by JetCorrectionUncertainty!" << std::endl;
+	    std::cout << mLegend << "WARNING! Possibly, trying to correct a jet/MET outside correction range." << std::endl;
+	    std::cout << mLegend << "WARNING! Jet/MET will remain uncorrected." << std::endl;
+	  }
+	  
+	}
+	correctedJet.scaleEnergy(correction);
+	pt = correctedJet.pt();
+	
+      }
     }
 
     TLorentzVector jetP4;
@@ -510,6 +529,189 @@ TLorentzVector BaseEventSelector::correctJet(const pat::Jet & jet, edm::EventBas
 
 
     return jetP4;
+}
+
+pat::Jet BaseEventSelector::correctJetReturnPatJet(const pat::Jet & jet, edm::EventBase const & event, bool doAK8Corr)
+{
+
+  // JES and JES systematics
+    pat::Jet correctedJet;
+    if (mbPar["doNewJEC"])
+        correctedJet = jet.correctedJet(0);                 //copy original jet
+    else
+        correctedJet = jet;                                 //copy default corrected jet
+
+    double ptscale = 1.0;
+    double unc = 1.0;
+    double pt = correctedJet.pt();
+    double correction = 1.0;
+
+    edm::Handle<double> rhoHandle;
+    edm::InputTag rhoSrc_("fixedGridRhoAll", "");
+    event.getByLabel(rhoSrc_, rhoHandle);
+    double rho = std::max(*(rhoHandle.product()), 0.0);
+
+    if ( mbPar["isMc"] ){ 
+
+    	if (mbPar["doNewJEC"]) {
+      	    // We need to undo the default corrections and then apply the new ones
+ 
+      	    double pt_raw = jet.correctedJet(0).pt();
+
+	    if (doAK8Corr){
+                JetCorrectorAK8->setJetEta(jet.eta());
+          	JetCorrectorAK8->setJetPt(pt_raw);
+                JetCorrectorAK8->setJetA(jet.jetArea());
+          	JetCorrectorAK8->setRho(rho); 
+    
+                try{
+    		    correction = JetCorrectorAK8->getCorrection();
+                }
+          	catch(...){
+    		    std::cout << mLegend << "WARNING! Exception thrown by JetCorrectionUncertainty!" << std::endl;
+    		    std::cout << mLegend << "WARNING! Possibly, trying to correct a jet/MET outside correction range." << std::endl;
+    		    std::cout << mLegend << "WARNING! Jet/MET will remain uncorrected." << std::endl;
+                }
+	    }
+
+	    else{
+                JetCorrector->setJetEta(jet.eta());
+          	JetCorrector->setJetPt(pt_raw);
+                JetCorrector->setJetA(jet.jetArea());
+          	JetCorrector->setRho(rho); 
+    
+                try{
+    		    correction = JetCorrector->getCorrection();
+                }
+          	catch(...){
+    		    std::cout << mLegend << "WARNING! Exception thrown by JetCorrectionUncertainty!" << std::endl;
+    		    std::cout << mLegend << "WARNING! Possibly, trying to correct a jet/MET outside correction range." << std::endl;
+    		    std::cout << mLegend << "WARNING! Jet/MET will remain uncorrected." << std::endl;
+                }
+	    }
+      
+            correctedJet.scaleEnergy(correction);
+            pt = correctedJet.pt();
+
+        }
+        double factor = 0.0; // For Nominal Case
+        double theAbsJetEta = fabs(jet.eta());
+        
+        if ( theAbsJetEta < 0.5 ) {
+            factor = .052;
+            if (mbPar["JERup"]) factor = 0.115;
+            if (mbPar["JERdown"]) factor = -0.011;
+        }
+        else if ( theAbsJetEta < 1.1) {
+            factor = 0.057;
+            if (mbPar["JERup"]) factor = 0.114;
+            if (mbPar["JERdown"]) factor = 0.0;
+        }
+        else if ( theAbsJetEta < 1.7) {
+            factor = 0.096;
+            if (mbPar["JERup"]) factor = 0.161;
+            if (mbPar["JERdown"]) factor = 0.031;
+        }
+        else if ( theAbsJetEta < 2.3) {
+            factor = 0.134;
+            if (mbPar["JERup"]) factor = 0.228;
+            if (mbPar["JERdown"]) factor = 0.040;
+            
+        }
+        else if (theAbsJetEta < 5.0) {
+            factor = 0.288;
+            if (mbPar["JERup"]) factor = 0.488;
+            if (mbPar["JERdown"]) factor = 0.088;
+        }
+
+        const reco::GenJet * genJet = jet.genJet();
+    	if (genJet && genJet->pt()>15. && (fabs(genJet->pt()/pt-1)<0.5)){
+      	    double gen_pt = genJet->pt();
+      	    double reco_pt = pt;
+            double deltapt = (reco_pt - gen_pt) * factor;
+            ptscale = max(0.0, (reco_pt + deltapt) / reco_pt);
+        }
+
+        if ( mbPar["JECup"] || mbPar["JECdown"]) {
+            jecUnc->setJetEta(jet.eta());
+            jecUnc->setJetPt(pt*ptscale);
+
+        if (mbPar["JECup"]) { 
+	    try{
+                unc = jecUnc->getUncertainty(true);
+	    }
+	    catch(...){ // catch all exceptions. Jet Uncertainty tool throws when binning out of range
+	        std::cout << mLegend << "WARNING! Exception thrown by JetCorrectionUncertainty!" << std::endl;
+                std::cout << mLegend << "WARNING! Possibly, trying to correct a jet/MET outside correction range." << std::endl;
+	        std::cout << mLegend << "WARNING! Jet/MET will remain uncorrected." << std::endl;
+	        unc = 0.0;
+	    }
+            unc = 1 + unc; 
+        }
+        else { 
+	    try{
+                unc = jecUnc->getUncertainty(false);
+	    }
+	    catch(...){
+	        std::cout << mLegend << "WARNING! Exception thrown by JetCorrectionUncertainty!" << std::endl;
+	        std::cout << mLegend << "WARNING! Possibly, trying to correct a jet/MET outside correction range." << std::endl;
+	        std::cout << mLegend << "WARNING! Jet/MET will remain uncorrected." << std::endl;
+	        unc = 0.0;
+	    }
+            unc = 1 - unc; 
+        }
+
+        if (pt*ptscale < 10.0 && mbPar["JECup"]) unc = 2.0;
+        if (pt*ptscale < 10.0 && mbPar["JECdown"]) unc = 0.01;
+
+        }
+    }
+    else if (!mbPar["isMc"]) {
+      
+        if (mbPar["doNewJEC"]) {
+
+	  double pt_raw = jet.correctedJet(0).pt();	
+            // We need to undo the default corrections and then apply the new ones
+
+	  if (doAK8Corr){
+	    JetCorrectorAK8->setJetEta(jet.eta());
+	    JetCorrectorAK8->setJetPt(pt_raw);
+	    JetCorrectorAK8->setJetA(jet.jetArea());
+	    JetCorrectorAK8->setRho(rho); 
+	    
+	    try{
+	      correction = JetCorrectorAK8->getCorrection();
+	    }
+	    catch(...){
+	      std::cout << mLegend << "WARNING! Exception thrown by JetCorrectionUncertainty!" << std::endl;
+	      std::cout << mLegend << "WARNING! Possibly, trying to correct a jet/MET outside correction range." << std::endl;
+	      std::cout << mLegend << "WARNING! Jet/MET will remain uncorrected." << std::endl;
+	    }
+	  }
+
+	  else{
+	    double pt_raw = jet.correctedJet(0).pt();
+            JetCorrector->setJetEta(jet.eta());
+            JetCorrector->setJetPt(pt_raw);
+            JetCorrector->setJetA(jet.jetArea());
+            JetCorrector->setRho(rho); 
+	    
+	    try{
+	      correction = JetCorrector->getCorrection();
+	    }
+	    catch(...){
+	      std::cout << mLegend << "WARNING! Exception thrown by JetCorrectionUncertainty!" << std::endl;
+	      std::cout << mLegend << "WARNING! Possibly, trying to correct a jet/MET outside correction range." << std::endl;
+	      std::cout << mLegend << "WARNING! Jet/MET will remain uncorrected." << std::endl;
+	    }
+	  }
+	  correctedJet.scaleEnergy(correction);
+	  pt = correctedJet.pt();
+
+        }
+    }
+
+    return correctedJet;
 }
 
 bool BaseEventSelector::isJetTagged(const pat::Jet & jet, edm::EventBase const & event, bool applySF)
