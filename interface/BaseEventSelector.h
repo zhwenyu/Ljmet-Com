@@ -100,6 +100,7 @@ public:
     
     bool isJetTagged(const pat::Jet &jet, edm::EventBase const & event, bool applySF = true);
     TLorentzVector correctJet(const pat::Jet & jet, edm::EventBase const & event, bool doAK8Corr = false);
+    pat::Jet correctJetReturnPatJet(const pat::Jet & jet, edm::EventBase const & event, bool doAK8Corr = false);
     TLorentzVector correctMet(const pat::MET & met, edm::EventBase const & event);
     TLorentzVector correctMet(const pat::MET & met, edm::EventBase const & event, std::vector<pat::Jet> jets);
     TLorentzVector correctMet(const pat::MET & met, edm::EventBase const & event, std::vector<edm::Ptr<pat::Jet> > jets);
@@ -126,6 +127,8 @@ protected:
     std::map<std::string, unsigned int> mvSelTriggersMu;
     std::map<std::string, unsigned int> mvSelMCTriggersEl;
     std::map<std::string, unsigned int> mvSelMCTriggersMu;
+    std::map<std::string, int> mvSelPrescalesEl;
+    std::map<std::string, int> mvSelPrescalesMu;
     std::vector<edm::Ptr<reco::Vertex>> mvSelPVs;
     double mTestValue;
     
