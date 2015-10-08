@@ -11,6 +11,7 @@
 #include "TLorentzVector.h"
 
 #include "LJMet/Com/interface/BaseCalc.h"
+#include "LJMet/Com/interface/BaseEventSelector.h"
 #include "LJMet/Com/interface/LjmetFactory.h"
 #include "LJMet/Com/interface/LjmetEventContent.h"
 #include "DataFormats/PatCandidates/interface/Jet.h"
@@ -19,6 +20,10 @@
 #include "DataFormats/PatCandidates/interface/PATObject.h"
 #include "DataFormats/BTauReco/interface/CATopJetTagInfo.h"
 #include "LJMet/Com/interface/HTTTopJetTagInfo.h"
+#include "CondFormats/JetMETObjects/interface/JetCorrectionUncertainty.h"
+#include "JetMETCorrections/Objects/interface/JetCorrector.h"
+#include "JetMETCorrections/Objects/interface/JetCorrectionsRecord.h"
+#include "CondFormats/JetMETObjects/interface/JetCorrectorParameters.h"
 
 using namespace std;
 
@@ -44,6 +49,8 @@ private:
   std::string tagInfo;
   double kappa;
   bool useHTT;
+  bool killHF;
+  bool doNewJEC;
 };
 
 static int reg = LjmetFactory::GetInstance()->Register(new JetSubCalc(), "JetSubCalc");
@@ -78,6 +85,12 @@ int JetSubCalc::BeginJob()
     if(mPset.exists("kappa")) kappa = mPset.getParameter<double>("kappa");
     else kappa = 0.5;
 
+    if(mPset.exists("killHF")) killHF = mPset.getParameter<bool>("killHF");
+    else killHF = false;
+
+    if(mPset.exists("doNewJEC")) killHF = mPset.getParameter<bool>("doNewJEC");
+    else doNewJEC = false;
+
     if(useHTT){
       cout << " JetSubCalc is using HTT -- have you installed HEPTopTagger v2?" << endl;
 
@@ -94,7 +107,7 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * s
 {
     // ----- Get AK4 jet objects from the selector -----
     // This is updated -- original version used all AK4 jets without selection 
-    std::vector<edm::Ptr<pat::Jet> >            const & theJets = selector->GetSelectedJets();
+    std::vector<edm::Ptr<pat::Jet>>             const & theJets = selector->GetSelectedJets();
     std::vector<std::pair<TLorentzVector,bool>> const & theCorrBtagJets = selector->GetCorrJetsWithBTags();
 
     // Old version
@@ -155,20 +168,26 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * s
     
     double theVtxMass, theVtxNtracks, theVtx3DVal, theVtx3DSig, thePileupJetId;
 
-    for (unsigned int ii = 0; ii < theCorrBtagJets.size(); ii++){
-      int index = ii;
-      
+    for (std::vector<edm::Ptr<pat::Jet>>::const_iterator ijet = theJets.begin(); ijet != theJets.end(); ijet++) {
+      int index = (int)(ijet-theJets.begin());
+
+      pat::Jet corrak4;
+      if(doNewJEC) corrak4 = selector->correctJetReturnPatJet(*ijet, event, false);
+      else corrak4 = *ijet;
+
+      if(killHF && fabs(corrak4.eta()) > 2.5) continue;
+
       theVtxNtracks  = -std::numeric_limits<double>::max();
-      theVtxNtracks  = (double)theJets[ii]->userFloat("vtxNtracks");
+      theVtxNtracks  = (double)corrak4.userFloat("vtxNtracks");
 				
       if (theVtxNtracks > 0) {
 	theVtxMass     = -std::numeric_limits<double>::max();
 	theVtx3DVal    = -std::numeric_limits<double>::max();
 	theVtx3DSig    = -std::numeric_limits<double>::max();
 	
-	theVtxMass     = (double)theJets[ii]->userFloat("vtxMass");
-	theVtx3DVal    = (double)theJets[ii]->userFloat("vtx3DVal");
-	theVtx3DSig    = (double)theJets[ii]->userFloat("vtx3DSig");
+	theVtxMass     = (double)corrak4.userFloat("vtxMass");
+	theVtx3DVal    = (double)corrak4.userFloat("vtx3DVal");
+	theVtx3DSig    = (double)corrak4.userFloat("vtx3DSig");
         
 	theJetVtxNtracks.push_back(theVtxNtracks);
 	theJetVtxMass.push_back(theVtxMass);
@@ -177,53 +196,54 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * s
       }
       
       thePileupJetId = -std::numeric_limits<double>::max();
-      thePileupJetId = (double)theJets[ii]->userFloat("pileupJetId:fullDiscriminant");
+      thePileupJetId = (double)corrak4.userFloat("pileupJetId:fullDiscriminant");
       theJetPileupJetId.push_back(thePileupJetId);
 
-      //Four vector
-      TLorentzVector lv = theCorrBtagJets[ii].first;
-
-      theJetPt     . push_back(lv.Pt());
-      theJetEta    . push_back(lv.Eta());
-      theJetPhi    . push_back(lv.Phi());
-      theJetEnergy . push_back(lv.Energy());
+      theJetPt     . push_back(corrak4.pt());
+      theJetEta    . push_back(corrak4.eta());
+      theJetPhi    . push_back(corrak4.phi());
+      theJetEnergy . push_back(corrak4.energy());
       
-      theJetCSV.push_back(theJets[ii]->bDiscriminator( bDiscriminant ));
-      theJetBTag.push_back(theCorrBtagJets[ii].second);
-      theJetFlav.push_back(abs(theJets[ii]->partonFlavour()));
+      theJetCSV.push_back(corrak4.bDiscriminator( bDiscriminant ));
+      theJetBTag.push_back(theCorrBtagJets[index].second);
+      theJetFlav.push_back(abs(corrak4.partonFlavour()));
 
-      theJetCEmEnergy.push_back(theJets[ii]->chargedEmEnergy());
-      theJetNEmEnergy.push_back(theJets[ii]->neutralEmEnergy());
-      theJetCEmEFrac.push_back(theJets[ii]->chargedEmEnergyFraction());
-      theJetNEmEFrac.push_back(theJets[ii]->neutralEmEnergyFraction());	    
+      theJetCEmEnergy.push_back(corrak4.chargedEmEnergy());
+      theJetNEmEnergy.push_back(corrak4.neutralEmEnergy());
+      theJetCEmEFrac.push_back(corrak4.chargedEmEnergyFraction());
+      theJetNEmEFrac.push_back(corrak4.neutralEmEnergyFraction());	    
 
-      theJetCHadEnergy.push_back(theJets[ii]->chargedHadronEnergy());
-      theJetNHadEnergy.push_back(theJets[ii]->neutralHadronEnergy());
-      theJetCHadEFrac.push_back(theJets[ii]->chargedHadronEnergyFraction());
-      theJetNHadEFrac.push_back(theJets[ii]->neutralHadronEnergyFraction());
+      theJetCHadEnergy.push_back(corrak4.chargedHadronEnergy());
+      theJetNHadEnergy.push_back(corrak4.neutralHadronEnergy());
+      theJetCHadEFrac.push_back(corrak4.chargedHadronEnergyFraction());
+      theJetNHadEFrac.push_back(corrak4.neutralHadronEnergyFraction());
       
       theJetIndex.push_back(index);
-      theJetnDaughters.push_back((int)theJets[ii]->numberOfDaughters());
+      theJetnDaughters.push_back((int)corrak4.numberOfDaughters());
  
       //HT
-      theJetHT += lv.Pt(); 
+      theJetHT += corrak4.pt(); 
     }
-
+    
     double leading_pt = -999.;
-    for (unsigned int ii = 0; ii < theCorrBtagJets.size(); ii++){
-        TLorentzVector lv = theCorrBtagJets[ii].first;
-        
-	if (lv.Pt() > leading_pt){leading_pt = lv.Pt();}
+    for (std::vector<edm::Ptr<pat::Jet>>::const_iterator ijet = theJets.begin(); ijet != theJets.end(); ijet++) { 
+      pat::Jet corrak4;
+      if(doNewJEC) corrak4 = selector->correctJetReturnPatJet(*ijet, event, false);
+      else corrak4 = *ijet;
+      if(killHF && fabs(corrak4.eta()) > 2.5) continue;
+      if (corrak4.pt() > leading_pt){leading_pt = corrak4.pt();}
     }
     double second_leading_pt =-999.;
-    for (unsigned int ii = 0; ii < theCorrBtagJets.size(); ii++){
-        TLorentzVector lv = theCorrBtagJets[ii].first;
-        
-        if(lv.Pt() > second_leading_pt && lv.Pt() < leading_pt){
-	  second_leading_pt = lv.Pt();
-        }
+    for (std::vector<edm::Ptr<pat::Jet>>::const_iterator ijet = theJets.begin(); ijet != theJets.end(); ijet++) { 
+      pat::Jet corrak4;
+      if(doNewJEC) corrak4 = selector->correctJetReturnPatJet(*ijet, event, false);
+      else corrak4 = *ijet;
+      if(killHF && fabs(corrak4.eta()) > 2.5) continue;
+      if(corrak4.pt() > second_leading_pt && corrak4.pt() < leading_pt){
+	second_leading_pt = corrak4.pt();
+      }
     }
-
+    
 
     SetValue("theJetPt",     theJetPt);
     SetValue("theJetEta",    theJetEta);
@@ -350,23 +370,35 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * s
 
     for (std::vector<pat::Jet>::const_iterator ijet = theAK8Jets->begin(); ijet != theAK8Jets->end(); ijet++) {
       int index = (int)(ijet-theAK8Jets->begin());
-      
+
+      pat::Jet corrak8;
+      if(doNewJEC) corrak8 = selector->correctJetReturnPatJet(*ijet, event, true);
+      else corrak8 = *ijet;
+
+      if(killHF && fabs(corrak8.eta()) > 2.1) continue;
+
+      theJetAK8Pt    .push_back(corrak8.pt());
+      theJetAK8Eta   .push_back(corrak8.eta());
+      theJetAK8Phi   .push_back(corrak8.phi());
+      theJetAK8Energy.push_back(corrak8.energy());
+      theJetAK8Mass  .push_back(corrak8.mass());
+
       thePrunedMass   = -std::numeric_limits<double>::max();
       theTrimmedMass  = -std::numeric_limits<double>::max();
       theFilteredMass = -std::numeric_limits<double>::max();
       theSoftDropMass = -std::numeric_limits<double>::max();
       
-      thePrunedMass   = (double)ijet->userFloat("ak8PFJetsCHSPrunedMass");
-      theTrimmedMass  = (double)ijet->userFloat("ak8PFJetsCHSTrimmedMass");
-      theFilteredMass = (double)ijet->userFloat("ak8PFJetsCHSFilteredMass");
-      theSoftDropMass = (double)ijet->userFloat("ak8PFJetsCHSSoftDropMass");
+      thePrunedMass   = (double)corrak8.userFloat("ak8PFJetsCHSPrunedMass");
+      theTrimmedMass  = (double)corrak8.userFloat("ak8PFJetsCHSTrimmedMass");
+      theFilteredMass = (double)corrak8.userFloat("ak8PFJetsCHSFilteredMass");
+      theSoftDropMass = (double)corrak8.userFloat("ak8PFJetsCHSSoftDropMass");
       
       theNjettinessTau1 = -std::numeric_limits<double>::max();
       theNjettinessTau2 = -std::numeric_limits<double>::max();
       theNjettinessTau3 = -std::numeric_limits<double>::max();
-      theNjettinessTau1 = (double)ijet->userFloat("NjettinessAK8:tau1");
-      theNjettinessTau2 = (double)ijet->userFloat("NjettinessAK8:tau2");
-      theNjettinessTau3 = (double)ijet->userFloat("NjettinessAK8:tau3");
+      theNjettinessTau1 = (double)corrak8.userFloat("NjettinessAK8:tau1");
+      theNjettinessTau2 = (double)corrak8.userFloat("NjettinessAK8:tau2");
+      theNjettinessTau3 = (double)corrak8.userFloat("NjettinessAK8:tau3");
 
       double theNjettinessTau21 = 99;
       double theNjettinessTau32 = 99;
@@ -378,31 +410,26 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * s
       if(theSoftDropMass<230 && theSoftDropMass>140 && theNjettinessTau32 <0.65) SoftDropTau32Tagged = true;
 
       bool SoftDropTau21Tagged = false;
-      if(ijet->pt() > 200 && theNjettinessTau21 < 0.65 && theSoftDropMass > 55 && theSoftDropMass < 95){
+      if(corrak8.pt() > 200 && theNjettinessTau21 < 0.65 && theSoftDropMass > 55 && theSoftDropMass < 95){
 	SoftDropTau21Tagged = true;
       }
       bool PruningTau21Tagged = false;
-      if(ijet->pt() > 200 && theNjettinessTau21 < 0.65 && thePrunedMass > 55 && thePrunedMass < 95){
+      if(corrak8.pt() > 200 && theNjettinessTau21 < 0.65 && thePrunedMass > 55 && thePrunedMass < 95){
 	PruningTau21Tagged = true;
       }
       
-      theJetAK8Pt    .push_back(ijet->pt());
-      theJetAK8Eta   .push_back(ijet->eta());
-      theJetAK8Phi   .push_back(ijet->phi());
-      theJetAK8Energy.push_back(ijet->energy());
-      theJetAK8CSV.push_back(ijet->bDiscriminator( bDiscriminant ));
+      theJetAK8CSV.push_back(corrak8.bDiscriminator( bDiscriminant ));
 
-      theJetAK8CEmEnergy.push_back(ijet->chargedEmEnergy());
-      theJetAK8NEmEnergy.push_back(ijet->neutralEmEnergy());
-      theJetAK8CEmEFrac.push_back(ijet->chargedEmEnergyFraction());
-      theJetAK8NEmEFrac.push_back(ijet->neutralEmEnergyFraction());	    
+      theJetAK8CEmEnergy.push_back(corrak8.chargedEmEnergy());
+      theJetAK8NEmEnergy.push_back(corrak8.neutralEmEnergy());
+      theJetAK8CEmEFrac.push_back(corrak8.chargedEmEnergyFraction());
+      theJetAK8NEmEFrac.push_back(corrak8.neutralEmEnergyFraction());	    
 
-      theJetAK8CHadEnergy.push_back(ijet->chargedHadronEnergy());
-      theJetAK8NHadEnergy.push_back(ijet->neutralHadronEnergy());
-      theJetAK8CHadEFrac.push_back(ijet->chargedHadronEnergyFraction());
-      theJetAK8NHadEFrac.push_back(ijet->neutralHadronEnergyFraction());
+      theJetAK8CHadEnergy.push_back(corrak8.chargedHadronEnergy());
+      theJetAK8NHadEnergy.push_back(corrak8.neutralHadronEnergy());
+      theJetAK8CHadEFrac.push_back(corrak8.chargedHadronEnergyFraction());
+      theJetAK8NHadEFrac.push_back(corrak8.neutralHadronEnergyFraction());
       
-      theJetAK8Mass.push_back(ijet->mass());
       theJetAK8PrunedMass  .push_back(thePrunedMass);
       theJetAK8TrimmedMass .push_back(theTrimmedMass);
       theJetAK8FilteredMass.push_back(theFilteredMass);
@@ -416,12 +443,12 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * s
       theJetAK8SoftDropTau21Tag.push_back(SoftDropTau21Tagged);
       theJetAK8PrunedTau21Tag.push_back(PruningTau21Tagged);
 
-      theJetAK8nDaughters.push_back((int)ijet->numberOfDaughters());
+      theJetAK8nDaughters.push_back((int)corrak8.numberOfDaughters());
       theJetAK8Index.push_back(index);
 
       //JetCharge calculation
 
-      reco::Jet::Constituents constituents = ijet->getJetConstituents();
+      reco::Jet::Constituents constituents = corrak8.getJetConstituents();
 
       double sumWeightedCharge = 0.0;
       int con_charge = 0;
@@ -436,13 +463,13 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * s
 	
       }
 
-      jetCharge  = 1.0/( pow( (ijet->pt()), kappa) ) * sumWeightedCharge;
+      jetCharge  = 1.0/( pow( (corrak8.pt()), kappa) ) * sumWeightedCharge;
 
       theJetAK8JetCharge.push_back(jetCharge);
 
       // CMSTopTagger information
       bool Run1CMStopTagged = false;
-      reco::CATopJetTagInfo const * jetInfo = dynamic_cast<reco::CATopJetTagInfo const *>( ijet->tagInfo( tagInfo ));
+      reco::CATopJetTagInfo const * jetInfo = dynamic_cast<reco::CATopJetTagInfo const *>( corrak8.tagInfo( tagInfo ));
       topMass   = -99.99;
       minMass   = -99.99;
       nSubJets  = -9;
@@ -467,9 +494,14 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * s
       nSDSubsCSVL = 0;
       nSDSubsCSVM = 0;
 
-      auto const & sdSubjets = ijet->subjets("SoftDrop");
+      auto const & sdSubjets = corrak8.subjets("SoftDrop");
       nSDSubJets = (int)sdSubjets.size();
       for ( auto const & it : sdSubjets ) {
+
+	pat::Jet corrsubjet;
+	if(doNewJEC) corrsubjet = selector->correctJetReturnPatJet(*it, event, false);	
+	else corrsubjet = *it;
+
 	SDsubjetPt        = -std::numeric_limits<double>::max();
 	SDsubjetEta       = -std::numeric_limits<double>::max();
 	SDsubjetPhi       = -std::numeric_limits<double>::max();
@@ -477,12 +509,12 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * s
 	SDsubjetBdisc     = -std::numeric_limits<double>::max();
 	SDdeltaRsubjetJet = std::numeric_limits<double>::max();
       
-	SDsubjetPt        = it->pt();
-	SDsubjetEta       = it->eta();
-	SDsubjetPhi       = it->phi();
-	SDsubjetMass      = it->mass();
-	SDsubjetBdisc     = it->bDiscriminator(bDiscriminant); 
-	SDdeltaRsubjetJet = deltaR(ijet->eta(), ijet->phi(), SDsubjetEta, SDsubjetPhi);
+	SDsubjetPt        = corrsubjet.pt();
+	SDsubjetEta       = corrsubjet.eta();
+	SDsubjetPhi       = corrsubjet.phi();
+	SDsubjetMass      = corrsubjet.mass();
+	SDsubjetBdisc     = corrsubjet.bDiscriminator(bDiscriminant); 
+	SDdeltaRsubjetJet = deltaR(corrak8.eta(), corrak8.phi(), SDsubjetEta, SDsubjetPhi);
 
 	if(SDsubjetBdisc > 0.605) nSDSubsCSVL++;
 	if(SDsubjetBdisc > 0.890) nSDSubsCSVM++;
@@ -506,9 +538,14 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * s
       nTopSubsCSVL  = 0;
       nTopSubsCSVM  = 0;
 
-      auto const & topSubjets = ijet->subjets("CMSTopTag");
+      auto const & topSubjets = corrak8.subjets("CMSTopTag");
       nTopSubJets = (int)topSubjets.size();
       for ( auto const & it : topSubjets ) {
+
+	pat::Jet corrsubjet;
+	if(doNewJEC) corrsubjet = selector->correctJetReturnPatJet(*it, event, false);	
+	else corrsubjet = *it;
+
 	CTTsubjetPt        = -std::numeric_limits<double>::max();
 	CTTsubjetEta       = -std::numeric_limits<double>::max();
 	CTTsubjetPhi       = -std::numeric_limits<double>::max();
@@ -516,12 +553,12 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * s
 	CTTsubjetBdisc     = -std::numeric_limits<double>::max();
 	CTTdeltaRsubjetJet = std::numeric_limits<double>::max();
 
-	CTTsubjetPt       = it->pt();
-	CTTsubjetEta      = it->eta();
-	CTTsubjetPhi      = it->phi();
-	CTTsubjetMass     = it->mass();
-	CTTsubjetBdisc    = it->bDiscriminator(bDiscriminant); 
-	CTTdeltaRsubjetJet = deltaR(ijet->eta(), ijet->phi(), CTTsubjetEta, CTTsubjetPhi);
+	CTTsubjetPt       = corrsubjet.pt();
+	CTTsubjetEta      = corrsubjet.eta();
+	CTTsubjetPhi      = corrsubjet.phi();
+	CTTsubjetMass     = corrsubjet.mass();
+	CTTsubjetBdisc    = corrsubjet.bDiscriminator(bDiscriminant); 
+	CTTdeltaRsubjetJet = deltaR(corrak8.eta(), corrak8.phi(), CTTsubjetEta, CTTsubjetPhi);
 
 	if(CTTsubjetBdisc > 0.605) nTopSubsCSVL++;
 	if(CTTsubjetBdisc > 0.890) nTopSubsCSVM++;
@@ -566,7 +603,6 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * s
     SetValue("theJetAK8NjettinessTau1", theJetAK8NjettinessTau1);
     SetValue("theJetAK8NjettinessTau2", theJetAK8NjettinessTau2);
     SetValue("theJetAK8NjettinessTau3", theJetAK8NjettinessTau3);
-
     SetValue("theJetAK8SoftDropTau32Tag", theJetAK8SoftDropTau32Tag);
     SetValue("theJetAK8SoftDropTau21Tag", theJetAK8SoftDropTau21Tag);
     SetValue("theJetAK8PrunedTau21Tag", theJetAK8PrunedTau21Tag);

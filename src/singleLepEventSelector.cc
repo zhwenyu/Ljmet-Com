@@ -630,7 +630,6 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
             } // end of EE Bad SC cuts
         }
 
-
         //======================================================
         //
         //_____ Muon cuts ________________________________
@@ -681,7 +680,7 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
 
                     if ( fabs(_imu->eta())<mdPar["muon_maxeta"] ){ }
                     else break;
-
+                    
                     pass = true; // success
                     break;
                 }
@@ -1084,7 +1083,8 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
             //if ( mpType1CorrMet.isNonnull() && mpType1CorrMet.isAvailable() ) {
             if ( mpMet.isNonnull() && mpMet.isAvailable() ) {
                 pat::MET const & met = mhMet->at(0);
-                if ( ignoreCut("Min MET") ||met.et()>cut("Min MET", double()) ) passCut(ret, "Min MET");
+                TLorentzVector corrMET = correctMet(met, event);
+                if ( ignoreCut("Min MET") || corrMET.Pt()>cut("Min MET", double()) ) passCut(ret, "Min MET");
                 else break;
             }
         } // end of MET cuts
