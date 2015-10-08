@@ -564,8 +564,8 @@ bool DileptonEventSelector::operator()( edm::EventBase const & event, pat::strbi
 	      //get 1/e -1/1p
 	      float ooEmooP = 1.0/_iel->ecalEnergy() - _iel->eSuperClusterOverP()/_iel->ecalEnergy();
 	      
-	      //check to see if it passes loose id for lepton jet cleaning, unfortunately one ID for mc, one for data
-	      if(mbPar["isMc"]){
+	      //check to see if it passes loose id for lepton jet cleaning, unfortunately one ID for mc, one for data - outdated now using 25ns datat so same ID
+	      //if(mbPar["isMc"]){
 		//Barrel
 		if(fabs(_iel->ecalDrivenMomentum().eta()) <= 1.479){
 		  if(_iel->full5x5_sigmaIetaIeta() >= 0.0103) {passLoose= false; }
@@ -597,8 +597,8 @@ bool DileptonEventSelector::operator()( edm::EventBase const & event, pat::strbi
 		  else if(!_iel->passConversionVeto())        {passLoose= false; }
 		  else passLoose=true;
 		}
-	      }
-	      else{//not mc, implement 50ns data cut
+		//}
+	      /* else{//not mc, implement 50ns data cut
 		//Barrel
 		if(fabs(_iel->ecalDrivenMomentum().eta()) <= 1.479){
 		  if(_iel->full5x5_sigmaIetaIeta() >= 0.0105) {passLoose= false; }
@@ -630,7 +630,7 @@ bool DileptonEventSelector::operator()( edm::EventBase const & event, pat::strbi
 		  else if(!_iel->passConversionVeto())        {passLoose= false; }
 		  else passLoose=true;
 		}
-	      }
+		}*/
 	      // electron Et cut
 	      if (_iel->pt()>mdPar["electron_minpt"]){ }
 	      else break;
