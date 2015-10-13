@@ -71,7 +71,8 @@ process.event_selector = cms.PSet(
     # PV cuts
     pv_cut         = cms.bool(True),
     hbhe_cut       = cms.bool(True),
-    hbhe_cut_value = cms.string('Run1'),
+    hbheiso_cut    = cms.bool(True),
+    hbhe_cut_value = cms.string('Run2Loose'),
     csc_cut        = cms.bool(True),
     eesc_cut       = cms.bool(True),
     flag_tag       = cms.InputTag('TriggerResults::PAT'),

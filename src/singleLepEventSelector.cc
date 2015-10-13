@@ -229,6 +229,7 @@ void singleLepEventSelector::BeginJob( std::map<std::string, edm::ParameterSet c
         mtPar["flag_tag"]                 = par[_key].getParameter<edm::InputTag>("flag_tag");
         mbPar["pv_cut"]                   = par[_key].getParameter<bool>         ("pv_cut");
         mbPar["hbhe_cut"]                 = par[_key].getParameter<bool>         ("hbhe_cut");
+        mbPar["hbheiso_cut"]              = par[_key].getParameter<bool>         ("hbheiso_cut");
         msPar["hbhe_cut_value"]           = par[_key].getParameter<std::string>  ("hbhe_cut_value");
         mbPar["csc_cut"]                  = par[_key].getParameter<bool>         ("csc_cut");
         mbPar["eesc_cut"]                 = par[_key].getParameter<bool>         ("eesc_cut");
@@ -317,6 +318,7 @@ void singleLepEventSelector::BeginJob( std::map<std::string, edm::ParameterSet c
     push_back("Trigger");
     push_back("Primary vertex");
     push_back("HBHE noise and scraping filter");
+    push_back("HBHE Iso noise filter");
     push_back("CSC Tight Halo filter");
     push_back("EE Bad SC filter");
     push_back("One jet or more");
@@ -344,6 +346,7 @@ void singleLepEventSelector::BeginJob( std::map<std::string, edm::ParameterSet c
     set("Trigger", mbPar["trigger_cut"]); 
     set("Primary vertex", mbPar["pv_cut"]);
     set("HBHE noise and scraping filter", mbPar["hbhe_cut"]); 
+    set("HBHE Iso noise filter", mbPar["hbheiso_cut"]); 
     set("CSC Tight Halo filter", mbPar["csc_cut"]); 
     set("EE Bad SC filter", mbPar["eesc_cut"]); 
  
@@ -532,7 +535,7 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
         //
         //_____ HBHE noise and scraping filter________________________
         //
-        if ( considerCut("HBHE noise and scraping filter") ) {
+        if ( considerCut("HBHE noise and scraping filter") || considerCut("HBHE Iso noise filter")) {
             
 	  //set cut value considered
 	  bool run1Cut=false;
@@ -564,6 +567,10 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
 	  int minZeros = 999999.;
 	  bool IgnoreTS4TS5ifJetInLowBVRegion = false;
 
+          int minNumIsolatedNoiseChannels = 10;
+          double minIsolatedNoiseSumE = 50.0;
+          double minIsolatedNoiseSumEt = 25.0;
+
 	  // get the Noise summary object
 	  edm::Handle<HcalNoiseSummary> summary_h;
 	  event.getByLabel(noiselabel, summary_h);
@@ -585,21 +592,29 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
 
 	  const bool failRun2Tight = failCommon || (summary.HasBadRBXRechitR45Tight() && !goodJetFoundInLowBVRegion);
 
+          if (considerCut("HBHE noise and scraping filter")) {
+  	    if(run1Cut){
+  	      if (!failRun1) passCut(ret, "HBHE noise and scraping filter"); // HBHE cuts total
+              else break;
+  	    }
+  	    else if(run2LooseCut){
+  	      if (!failRun2Loose) passCut(ret, "HBHE noise and scraping filter"); // HBHE cuts total
+              else break;
+  	    }
+  	    else if(run2TightCut){
+  	      if (!failRun2Tight) passCut(ret, "HBHE noise and scraping filter"); // HBHE cuts total
+              else break;
+  	    }
+  	    else {std::cout<<"No HBHE cut!"<<std::endl; passCut(ret, "HBHE noise and scraping filter");} // HBHE cuts total
+          }
+
 	  // Check isolation requirements
-	  //const bool failIsolation = summary.numIsolatedNoiseChannels() >= minNumIsolatedNoiseChannels || summary.isolatedNoiseSumE() >= minIsolatedNoiseSumE || summary.isolatedNoiseSumEt() >= minIsolatedNoiseSumEt;
-	  if(run1Cut){
-	    if (!failRun1) passCut(ret, "HBHE noise and scraping filter"); // HBHE cuts total
+	  const bool failIsolation = summary.numIsolatedNoiseChannels() >= minNumIsolatedNoiseChannels || summary.isolatedNoiseSumE() >= minIsolatedNoiseSumE || summary.isolatedNoiseSumEt() >= minIsolatedNoiseSumEt;
+          if (considerCut("HBHE Iso noise filter")) {
+	    if (!failIsolation) passCut(ret, "HBHE Iso noise filter"); // HBHE Iso cut
             else break;
-	  }
-	  else if(run2LooseCut){
-	    if (!failRun2Loose) passCut(ret, "HBHE noise and scraping filter"); // HBHE cuts total
-            else break;
-	  }
-	  else if(run2TightCut){
-	    if (!failRun2Tight) passCut(ret, "HBHE noise and scraping filter"); // HBHE cuts total
-            else break;
-	  }
-	  else {std::cout<<"No HBHE cut!"<<std::endl; passCut(ret, "HBHE noise and scraping filter");} // HBHE cuts total
+          }
+
         } // end of hbhe cuts
 
         if ( considerCut("CSC Tight Halo filter") || considerCut("EE Bad SC filter") ) {
