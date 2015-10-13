@@ -242,6 +242,7 @@ void singleLepEventSelector::BeginJob( std::map<std::string, edm::ParameterSet c
 
         mbPar["muon_cuts"]                 = par[_key].getParameter<bool>         ("muon_cuts");
         mbPar["muon_selector"]             = par[_key].getParameter<bool>         ("muon_selector");
+        mbPar["muon_selector_medium"]      = par[_key].getParameter<bool>         ("muon_selector_medium");
         mdPar["muon_reliso"]               = par[_key].getParameter<double>       ("muon_reliso");
         mdPar["muon_minpt"]                = par[_key].getParameter<double>       ("muon_minpt");
         mdPar["muon_maxeta"]               = par[_key].getParameter<double>       ("muon_maxeta");
@@ -659,7 +660,8 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
                         else break; // fail
 		    }
 		    else {
-                        if ( (*_imu).isTightMuon(*mvSelPVs[0]) ){ }
+                        if ( mbPar["muon_selector_medium"] && (*_imu).isMediumMuon() ){ }
+                        else if ( !mbPar["muon_selector_medium"] && (*_imu).isTightMuon(*mvSelPVs[0]) ){ }
 		        else break; // fail
 
                         double chIso = (*_imu).pfIsolationR04().sumChargedHadronPt;
