@@ -8,7 +8,7 @@ files_per_job = 1
 
 rel_base = os.environ['CMSSW_BASE']
 
-outdir = '/eos/uscms/store/user/lpctlbsm/clint/Spring15/25ns/FakeRate'
+outdir = '/eos/uscms/store/user/lpctlbsm/clint/Spring15/25ns/FakeRate/Oct08/'
 
 ### What is the name of your FWLite Analyzer
 FWLiteAnalyzer = 'ljmet'
@@ -41,14 +41,14 @@ prefix = []
 
 if DONOMINAL=='True':
     prefix.extend([
-#'QCD_HT100To200',
+'QCD_HT100To200',
 #'QCD_HT200To300',
 #'QCD_HT300To500',
 #'QCD_HT500To700',
 #'QCD_HT700To1000',
 #'QCD_HT1000To1500',
 #'QCD_HT1500To2000',
-'QCD_HT2000ToInf',
+#'QCD_HT2000ToInf',
     ])
 
 
@@ -66,14 +66,14 @@ for i in prefix:
 list = [] 
 
 listnom = [
-#'Samples_Spring15MC/QCD_HT100to200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v2.txt',
+'Samples_Spring15MC/QCD_HT100to200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v2.txt',
 #'Samples_Spring15MC/QCD_HT200to300_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v2.txt',
 #'Samples_Spring15MC/QCD_HT300to500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v2.txt',
 #'Samples_Spring15MC/QCD_HT500to700_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1.txt',
 #'Samples_Spring15MC/QCD_HT700to1000_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1.txt',
 #'Samples_Spring15MC/QCD_HT1000to1500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v2.txt',
 #'Samples_Spring15MC/QCD_HT1500to2000_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1.txt',
-'Samples_Spring15MC/QCD_HT2000toInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1.txt',
+#'Samples_Spring15MC/QCD_HT2000toInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1.txt',
     ]
 
 if DONOMINAL=='True':
