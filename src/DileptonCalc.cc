@@ -304,6 +304,9 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
     std::vector <int>    elIsEBEE;
     std::vector <int>    elQuality;
     std::vector <int>    elCharge;
+    std::vector <int>    elGsfCharge;
+    std::vector <int>    elCtfCharge;
+    std::vector <int>    elScPixCharge;
     
     //ID requirement
     std::vector <double> elDeta;
@@ -430,6 +433,11 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
 	double dist   = (*iel)->convDist();
 	double dcot   = (*iel)->convDcot();
 	int notConv   = nLostHits == 0 and (fabs(dist) > 0.02 or fabs(dcot) > 0.02);
+	//get three different charges
+	elGsfCharge.push_back( (*iel)->gsfTrack()->charge());
+	if( (*iel)->closestCtfTrackRef().isNonnull()) elCtfCharge.push_back((*iel)->closestCtfTrackRef()->charge());
+	else elCtfCharge.push_back(-999);
+	elScPixCharge.push_back((*iel)->scPixCharge());
 	elCharge.push_back((*iel)->charge());
 	elNotConversion . push_back(notConv);
         
@@ -575,6 +583,9 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
     SetValue("elCharge1", elCharge1);
     SetValue("elCharge2", elCharge2);
     
+    SetValue("elGsfCharge",elGsfCharge);
+    SetValue("elCtfCharge",elCtfCharge);
+    SetValue("elScPixCharge",elScPixCharge);
     SetValue("elCharge", elCharge);
     //Quality requirements
     SetValue("elRelIso" , elRelIso); //Isolation
