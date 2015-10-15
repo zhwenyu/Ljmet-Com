@@ -8,7 +8,7 @@ files_per_job = 1
 
 rel_base = os.environ['CMSSW_BASE']
 
-outdir = '/eos/uscms/store/user/lpctlbsm/clint/Run2015B/'
+outdir = '/eos/uscms/store/user/lpctlbsm/clint/Run2015B/Oct02/'
 
 ### What is the name of your FWLite Analyzer
 FWLiteAnalyzer = 'ljmet'
@@ -42,7 +42,7 @@ prefix = []
 if DONOMINAL=='True':
     prefix.extend([
             'DoubleMuon_Run2015B_PromptReco',
-#            'DoubleEG_Run2015B_PromptReco',
+            'DoubleEG_Run2015B_PromptReco',
             'MuonEG_Run2015B_PromptReco',            
 
     ])
@@ -63,7 +63,7 @@ list = []
 
 listnom = [
     'Samples_Run2015B/DoubleMuon_Run2015B_PromptReco.txt',
-#    'Samples_Run2015B/DoubleEG_Run2015B_PromptReco.txt',
+    'Samples_Run2015B/DoubleEG_Run2015B_PromptReco.txt',
     'Samples_Run2015B/MuonEG_Run2015B_PromptReco.txt',
     ]
 
