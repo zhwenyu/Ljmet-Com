@@ -8,7 +8,7 @@ files_per_job = 1
 
 rel_base = os.environ['CMSSW_BASE']
 
-outdir = '/eos/uscms/store/user/lpctlbsm/clint/Run2015B/Oct06/'
+outdir = '/eos/uscms/store/user/lpctlbsm/clint/Run2015D/Oct15/'
 
 ### What is the name of your FWLite Analyzer
 FWLiteAnalyzer = 'ljmet'
@@ -22,7 +22,7 @@ DOQCDMC = 'False'
 DOTTBARSYS = 'False'
 
 ### JSON file to use
-MYJSON = "'../data/json/Cert_246908-254349_13TeV_PromptReco_Collisions15_JSON.txt'"
+MYJSON = "'../data/json/Cert_246908-258159_13TeV_PromptReco_Collisions15_25ns_JSON_v3.txt'"
 
 ### Systematics flags
 BTAGUNCERTUP = 'False'
@@ -41,9 +41,12 @@ prefix = []
 
 if DONOMINAL=='True':
     prefix.extend([
-            'DoubleMuon_Run2015B_PromptReco',
-            'DoubleEG_Run2015B_PromptReco',
-            'MuonEG_Run2015B_PromptReco',            
+            'DoubleMuon_Run2015B_PromptReco_v3',
+            'DoubleEG_Run2015B_PromptReco_v3',
+            'MuonEG_Run2015B_PromptReco_v3',            
+            'DoubleMuon_Run2015B_PromptReco_v4',
+            'DoubleEG_Run2015B_PromptReco_v4',
+            'MuonEG_Run2015B_PromptReco_v4',            
 
     ])
 
@@ -62,9 +65,12 @@ for i in prefix:
 list = [] 
 
 listnom = [
-    'Samples_Run2015D/DoubleMuon_Run2015D_PromptReco.txt',
-    'Samples_Run2015D/DoubleEG_Run2015D_PromptReco.txt',
-    'Samples_Run2015D/MuonEG_Run2015D_PromptReco.txt',
+    'Samples_Run2015D/DoubleMuon_Run2015D_PromptReco_v3.txt',
+    'Samples_Run2015D/DoubleEG_Run2015D_PromptReco_v3.txt',
+    'Samples_Run2015D/MuonEG_Run2015D_PromptReco_v3.txt',
+    'Samples_Run2015D/DoubleMuon_Run2015D_PromptReco_v4.txt',
+    'Samples_Run2015D/DoubleEG_Run2015D_PromptReco_v4.txt',
+    'Samples_Run2015D/MuonEG_Run2015D_PromptReco_v4.txt',
     ]
 
 if DONOMINAL=='True':
