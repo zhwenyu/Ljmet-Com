@@ -8,7 +8,7 @@ files_per_job = 1
 
 rel_base = os.environ['CMSSW_BASE']
 
-outdir = '/eos/uscms/store/user/lpctlbsm/clint/Spring15/25ns/Oct06/'
+outdir = '/eos/uscms/store/user/lpctlbsm/clint/Run2015D/Oct15/'
 
 ### What is the name of your FWLite Analyzer
 FWLiteAnalyzer = 'ljmet'
@@ -22,7 +22,7 @@ DOQCDMC = 'False'
 DOTTBARSYS = 'False'
 
 ### JSON file to use
-MYJSON = "''"
+MYJSON = "'../data/json/Cert_246908-258159_13TeV_PromptReco_Collisions15_25ns_JSON_v3.txt'"
 
 ### Systematics flags
 BTAGUNCERTUP = 'False'
@@ -41,14 +41,13 @@ prefix = []
 
 if DONOMINAL=='True':
     prefix.extend([
-#            'DYJets',
-#            'TTJets',
-            'WJets',
-            'WZ',
-            'WZJets',
-            'ZZ',
-            'TTW',
-            'TTZ',
+            'DoubleMuon_Run2015B_PromptReco_v3',
+            'DoubleEG_Run2015B_PromptReco_v3',
+            'MuonEG_Run2015B_PromptReco_v3',            
+            'DoubleMuon_Run2015B_PromptReco_v4',
+            'DoubleEG_Run2015B_PromptReco_v4',
+            'MuonEG_Run2015B_PromptReco_v4',            
+
     ])
 
 
@@ -66,14 +65,12 @@ for i in prefix:
 list = [] 
 
 listnom = [
- #   'Samples_Spring15MC/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v3.txt',
- #   'Samples_Spring15MC/TTJets_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_RunIISpring15DR74_Asympt25ns_MCRUN2_74_V9-v1.txt',
-    'Samples_Spring15MC/WJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1.txt',
-    'Samples_Spring15MC/WZTo3LNu_TuneCUETP8M1_13TeV-powheg-pythia8_RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1.txt',
-    'Samples_Spring15MC/WZJets_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v2.txt',
-    'Samples_Spring15MC/ZZTo4L_13TeV_powheg_pythia8_RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1.txt',
-    'Samples_Spring15MC/TTWJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-madspin-pythia8_RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1.txt',
-    'Samples_Spring15MC/TTZToLLNuNu_M-10_TuneCUETP8M1_13TeV-amcatnlo-pythia8_RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1.txt',
+    'Samples_Run2015D/DoubleMuon_Run2015D_PromptReco_v3.txt',
+    'Samples_Run2015D/DoubleEG_Run2015D_PromptReco_v3.txt',
+    'Samples_Run2015D/MuonEG_Run2015D_PromptReco_v3.txt',
+    'Samples_Run2015D/DoubleMuon_Run2015D_PromptReco_v4.txt',
+    'Samples_Run2015D/DoubleEG_Run2015D_PromptReco_v4.txt',
+    'Samples_Run2015D/MuonEG_Run2015D_PromptReco_v4.txt',
     ]
 
 if DONOMINAL=='True':
@@ -110,7 +107,7 @@ for i in range(len(prefix)):
     nfiles = 1
 
         
-    FLAGTAG = 'TriggerResults::PAT'
+    FLAGTAG = 'TriggerResults::RECO'
     
     print 'CONDOR work dir: '+dir[i]
     #os.system('rm -rf '+dir[i])
@@ -129,7 +126,7 @@ for i in range(len(prefix)):
 
     while ( nfiles <= count ):    
 
-        py_templ_file = open(rel_base+"/src/LJMet/Com/condor/Dilepton_Spring15MC_25ns_python.templ")
+        py_templ_file = open(rel_base+"/src/LJMet/Com/condor/Dilepton_Data_Run2015D_python.templ")
         condor_templ_file = open(rel_base+"/src/LJMet/Com/condor/X53condor.templ")
         csh_templ_file    = open(rel_base+"/src/LJMet/Com/condor/X53csh.templ")
 

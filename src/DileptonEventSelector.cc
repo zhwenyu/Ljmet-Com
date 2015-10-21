@@ -149,7 +149,9 @@ void DileptonEventSelector::BeginJob( std::map<std::string, edm::ParameterSet co
         mbPar["pv_cut"]                   = par[_key].getParameter<bool>         ("pv_cut");
         mbPar["hbhe_cut"]                 = par[_key].getParameter<bool>         ("hbhe_cut");
         msPar["hbhe_cut_value"]           = par[_key].getParameter<std::string>  ("hbhe_cut_value");
+        mbPar["hbheiso_cut"]              = par[_key].getParameter<bool>         ("hbheiso_cut");
 	mbPar["cscHalo_cut"]              = par[_key].getParameter<bool>         ("cscHalo_cut");
+	mbPar["eesc_cut"]                 = par[_key].getParameter<bool>         ("eesc_cut");
 	mtPar["flag_tag"]                 = par[_key].getParameter<edm::InputTag>("flag_tag");
         mbPar["jet_cuts"]                 = par[_key].getParameter<bool>         ("jet_cuts");
         mdPar["jet_minpt"]                = par[_key].getParameter<double>       ("jet_minpt");
@@ -204,7 +206,9 @@ void DileptonEventSelector::BeginJob( std::map<std::string, edm::ParameterSet co
     push_back("Trigger");
     push_back("Primary vertex");
     push_back("HBHE noise and scraping filter");
+    push_back("HBHE Iso noise filter");
     push_back("CSC Tight Halo filter");
+    push_back("EE Bad SC filter");
     push_back("Min muon");
     push_back("Max muon");
     push_back("Min electron");
@@ -225,7 +229,9 @@ void DileptonEventSelector::BeginJob( std::map<std::string, edm::ParameterSet co
     set("Trigger", mbPar["trigger_cut"]);
     set("Primary vertex", mbPar["pv_cut"]);
     set("HBHE noise and scraping filter", mbPar["hbhe_cut"]);
+    set("HBHE Iso noise filter", mbPar["hbheiso_cut"]); 
     set("CSC Tight Halo filter", mbPar["cscHalo_cut"]);
+    set("EE Bad SC filter", mbPar["eesc_cut"]); 
 
     if (mbPar["muon_cuts"]){
         set("Min muon", miPar["min_muon"]);
@@ -362,7 +368,7 @@ bool DileptonEventSelector::operator()( edm::EventBase const & event, pat::strbi
         //
         //_____ HBHE noise and scraping filter________________________
         //
-        if ( considerCut("HBHE noise and scraping filter") ) {
+        if ( considerCut("HBHE noise and scraping filter") || considerCut("HBHE Iso noise filter") ) {
             
 	  //set cut value considered
 	  bool run1Cut=false;
@@ -393,6 +399,11 @@ bool DileptonEventSelector::operator()( edm::EventBase const & event, pat::strbi
 	  //int minZeros = 10;
 	  int minZeros = 999999.;
 	  bool IgnoreTS4TS5ifJetInLowBVRegion = false;
+
+	  //iso cuts
+          int minNumIsolatedNoiseChannels = 10;
+          double minIsolatedNoiseSumE = 50.0;
+          double minIsolatedNoiseSumEt = 25.0;
 
 	  // get the Noise summary object
 	  edm::Handle<HcalNoiseSummary> summary_h;
@@ -427,27 +438,49 @@ bool DileptonEventSelector::operator()( edm::EventBase const & event, pat::strbi
 	    if (!failRun2Tight) passCut(ret, "HBHE noise and scraping filter"); // HBHE cuts total
 	  }
 	  else {std::cout<<"No HBHE cut!"<<std::endl; passCut(ret, "HBHE noise and scraping filter");} // HBHE cuts total
+
+
+	  // Check isolation requirements
+	  const bool failIsolation = summary.numIsolatedNoiseChannels() >= minNumIsolatedNoiseChannels || summary.isolatedNoiseSumE() >= minIsolatedNoiseSumE || summary.isolatedNoiseSumEt() >= minIsolatedNoiseSumEt;
+          if (considerCut("HBHE Iso noise filter")) {
+	    if (!failIsolation) passCut(ret, "HBHE Iso noise filter"); // HBHE Iso cut
+            else break;
+          }
+
+
         } // end of hbhe cuts
 
-	//_________CSC Halo Filter_________
+	//_________CSC Halo Filter and EE Bad SuperCluster Filter_________
 
-	if ( considerCut("CSC Tight Halo filter") ) {
-	      
+        if ( considerCut("CSC Tight Halo filter") || considerCut("EE Bad SC filter") ) {
 	  edm::Handle<edm::TriggerResults > PatTriggerResults;
 	  event.getByLabel( mtPar["flag_tag"], PatTriggerResults );
 	  const edm::TriggerNames patTrigNames = event.triggerNames(*PatTriggerResults);
+	  if ( considerCut("CSC Tight Halo filter") ) {
+	        
+	    bool cscpass = false;
+    
+	    for (unsigned int i=0; i<PatTriggerResults->size(); i++){
+	      if (patTrigNames.triggerName(i) == "Flag_CSCTightHaloFilter") cscpass = PatTriggerResults->accept(patTrigNames.triggerIndex(patTrigNames.triggerName(i)));
+	    }
+    
+	    if (cscpass) passCut(ret, "CSC Tight Halo filter"); // CSC cut
+	    else break;
+	  } // end of CSC cuts
+    
+	  if ( considerCut("EE Bad SC filter") ) {
+	        
+	    bool eescpass = false;
+    
+	    for (unsigned int i=0; i<PatTriggerResults->size(); i++){
+	      if (patTrigNames.triggerName(i) == "Flag_eeBadScFilter") eescpass = PatTriggerResults->accept(patTrigNames.triggerIndex(patTrigNames.triggerName(i)));
+	    }
+    
+	    if (eescpass) passCut(ret, "EE Bad SC filter"); // EE Bad SC cut
+	    else break;
+	  } // end of EE Bad SC cuts
+        }
 
-	  bool cscpass = false;
-
-	  for (unsigned int i=0; i<PatTriggerResults->size(); i++){
-	    if (patTrigNames.triggerName(i) == "Flag_CSCTightHaloFilter") cscpass = PatTriggerResults->accept(patTrigNames.triggerIndex(patTrigNames.triggerName(i)));
-	  }
-
-	  if (cscpass) passCut(ret, "CSC Tight Halo filter"); // CSC cut
-        } // end of CSC cuts
-
-
-        
         //
         //_____ Muon cuts ________________________________
         //
@@ -564,8 +597,8 @@ bool DileptonEventSelector::operator()( edm::EventBase const & event, pat::strbi
 	      //get 1/e -1/1p
 	      float ooEmooP = 1.0/_iel->ecalEnergy() - _iel->eSuperClusterOverP()/_iel->ecalEnergy();
 	      
-	      //check to see if it passes loose id for lepton jet cleaning, unfortunately one ID for mc, one for data
-	      if(mbPar["isMc"]){
+	      //check to see if it passes loose id for lepton jet cleaning, unfortunately one ID for mc, one for data - outdated now using 25ns datat so same ID
+	      //if(mbPar["isMc"]){
 		//Barrel
 		if(fabs(_iel->ecalDrivenMomentum().eta()) <= 1.479){
 		  if(_iel->full5x5_sigmaIetaIeta() >= 0.0103) {passLoose= false; }
@@ -597,8 +630,8 @@ bool DileptonEventSelector::operator()( edm::EventBase const & event, pat::strbi
 		  else if(!_iel->passConversionVeto())        {passLoose= false; }
 		  else passLoose=true;
 		}
-	      }
-	      else{//not mc, implement 50ns data cut
+		//}
+	      /* else{//not mc, implement 50ns data cut
 		//Barrel
 		if(fabs(_iel->ecalDrivenMomentum().eta()) <= 1.479){
 		  if(_iel->full5x5_sigmaIetaIeta() >= 0.0105) {passLoose= false; }
@@ -630,7 +663,7 @@ bool DileptonEventSelector::operator()( edm::EventBase const & event, pat::strbi
 		  else if(!_iel->passConversionVeto())        {passLoose= false; }
 		  else passLoose=true;
 		}
-	      }
+		}*/
 	      // electron Et cut
 	      if (_iel->pt()>mdPar["electron_minpt"]){ }
 	      else break;
