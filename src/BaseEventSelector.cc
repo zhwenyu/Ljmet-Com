@@ -346,7 +346,7 @@ TLorentzVector BaseEventSelector::correctJet(const pat::Jet & jet, edm::EventBas
     double correction = 1.0;
 
     edm::Handle<double> rhoHandle;
-    edm::InputTag rhoSrc_("fixedGridRhoAll", "");
+    edm::InputTag rhoSrc_("fixedGridRhoFastjetAll", "");
     event.getByLabel(rhoSrc_, rhoHandle);
     double rho = std::max(*(rhoHandle.product()), 0.0);
 
@@ -394,7 +394,8 @@ TLorentzVector BaseEventSelector::correctJet(const pat::Jet & jet, edm::EventBas
 
         }
         double factor = 0.0; // For Nominal Case
-        double theAbsJetEta = fabs(jet.eta());
+        //double theAbsJetEta = fabs(jet.eta());
+        double theAbsJetEta = 9.; // for now, force no smearing (instead of using 2012 numbers)
         
         if ( theAbsJetEta < 0.5 ) {
             factor = .052;
@@ -489,7 +490,6 @@ TLorentzVector BaseEventSelector::correctJet(const pat::Jet & jet, edm::EventBas
 	}
 	
 	else{
-	  double pt_raw = jet.correctedJet(0).pt();
 	  JetCorrector->setJetEta(jet.eta());
 	  JetCorrector->setJetPt(pt_raw);
 	  JetCorrector->setJetA(jet.jetArea());
@@ -526,6 +526,8 @@ TLorentzVector BaseEventSelector::correctJet(const pat::Jet & jet, edm::EventBas
         SetHistValue("jes_correction", jetP4.Pt()/_orig_pt);
         ++mNCorrJets;
     }
+   // if (jetP4.Pt()>30.) std::cout<<"JEC Ratio (new/old) = "<<jetP4.Pt()/jet.pt()<<"     -->    corrected pT / eta = "<<jetP4.Pt()<<" / "<<jetP4.Eta()<<std::endl;
+
 
 
     return jetP4;
@@ -547,7 +549,7 @@ pat::Jet BaseEventSelector::correctJetReturnPatJet(const pat::Jet & jet, edm::Ev
     double correction = 1.0;
 
     edm::Handle<double> rhoHandle;
-    edm::InputTag rhoSrc_("fixedGridRhoAll", "");
+    edm::InputTag rhoSrc_("fixedGridRhoFastjetAll", "");
     event.getByLabel(rhoSrc_, rhoHandle);
     double rho = std::max(*(rhoHandle.product()), 0.0);
 
@@ -595,7 +597,8 @@ pat::Jet BaseEventSelector::correctJetReturnPatJet(const pat::Jet & jet, edm::Ev
 
         }
         double factor = 0.0; // For Nominal Case
-        double theAbsJetEta = fabs(jet.eta());
+        //double theAbsJetEta = fabs(jet.eta());
+        double theAbsJetEta = 9.; // for now, force no smearing (instead of using 2012 numbers)
         
         if ( theAbsJetEta < 0.5 ) {
             factor = .052;
@@ -690,7 +693,6 @@ pat::Jet BaseEventSelector::correctJetReturnPatJet(const pat::Jet & jet, edm::Ev
 	  }
 
 	  else{
-	    double pt_raw = jet.correctedJet(0).pt();
             JetCorrector->setJetEta(jet.eta());
             JetCorrector->setJetPt(pt_raw);
             JetCorrector->setJetA(jet.jetArea());
