@@ -8,7 +8,7 @@ files_per_job = 1
 
 rel_base = os.environ['CMSSW_BASE']
 
-outdir = '/eos/uscms/store/user/lpctlbsm/clint/Spring15/25ns/Oct06/'
+outdir = '/eos/uscms/store/user/lpctlbsm/clint/Spring15/25ns/Oct15v2/'
 
 ### What is the name of your FWLite Analyzer
 FWLiteAnalyzer = 'ljmet'
