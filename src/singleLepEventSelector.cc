@@ -933,7 +933,10 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
 	            if ( deltaR(mvSelMuons[0]->p4(),_ijet->p4()) < 0.8 ){
                         std::vector<reco::CandidatePtr> muDaughters;
                         for ( unsigned int isrc = 0; isrc < mvSelMuons[0]->numberOfSourceCandidatePtrs(); ++isrc ){
-                            if (mvSelMuons[0]->sourceCandidatePtr(isrc).isAvailable()) muDaughters.push_back( mvSelMuons[0]->sourceCandidatePtr(isrc) );
+                            if (mvSelMuons[0]->sourceCandidatePtr(isrc).isAvailable()) {
+                                muDaughters.push_back( mvSelMuons[0]->sourceCandidatePtr(isrc) );
+                                if (mbPar["debug"]) std::cout<<"Mu daughter ref = "<<mvSelMuons[0]->sourceCandidatePtr(isrc).key()<<std::endl;
+                            }
                         }
             	        if (mbPar["debug"]) {
 			    std::cout << "Jet Overlaps with the Muon... Cleaning jet..." << std::endl;
@@ -942,6 +945,7 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
 			}
 			const std::vector<edm::Ptr<reco::Candidate> > _ijet_consts = _ijet->daughterPtrVector();
         		for ( std::vector<edm::Ptr<reco::Candidate> >::const_iterator _i_const = _ijet_consts.begin(); _i_const != _ijet_consts.end(); ++_i_const){
+                            if (mbPar["debug"]) std::cout<<"Jet constituent ref = "<<(*_i_const).key()<<std::endl;
 			    /*if ( (*_i_const).key() == mvSelMuons[0]->originalObjectRef().key() ) {
 				tmpJet.setP4( _ijet->p4() - mvSelMuons[0]->p4() );
 				jetP4 = correctJet(tmpJet, event);
@@ -951,6 +955,8 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
                             for (unsigned int muI = 0; muI < muDaughters.size(); muI++) {
 			        if ( (*_i_const).key() == muDaughters[muI].key() ) {
 				    tmpJet.setP4( tmpJet.p4() - muDaughters[muI]->p4() );
+				    if (mbPar["debug"]) std::cout << "  Cleaned Jet : pT = " << tmpJet.pt() << " eta = " << tmpJet.eta() << " phi = " << tmpJet.phi() << std::endl;
+				    if (mbPar["debug"]) std::cout << "Clean Raw Jet : pT = " << tmpJet.correctedJet(0).pt() << " eta = " << tmpJet.correctedJet(0).eta() << " phi = " << tmpJet.correctedJet(0).phi() << std::endl;
 				    jetP4 = correctJet(tmpJet, event);
 				    if (mbPar["debug"]) std::cout << "Corrected Jet : pT = " << jetP4.Pt() << " eta = " << jetP4.Eta() << " phi = " << jetP4.Phi() << std::endl;
 			            _cleaned = true;
