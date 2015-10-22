@@ -229,6 +229,7 @@ void singleLepEventSelector::BeginJob( std::map<std::string, edm::ParameterSet c
         mtPar["flag_tag"]                 = par[_key].getParameter<edm::InputTag>("flag_tag");
         mbPar["pv_cut"]                   = par[_key].getParameter<bool>         ("pv_cut");
         mbPar["hbhe_cut"]                 = par[_key].getParameter<bool>         ("hbhe_cut");
+        mbPar["hbheiso_cut"]              = par[_key].getParameter<bool>         ("hbheiso_cut");
         msPar["hbhe_cut_value"]           = par[_key].getParameter<std::string>  ("hbhe_cut_value");
         mbPar["csc_cut"]                  = par[_key].getParameter<bool>         ("csc_cut");
         mbPar["eesc_cut"]                 = par[_key].getParameter<bool>         ("eesc_cut");
@@ -242,6 +243,7 @@ void singleLepEventSelector::BeginJob( std::map<std::string, edm::ParameterSet c
 
         mbPar["muon_cuts"]                 = par[_key].getParameter<bool>         ("muon_cuts");
         mbPar["muon_selector"]             = par[_key].getParameter<bool>         ("muon_selector");
+        mbPar["muon_selector_medium"]      = par[_key].getParameter<bool>         ("muon_selector_medium");
         mdPar["muon_reliso"]               = par[_key].getParameter<double>       ("muon_reliso");
         mdPar["muon_minpt"]                = par[_key].getParameter<double>       ("muon_minpt");
         mdPar["muon_maxeta"]               = par[_key].getParameter<double>       ("muon_maxeta");
@@ -316,6 +318,7 @@ void singleLepEventSelector::BeginJob( std::map<std::string, edm::ParameterSet c
     push_back("Trigger");
     push_back("Primary vertex");
     push_back("HBHE noise and scraping filter");
+    push_back("HBHE Iso noise filter");
     push_back("CSC Tight Halo filter");
     push_back("EE Bad SC filter");
     push_back("One jet or more");
@@ -343,6 +346,7 @@ void singleLepEventSelector::BeginJob( std::map<std::string, edm::ParameterSet c
     set("Trigger", mbPar["trigger_cut"]); 
     set("Primary vertex", mbPar["pv_cut"]);
     set("HBHE noise and scraping filter", mbPar["hbhe_cut"]); 
+    set("HBHE Iso noise filter", mbPar["hbheiso_cut"]); 
     set("CSC Tight Halo filter", mbPar["csc_cut"]); 
     set("EE Bad SC filter", mbPar["eesc_cut"]); 
  
@@ -531,7 +535,7 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
         //
         //_____ HBHE noise and scraping filter________________________
         //
-        if ( considerCut("HBHE noise and scraping filter") ) {
+        if ( considerCut("HBHE noise and scraping filter") || considerCut("HBHE Iso noise filter")) {
             
 	  //set cut value considered
 	  bool run1Cut=false;
@@ -563,6 +567,10 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
 	  int minZeros = 999999.;
 	  bool IgnoreTS4TS5ifJetInLowBVRegion = false;
 
+          int minNumIsolatedNoiseChannels = 10;
+          double minIsolatedNoiseSumE = 50.0;
+          double minIsolatedNoiseSumEt = 25.0;
+
 	  // get the Noise summary object
 	  edm::Handle<HcalNoiseSummary> summary_h;
 	  event.getByLabel(noiselabel, summary_h);
@@ -584,21 +592,29 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
 
 	  const bool failRun2Tight = failCommon || (summary.HasBadRBXRechitR45Tight() && !goodJetFoundInLowBVRegion);
 
+          if (considerCut("HBHE noise and scraping filter")) {
+  	    if(run1Cut){
+  	      if (!failRun1) passCut(ret, "HBHE noise and scraping filter"); // HBHE cuts total
+              else break;
+  	    }
+  	    else if(run2LooseCut){
+  	      if (!failRun2Loose) passCut(ret, "HBHE noise and scraping filter"); // HBHE cuts total
+              else break;
+  	    }
+  	    else if(run2TightCut){
+  	      if (!failRun2Tight) passCut(ret, "HBHE noise and scraping filter"); // HBHE cuts total
+              else break;
+  	    }
+  	    else {std::cout<<"No HBHE cut!"<<std::endl; passCut(ret, "HBHE noise and scraping filter");} // HBHE cuts total
+          }
+
 	  // Check isolation requirements
-	  //const bool failIsolation = summary.numIsolatedNoiseChannels() >= minNumIsolatedNoiseChannels || summary.isolatedNoiseSumE() >= minIsolatedNoiseSumE || summary.isolatedNoiseSumEt() >= minIsolatedNoiseSumEt;
-	  if(run1Cut){
-	    if (!failRun1) passCut(ret, "HBHE noise and scraping filter"); // HBHE cuts total
+	  const bool failIsolation = summary.numIsolatedNoiseChannels() >= minNumIsolatedNoiseChannels || summary.isolatedNoiseSumE() >= minIsolatedNoiseSumE || summary.isolatedNoiseSumEt() >= minIsolatedNoiseSumEt;
+          if (considerCut("HBHE Iso noise filter")) {
+	    if (!failIsolation) passCut(ret, "HBHE Iso noise filter"); // HBHE Iso cut
             else break;
-	  }
-	  else if(run2LooseCut){
-	    if (!failRun2Loose) passCut(ret, "HBHE noise and scraping filter"); // HBHE cuts total
-            else break;
-	  }
-	  else if(run2TightCut){
-	    if (!failRun2Tight) passCut(ret, "HBHE noise and scraping filter"); // HBHE cuts total
-            else break;
-	  }
-	  else {std::cout<<"No HBHE cut!"<<std::endl; passCut(ret, "HBHE noise and scraping filter");} // HBHE cuts total
+          }
+
         } // end of hbhe cuts
 
         if ( considerCut("CSC Tight Halo filter") || considerCut("EE Bad SC filter") ) {
@@ -630,7 +646,6 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
             } // end of EE Bad SC cuts
         }
 
-
         //======================================================
         //
         //_____ Muon cuts ________________________________
@@ -660,7 +675,8 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
                         else break; // fail
 		    }
 		    else {
-                        if ( (*_imu).isTightMuon(*mvSelPVs[0]) ){ }
+                        if ( mbPar["muon_selector_medium"] && (*_imu).isMediumMuon() ){ }
+                        else if ( !mbPar["muon_selector_medium"] && (*_imu).isTightMuon(*mvSelPVs[0]) ){ }
 		        else break; // fail
 
                         double chIso = (*_imu).pfIsolationR04().sumChargedHadronPt;
@@ -681,7 +697,7 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
 
                     if ( fabs(_imu->eta())<mdPar["muon_maxeta"] ){ }
                     else break;
-
+                    
                     pass = true; // success
                     break;
                 }
@@ -917,7 +933,10 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
 	            if ( deltaR(mvSelMuons[0]->p4(),_ijet->p4()) < 0.8 ){
                         std::vector<reco::CandidatePtr> muDaughters;
                         for ( unsigned int isrc = 0; isrc < mvSelMuons[0]->numberOfSourceCandidatePtrs(); ++isrc ){
-                            if (mvSelMuons[0]->sourceCandidatePtr(isrc).isAvailable()) muDaughters.push_back( mvSelMuons[0]->sourceCandidatePtr(isrc) );
+                            if (mvSelMuons[0]->sourceCandidatePtr(isrc).isAvailable()) {
+                                muDaughters.push_back( mvSelMuons[0]->sourceCandidatePtr(isrc) );
+                                if (mbPar["debug"]) std::cout<<"Mu daughter ref = "<<mvSelMuons[0]->sourceCandidatePtr(isrc).key()<<std::endl;
+                            }
                         }
             	        if (mbPar["debug"]) {
 			    std::cout << "Jet Overlaps with the Muon... Cleaning jet..." << std::endl;
@@ -926,6 +945,7 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
 			}
 			const std::vector<edm::Ptr<reco::Candidate> > _ijet_consts = _ijet->daughterPtrVector();
         		for ( std::vector<edm::Ptr<reco::Candidate> >::const_iterator _i_const = _ijet_consts.begin(); _i_const != _ijet_consts.end(); ++_i_const){
+                            if (mbPar["debug"]) std::cout<<"Jet constituent ref = "<<(*_i_const).key()<<std::endl;
 			    /*if ( (*_i_const).key() == mvSelMuons[0]->originalObjectRef().key() ) {
 				tmpJet.setP4( _ijet->p4() - mvSelMuons[0]->p4() );
 				jetP4 = correctJet(tmpJet, event);
@@ -935,6 +955,8 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
                             for (unsigned int muI = 0; muI < muDaughters.size(); muI++) {
 			        if ( (*_i_const).key() == muDaughters[muI].key() ) {
 				    tmpJet.setP4( tmpJet.p4() - muDaughters[muI]->p4() );
+				    if (mbPar["debug"]) std::cout << "  Cleaned Jet : pT = " << tmpJet.pt() << " eta = " << tmpJet.eta() << " phi = " << tmpJet.phi() << std::endl;
+				    if (mbPar["debug"]) std::cout << "Clean Raw Jet : pT = " << tmpJet.correctedJet(0).pt() << " eta = " << tmpJet.correctedJet(0).eta() << " phi = " << tmpJet.correctedJet(0).phi() << std::endl;
 				    jetP4 = correctJet(tmpJet, event);
 				    if (mbPar["debug"]) std::cout << "Corrected Jet : pT = " << jetP4.Pt() << " eta = " << jetP4.Eta() << " phi = " << jetP4.Phi() << std::endl;
 			            _cleaned = true;
@@ -1084,7 +1106,8 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
             //if ( mpType1CorrMet.isNonnull() && mpType1CorrMet.isAvailable() ) {
             if ( mpMet.isNonnull() && mpMet.isAvailable() ) {
                 pat::MET const & met = mhMet->at(0);
-                if ( ignoreCut("Min MET") ||met.et()>cut("Min MET", double()) ) passCut(ret, "Min MET");
+                TLorentzVector corrMET = correctMet(met, event);
+                if ( ignoreCut("Min MET") || corrMET.Pt()>cut("Min MET", double()) ) passCut(ret, "Min MET");
                 else break;
             }
         } // end of MET cuts
