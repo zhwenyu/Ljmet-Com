@@ -526,7 +526,7 @@ TLorentzVector BaseEventSelector::correctJet(const pat::Jet & jet, edm::EventBas
         SetHistValue("jes_correction", jetP4.Pt()/_orig_pt);
         ++mNCorrJets;
     }
-   // if (jetP4.Pt()>30.) std::cout<<"JEC Ratio (new/old) = "<<jetP4.Pt()/jet.pt()<<"     -->    corrected pT / eta = "<<jetP4.Pt()<<" / "<<jetP4.Eta()<<std::endl;
+    //if (jetP4.Pt()>30.) std::cout<<"JEC Ratio (new/old) = "<<jetP4.Pt()/jet.pt()<<"     -->    corrected pT / eta = "<<jetP4.Pt()<<" / "<<jetP4.Eta()<<std::endl;
 
 
 
