@@ -927,10 +927,10 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
 	    TLorentzVector jetP4;
 
 	    if ( mbPar["doLepJetCleaning"] ){
-	        pat::Jet tmpJet = *_ijet;
+	        pat::Jet tmpJet = _ijet->correctedJet(0);
 		if (mbPar["debug"]) std::cout << "Checking Overlap" << std::endl;
                 if (mvSelMuons.size()>0){
-	            if ( deltaR(mvSelMuons[0]->p4(),_ijet->p4()) < 0.8 ){
+	            if ( deltaR(mvSelMuons[0]->p4(),_ijet->p4()) < 0.6 ){
                         std::vector<reco::CandidatePtr> muDaughters;
                         for ( unsigned int isrc = 0; isrc < mvSelMuons[0]->numberOfSourceCandidatePtrs(); ++isrc ){
                             if (mvSelMuons[0]->sourceCandidatePtr(isrc).isAvailable()) {
@@ -951,7 +951,7 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
 				jetP4 = correctJet(tmpJet, event);
 				if (mbPar["debug"]) std::cout << "Corrected Jet : pT = " << jetP4.Pt() << " eta = " << jetP4.Eta() << " phi = " << jetP4.Phi() << std::endl;
 			        _cleaned = true;
-			    }*///old ref mathcing method, appears to be depreciated in CMSSW_7_4_X(?) 
+			    }*////old ref mathcing method, appears to be depreciated in CMSSW_7_4_X(?) 
                             for (unsigned int muI = 0; muI < muDaughters.size(); muI++) {
 			        if ( (*_i_const).key() == muDaughters[muI].key() ) {
 				    tmpJet.setP4( tmpJet.p4() - muDaughters[muI]->p4() );
@@ -966,15 +966,17 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
 			    }
 			}
 			// zprime method (gives same results as far as i can tell)
-			/*double muEchk = _ijet->energy()*_ijet->muonEnergyFraction()/mvSelMuons[0]->energy();
-			if ( !(muEchk < 0.9 || (muEchk > 1.1 && _ijet->muonMultiplicity()==1)) ) {
- 			    tmpJet.setP4( _ijet->p4()-mvSelMuons[0]->p4() );
-			    if (tmpJet.pt() > 5 && deltaR(_ijet->p4(),tmpJet.p4()) > 1.57) std::cout << "Lepton-Jet cleaning flipped direction, not cleaning!" << std::endl;
-			    else {
- 			        jetP4 = correctJet(tmpJet, event);
-			        if (mbPar["debug"]) std::cout << "Corrected Jet : pT = " << jetP4.Pt() << " eta = " << jetP4.Eta() << " phi = " << jetP4.Phi() << std::endl;
-			        _cleaned = true;
-			    }
+			/*if (_ijet->muonMultiplicity() > 0) {
+			    double muEchk = (_ijet->correctedJet(0).energy()*_ijet->muonEnergyFraction()-mvSelMuons[0]->energy())/mvSelMuons[0]->energy();
+			    if ( !(muEchk < -0.1 || (muEchk > 0.1 && _ijet->muonMultiplicity()==1)) ) {
+ 			        tmpJet.setP4( _ijet->correctedJet(0).p4()-mvSelMuons[0]->p4() );
+			        if (tmpJet.pt() > 5 && deltaR(_ijet->correctedJet(0).p4(),tmpJet.p4()) > 1.57) std::cout << "Lepton-Jet cleaning flipped direction, not cleaning!" << std::endl;
+			        else {
+ 			            jetP4 = correctJet(tmpJet, event);
+			            if (mbPar["debug"]) std::cout << "Corrected Jet : pT = " << jetP4.Pt() << " eta = " << jetP4.Eta() << " phi = " << jetP4.Phi() << std::endl;
+			            _cleaned = true;
+			        }
+                            }
                         }*/
 			//old deltaR matching method
 			/*for (unsigned int id = 0, nd = (*_ijet).numberOfDaughters(); id < nd; ++id) {
@@ -990,7 +992,7 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
             	}
             
                 if (mvSelElectrons.size()>0){
-	            if ( deltaR(mvSelElectrons[0]->p4(),_ijet->p4()) < 0.8 ){
+	            if ( deltaR(mvSelElectrons[0]->p4(),_ijet->p4()) < 0.6 ){
                         std::vector<reco::CandidatePtr> elDaughters;
                         for ( unsigned int isrc = 0; isrc < mvSelElectrons[0]->numberOfSourceCandidatePtrs(); ++isrc ){
                             if (mvSelElectrons[0]->sourceCandidatePtr(isrc).isAvailable()) elDaughters.push_back( mvSelElectrons[0]->sourceCandidatePtr(isrc) );
@@ -1013,6 +1015,18 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
 			        }
 			    }
 			}
+			/*if (_ijet->electronMultiplicity() > 0) {
+			    double elEchk = (_ijet->correctedJet(0).energy()*_ijet->chargedEmEnergyFraction()-mvSelElectrons[0]->energy())/mvSelElectrons[0]->energy();
+			    if ( !(elEchk < -0.1 || (elEchk > 0.1 && _ijet->electronMultiplicity()==1)) ) {
+ 			        tmpJet.setP4( _ijet->correctedJet(0).p4()-mvSelElectrons[0]->p4() );
+			        if (tmpJet.pt() > 5 && deltaR(_ijet->correctedJet(0).p4(),tmpJet.p4()) > 1.57) std::cout << "Lepton-Jet cleaning flipped direction, not cleaning!" << std::endl;
+			        else {
+ 			            jetP4 = correctJet(tmpJet, event);
+			            if (mbPar["debug"]) std::cout << "Corrected Jet : pT = " << jetP4.Pt() << " eta = " << jetP4.Eta() << " phi = " << jetP4.Phi() << std::endl;
+			            _cleaned = true;
+			        }
+                            }
+                        }*/
 		    }
             	}
 	    }
