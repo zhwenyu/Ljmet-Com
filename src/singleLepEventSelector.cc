@@ -1022,7 +1022,7 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
 			        }
 			    }
 			}
-			if (_ijet->electronMultiplicity() > 0) {
+			/*if (_ijet->electronMultiplicity() > 0) {
 			    double elEchk = (_ijet->correctedJet(0).energy()*_ijet->chargedEmEnergyFraction()-mvSelElectrons[0]->energy())/mvSelElectrons[0]->energy();
                             if (mbPar["debug"]) std::cout<<"Non-zero electron multiplicity in jet, jet_chEm_Energy = "<<_ijet->correctedJet(0).energy()*_ijet->chargedEmEnergyFraction()<<std::endl;
 			    if ( !(elEchk < -0.1 || (elEchk > 0.1 && _ijet->electronMultiplicity()==1)) ) {
@@ -1034,7 +1034,7 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
 			            //_cleaned = true;
 			        }
                             }
-                        }
+                        }*/
 		    }
             	}
 	    }
