@@ -155,7 +155,7 @@ void BaseEventSelector::BeginJob(std::map<std::string, edm::ParameterSet const >
     vector<JetCorrectorParameters> vPar;
     vector<JetCorrectorParameters> vParAK8;
 
-    if ( mbPar["isMc"] && mbPar["doNewJEC"] ) {
+    if ( mbPar["isMc"] ) {
         // Create the JetCorrectorParameter objects, the order does not matter.
 
         JetCorrectorParameters *L3JetPar  = new JetCorrectorParameters(msPar["MCL3JetPar"]);
@@ -175,9 +175,8 @@ void BaseEventSelector::BeginJob(std::map<std::string, edm::ParameterSet const >
     	vParAK8.push_back(*L2JetParAK8);
     	vParAK8.push_back(*L3JetParAK8);
 
-    	std::cout << mLegend << "Applying new jet energy corrections" << std::endl;
     }
-    else if ( !mbPar["isMc"] && mbPar["doNewJEC"] ) {
+    else if ( !mbPar["isMc"] ) {
         // Create the JetCorrectorParameter objects, the order does not matter.
 
         JetCorrectorParameters *ResJetPar = new JetCorrectorParameters(msPar["DataResJetPar"]); 
@@ -201,11 +200,10 @@ void BaseEventSelector::BeginJob(std::map<std::string, edm::ParameterSet const >
     	vParAK8.push_back(*L3JetParAK8);
     	vParAK8.push_back(*ResJetParAK8);
 
-    	std::cout << mLegend << "Applying new jet energy corrections" << std::endl;
     }
-    else{
-    	std::cout << mLegend << "NOT applying new jet energy corrections - ARE YOU SURE?" << std::endl;
-    }
+    if (mbPar["doNewJEC"]) std::cout << mLegend << "Applying new jet energy corrections" << std::endl;
+    else std::cout << mLegend << "NOT applying new jet energy corrections - ARE YOU SURE?" << std::endl;
+
     JetCorrector = new FactorizedJetCorrector(vPar);
     JetCorrectorAK8 = new FactorizedJetCorrector(vParAK8);
  
@@ -330,12 +328,12 @@ void BaseEventSelector::Init( void )
     mpEc->SetHistogram(mName, "nBtagSfCorrections", 100, 0.0, 10.0);
 }
 
-TLorentzVector BaseEventSelector::correctJet(const pat::Jet & jet, edm::EventBase const & event, bool doAK8Corr)
+TLorentzVector BaseEventSelector::correctJet(const pat::Jet & jet, edm::EventBase const & event, bool doAK8Corr, bool forceCorr)
 {
 
   // JES and JES systematics
     pat::Jet correctedJet;
-    if (mbPar["doNewJEC"])
+    if (mbPar["doNewJEC"] || forceCorr)
         correctedJet = jet.correctedJet(0);                 //copy original jet
     else
         correctedJet = jet;                                 //copy default corrected jet
@@ -352,7 +350,7 @@ TLorentzVector BaseEventSelector::correctJet(const pat::Jet & jet, edm::EventBas
 
     if ( mbPar["isMc"] ){ 
 
-    	if (mbPar["doNewJEC"]) {
+    	if (mbPar["doNewJEC"] || forceCorr) {
       	    // We need to undo the default corrections and then apply the new ones
 
       	    double pt_raw = jet.correctedJet(0).pt();
@@ -468,7 +466,7 @@ TLorentzVector BaseEventSelector::correctJet(const pat::Jet & jet, edm::EventBas
     }
     else if (!mbPar["isMc"]) {
       
-      if (mbPar["doNewJEC"]) {
+      if (mbPar["doNewJEC"] || forceCorr) {
 
 	double pt_raw = jet.correctedJet(0).pt();	
 	// We need to undo the default corrections and then apply the new ones
@@ -533,12 +531,12 @@ TLorentzVector BaseEventSelector::correctJet(const pat::Jet & jet, edm::EventBas
     return jetP4;
 }
 
-pat::Jet BaseEventSelector::correctJetReturnPatJet(const pat::Jet & jet, edm::EventBase const & event, bool doAK8Corr)
+pat::Jet BaseEventSelector::correctJetReturnPatJet(const pat::Jet & jet, edm::EventBase const & event, bool doAK8Corr, bool forceCorr)
 {
 
   // JES and JES systematics
     pat::Jet correctedJet;
-    if (mbPar["doNewJEC"])
+    if (mbPar["doNewJEC"] || forceCorr)
         correctedJet = jet.correctedJet(0);                 //copy original jet
     else
         correctedJet = jet;                                 //copy default corrected jet
@@ -555,7 +553,7 @@ pat::Jet BaseEventSelector::correctJetReturnPatJet(const pat::Jet & jet, edm::Ev
 
     if ( mbPar["isMc"] ){ 
 
-    	if (mbPar["doNewJEC"]) {
+    	if (mbPar["doNewJEC"] || forceCorr) {
       	    // We need to undo the default corrections and then apply the new ones
  
       	    double pt_raw = jet.correctedJet(0).pt();
@@ -671,7 +669,7 @@ pat::Jet BaseEventSelector::correctJetReturnPatJet(const pat::Jet & jet, edm::Ev
     }
     else if (!mbPar["isMc"]) {
       
-        if (mbPar["doNewJEC"]) {
+        if (mbPar["doNewJEC"] || forceCorr) {
 
 	  double pt_raw = jet.correctedJet(0).pt();	
             // We need to undo the default corrections and then apply the new ones
@@ -757,6 +755,7 @@ TLorentzVector BaseEventSelector::correctMet(const pat::MET & met, edm::EventBas
     
     for (std::vector<edm::Ptr<pat::Jet> >::const_iterator ijet = mvAllJets.begin();
          ijet != mvAllJets.end(); ++ijet) {
+        if ((**ijet).pt()<15) continue;
         TLorentzVector lv = correctJet(**ijet, event);
         correctedMET_px += (**ijet).px() -lv.Px();
         correctedMET_py += (**ijet).py() -lv.Py();
@@ -780,6 +779,7 @@ TLorentzVector BaseEventSelector::correctMet(const pat::MET & met, edm::EventBas
     
     for (std::vector<pat::Jet>::const_iterator ijet = jets.begin();
          ijet != jets.end(); ++ijet) {
+        if ((*ijet).pt()<15) continue;
         TLorentzVector lv = correctJet(*ijet, event);
         correctedMET_px += (*ijet).px() -lv.Px();
         correctedMET_py += (*ijet).py() -lv.Py();
