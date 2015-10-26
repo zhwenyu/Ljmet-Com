@@ -772,7 +772,8 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
         _met = pMet->p4().pt();
         _met_phi = pMet->p4().phi();
             
-        TLorentzVector corrMET = selector->correctMet(*pMet, event);
+        TLorentzVector corrMET = selector->correctMet(*pMet, event) + selector->GetCleanedCorrMet();
+        //std::cout<<(selector->GetCleanedCorrMet()).Pt()<<std::endl;
         if(corrMET.Pt()>0) {
             _corr_met = corrMET.Pt();
             _corr_met_phi = corrMET.Phi();

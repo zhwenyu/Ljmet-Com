@@ -911,6 +911,8 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
         mvCorrJetsWithBTags.clear();
         mvSelBtagJets.clear();
 
+        TLorentzVector cleanedCorrMet;
+
         // try to get earlier produced data (in a calc)
         //std::cout << "Must be 2.34: " << GetTestValue() << std::endl;
 
@@ -926,12 +928,14 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
 
 	    TLorentzVector jetP4;
 
+	    pat::Jet tmpJet = _ijet->correctedJet(0);
+
 	    if ( mbPar["doLepJetCleaning"] ){
-	        pat::Jet tmpJet = *_ijet;
 		if (mbPar["debug"]) std::cout << "Checking Overlap" << std::endl;
                 if (mvSelMuons.size()>0){
-	            if ( deltaR(mvSelMuons[0]->p4(),_ijet->p4()) < 0.8 ){
+	            if ( deltaR(mvSelMuons[0]->p4(),_ijet->p4()) < 0.6 ){
                         std::vector<reco::CandidatePtr> muDaughters;
+                        if (mbPar["debug"]) std::cout<<"Mu origin ref = "<<mvSelMuons[0]->originalObjectRef().key()<<std::endl;
                         for ( unsigned int isrc = 0; isrc < mvSelMuons[0]->numberOfSourceCandidatePtrs(); ++isrc ){
                             if (mvSelMuons[0]->sourceCandidatePtr(isrc).isAvailable()) {
                                 muDaughters.push_back( mvSelMuons[0]->sourceCandidatePtr(isrc) );
@@ -951,13 +955,13 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
 				jetP4 = correctJet(tmpJet, event);
 				if (mbPar["debug"]) std::cout << "Corrected Jet : pT = " << jetP4.Pt() << " eta = " << jetP4.Eta() << " phi = " << jetP4.Phi() << std::endl;
 			        _cleaned = true;
-			    }*///old ref mathcing method, appears to be depreciated in CMSSW_7_4_X(?) 
+			    }*////old ref mathcing method, appears to be depreciated in CMSSW_7_4_X(?) 
                             for (unsigned int muI = 0; muI < muDaughters.size(); muI++) {
 			        if ( (*_i_const).key() == muDaughters[muI].key() ) {
 				    tmpJet.setP4( tmpJet.p4() - muDaughters[muI]->p4() );
 				    if (mbPar["debug"]) std::cout << "  Cleaned Jet : pT = " << tmpJet.pt() << " eta = " << tmpJet.eta() << " phi = " << tmpJet.phi() << std::endl;
 				    if (mbPar["debug"]) std::cout << "Clean Raw Jet : pT = " << tmpJet.correctedJet(0).pt() << " eta = " << tmpJet.correctedJet(0).eta() << " phi = " << tmpJet.correctedJet(0).phi() << std::endl;
-				    jetP4 = correctJet(tmpJet, event);
+				    jetP4 = correctJet(tmpJet, event, false, true);
 				    if (mbPar["debug"]) std::cout << "Corrected Jet : pT = " << jetP4.Pt() << " eta = " << jetP4.Eta() << " phi = " << jetP4.Phi() << std::endl;
 			            _cleaned = true;
                                     muDaughters.erase( muDaughters.begin()+muI );
@@ -966,15 +970,17 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
 			    }
 			}
 			// zprime method (gives same results as far as i can tell)
-			/*double muEchk = _ijet->energy()*_ijet->muonEnergyFraction()/mvSelMuons[0]->energy();
-			if ( !(muEchk < 0.9 || (muEchk > 1.1 && _ijet->muonMultiplicity()==1)) ) {
- 			    tmpJet.setP4( _ijet->p4()-mvSelMuons[0]->p4() );
-			    if (tmpJet.pt() > 5 && deltaR(_ijet->p4(),tmpJet.p4()) > 1.57) std::cout << "Lepton-Jet cleaning flipped direction, not cleaning!" << std::endl;
-			    else {
- 			        jetP4 = correctJet(tmpJet, event);
-			        if (mbPar["debug"]) std::cout << "Corrected Jet : pT = " << jetP4.Pt() << " eta = " << jetP4.Eta() << " phi = " << jetP4.Phi() << std::endl;
-			        _cleaned = true;
-			    }
+			/*if (_ijet->muonMultiplicity() > 0) {
+			    double muEchk = (_ijet->correctedJet(0).energy()*_ijet->muonEnergyFraction()-mvSelMuons[0]->energy())/mvSelMuons[0]->energy();
+			    if ( !(muEchk < -0.1 || (muEchk > 0.1 && _ijet->muonMultiplicity()==1)) ) {
+ 			        tmpJet.setP4( _ijet->correctedJet(0).p4()-mvSelMuons[0]->p4() );
+			        if (tmpJet.pt() > 5 && deltaR(_ijet->correctedJet(0).p4(),tmpJet.p4()) > 1.57) std::cout << "Lepton-Jet cleaning flipped direction, not cleaning!" << std::endl;
+			        else {
+ 			            jetP4 = correctJet(tmpJet, event);
+			            if (mbPar["debug"]) std::cout << "Corrected Jet : pT = " << jetP4.Pt() << " eta = " << jetP4.Eta() << " phi = " << jetP4.Phi() << std::endl;
+			            _cleaned = true;
+			        }
+                            }
                         }*/
 			//old deltaR matching method
 			/*for (unsigned int id = 0, nd = (*_ijet).numberOfDaughters(); id < nd; ++id) {
@@ -990,22 +996,28 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
             	}
             
                 if (mvSelElectrons.size()>0){
-	            if ( deltaR(mvSelElectrons[0]->p4(),_ijet->p4()) < 0.8 ){
+	            if ( deltaR(mvSelElectrons[0]->p4(),_ijet->p4()) < 0.6 ){
                         std::vector<reco::CandidatePtr> elDaughters;
+                        if (mbPar["debug"]) std::cout<<"El origin ref = "<<mvSelElectrons[0]->originalObjectRef().key()<<std::endl;
                         for ( unsigned int isrc = 0; isrc < mvSelElectrons[0]->numberOfSourceCandidatePtrs(); ++isrc ){
-                            if (mvSelElectrons[0]->sourceCandidatePtr(isrc).isAvailable()) elDaughters.push_back( mvSelElectrons[0]->sourceCandidatePtr(isrc) );
+                            if (mvSelElectrons[0]->sourceCandidatePtr(isrc).isAvailable()) {
+                                elDaughters.push_back( mvSelElectrons[0]->sourceCandidatePtr(isrc) );
+                                if (mbPar["debug"]) std::cout<<"El daughter ref = "<<mvSelElectrons[0]->sourceCandidatePtr(isrc).key()<<" , id = "<<mvSelElectrons[0]->sourceCandidatePtr(isrc)->pdgId()<<" , pt = "<<mvSelElectrons[0]->sourceCandidatePtr(isrc)->pt()<<" , "<<mvSelElectrons[0]->sourceCandidatePtr(isrc)->eta()<<" , "<<mvSelElectrons[0]->sourceCandidatePtr(isrc)->phi()<<std::endl;
+                            }
                         }
             	        if (mbPar["debug"]) {
 			    std::cout << "Jet Overlaps with the Electron... Cleaning jet..." << std::endl;
             	            std::cout << "Lepton : pT = " << mvSelElectrons[0]->pt() << " eta = " << mvSelElectrons[0]->eta() << " phi = " << mvSelElectrons[0]->phi() << std::endl;
             	            std::cout << "      Raw Jet : pT = " << _ijet->pt() << " eta = " << _ijet->eta() << " phi = " << _ijet->phi() << std::endl;
+                            std::cout << "_ijet->electronMultiplicity() = "<<_ijet->electronMultiplicity()<<std::endl;
 			}
 			const std::vector<edm::Ptr<reco::Candidate> > _ijet_consts = _ijet->daughterPtrVector();
         		for ( std::vector<edm::Ptr<reco::Candidate> >::const_iterator _i_const = _ijet_consts.begin(); _i_const != _ijet_consts.end(); ++_i_const){
+                            if (mbPar["debug"]) std::cout<<"Jet constituent ref = "<<(*_i_const).key()<<std::endl;
                             for (unsigned int elI = 0; elI < elDaughters.size(); elI++) {
 			        if ( (*_i_const).key() == elDaughters[elI].key() ) {
 				    tmpJet.setP4( tmpJet.p4() - elDaughters[elI]->p4() );
-				    jetP4 = correctJet(tmpJet, event);
+				    jetP4 = correctJet(tmpJet, event, false, true);
 				    if (mbPar["debug"]) std::cout << "Corrected Jet : pT = " << jetP4.Pt() << " eta = " << jetP4.Eta() << " phi = " << jetP4.Phi() << std::endl;
 			            _cleaned = true;
                                     elDaughters.erase( elDaughters.begin()+elI );
@@ -1013,10 +1025,33 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
 			        }
 			    }
 			}
+			/*if (_ijet->electronMultiplicity() > 0) {
+			    double elEchk = (_ijet->correctedJet(0).energy()*_ijet->chargedEmEnergyFraction()-mvSelElectrons[0]->energy())/mvSelElectrons[0]->energy();
+                            if (mbPar["debug"]) std::cout<<"Non-zero electron multiplicity in jet, jet_chEm_Energy = "<<_ijet->correctedJet(0).energy()*_ijet->chargedEmEnergyFraction()<<std::endl;
+			    if ( !(elEchk < -0.1 || (elEchk > 0.1 && _ijet->electronMultiplicity()==1)) ) {
+ 			        //tmpJet.setP4( _ijet->correctedJet(0).p4()-mvSelElectrons[0]->p4() );
+			        if (tmpJet.pt() > 5 && deltaR(_ijet->correctedJet(0).p4(),tmpJet.p4()) > 1.57) std::cout << "Lepton-Jet cleaning flipped direction, not cleaning!" << std::endl;
+			        else {
+ 			            //jetP4 = correctJet(tmpJet, event);
+			            if (mbPar["debug"]) std::cout << "Corrected Jet : pT = " << jetP4.Pt() << " eta = " << jetP4.Eta() << " phi = " << jetP4.Phi() << std::endl;
+			            //_cleaned = true;
+			        }
+                            }
+                        }*/
 		    }
             	}
 	    }
-	    if (!_cleaned) jetP4 = correctJet(*_ijet, event);
+	    if (!_cleaned) {
+                jetP4 = correctJet(*_ijet, event);
+            }
+            else if (jetP4.Pt()>15 && mbPar["doNewJEC"]) {
+                reco::Candidate::LorentzVector cleanCorrJet;
+                cleanCorrJet.SetPxPyPzE(jetP4.Px(),jetP4.Py(),jetP4.Pz(),jetP4.E());
+                reco::Candidate::LorentzVector metCorr_lv = (cleanCorrJet-tmpJet.p4())-(_ijet->p4()-_ijet->correctedJet(0).p4());
+                TLorentzVector tmpCorr;
+                tmpCorr.SetPtEtaPhiE(metCorr_lv.Pt(),metCorr_lv.Eta(),metCorr_lv.Phi(),metCorr_lv.E());
+                cleanedCorrMet += tmpCorr;
+            }
 
             _isTagged = isJetTagged(*_ijet, event);
 
@@ -1062,12 +1097,13 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
       
             // save all the pf jets regardless of pt or eta
             // needed for MET corrections with JER/JES uncertainty
-            if (_passpf) mvAllJets.push_back(edm::Ptr<pat::Jet>( mhJets, _n_jets)); 
+            if (_passpf && !_cleaned)  mvAllJets.push_back(edm::Ptr<pat::Jet>( mhJets, _n_jets)); 
 
             ++_n_jets; 
       
         } // end of loop over jets
 
+        SetCleanedCorrMet(cleanedCorrMet);
 		
         //
         if ( mbPar["jet_cuts"] ) {
@@ -1107,6 +1143,7 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
             if ( mpMet.isNonnull() && mpMet.isAvailable() ) {
                 pat::MET const & met = mhMet->at(0);
                 TLorentzVector corrMET = correctMet(met, event);
+                if (mbPar["doNewJEC"]) corrMET += cleanedCorrMet;
                 if ( ignoreCut("Min MET") || corrMET.Pt()>cut("Min MET", double()) ) passCut(ret, "Min MET");
                 else break;
             }

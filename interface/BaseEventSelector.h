@@ -77,6 +77,7 @@ public:
     edm::Ptr<pat::MET> const & GetMet() const { return mpMet; }
     edm::Ptr<reco::PFMET> const & GetType1CorrMet() const { return mpType1CorrMet; }
     TLorentzVector const & GetCorrectedMet() const { return correctedMET_p4; }
+    TLorentzVector const & GetCleanedCorrMet() const { return cleanedCorrMet; }
     std::vector<unsigned int> const & GetSelectedTriggers() const { return mvSelTriggers; }
     std::map<std::string, unsigned int> const & GetSelectedTriggersEl() const { return mvSelTriggersEl; }
     std::map<std::string, unsigned int> const & GetSelectedTriggersMu() const { return mvSelTriggersMu; }
@@ -96,11 +97,12 @@ public:
     void SetTestValue(double & test) { mTestValue = test; }
     
     void SetCorrectedMet(TLorentzVector & met) { correctedMET_p4 = met; }
+    void SetCleanedCorrMet(TLorentzVector & corr) { cleanedCorrMet = corr; }
     void SetCorrJetsWithBTags(std::vector<std::pair<TLorentzVector, bool>> & jets) { mvCorrJetsWithBTags = jets; }
     
     bool isJetTagged(const pat::Jet &jet, edm::EventBase const & event, bool applySF = true);
-    TLorentzVector correctJet(const pat::Jet & jet, edm::EventBase const & event, bool doAK8Corr = false);
-    pat::Jet correctJetReturnPatJet(const pat::Jet & jet, edm::EventBase const & event, bool doAK8Corr = false);
+    TLorentzVector correctJet(const pat::Jet & jet, edm::EventBase const & event, bool doAK8Corr = false, bool forceCorr = false);
+    pat::Jet correctJetReturnPatJet(const pat::Jet & jet, edm::EventBase const & event, bool doAK8Corr = false, bool forceCorr = false);
     TLorentzVector correctMet(const pat::MET & met, edm::EventBase const & event);
     TLorentzVector correctMet(const pat::MET & met, edm::EventBase const & event, std::vector<pat::Jet> jets);
     TLorentzVector correctMet(const pat::MET & met, edm::EventBase const & event, std::vector<edm::Ptr<pat::Jet> > jets);
@@ -122,6 +124,7 @@ protected:
     edm::Ptr<pat::MET> mpMet;
     edm::Ptr<reco::PFMET> mpType1CorrMet;
     TLorentzVector correctedMET_p4;
+    TLorentzVector cleanedCorrMet;
     std::vector<unsigned int> mvSelTriggers;
     std::map<std::string, unsigned int> mvSelTriggersEl;
     std::map<std::string, unsigned int> mvSelTriggersMu;
