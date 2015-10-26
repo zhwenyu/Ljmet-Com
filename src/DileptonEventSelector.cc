@@ -739,7 +739,8 @@ bool DileptonEventSelector::operator()( edm::EventBase const & event, pat::strbi
 	    bool _cleaned = false;	    
 	    pat::Jet cleanedJet = *_ijet;
 	    TLorentzVector jetP4;
-	    
+	    pat::Jet tmpJet = _ijet->correctedJet(0);
+
 	    if ( mbPar["doLepJetCleaning"] ){
 
 	      if (mbPar["debug"]) std::cout << "Checking Overlap" << std::endl;
@@ -776,22 +777,21 @@ bool DileptonEventSelector::operator()( edm::EventBase const & event, pat::strbi
 		      }*/ //switching to new lep-jet cleaning from dylan
 		    for (unsigned int muI = 0; muI < muDaughters.size(); muI++) {
 		      if ( (*_i_const).key() == muDaughters[muI].key() ) {
-			cleanedJet.setP4( cleanedJet.p4() - muDaughters[muI]->p4() );
-			jetP4 = correctJet(cleanedJet, event);
-			//annoying thing to convert our tlorentzvector to root::math::lorentzvector
-			ROOT::Math::LorentzVector<ROOT::Math::PtEtaPhiM4D<double > > rlv;
-			rlv.SetXYZT(jetP4.X(),jetP4.Y(),jetP4.Z(),jetP4.T());
-			cleanedJet.setP4(rlv);
+			
+
+			tmpJet.setP4( tmpJet.p4() - muDaughters[muI]->p4() );
 			
 			if (mbPar["debug"]) std::cout << "Corrected Jet : pT = " << jetP4.Pt() << " eta = " << jetP4.Eta() << " phi = " << jetP4.Phi() << std::endl;
 			_cleaned = true;
 			muDaughters.erase( muDaughters.begin()+muI );
-			break;
-		      }
-		    }
-		  }
-		}
-	      }//end muon cleaning
+			break; //breaks out of mu daughters loop
+		      }// end of if muon ref == jet ref
+		    }//end loop over mu daughters
+		   		 
+		  }//end loop over jet constituents
+		}//end check of muons being inside jet
+	      }// end loop over muons for cleaning
+	      	    
 	      
 	      //clean for electrons
 	      for (unsigned int ilep=0; ilep <electronsForCleaning.size();ilep++){
@@ -821,13 +821,8 @@ bool DileptonEventSelector::operator()( edm::EventBase const & event, pat::strbi
 		      }*/
 		    for (unsigned int elI = 0; elI < elDaughters.size(); elI++) {
 		      if ( (*_i_const).key() == elDaughters[elI].key() ) {
-			cleanedJet.setP4( _ijet->p4() - elDaughters[elI]->p4() );
-			//get the correct 4vector
-			jetP4 = correctJet(cleanedJet, event);
-			//annoying thing to convert our tlorentzvector to root::math::lorentzvector
-			ROOT::Math::LorentzVector<ROOT::Math::PtEtaPhiM4D<double > > rlv;
-			rlv.SetXYZT(jetP4.X(),jetP4.Y(),jetP4.Z(),jetP4.T());
-			cleanedJet.setP4(rlv);
+			tmpJet.setP4( tmpJet.p4() - elDaughters[elI]->p4() );
+
 			if (mbPar["debug"]) std::cout << "Corrected Jet : pT = " << jetP4.Pt() << " eta = " << jetP4.Eta() << " phi = " << jetP4.Phi() << std::endl;
 			_cleaned = true;
 			elDaughters.erase( elDaughters.begin()+elI );
@@ -838,6 +833,8 @@ bool DileptonEventSelector::operator()( edm::EventBase const & event, pat::strbi
 		}
 	      }//end electron cleaning
 	      
+
+
 	      //if not cleaned just use first jet (remember if no cleaning then cleanedJet==*_ijet) to get corrected four vector and set the cleaned jet to have it
 	      if (!_cleaned) {
 		jetP4 = correctJet(cleanedJet, event);
@@ -845,6 +842,15 @@ bool DileptonEventSelector::operator()( edm::EventBase const & event, pat::strbi
 		ROOT::Math::LorentzVector<ROOT::Math::PtEtaPhiM4D<double > > rlv;
 		rlv.SetXYZT(jetP4.X(),jetP4.Y(),jetP4.Z(),jetP4.T());
 		cleanedJet.setP4(rlv);
+	      }
+	      else{
+		//get the correct 4vector
+		jetP4 = correctJet(tmpJet, event);
+		//annoying thing to convert our tlorentzvector to root::math::lorentzvector
+		ROOT::Math::LorentzVector<ROOT::Math::PtEtaPhiM4D<double > > rlv;
+		rlv.SetXYZT(jetP4.X(),jetP4.Y(),jetP4.Z(),jetP4.T());
+		cleanedJet.setP4(rlv);     
+
 	      }
 	      
 	      
