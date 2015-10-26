@@ -35,6 +35,7 @@
 //#include "FWCore/PythonParameterSet/interface/PythonProcessDesc.h"
 //#include "PhysicsTools/SelectorUtils/interface/PFElectronSelector.h"
 #include "LJMet/Com/interface/TopElectronSelector.h"
+#include "LJMet/Com/interface/MiniIsolation.h"
 #include "PhysicsTools/SelectorUtils/interface/PFJetIDSelectionFunctor.h"
 #include "PhysicsTools/SelectorUtils/interface/PFMuonSelector.h"
 #include "PhysicsTools/SelectorUtils/interface/PVSelector.h"
@@ -569,6 +570,31 @@ bool DileptonEventSelector::operator()( edm::EventBase const & event, pat::strbi
 	      if (not _iel->gsfTrack().isNonnull() or not _iel->gsfTrack().isAvailable()) break;
 	      //skip if in barrel-endcap gap; doing it here means I never have to worry about it downstream since both electrons for analysis and those for cleaning are made here
 	      if (_iel->isEBEEGap()) break;
+
+	      //mva loose for cleaning
+	      float mvaVal = mvaValue( *_iel,event);
+	      //miniIso
+	      edm::Handle<pat::PackedCandidateCollection> packedPFCands;
+	      edm::InputTag packedPFCandsLabel_("packedPFCandidates");
+	      event.getByLabel(packedPFCandsLabel_, packedPFCands);
+	      pat::Electron* elptr = new pat::Electron(*_iel);
+	      float miniIso = getPFMiniIsolation(packedPFCands, dynamic_cast<const reco::Candidate* > (elptr), 0.05, 0.2, 10., false);
+	      
+
+	      if(_iel->pt() < 10) passLoose=false;
+	      else if(miniIso < 0.4) passLoose=false;
+	      else{
+		if(fabs(_iel->ecalDrivenMomentum().eta()) <0.8){
+		  if(mvaVal>0.933) passLoose = true;
+		}
+		else if(fabs(_iel->ecalDrivenMomentum().eta()) < 1.479){
+		  if(mvaVal>0.917) passLoose = true;
+		}
+		else if(fabs(_iel->ecalDrivenMomentum().eta())<2.4){
+		  if(mvaVal > 0.683) passLoose=true;
+		}
+	      }
+	      /* NOT USING CUT BASED LOOSE ANYMORE
 	      //get effective area to do pu correction for iso
 	      double AEff;
 	      if( fabs(_iel->ecalDrivenMomentum().eta())<1.0) AEff=0.1752;
@@ -596,10 +622,9 @@ bool DileptonEventSelector::operator()( edm::EventBase const & event, pat::strbi
 	      else {dZ=-999;}
 	      //get 1/e -1/1p
 	      float ooEmooP = 1.0/_iel->ecalEnergy() - _iel->eSuperClusterOverP()/_iel->ecalEnergy();
-	      
-	      //check to see if it passes loose id for lepton jet cleaning, unfortunately one ID for mc, one for data - outdated now using 25ns datat so same ID
-	      //if(mbPar["isMc"]){
-		//Barrel
+
+
+
 		if(fabs(_iel->ecalDrivenMomentum().eta()) <= 1.479){
 		  if(_iel->full5x5_sigmaIetaIeta() >= 0.0103) {passLoose= false; }
 		  else if(fabs(_iel->deltaEtaSuperClusterTrackAtVtx()) >= 0.0105)    {passLoose= false; }
@@ -630,40 +655,7 @@ bool DileptonEventSelector::operator()( edm::EventBase const & event, pat::strbi
 		  else if(!_iel->passConversionVeto())        {passLoose= false; }
 		  else passLoose=true;
 		}
-		//}
-	      /* else{//not mc, implement 50ns data cut
-		//Barrel
-		if(fabs(_iel->ecalDrivenMomentum().eta()) <= 1.479){
-		  if(_iel->full5x5_sigmaIetaIeta() >= 0.0105) {passLoose= false; }
-		  else if(fabs(_iel->deltaEtaSuperClusterTrackAtVtx()) >= 0.00976)    {passLoose= false; }
-		  else if(fabs(_iel->deltaPhiSuperClusterTrackAtVtx()) >= 0.0929)    {passLoose= false; }
-		  else if(_iel->hcalOverEcal() >= 0.0765)         {passLoose= false; }
-		  else if(relIso >= 0.118)          {passLoose= false; }
-		  else if(ooEmooP >= 0.184) {passLoose= false; }
-		  else if(fabs(d0) >= 0.0227)      {passLoose= false; }
-		  else if(fabs(dZ) >= 0.379)     {passLoose= false; }
-		  else if(_iel->gsfTrack()->hitPattern().numberOfHits(reco::HitPattern::MISSING_INNER_HITS) > 2)              {passLoose= false; }
-		  else if(_iel->isGsfCtfScPixChargeConsistent() < 1)  {passLoose= false; }
-		  else if(!_iel->passConversionVeto())        {passLoose= false; }
-		  else passLoose=true;
-		}
-		
-		//Endcap
-		else{
-		  if(_iel->full5x5_sigmaIetaIeta() >= 0.0318)  {passLoose= false; }
-		  else if(fabs(_iel->deltaEtaSuperClusterTrackAtVtx()) >= 0.00952)    {passLoose= false; }
-		  else if(fabs(_iel->deltaPhiSuperClusterTrackAtVtx()) >= 0.181)    {passLoose= false; }
-		  else if(_iel->hcalOverEcal() >= 0.0824)        {passLoose= false; }
-		  else if(relIso >= 0.118)        {passLoose= false; }
-		  else if(ooEmooP >= 0.125) {passLoose= false; }
-		  else if(fabs(d0) >= 0.242)       {passLoose= false; }
-		  else if(fabs(dZ) >= 0.921)      {passLoose= false; }
-		  else if(_iel->gsfTrack()->hitPattern().numberOfHits(reco::HitPattern::MISSING_INNER_HITS) > 1)              {passLoose= false; }
-		  else if(_iel->isGsfCtfScPixChargeConsistent() < 1)  {passLoose= false; }
-		  else if(!_iel->passConversionVeto())        {passLoose= false; }
-		  else passLoose=true;
-		}
-		}*/
+		*/
 	      // electron Et cut
 	      if (_iel->pt()>mdPar["electron_minpt"]){ }
 	      else break;
