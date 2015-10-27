@@ -98,7 +98,7 @@ float BtagHardcodedConditions::getDiscriminant(const std::string & op){
 
 
 double BtagHardcodedConditions::GetBtagEfficiency(double pt, double eta,
-                                                  std::string tagger, TH2D *eff)
+                                                  std::string tagger)
 {
   // Efficiencies from TTJets madgraph sample miniAODv2 -- more elegant fits needed later!
   // See distribution in /uscms_data/d3/jmanagan/MCBeff/TTJetsBEff/Beff.png
@@ -282,7 +282,7 @@ double BtagHardcodedConditions::GetBtagSFUncertDown(double pt, double eta,
 
 
 double BtagHardcodedConditions::GetMistagRate(double pt, double eta,
-                                              std::string tagger, TH2D *eff){
+                                              std::string tagger){
   // Mistag rates from TTJets madgraph sample miniAODv2. More elegant fits needed later!!
   // See distribution in /uscms_data/d3/jmanagan/MCBeff/TTJetsBEff/Leff.png
   // Uses hadronFlavour() rather than partonFlavour() as recommended in BTV physics plenary CMS Week 10/2015
