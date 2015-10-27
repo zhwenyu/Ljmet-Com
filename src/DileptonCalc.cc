@@ -80,7 +80,7 @@ int DileptonCalc::BeginJob()
     else                              dataType = "None";
     
     if (mPset.exists("rhoSrc"))       rhoSrc_it = mPset.getParameter<edm::InputTag>("rhoSrc");
-    else                              rhoSrc_it = edm::InputTag("fixedGridRhoFastJetAll", "", "");
+    else                              rhoSrc_it = edm::InputTag("fixedGridRhoFastjetAll", "", "");
     
     if (mPset.exists("pvCollection")) pvCollection_it = mPset.getParameter<edm::InputTag>("pvCollection");
     else                              pvCollection_it = edm::InputTag("offlineSlimmedPrimaryVertices");

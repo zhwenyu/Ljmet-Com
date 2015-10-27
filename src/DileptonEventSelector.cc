@@ -551,7 +551,7 @@ bool DileptonEventSelector::operator()( edm::EventBase const & event, pat::strbi
         if ( mbPar["electron_cuts"] ) {
 
 	  //get rho src
-	  edm::InputTag rhoSrc_it("fixedGridRhoFastJetAll","");
+	  edm::InputTag rhoSrc_it("fixedGridRhoFastjetAll","");
 	  edm::Handle<double> rhoHandle;
 	  event.getByLabel(rhoSrc_it, rhoHandle);
 	  double rhoIso = std::max(*(rhoHandle.product()), 0.0);
