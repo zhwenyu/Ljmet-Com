@@ -354,7 +354,6 @@ TLorentzVector BaseEventSelector::correctJet(const pat::Jet & jet, edm::EventBas
       	    // We need to undo the default corrections and then apply the new ones
 
       	    double pt_raw = jet.correctedJet(0).pt();
-
 	    if (doAK8Corr){
                 JetCorrectorAK8->setJetEta(jet.eta());
           	JetCorrectorAK8->setJetPt(pt_raw);
