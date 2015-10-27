@@ -5,7 +5,6 @@
 #include <iostream>
 #include <vector>
 #include <algorithm>
-#include "TH2.h"
 
 class BtagHardcodedConditions{
     

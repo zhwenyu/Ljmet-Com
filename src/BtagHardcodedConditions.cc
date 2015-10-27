@@ -16,8 +16,6 @@
 #include <cmath>
 #include "LJMet/Com/interface/BtagHardcodedConditions.h"
 #include "FWCore/Utilities/interface/Exception.h"
-#include "TH2.h"
-#include "TFile.h"
 
 using namespace std;
 BtagHardcodedConditions::BtagHardcodedConditions() {
