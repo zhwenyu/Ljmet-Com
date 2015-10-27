@@ -80,7 +80,7 @@ int DileptonCalc::BeginJob()
     else                              dataType = "None";
     
     if (mPset.exists("rhoSrc"))       rhoSrc_it = mPset.getParameter<edm::InputTag>("rhoSrc");
-    else                              rhoSrc_it = edm::InputTag("fixedGridRhoAll", "", "RECO");
+    else                              rhoSrc_it = edm::InputTag("fixedGridRhoFastJetAll", "", "RECO");
     
     if (mPset.exists("pvCollection")) pvCollection_it = mPset.getParameter<edm::InputTag>("pvCollection");
     else                              pvCollection_it = edm::InputTag("offlineSlimmedPrimaryVertices");
@@ -297,13 +297,17 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
     
     //Quality criteria
     std::vector <double> elRelIso;
-    std::vector <double> elMiniIso;
+    std::vector <double> elMiniIsoEA;
+    std::vector <double> elMiniIsoDB;
     std::vector <double> elDxy;
     std::vector <int>    elNotConversion;
     std::vector <int>    elChargeConsistent;
     std::vector <int>    elIsEBEE;
     std::vector <int>    elQuality;
     std::vector <int>    elCharge;
+    std::vector <int>    elGsfCharge;
+    std::vector <int>    elCtfCharge;
+    std::vector <int>    elScPixCharge;
     
     //ID requirement
     std::vector <double> elDeta;
@@ -357,10 +361,23 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
     edm::Handle<double> rhoHandle;
     event.getByLabel(rhoSrc_it, rhoHandle);
     rhoIso = std::max(*(rhoHandle.product()), 0.0);
+
+    //rho isolation from susy recommendation
+    edm::Handle<double> rhoJetsNC;
+    event.getByLabel(edm::InputTag("fixedGridRhoFastjetCentralNeutral","") , rhoJetsNC);
+    double myRhoJetsNC = *rhoJetsNC;
+    double _rhoNC = myRhoJetsNC;
+
+    //pfcandidates for mini iso
+    
+    edm::Handle<pat::PackedCandidateCollection> packedPFCands;
+    event.getByLabel(packedPFCandsLabel_, packedPFCands);
+	
     
     pat::strbitset retElectron  = electronSelL_->getBitTemplate();
     bool retElectronT,retElectronM,retElectronL;
     
+
     
     //
     //_____Electrons______
@@ -430,6 +447,11 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
 	double dist   = (*iel)->convDist();
 	double dcot   = (*iel)->convDcot();
 	int notConv   = nLostHits == 0 and (fabs(dist) > 0.02 or fabs(dcot) > 0.02);
+	//get three different charges
+	elGsfCharge.push_back( (*iel)->gsfTrack()->charge());
+	if( (*iel)->closestCtfTrackRef().isNonnull()) elCtfCharge.push_back((*iel)->closestCtfTrackRef()->charge());
+	else elCtfCharge.push_back(-999);
+	elScPixCharge.push_back((*iel)->scPixCharge());
 	elCharge.push_back((*iel)->charge());
 	elNotConversion . push_back(notConv);
         
@@ -459,10 +481,12 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
 	elVtxFitConv.push_back((*iel)->passConversionVeto());
         //add mva
 	elMVA.push_back( selector->mvaValue( *(iel->get()), event) );
+
 	//add miniIso
-	edm::Handle<pat::PackedCandidateCollection> packedPFCands;
-	event.getByLabel(packedPFCandsLabel_, packedPFCands);
-	elMiniIso.push_back(getPFMiniIsolation(packedPFCands, dynamic_cast<const reco::Candidate *>(iel->get()), 0.05, 0.2, 10., false));
+	elMiniIsoEA.push_back(getPFMiniIsolation_EffectiveArea(packedPFCands, dynamic_cast<const reco::Candidate *>(iel->get()),0.05, 0.2, 10., false, false,myRhoJetsNC));
+	elMiniIsoDB.push_back(getPFMiniIsolation_DeltaBeta(packedPFCands, dynamic_cast<const reco::Candidate *>(iel->get()), 0.05, 0.2, 10., false));
+
+
 	//Trigger Matching - store 4-vector and filter information for all trigger objects deltaR matched to electrons
 	/*if(doTriggerStudy_){
 	  
@@ -575,6 +599,9 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
     SetValue("elCharge1", elCharge1);
     SetValue("elCharge2", elCharge2);
     
+    SetValue("elGsfCharge",elGsfCharge);
+    SetValue("elCtfCharge",elCtfCharge);
+    SetValue("elScPixCharge",elScPixCharge);
     SetValue("elCharge", elCharge);
     //Quality requirements
     SetValue("elRelIso" , elRelIso); //Isolation
@@ -583,7 +610,10 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
     SetValue("elChargeConsistent", elChargeConsistent);
     SetValue("elIsEBEE", elIsEBEE);
     SetValue("elQuality", elQuality);
-    SetValue("elMiniIso",elMiniIso);
+    SetValue("elMiniIsoEA",elMiniIsoEA);
+    SetValue("elMiniIsoDB",elMiniIsoDB);
+    //this value not specific to electrons but we set it here
+    SetValue("rhoNC",_rhoNC);
 
     //ID cuts
     SetValue("elDeta", elDeta);
@@ -643,7 +673,8 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
     std::vector <double> muDxy;
     std::vector <double> muDz;
     std::vector <double> muRelIso;
-    std::vector <double> muMiniIso;
+    std::vector <double> muMiniIsoEA;
+    std::vector <double> muMiniIsoDB;
     
     std::vector <int> muNValMuHits;
     std::vector <int> muNMatchedStations;
@@ -733,10 +764,8 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
             muPuIso . push_back(puIso);
 
             //get miniIso
-            edm::Handle<pat::PackedCandidateCollection> packedPFCands;
-            event.getByLabel(packedPFCandsLabel_, packedPFCands);
-	    muMiniIso.push_back(getPFMiniIsolation(packedPFCands, dynamic_cast<const reco::Candidate *>(imu->get()), 0.05, 0.2, 10., false));
-            
+	    muMiniIsoEA.push_back(getPFMiniIsolation_EffectiveArea(packedPFCands, dynamic_cast<const reco::Candidate *>(imu->get()),0.05, 0.2, 10., false, false,myRhoJetsNC));
+	    muMiniIsoDB.push_back(getPFMiniIsolation_DeltaBeta(packedPFCands, dynamic_cast<const reco::Candidate *>(imu->get()), 0.05, 0.2, 10., false));            
             //IP: for some reason this is with respect to the first vertex in the collection
             if (goodPVs.size() > 0){
 	      muDxy . push_back((*imu)->dB());
@@ -873,7 +902,8 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
     SetValue("muDxy"    , muDxy);
     SetValue("muDz"     , muDz);
     SetValue("muRelIso" , muRelIso);
-    SetValue("muMiniIso", muMiniIso);
+    SetValue("muMiniIsoEA", muMiniIsoEA);
+    SetValue("muMiniIsoDB", muMiniIsoDB);
 
     SetValue("muNValMuHits"       , muNValMuHits);
     SetValue("muNMatchedStations" , muNMatchedStations);
