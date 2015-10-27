@@ -1,9 +1,11 @@
+// COMMENT
 #ifndef BtagHardcodedConditions_h
 #define BtagHardcodedConditions_h
 
 #include <iostream>
 #include <vector>
 #include <algorithm>
+#include "TH2.h"
 
 class BtagHardcodedConditions{
     
@@ -34,35 +36,36 @@ public:
         return op[op.length()-1];
     }
     
-    double GetBtagEfficiency(double pt, double eta, std::string tagger="CSVM");
-    double GetBtagScaleFactor(double pt, double eta, std::string tagger="CSVM", int year = 2012);
-    double GetBtagSFUncertUp(double pt, double eta, std::string tagger="CSVM", int year = 2012);
-    double GetBtagSFUncertDown(double pt, double eta, std::string tagger="CSVM", int year = 2012);
+    double GetBtagEfficiency(double pt, double eta, std::string tagger="CSVM", TH2D *eff = 0);
+    double GetBtagScaleFactor(double pt, double eta, std::string tagger="CSVM", int year = 2015);
+    double GetBtagSFUncertUp(double pt, double eta, std::string tagger="CSVM", int year = 2015);
+    double GetBtagSFUncertDown(double pt, double eta, std::string tagger="CSVM", int year = 2015);
     
-    double GetMistagRate(double pt, double eta, std::string tagger="CSVM");
-    double GetMistagScaleFactor(double pt, double eta, std::string tagger="CSVM", int year = 2012);
-    double GetMistagSFUncertUp(double pt, double eta, std::string tagger="CSVM", int year = 2012);
-    double GetMistagSFUncertDown(double pt, double eta, std::string tagger="CSVM", int year = 2012);
+    double GetMistagRate(double pt, double eta, std::string tagger="CSVM", TH2D *eff = 0);
+    double GetMistagScaleFactor(double pt, double eta, std::string tagger="CSVM", int year = 2015);
+    double GetMistagSFUncertUp(double pt, double eta, std::string tagger="CSVM", int year = 2015);
+    double GetMistagSFUncertDown(double pt, double eta, std::string tagger="CSVM", int year = 2015);
     
 private:
     double GetBtagScaleFactor2011(double pt, double eta, std::string tagger="CSVM");
     double GetBtagScaleFactor2012(double pt, double eta, std::string tagger="CSVM");
+    double GetBtagScaleFactor2015(double pt, double eta, std::string tagger="CSVM");
     double GetBtagSFUncertainty2011(double pt, double eta, std::string tagger="CSVM");
     double GetBtagSFUncertainty2012(double pt, double eta, std::string tagger="CSVM");
-    double GetMistagSF2011(double pt, double eta, std::string tagger,
-                           std::string meanminmax);
-    double GetMistagSF2012(double pt, double eta, std::string tagger,
-                           std::string meanminmax);
+    double GetBtagSFUncertainty2015(double pt, double eta, std::string tagger="CSVM");
+    double GetMistagSF2011(double pt, double eta, std::string tagger, std::string meanminmax);
+    double GetMistagSF2012(double pt, double eta, std::string tagger, std::string meanminmax);
     inline void fillArray(float* a, float* b, int n) {
         for (int i=0;i<n;++i) a[i] = b[i];
     }
     
     float SFb_TCHPT_error11[14], SFb_CSVL_error11[14], SFb_CSVM_error11[14], SFb_CSVT_error11[14], SFb_JPL_error11[14], SFb_JPM_error11[14], SFb_JPT_error11[14];
     float SFb_TCHPT_error12[16], SFb_CSVL_error12[16], SFb_CSVM_error12[16], SFb_CSVT_error12[16], SFb_JPL_error12[16], SFb_JPM_error12[16], SFb_JPT_error12[16];
+    float SFb_CSVL_error15[7], SFb_CSVM_error15[7], SFb_CSVT_error15[7];
     float ptmin, ptmax;
     typedef std::vector< float > FVec;
     typedef std::vector< float >::iterator FVecI;
-    FVec ptRange11, ptRange12;
+    FVec ptRange11, ptRange12, ptRange15;
     inline int findBin(float pt, FVec ptRange){
         return (std::upper_bound(ptRange.begin(), ptRange.end(), pt)-ptRange.begin())-1;
     }
