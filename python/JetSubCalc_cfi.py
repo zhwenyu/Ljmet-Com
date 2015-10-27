@@ -20,7 +20,14 @@ JetSubCalc = cms.PSet(
                       useHTT             = cms.bool(False),
                       killHF             = cms.bool(False),
                       doNewJEC           = cms.bool(False),
-                      selectedJetsCA15Coll = cms.InputTag("selectedPatJetsCA15PFCHSNoHF")
+                      selectedJetsCA15Coll = cms.InputTag("selectedPatJetsCA15PFCHSNoHF"),
+                      useL2L3Mass = cms.bool(False),
+                      isMc = cms.bool(True),
+                      MCL2JetParAK8 = cms.string('/uscms_data/d3/jmanagan/CMSSW_7_4_14/src/LJMet/Com/data/Summer15_25nsV2_MC_L2Relative_AK8PFchs.txt'),
+                      MCL3JetParAK8 = cms.string('/uscms_data/d3/jmanagan/CMSSW_7_4_14/src/LJMet/Com/data/Summer15_25nsV2_MC_L3Absolute_AK8PFchs.txt'),
+                      DataL2JetParAK8 = cms.string('/uscms_data/d3/jmanagan/CMSSW_7_4_14/src/LJMet/Com/data/Summer15_25nsV5_DATA_L2Relative_AK8PFchs.txt'),
+                      DataL3JetParAK8 = cms.string('/uscms_data/d3/jmanagan/CMSSW_7_4_14/src/LJMet/Com/data/Summer15_25nsV5_DATA_L3Absolute_AK8PFchs.txt'),
+                      DataResJetParAK8 = cms.string('/uscms_data/d3/jmanagan/CMSSW_7_4_14/src/LJMet/Com/data/Summer15_25nsV5_DATA_L2L3Residual_AK8PFchs.txt')
                       )
 
 #######################################################################
