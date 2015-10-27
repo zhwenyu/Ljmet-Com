@@ -561,6 +561,16 @@ bool DileptonEventSelector::operator()( edm::EventBase const & event, pat::strbi
 	  event.getByLabel( mtPar["electron_collection"], mhElectrons );
           
 	  mvSelElectrons.clear();
+
+	  //packed pf candidates and rho source needed miniIso
+	  edm::Handle<pat::PackedCandidateCollection> packedPFCands;
+	  edm::InputTag packedPFCandsLabel_("packedPFCandidates");
+	  event.getByLabel(packedPFCandsLabel_, packedPFCands);
+	  //rho isolation from susy recommendation
+	  edm::Handle<double> rhoJetsNC;
+	  event.getByLabel(edm::InputTag("fixedGridRhoFastjetCentralNeutral","") , rhoJetsNC);
+	  double myRhoJetsNC = *rhoJetsNC;
+
           
 	  for ( std::vector<pat::Electron>::const_iterator _iel = mhElectrons->begin(); _iel != mhElectrons->end(); _iel++){
 	    
@@ -573,12 +583,8 @@ bool DileptonEventSelector::operator()( edm::EventBase const & event, pat::strbi
 
 	      //mva loose for cleaning
 	      float mvaVal = mvaValue( *_iel,event);
-	      //miniIso
-	      edm::Handle<pat::PackedCandidateCollection> packedPFCands;
-	      edm::InputTag packedPFCandsLabel_("packedPFCandidates");
-	      event.getByLabel(packedPFCandsLabel_, packedPFCands);
 	      pat::Electron* elptr = new pat::Electron(*_iel);
-	      float miniIso = getPFMiniIsolation(packedPFCands, dynamic_cast<const reco::Candidate* > (elptr), 0.05, 0.2, 10., false);
+	      float miniIso = getPFMiniIsolation_EffectiveArea(packedPFCands, dynamic_cast<const reco::Candidate* > (elptr), 0.05, 0.2, 10., false, false,myRhoJetsNC);
 	      
 
 	      if(_iel->pt() < 10) passLoose=false;

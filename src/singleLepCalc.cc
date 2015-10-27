@@ -289,7 +289,7 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
 
             edm::Handle<pat::PackedCandidateCollection> packedPFCands;
             event.getByLabel(packedPFCandsLabel_, packedPFCands);
-            double miniIso = getPFMiniIsolation(packedPFCands, dynamic_cast<const reco::Candidate *>(imu->get()), 0.05, 0.2, 10., false);
+            double miniIso = getPFMiniIsolation_DeltaBeta(packedPFCands, dynamic_cast<const reco::Candidate *>(imu->get()), 0.05, 0.2, 10., false);
 
             muRelIso . push_back(relIso);
             muMiniIso . push_back(miniIso);
@@ -450,6 +450,14 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
     edm::Handle<double> rhoHandle;
     event.getByLabel(rhoSrc_, rhoHandle);
     double rhoIso = std::max(*(rhoHandle.product()), 0.0);
+
+    //rho source for miniIso
+    edm::Handle<double> rhoJetsNC;
+    event.getByLabel(edm::InputTag("fixedGridRhoFastjetCentralNeutral","") , rhoJetsNC);
+    double myRhoJetsNC = *rhoJetsNC;
+    double _rhoNC = myRhoJetsNC;
+
+
     //
     //_____Electrons______
     //
@@ -494,7 +502,7 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
 
             edm::Handle<pat::PackedCandidateCollection> packedPFCands;
             event.getByLabel(packedPFCandsLabel_, packedPFCands);
-            double miniIso = getPFMiniIsolation(packedPFCands, dynamic_cast<const reco::Candidate *>(iel->get()), 0.05, 0.2, 10., false);
+            double miniIso = getPFMiniIsolation_EffectiveArea(packedPFCands, dynamic_cast<const reco::Candidate *>(iel->get()), 0.05, 0.2, 10., false, false,myRhoJetsNC);
 
             elRelIso . push_back(relIso);
             elMiniIso . push_back(miniIso);
