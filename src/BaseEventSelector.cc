@@ -150,7 +150,7 @@ void BaseEventSelector::BeginJob(std::map<std::string, edm::ParameterSet const >
     std::cout << "b-tag check "<<msPar["btagOP"]<<" "<< msPar["btagger"]<<" "<<mdPar["btag_min_discr"]<<std::endl;
     
     if ( mbPar["isMc"] && ( mbPar["JECup"] || mbPar["JECdown"]))
-        jecUnc = new JetCorrectionUncertainty(*(new JetCorrectorParameters(msPar["JEC_txtfile"].c_str(), "Total")));
+        jecUnc = new JetCorrectionUncertainty(msPar["JEC_txtfile"]);
 
     vector<JetCorrectorParameters> vPar;
     vector<JetCorrectorParameters> vParAK8;
