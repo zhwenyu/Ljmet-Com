@@ -150,7 +150,7 @@ void BaseEventSelector::BeginJob(std::map<std::string, edm::ParameterSet const >
     std::cout << "b-tag check "<<msPar["btagOP"]<<" "<< msPar["btagger"]<<" "<<mdPar["btag_min_discr"]<<std::endl;
     
     if ( mbPar["isMc"] && ( mbPar["JECup"] || mbPar["JECdown"]))
-        jecUnc = new JetCorrectionUncertainty(*(new JetCorrectorParameters(msPar["JEC_txtfile"].c_str(), "Total")));
+        jecUnc = new JetCorrectionUncertainty(msPar["JEC_txtfile"]);
 
     vector<JetCorrectorParameters> vPar;
     vector<JetCorrectorParameters> vParAK8;
@@ -727,7 +727,7 @@ bool BaseEventSelector::isJetTagged(const pat::Jet & jet, edm::EventBase const &
         else if ( mbPar["BTagUncertDown"] ) _lightSf -= mBtagCond.GetMistagSFUncertDown(lvjet.Et(), lvjet.Eta(), msPar["btagOP"]);
         double _lightEff = mBtagCond.GetMistagRate(lvjet.Et(), lvjet.Eta(), msPar["btagOP"]);
         
-        int _jetFlavor = abs(jet.partonFlavour());
+        int _jetFlavor = abs(jet.hadronFlavour());
         double _btagSf = mBtagCond.GetBtagScaleFactor(lvjet.Et(), lvjet.Eta(), msPar["btagOP"]);
         if ( mbPar["BTagUncertUp"] ) _btagSf += (mBtagCond.GetBtagSFUncertUp(lvjet.Et(), lvjet.Eta(), msPar["btagOP"])*(_jetFlavor==4?2:1));
         else if ( mbPar["BTagUncertDown"] ) _btagSf -= (mBtagCond.GetBtagSFUncertDown(lvjet.Et(), lvjet.Eta(), msPar["btagOP"])*(_jetFlavor==4?2:1));
