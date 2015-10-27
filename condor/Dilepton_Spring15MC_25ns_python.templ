@@ -69,7 +69,7 @@ process.event_selector = cms.PSet(
     hbheiso_cut              = cms.bool(True),
     eesc_cut                 = cms.bool(True),
     flag_tag                 = cms.InputTag('FLAGTAG'),
-    cscHalo_cut              = cms.bool(True),
+    cscHalo_cut              = cms.bool(False),
     jet_cuts                 = cms.bool(False),
     jet_minpt                = cms.double(30.0),
     jet_maxeta               = cms.double(2.4),
@@ -108,7 +108,7 @@ process.event_selector = cms.PSet(
 
     #This is for uncertainty calculations
     #We will not use it in this exercise
-    JEC_txtfile = cms.string('/uscms_data/d2/avetisya/CMSDAS/2015/CMSSW_7_3_0/src/LJMet/Com/tools/Summer13_V5_DATA_Uncertainty_AK5PF.txt'),
+    #JEC_txtfile = cms.string('/uscms_data/d2/avetisya/CMSDAS/2015/CMSSW_7_3_0/src/LJMet/Com/tools/Summer13_V5_DATA_Uncertainty_AK5PF.txt'),
     JECup		     = cms.bool(False),
     JECdown                  = cms.bool(False),
     JERup                    = cms.bool(False),
