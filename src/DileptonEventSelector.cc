@@ -551,7 +551,7 @@ bool DileptonEventSelector::operator()( edm::EventBase const & event, pat::strbi
         if ( mbPar["electron_cuts"] ) {
 
 	  //get rho src
-	  edm::InputTag rhoSrc_it("fixedGridRhoAll");
+	  edm::InputTag rhoSrc_it("fixedGridRhoFastjetAll","");
 	  edm::Handle<double> rhoHandle;
 	  event.getByLabel(rhoSrc_it, rhoHandle);
 	  double rhoIso = std::max(*(rhoHandle.product()), 0.0);
@@ -591,13 +591,13 @@ bool DileptonEventSelector::operator()( edm::EventBase const & event, pat::strbi
 	      else if(miniIso < 0.4) passLoose=false;
 	      else{
 		if(fabs(_iel->ecalDrivenMomentum().eta()) <0.8){
-		  if(mvaVal>0.933) passLoose = true;
+		  if(mvaVal>0.913286) passLoose = true;
 		}
 		else if(fabs(_iel->ecalDrivenMomentum().eta()) < 1.479){
-		  if(mvaVal>0.917) passLoose = true;
+		  if(mvaVal>0.805013) passLoose = true;
 		}
 		else if(fabs(_iel->ecalDrivenMomentum().eta())<2.4){
-		  if(mvaVal > 0.683) passLoose=true;
+		  if(mvaVal > 0.358969) passLoose=true;
 		}
 	      }
 	      /* NOT USING CUT BASED LOOSE ANYMORE
