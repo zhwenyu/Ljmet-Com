@@ -434,33 +434,33 @@ TLorentzVector BaseEventSelector::correctJet(const pat::Jet & jet, edm::EventBas
             jecUnc->setJetEta(jet.eta());
             jecUnc->setJetPt(pt*ptscale);
 
-        if (mbPar["JECup"]) { 
-	    try{
-                unc = jecUnc->getUncertainty(true);
-	    }
-	    catch(...){ // catch all exceptions. Jet Uncertainty tool throws when binning out of range
-	        std::cout << mLegend << "WARNING! Exception thrown by JetCorrectionUncertainty!" << std::endl;
-                std::cout << mLegend << "WARNING! Possibly, trying to correct a jet/MET outside correction range." << std::endl;
-	        std::cout << mLegend << "WARNING! Jet/MET will remain uncorrected." << std::endl;
-	        unc = 0.0;
-	    }
-            unc = 1 + unc; 
-        }
-        else { 
-	    try{
-                unc = jecUnc->getUncertainty(false);
-	    }
-	    catch(...){
-	        std::cout << mLegend << "WARNING! Exception thrown by JetCorrectionUncertainty!" << std::endl;
-	        std::cout << mLegend << "WARNING! Possibly, trying to correct a jet/MET outside correction range." << std::endl;
-	        std::cout << mLegend << "WARNING! Jet/MET will remain uncorrected." << std::endl;
-	        unc = 0.0;
-	    }
-            unc = 1 - unc; 
-        }
+            if (mbPar["JECup"]) { 
+	        try{
+                    unc = jecUnc->getUncertainty(true);
+	        }
+	        catch(...){ // catch all exceptions. Jet Uncertainty tool throws when binning out of range
+	            std::cout << mLegend << "WARNING! Exception thrown by JetCorrectionUncertainty!" << std::endl;
+                    std::cout << mLegend << "WARNING! Possibly, trying to correct a jet/MET outside correction range." << std::endl;
+	            std::cout << mLegend << "WARNING! Jet/MET will remain uncorrected." << std::endl;
+	            unc = 0.0;
+	        }
+                unc = 1 + unc; 
+            }
+            else { 
+	        try{
+                    unc = jecUnc->getUncertainty(false);
+	        }
+	        catch(...){
+	            std::cout << mLegend << "WARNING! Exception thrown by JetCorrectionUncertainty!" << std::endl;
+	            std::cout << mLegend << "WARNING! Possibly, trying to correct a jet/MET outside correction range." << std::endl;
+	            std::cout << mLegend << "WARNING! Jet/MET will remain uncorrected." << std::endl;
+	            unc = 0.0;
+	        }
+                unc = 1 - unc; 
+            }
 
-        if (pt*ptscale < 10.0 && mbPar["JECup"]) unc = 2.0;
-        if (pt*ptscale < 10.0 && mbPar["JECdown"]) unc = 0.01;
+            if (pt*ptscale < 10.0 && mbPar["JECup"]) unc = 2.0;
+            if (pt*ptscale < 10.0 && mbPar["JECdown"]) unc = 0.01;
 
         }
     }
@@ -637,33 +637,33 @@ pat::Jet BaseEventSelector::correctJetReturnPatJet(const pat::Jet & jet, edm::Ev
             jecUnc->setJetEta(jet.eta());
             jecUnc->setJetPt(pt*ptscale);
 
-        if (mbPar["JECup"]) { 
-	    try{
-                unc = jecUnc->getUncertainty(true);
-	    }
-	    catch(...){ // catch all exceptions. Jet Uncertainty tool throws when binning out of range
-	        std::cout << mLegend << "WARNING! Exception thrown by JetCorrectionUncertainty!" << std::endl;
-                std::cout << mLegend << "WARNING! Possibly, trying to correct a jet/MET outside correction range." << std::endl;
-	        std::cout << mLegend << "WARNING! Jet/MET will remain uncorrected." << std::endl;
-	        unc = 0.0;
-	    }
-            unc = 1 + unc; 
-        }
-        else { 
-	    try{
-                unc = jecUnc->getUncertainty(false);
-	    }
-	    catch(...){
-	        std::cout << mLegend << "WARNING! Exception thrown by JetCorrectionUncertainty!" << std::endl;
-	        std::cout << mLegend << "WARNING! Possibly, trying to correct a jet/MET outside correction range." << std::endl;
-	        std::cout << mLegend << "WARNING! Jet/MET will remain uncorrected." << std::endl;
-	        unc = 0.0;
-	    }
-            unc = 1 - unc; 
-        }
-
-        if (pt*ptscale < 10.0 && mbPar["JECup"]) unc = 2.0;
-        if (pt*ptscale < 10.0 && mbPar["JECdown"]) unc = 0.01;
+            if (mbPar["JECup"]) { 
+    	        try{
+                    unc = jecUnc->getUncertainty(true);
+                }
+    	        catch(...){ // catch all exceptions. Jet Uncertainty tool throws when binning out of range
+    	            std::cout << mLegend << "WARNING! Exception thrown by JetCorrectionUncertainty!" << std::endl;
+                    std::cout << mLegend << "WARNING! Possibly, trying to correct a jet/MET outside correction range." << std::endl;
+                    std::cout << mLegend << "WARNING! Jet/MET will remain uncorrected." << std::endl;
+    	            unc = 0.0;
+    	        }
+                unc = 1 + unc; 
+            }
+            else { 
+    	        try{
+                    unc = jecUnc->getUncertainty(false);
+    	        }
+    	        catch(...){
+    	            std::cout << mLegend << "WARNING! Exception thrown by JetCorrectionUncertainty!" << std::endl;
+    	            std::cout << mLegend << "WARNING! Possibly, trying to correct a jet/MET outside correction range." << std::endl;
+    	            std::cout << mLegend << "WARNING! Jet/MET will remain uncorrected." << std::endl;
+    	            unc = 0.0;
+    	        }
+                unc = 1 - unc; 
+            }
+    
+            if (pt*ptscale < 10.0 && mbPar["JECup"]) unc = 2.0;
+            if (pt*ptscale < 10.0 && mbPar["JECdown"]) unc = 0.01;
 
         }
     }
