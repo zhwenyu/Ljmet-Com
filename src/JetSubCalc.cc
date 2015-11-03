@@ -24,6 +24,7 @@
 #include "JetMETCorrections/Objects/interface/JetCorrector.h"
 #include "JetMETCorrections/Objects/interface/JetCorrectionsRecord.h"
 #include "CondFormats/JetMETObjects/interface/JetCorrectorParameters.h"
+#include "CondFormats/JetMETObjects/interface/FactorizedJetCorrector.h"
 
 using namespace std;
 
@@ -51,6 +52,14 @@ private:
   bool useHTT;
   bool killHF;
   bool doNewJEC;
+  bool isMc;
+  bool useL2L3Mass;
+  std::string MCL3;
+  std::string MCL2;
+  std::string DataL3;
+  std::string DataL2;
+  std::string DataL2L3;
+  FactorizedJetCorrector *jecak8;
 };
 
 static int reg = LjmetFactory::GetInstance()->Register(new JetSubCalc(), "JetSubCalc");
@@ -88,11 +97,13 @@ int JetSubCalc::BeginJob()
     if(mPset.exists("killHF")) killHF = mPset.getParameter<bool>("killHF");
     else killHF = false;
 
-    if(mPset.exists("doNewJEC")) killHF = mPset.getParameter<bool>("doNewJEC");
+    if(mPset.exists("doNewJEC")) doNewJEC = mPset.getParameter<bool>("doNewJEC");
     else doNewJEC = false;
 
+    cout << "JetSubCalc: doNewJEC = " << doNewJEC << ", killHF = " << killHF << endl;
+
     if(useHTT){
-      cout << " JetSubCalc is using HTT -- have you installed HEPTopTagger v2?" << endl;
+      cout << " JetSubCalc: using HTT -- have you installed HEPTopTagger v2?" << endl;
 
       if (mPset.exists("httTagInfo")) httTagInfo_it = mPset.getParameter<edm::InputTag>("httTagInfo");
       else httTagInfo_it = edm::InputTag("HTT");
@@ -100,6 +111,46 @@ int JetSubCalc::BeginJob()
       if (mPset.exists("selectedJetsCA15Coll")) selectedPatJetsCA15Coll_it = mPset.getParameter<edm::InputTag>("selectedJetsCA15Coll");
       else selectedPatJetsCA15Coll_it = edm::InputTag("selectedPatJetsCA15PFCHSNoHF");
     }
+
+    if(mPset.exists("useL2L3Mass")) useL2L3Mass = mPset.getParameter<bool>("useL2L3Mass");
+    else useL2L3Mass = false;
+
+    if(mPset.exists("isMc")) isMc = mPset.getParameter<bool>("isMc");
+    else isMc = false;
+
+    if(useL2L3Mass){
+      cout << "JetSubCalc: using L2+L3 corrected groomed masses" << endl;
+      if(mPset.exists("MCL2JetParAK8")) MCL2 = mPset.getParameter<std::string>("MCL2JetParAK8");
+      else MCL2 = "/uscms_data/d3/jmanagan/CMSSW_7_4_14/src/LJMet/Com/data/Summer15_25nsV5_MC_L1FastJet";
+      if(mPset.exists("MCL3JetParAK8")) MCL3 = mPset.getParameter<std::string>("MCL3JetParAK8");
+      else MCL3 = "/uscms_data/d3/jmanagan/CMSSW_7_4_14/src/LJMet/Com/data/Summer15_25nsV5_MC_L1FastJet";
+
+      if(mPset.exists("DataL2JetParAK8")) DataL2 = mPset.getParameter<std::string>("DataL2JetParAK8");
+      else DataL2 = "/uscms_data/d3/jmanagan/CMSSW_7_4_14/src/LJMet/Com/data/Summer15_25nsV5_Data_L1FastJet";
+      if(mPset.exists("DataL3JetParAK8")) DataL3 = mPset.getParameter<std::string>("DataL3JetParAK8");
+      else DataL3 = "/uscms_data/d3/jmanagan/CMSSW_7_4_14/src/LJMet/Com/data/Summer15_25nsV5_Data_L1FastJet";
+      if(mPset.exists("DataL2L3JetParAK8")) DataL2L3 = mPset.getParameter<std::string>("DataL2L3JetParAK8");
+      else DataL2L3 = "/uscms_data/d3/jmanagan/CMSSW_7_4_14/src/LJMet/Com/data/Summer15_25nsV5_Data_L1FastJet";
+  
+      std::vector<JetCorrectorParameters> vParAK8;
+      
+      if(isMc){
+	JetCorrectorParameters *L3JetParAK8  = new JetCorrectorParameters(MCL3);
+	JetCorrectorParameters *L2JetParAK8  = new JetCorrectorParameters(MCL2);
+	vParAK8.push_back(*L2JetParAK8);
+	vParAK8.push_back(*L3JetParAK8);
+      }else{
+	JetCorrectorParameters *ResJetParAK8 = new JetCorrectorParameters(DataL2L3); 
+	JetCorrectorParameters *L3JetParAK8  = new JetCorrectorParameters(DataL3);
+	JetCorrectorParameters *L2JetParAK8  = new JetCorrectorParameters(DataL2);
+	vParAK8.push_back(*L2JetParAK8);
+	vParAK8.push_back(*L3JetParAK8);
+	vParAK8.push_back(*ResJetParAK8);
+      }
+      
+      jecak8 = new FactorizedJetCorrector(vParAK8);
+    }
+
     return 0;
 }
 
@@ -387,12 +438,34 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * s
       theTrimmedMass  = -std::numeric_limits<double>::max();
       theFilteredMass = -std::numeric_limits<double>::max();
       theSoftDropMass = -std::numeric_limits<double>::max();
-      
-      thePrunedMass   = (double)corrak8.userFloat("ak8PFJetsCHSPrunedMass");
-      theTrimmedMass  = (double)corrak8.userFloat("ak8PFJetsCHSTrimmedMass");
-      theFilteredMass = (double)corrak8.userFloat("ak8PFJetsCHSFilteredMass");
-      theSoftDropMass = (double)corrak8.userFloat("ak8PFJetsCHSSoftDropMass");
-      
+
+      if(useL2L3Mass){
+	edm::Handle<double> rhoHandle;
+	edm::InputTag rhoSrc_("fixedGridRhoFastjetAll", "");
+	event.getByLabel(rhoSrc_, rhoHandle);
+	double rho = std::max(*(rhoHandle.product()), 0.0);
+
+	pat::Jet l2l3jet = *ijet;
+	jecak8->setJetEta(l2l3jet.correctedJet(0).eta());
+	jecak8->setJetPt(l2l3jet.correctedJet(0).pt());
+	jecak8->setJetE(l2l3jet.correctedJet(0).energy());
+	jecak8->setJetA(l2l3jet.jetArea());
+	jecak8->setRho(rho);
+	double corr = jecak8->getCorrection();
+	if(corr == 1.0) cout << "L2+L3 correction is 1.0" << endl;
+
+	thePrunedMass   = corr*(double)l2l3jet.userFloat("ak8PFJetsCHSPrunedMass");
+	theTrimmedMass  = corr*(double)l2l3jet.userFloat("ak8PFJetsCHSTrimmedMass");
+	theFilteredMass = corr*(double)l2l3jet.userFloat("ak8PFJetsCHSFilteredMass");
+	theSoftDropMass = corr*(double)l2l3jet.userFloat("ak8PFJetsCHSSoftDropMass");
+	
+      }else{
+	thePrunedMass   = (double)corrak8.userFloat("ak8PFJetsCHSPrunedMass");
+	theTrimmedMass  = (double)corrak8.userFloat("ak8PFJetsCHSTrimmedMass");
+	theFilteredMass = (double)corrak8.userFloat("ak8PFJetsCHSFilteredMass");
+	theSoftDropMass = (double)corrak8.userFloat("ak8PFJetsCHSSoftDropMass");
+      }
+
       theNjettinessTau1 = -std::numeric_limits<double>::max();
       theNjettinessTau2 = -std::numeric_limits<double>::max();
       theNjettinessTau3 = -std::numeric_limits<double>::max();

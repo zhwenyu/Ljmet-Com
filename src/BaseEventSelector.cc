@@ -354,7 +354,6 @@ TLorentzVector BaseEventSelector::correctJet(const pat::Jet & jet, edm::EventBas
       	    // We need to undo the default corrections and then apply the new ones
 
       	    double pt_raw = jet.correctedJet(0).pt();
-
 	    if (doAK8Corr){
                 JetCorrectorAK8->setJetEta(jet.eta());
           	JetCorrectorAK8->setJetPt(pt_raw);
@@ -728,7 +727,7 @@ bool BaseEventSelector::isJetTagged(const pat::Jet & jet, edm::EventBase const &
         else if ( mbPar["BTagUncertDown"] ) _lightSf -= mBtagCond.GetMistagSFUncertDown(lvjet.Et(), lvjet.Eta(), msPar["btagOP"]);
         double _lightEff = mBtagCond.GetMistagRate(lvjet.Et(), lvjet.Eta(), msPar["btagOP"]);
         
-        int _jetFlavor = abs(jet.partonFlavour());
+        int _jetFlavor = abs(jet.hadronFlavour());
         double _btagSf = mBtagCond.GetBtagScaleFactor(lvjet.Et(), lvjet.Eta(), msPar["btagOP"]);
         if ( mbPar["BTagUncertUp"] ) _btagSf += (mBtagCond.GetBtagSFUncertUp(lvjet.Et(), lvjet.Eta(), msPar["btagOP"])*(_jetFlavor==4?2:1));
         else if ( mbPar["BTagUncertDown"] ) _btagSf -= (mBtagCond.GetBtagSFUncertDown(lvjet.Et(), lvjet.Eta(), msPar["btagOP"])*(_jetFlavor==4?2:1));

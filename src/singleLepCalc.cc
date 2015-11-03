@@ -20,6 +20,7 @@
 #include "EgammaAnalysis/ElectronTools/interface/ElectronEffectiveArea.h"
 #include "LJMet/Com/interface/MVAElectronSelector.h"
 #include "SimDataFormats/GeneratorProducts/interface/GenEventInfoProduct.h"
+#include "SimDataFormats/GeneratorProducts/interface/LHEEventProduct.h"
 
 #include "DataFormats/BTauReco/interface/CATopJetTagInfo.h"
 #include "LJMet/Com/interface/MiniIsolation.h"
@@ -289,7 +290,7 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
 
             edm::Handle<pat::PackedCandidateCollection> packedPFCands;
             event.getByLabel(packedPFCandsLabel_, packedPFCands);
-            double miniIso = getPFMiniIsolation(packedPFCands, dynamic_cast<const reco::Candidate *>(imu->get()), 0.05, 0.2, 10., false);
+            double miniIso = getPFMiniIsolation_DeltaBeta(packedPFCands, dynamic_cast<const reco::Candidate *>(imu->get()), 0.05, 0.2, 10., false);
 
             muRelIso . push_back(relIso);
             muMiniIso . push_back(miniIso);
@@ -450,6 +451,14 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
     edm::Handle<double> rhoHandle;
     event.getByLabel(rhoSrc_, rhoHandle);
     double rhoIso = std::max(*(rhoHandle.product()), 0.0);
+
+    //rho source for miniIso
+    edm::Handle<double> rhoJetsNC;
+    event.getByLabel(edm::InputTag("fixedGridRhoFastjetCentralNeutral","") , rhoJetsNC);
+    double myRhoJetsNC = *rhoJetsNC;
+    double _rhoNC = myRhoJetsNC;
+
+
     //
     //_____Electrons______
     //
@@ -494,7 +503,7 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
 
             edm::Handle<pat::PackedCandidateCollection> packedPFCands;
             event.getByLabel(packedPFCandsLabel_, packedPFCands);
-            double miniIso = getPFMiniIsolation(packedPFCands, dynamic_cast<const reco::Candidate *>(iel->get()), 0.05, 0.2, 10., false);
+            double miniIso = getPFMiniIsolation_EffectiveArea(packedPFCands, dynamic_cast<const reco::Candidate *>(iel->get()), 0.05, 0.2, 10., false, false,myRhoJetsNC);
 
             elRelIso . push_back(relIso);
             elMiniIso . push_back(miniIso);
@@ -804,6 +813,7 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
    //event weights
    std::vector<double> evtWeightsMC;
    float MCWeight=1;
+    std::vector<double> LHEweights;
 
     std::vector <double> genJetPt;
     std::vector <double> genJetEta;
@@ -835,6 +845,28 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
       
         evtWeightsMC=evtWeights;
         MCWeight = theWeight;
+
+	edm::Handle<LHEEventProduct> EvtHandle;
+	edm::InputTag theSrc("externalLHEProducer");
+	event.getByLabel(theSrc,EvtHandle);
+	
+	// Storing LHE weights for MC@NLO renormalization and factorization scale. 
+	// https://twiki.cern.ch/twiki/bin/viewauth/CMS/LHEReaderCMSSW
+	// ID numbers 1001 - 1009. (muR,muF) = 
+	// 0 = 1001: (1,1)    3 = 1004: (2,1)    6 = 1007: (0.5,1)  
+	// 1 = 1002: (1,2)    4 = 1005: (2,2)  	 7 = 1008: (0.5,2)  
+	// 2 = 1003: (1,0.5)  5 = 1006: (2,0.5)	 8 = 1009: (0.5,0.5)
+	
+	std::string weightid;
+	if(EvtHandle->weights().size() > 0){	  
+	  for(int i = 0; i < 9; i++){
+	    weightid = EvtHandle->weights()[i].id; // annoyingly, these integers are stored as std::string
+	    if(i == 0 && weightid != "1001") cout << "LHE WEIGHT LIST NOT IN EXPECTED ORDER" << endl;	    
+	    LHEweights.push_back(EvtHandle->weights()[i].wgt/EvtHandle->originalXWGTUP());
+	  }
+	}else{
+	  for(int i = 0; i < 9; i++){ LHEweights.push_back(1.0); }
+	}
    
         //load genparticles collection
         edm::Handle<reco::GenParticleCollection> genParticles;
@@ -1005,6 +1037,7 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
 
     SetValue("evtWeightsMC", evtWeightsMC);
     SetValue("MCWeight", MCWeight);
+    SetValue("LHEWeights", LHEweights);
 
     return 0;
 }
