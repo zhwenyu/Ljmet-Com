@@ -1310,7 +1310,7 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
     std::vector <int> genStatus;
     std::vector <int> genMotherID;
     std::vector <int> genMotherIndex;
-
+    std::vector<bool> genIsFromTau;
     //event weights
     std::vector<double> evtWeightsMC;
     float MCWeight=1;
@@ -1335,6 +1335,12 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
             const reco::GenParticle & p = (*genParticles).at(i);
 
 	    bool keep=false;
+
+	    //attempt using mc gen particle flags
+	    if( fabs(p.pdgId())>10 && fabs(p.pdgId())<19 && p.isPromptFinalState()) keep = true; //only keep final state leptons if they are prompt
+	    else if( p.isPromptDecayed() ) keep = true; //only keep other particles if they are prompt
+
+	    /* OLD METHOD USING STATUSES IS FAULTY
             //Find particles from hard scattering/stable
             if (p.status() >=20 && p.status()<=29) keep=true;
 	    else if(p.status()==1 && ( fabs(p.pdgId())>10 && fabs(p.pdgId())<19) ){
@@ -1343,7 +1349,7 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
 		reco::Candidate* mother = (reco::Candidate*) p.mother();
 		if( fabs(mother->pdgId())==24 && ( (mother->status()>=20 && mother->status()<=29) || (mother->status()>=50 && mother->status()<=59)) ) keep=true;
 	      }
-	    }
+	    }*/
 
             if(!keep) continue;    
 	    //Four vector
@@ -1356,7 +1362,7 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
 	    genID            . push_back(p.pdgId());
 	    genIndex         . push_back((int) i);
 	    genStatus        . push_back(p.status());
-	    
+	    genIsFromTau     . push_back(p.isDirectPromptTauDecayProductFinalState()); //save whether or not a particle came from a prompt tau
 	    //mother info - stores mother pdgID if mother exists or -999 if mother doesn't exist. This way the entries will always be aligned with main gen particle entries
 	    if(p.mother()) genMotherID.push_back((p.mother())->pdgId());
 	    else genMotherID.push_back(-999);
@@ -1377,7 +1383,7 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
     SetValue("genStatus"     , genStatus);
     SetValue("genMotherID"   , genMotherID);
     SetValue("genMotherIndex", genMotherIndex);
-    
+    SetValue("genIsFromPromptTau", genIsFromTau);
     SetValue("evtWeightsMC", evtWeightsMC);
     SetValue("MCWeight",MCWeight);
 
