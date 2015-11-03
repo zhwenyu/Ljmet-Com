@@ -242,10 +242,10 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
 	  if(Path=="HLT_IsoTkMu24_IterTrk02_v1" || Path=="HLT_IsoTkMu24_IterTrk02_v2" || Path=="HLT_IsoTkMu24_IterTrk02_v3") HLT_IsoTkMu24=true;
 	  if(Path=="HLT_DoubleMu33NoFiltersNoVtx_v1" || Path=="HLT_DoubleMu33NoFiltersNoVtx_v2" || Path=="HLT_DoubleMu33NoFiltersNoVtx_v3") HLT_DoubleMu33NoFiltersNoVtx=true;
 	  //cross paths
-	  if(Path=="HLT_Mu17_TrkIsoVVL_Ele12_Gsf_CaloId_TrackId_IsoVL_v1" || Path=="HLT_Mu17_TrkIsoVVL_Ele12_Gsf_CaloId_TrackId_IsoVL_v2" || Path=="HLT_Mu17_TrkIsoVVL_Ele12_Gsf_CaloId_TrackId_IsoVL_v3") HLT_Mu17Ele12=true;
-	  if(Path=="HLT_Mu8_TrkIsoVVL_Ele17_Gsf_CaloId_TrackId_IsoVL_v1" || Path=="HLT_Mu8_TrkIsoVVL_Ele17_Gsf_CaloId_TrackId_IsoVL_v2" || Path=="HLT_Mu8_TrkIsoVVL_Ele17_Gsf_CaloId_TrackId_IsoVL_v3") HLT_Mu8Ele17=true;
-	  if(Path=="HLT_Mu23_TrkIsoVVL_Ele12_Gsf_CaloId_TrackId_IsoVL_v1" || Path=="HLT_Mu23_TrkIsoVVL_Ele12_Gsf_CaloId_TrackId_IsoVL_v2" || Path=="HLT_Mu23_TrkIsoVVL_Ele12_Gsf_CaloId_TrackId_IsoVL_v3") HLT_Mu23Ele12=true;
-	  if(Path=="HLT_Mu8_TrkIsoVVL_Ele23_Gsf_CaloId_TrackId_IsoVL_v1" || Path=="HLT_Mu8_TrkIsoVVL_Ele23_Gsf_CaloId_TrackId_IsoVL_v2" || Path=="HLT_Mu8_TrkIsoVVL_Ele23_Gsf_CaloId_TrackId_IsoVL_v3") HLT_Mu8Ele23=true;
+	  if(Path=="HLT_Mu17_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v1" || Path=="HLT_Mu17_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v2" || Path=="HLT_Mu17_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v3") HLT_Mu17Ele12=true;
+	  if(Path=="HLT_Mu8_TrkIsoVVL_Ele17_CaloIdL_TrackIdL_IsoVL_v1" || Path=="HLT_Mu8_TrkIsoVVL_Ele17_CaloIdL_TrackIdL_IsoVL_v2" || Path=="HLT_Mu8_TrkIsoVVL_Ele17_CaloIdL_TrackIdL_IsoVL_v3") HLT_Mu8Ele17=true;
+	  if(Path=="HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v1" || Path=="HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v2" || Path=="HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v3") HLT_Mu23Ele12=true;
+	  if(Path=="HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_v1" || Path=="HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_v2" || Path=="HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_v3") HLT_Mu8Ele23=true;
 	  if(Path=="HLT_Mu30_Ele30_CaloIdL_GsfTrkIdVL_v1" || Path=="HLT_Mu30_Ele30_CaloIdL_GsfTrkIdVL_v2" || Path=="HLT_Mu30_Ele30_CaloIdL_GsfTrkIdVL_v3") HLT_Mu30Ele30=true;
 	  //HT/Jet
 	  if(Path=="HLT_PFHT900_v1" || Path=="HLT_PFHT900_v2" || Path=="HLT_PFHT900_v3") HLT_PFHT900=true;
