@@ -814,6 +814,7 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
    std::vector<double> evtWeightsMC;
    float MCWeight=1;
     std::vector<double> LHEweights;
+    std::vector<int> LHEweightids;
 
     std::vector <double> genJetPt;
     std::vector <double> genJetEta;
@@ -848,24 +849,26 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
 
 	edm::Handle<LHEEventProduct> EvtHandle;
 	edm::InputTag theSrc("externalLHEProducer");
-	event.getByLabel(theSrc,EvtHandle);
-	
-	// Storing LHE weights for MC@NLO renormalization and factorization scale. 
-	// https://twiki.cern.ch/twiki/bin/viewauth/CMS/LHEReaderCMSSW
-	// ID numbers 1001 - 1009. (muR,muF) = 
-	// 0 = 1001: (1,1)    3 = 1004: (2,1)    6 = 1007: (0.5,1)  
-	// 1 = 1002: (1,2)    4 = 1005: (2,2)  	 7 = 1008: (0.5,2)  
-	// 2 = 1003: (1,0.5)  5 = 1006: (2,0.5)	 8 = 1009: (0.5,0.5)
-	
-	std::string weightid;
-	if(EvtHandle->weights().size() > 0){	  
-	  for(int i = 0; i < 9; i++){
-	    weightid = EvtHandle->weights()[i].id; // annoyingly, these integers are stored as std::string
-	    if(i == 0 && weightid != "1001") cout << "LHE WEIGHT LIST NOT IN EXPECTED ORDER" << endl;	    
-	    LHEweights.push_back(EvtHandle->weights()[i].wgt/EvtHandle->originalXWGTUP());
+	if(event.getByLabel(theSrc,EvtHandle)){
+	  
+	  // Storing LHE weights https://twiki.cern.ch/twiki/bin/viewauth/CMS/LHEReaderCMSSW
+	  // for MC@NLO renormalization and factorization scale. 
+	  // ID numbers 1001 - 1009. (muR,muF) = 
+	  // 0 = 1001: (1,1)    3 = 1004: (2,1)    6 = 1007: (0.5,1)  
+	  // 1 = 1002: (1,2)    4 = 1005: (2,2)  	 7 = 1008: (0.5,2)  
+	  // 2 = 1003: (1,0.5)  5 = 1006: (2,0.5)	 8 = 1009: (0.5,0.5)
+	  // for PDF variations: ID numbers > 2000
+
+	  std::string weightidstr;
+	  int weightid;
+	  if(EvtHandle->weights().size() > 0){	  
+	    for(unsigned int i = 0; i < EvtHandle->weights().size(); i++){
+	      weightidstr = EvtHandle->weights()[i].id;
+	      weightid = std::stoi(weightidstr);
+	      LHEweights.push_back(EvtHandle->weights()[i].wgt/EvtHandle->originalXWGTUP());
+	      LHEweightids.push_back(weightid);
+	    }
 	  }
-	}else{
-	  for(int i = 0; i < 9; i++){ LHEweights.push_back(1.0); }
 	}
    
         //load genparticles collection
@@ -1037,7 +1040,8 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
 
     SetValue("evtWeightsMC", evtWeightsMC);
     SetValue("MCWeight", MCWeight);
-    SetValue("LHEWeights", LHEweights);
+    SetValue("LHEweights", LHEweights);
+    SetValue("LHEweightids", LHEweightids);
 
     return 0;
 }
