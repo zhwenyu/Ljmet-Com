@@ -1035,14 +1035,6 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
 	    if (!_cleaned) {
                 jetP4 = correctJet(*_ijet, event);
             }
-            else if (jetP4.Pt()>15 && mbPar["doNewJEC"]) {
-                reco::Candidate::LorentzVector cleanCorrJet;
-                cleanCorrJet.SetPxPyPzE(jetP4.Px(),jetP4.Py(),jetP4.Pz(),jetP4.E());
-                reco::Candidate::LorentzVector metCorr_lv = (cleanCorrJet-tmpJet.p4())-(_ijet->p4()-_ijet->correctedJet(0).p4());
-                TLorentzVector tmpCorr;
-                tmpCorr.SetPtEtaPhiE(metCorr_lv.Pt(),metCorr_lv.Eta(),metCorr_lv.Phi(),metCorr_lv.E());
-                cleanedCorrMet += tmpCorr;
-            }
 
             _isTagged = isJetTagged(*_ijet, event);
 
@@ -1088,14 +1080,12 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
       
             // save all the pf jets regardless of pt or eta
             // needed for MET corrections with JER/JES uncertainty
-            if (_passpf && !_cleaned)  mvAllJets.push_back(edm::Ptr<pat::Jet>( mhJets, _n_jets)); 
+            if (_passpf)  mvAllJets.push_back(edm::Ptr<pat::Jet>( mhJets, _n_jets)); 
 
             ++_n_jets; 
       
         } // end of loop over jets
 
-        SetCleanedCorrMet(cleanedCorrMet);
-		
         //
         if ( mbPar["jet_cuts"] ) {
 
@@ -1133,8 +1123,9 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
             //if ( mpType1CorrMet.isNonnull() && mpType1CorrMet.isAvailable() ) {
             if ( mpMet.isNonnull() && mpMet.isAvailable() ) {
                 pat::MET const & met = mhMet->at(0);
-                TLorentzVector corrMET = correctMet(met, event);
-                if (mbPar["doNewJEC"]) corrMET += cleanedCorrMet;
+                TLorentzVector corrMET;
+                corrMET.SetPtEtaPhiM(met.pt(),0.,met.phi(),0.);
+                if (mbPar["doNewJEC"]) corrMET = correctMetFromRaw(met, event);
                 if ( ignoreCut("Min MET") || corrMET.Pt()>cut("Min MET", double()) ) passCut(ret, "Min MET");
                 else break;
             }
