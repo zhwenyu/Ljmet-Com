@@ -909,10 +909,10 @@ bool BaseEventSelector::isJetTagged(const pat::Jet & jet, edm::EventBase const &
 
 TLorentzVector BaseEventSelector::correctMetFromRaw(const pat::MET & met, edm::EventBase const & event)
 {
-    //double correctedMET_px = met.shiftedP2_74x(pat::MET::METUncertainty(12),pat::MET::Raw).px;//version1 miniAOD
-    //double correctedMET_py = met.shiftedP2_74x(pat::MET::METUncertainty(12),pat::MET::Raw).py;//version1 miniAOD
-    double correctedMET_px = met.uncorPx();//version2 miniAOD
-    double correctedMET_py = met.uncorPy();//version2 miniAOD
+    double correctedMET_px = met.shiftedP2_74x(pat::MET::METUncertainty(12),pat::MET::Raw).px;//version1 miniAOD
+    double correctedMET_py = met.shiftedP2_74x(pat::MET::METUncertainty(12),pat::MET::Raw).py;//version1 miniAOD
+    //double correctedMET_px = met.uncorPx();//version2 miniAOD
+    //double correctedMET_py = met.uncorPy();//version2 miniAOD
     
     for (std::vector<edm::Ptr<pat::Jet> >::const_iterator ijet = mvAllJets.begin();
          ijet != mvAllJets.end(); ++ijet) {
