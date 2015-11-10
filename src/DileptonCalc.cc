@@ -25,7 +25,10 @@
 #include "DataFormats/EgammaCandidates/interface/GsfElectron.h"
 #include "HLTrigger/HLTcore/interface/HLTConfigProvider.h"
 #include "SimDataFormats/GeneratorProducts/interface/GenEventInfoProduct.h"
+#include "SimDataFormats/GeneratorProducts/interface/LHEEventProduct.h"
 #include "LJMet/Com/interface/MiniIsolation.h"
+#include "HepPDT/ParticleID.hh"
+
 
 using std::cout;
 using std::endl;
@@ -1311,9 +1314,15 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
     std::vector <int> genMotherID;
     std::vector <int> genMotherIndex;
     std::vector<bool> genIsFromTau;
+    std::vector<bool> genIsPrompt;
+    std::vector<bool> genPMotherHasC;
+    std::vector<bool> genPMotherHasB;
+    std::vector<int> genPMother;
     //event weights
     std::vector<double> evtWeightsMC;
     float MCWeight=1;
+    std::vector<double> LHEweights;
+    std::vector<int> LHEweightids;
 
     if (isMc){
       //load info for event weight
@@ -1327,6 +1336,32 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
       evtWeightsMC=evtWeights;
       MCWeight = theWeight;
    
+
+      //weights for mc uncertainties
+      edm::Handle<LHEEventProduct> EvtHandle;
+      edm::InputTag theSrc("externalLHEProducer");
+      if(event.getByLabel(theSrc,EvtHandle)){
+	  
+	// Storing LHE weights https://twiki.cern.ch/twiki/bin/viewauth/CMS/LHEReaderCMSSW
+	// for MC@NLO renormalization and factorization scale. 
+	// ID numbers 1001 - 1009. (muR,muF) = 
+	// 0 = 1001: (1,1)    3 = 1004: (2,1)    6 = 1007: (0.5,1)  
+	// 1 = 1002: (1,2)    4 = 1005: (2,2)   7 = 1008: (0.5,2)  
+	// 2 = 1003: (1,0.5)  5 = 1006: (2,0.5) 8 = 1009: (0.5,0.5)
+	// for PDF variations: ID numbers > 2000
+
+	std::string weightidstr;
+	int weightid;
+	if(EvtHandle->weights().size() > 0){  
+	  for(unsigned int i = 0; i < EvtHandle->weights().size(); i++){
+	    weightidstr = EvtHandle->weights()[i].id;
+	    weightid = std::stoi(weightidstr);
+	    LHEweights.push_back(EvtHandle->weights()[i].wgt/EvtHandle->originalXWGTUP());
+	    LHEweightids.push_back(weightid);
+	  }
+	}
+      }
+
       //load genparticles collection
       edm::Handle<reco::GenParticleCollection> genParticles;
       event.getByLabel(genParticles_it, genParticles);
@@ -1337,8 +1372,11 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
 	    bool keep=false;
 
 	    //attempt using mc gen particle flags
-	    if( fabs(p.pdgId())>10 && fabs(p.pdgId())<19 && p.isPromptFinalState()) keep = true; //only keep final state leptons if they are prompt
-	    else if( p.isPromptDecayed() ) keep = true; //only keep other particles if they are prompt
+	    if(p.status()==1) keep = true; //all stable out going particles
+	    else if( p.isPromptDecayed() ) keep = true; //keep prompt particles which have undergone decay (e.g. B-mesons)
+	    else if( p.statusFlags().isPrompt()) keep = true; // keep all prompt particles in case I want to do quark matching
+	    else if( p.isDirectPromptTauDecayProductFinalState()) keep = true; //log save leptons from tau decays since they are 'prompt' for us
+	    
 
 	    /* OLD METHOD USING STATUSES IS FAULTY
             //Find particles from hard scattering/stable
@@ -1351,7 +1389,32 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
 	      }
 	    }*/
 
+
+
             if(!keep) continue;    
+
+	    bool promptMotherHasB = false;
+	    bool promptMotherHasC = false;
+
+	    reco::GenParticle* mother = 0;
+	    if(p.status()==1){
+	      mother = (reco::GenParticle*) p.mother();
+	      while(mother){
+		if(mother->isPromptDecayed()) break;
+		else{ mother = (reco::GenParticle*) mother->mother();}
+	      }
+	    }
+
+	    if(mother){
+	      HepPDT::ParticleID heppdtid(mother->pdgId());
+	      promptMotherHasB = heppdtid.hasBottom();
+	      promptMotherHasC = heppdtid.hasCharm();
+	    }
+
+	    genPMotherHasB.push_back(promptMotherHasB);
+	    genPMotherHasC.push_back(promptMotherHasC);
+	    if(mother) genPMother.push_back(mother->pdgId());
+	    else       genPMother.push_back(-999);
 	    //Four vector
 	    genPt     . push_back(p.pt());
 	    genEta    . push_back(p.eta());
@@ -1362,6 +1425,7 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
 	    genID            . push_back(p.pdgId());
 	    genIndex         . push_back((int) i);
 	    genStatus        . push_back(p.status());
+	    genIsPrompt      . push_back(p.statusFlags().isPrompt());
 	    genIsFromTau     . push_back(p.isDirectPromptTauDecayProductFinalState()); //save whether or not a particle came from a prompt tau
 	    //mother info - stores mother pdgID if mother exists or -999 if mother doesn't exist. This way the entries will always be aligned with main gen particle entries
 	    if(p.mother()) genMotherID.push_back((p.mother())->pdgId());
@@ -1383,9 +1447,15 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
     SetValue("genStatus"     , genStatus);
     SetValue("genMotherID"   , genMotherID);
     SetValue("genMotherIndex", genMotherIndex);
+    SetValue("genIsPrompt"   , genIsPrompt);
     SetValue("genIsFromPromptTau", genIsFromTau);
     SetValue("evtWeightsMC", evtWeightsMC);
     SetValue("MCWeight",MCWeight);
+    SetValue("LHEWeights",LHEweights);
+    SetValue("LHEWeightIDs",LHEweightids);
+    SetValue("genPMotherHasC",genPMotherHasC);
+    SetValue("genPMotherHasB",genPMotherHasB);
+    SetValue("genPMother",genPMother);
 
     return 0;
 }
