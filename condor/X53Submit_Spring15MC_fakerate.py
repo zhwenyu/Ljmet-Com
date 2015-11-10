@@ -8,7 +8,7 @@ files_per_job = 1
 
 rel_base = os.environ['CMSSW_BASE']
 
-outdir = '/eos/uscms/store/user/lpctlbsm/clint/Spring15/25ns/FakeRate/Oct08/'
+outdir = '/eos/uscms/store/user/lpctlbsm/clint/Spring15/25ns/FakeRate/PreApproval/'
 
 ### What is the name of your FWLite Analyzer
 FWLiteAnalyzer = 'ljmet'
@@ -41,14 +41,27 @@ prefix = []
 
 if DONOMINAL=='True':
     prefix.extend([
-'QCD_HT100To200',
-#'QCD_HT200To300',
-#'QCD_HT300To500',
-#'QCD_HT500To700',
-#'QCD_HT700To1000',
-#'QCD_HT1000To1500',
-#'QCD_HT1500To2000',
-#'QCD_HT2000ToInf',
+            #'TTJets',
+            'TTbar-powheg',
+            'TTbar-powheg_ext',
+            #'QCD_Pt-20to30_EMEnriched',
+            #'QCD_Pt-30to50_EMEnriched',
+            #'QCD_Pt-50to80_EMEnriched',
+            #'QCD_Pt-80to120_EMEnriched',
+            #'QCD_Pt-120to170_EMEnriched',
+            #'QCD_Pt-170to300_EMEnriched',
+            #'QCD_Pt-300toInf_EMEnriched',
+            #'QCD_Pt-20to30_MuEnrichedPt5',
+            #'QCD_Pt-30to50_MuEnrichedPt5',
+            #'QCD_Pt-50to80_MuEnrichedPt5',
+            #'QCD_Pt-80to120_MuEnrichedPt5',
+            #'QCD_Pt-120to170_MuEnrichedPt5',
+            #'QCD_Pt-170to300_MuEnrichedPt5',
+            #'QCD_Pt-300to470_MuEnrichedPt5',
+            #'QCD_Pt-470to600_MuEnrichedPt5',
+            #'QCD_Pt-600to800_MuEnrichedPt5',
+            #'QCD_Pt-800to1000_MuEnrichedPt5',
+            #'QCD_Pt-1000toInf_MuEnrichedPt5',
     ])
 
 
@@ -66,14 +79,27 @@ for i in prefix:
 list = [] 
 
 listnom = [
-'Samples_Spring15MC/QCD_HT100to200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v2.txt',
-#'Samples_Spring15MC/QCD_HT200to300_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v2.txt',
-#'Samples_Spring15MC/QCD_HT300to500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v2.txt',
-#'Samples_Spring15MC/QCD_HT500to700_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1.txt',
-#'Samples_Spring15MC/QCD_HT700to1000_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1.txt',
-#'Samples_Spring15MC/QCD_HT1000to1500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v2.txt',
-#'Samples_Spring15MC/QCD_HT1500to2000_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1.txt',
-#'Samples_Spring15MC/QCD_HT2000toInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1.txt',
+#    'Samples_Spring15MC/TTJets_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_RunIISpring15DR74_Asympt25ns_MCRUN2_74_V9-v1.txt',
+    'Samples_Spring15MC/TT_TuneCUETP8M1_13TeV-powheg-pythia8_RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v2.txt',
+    'Samples_Spring15MC/TT_TuneCUETP8M1_13TeV-powheg-pythia8_RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9_ext3-v1.txt',
+#    'Samples_Spring15MC/QCD_Pt-20to30_EMEnriched_TuneCUETP8M1_13TeV_pythia8_RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1.txt',
+#    'Samples_Spring15MC/QCD_Pt-30to50_EMEnriched_TuneCUETP8M1_13TeV_pythia8_RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1.txt',
+#    'Samples_Spring15MC/QCD_Pt-50to80_EMEnriched_TuneCUETP8M1_13TeV_pythia8_RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1.txt',
+#    'Samples_Spring15MC/QCD_Pt-80to120_EMEnriched_TuneCUETP8M1_13TeV_pythia8_RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v3.txt',
+#    'Samples_Spring15MC/QCD_Pt-120to170_EMEnriched_TuneCUETP8M1_13TeV_pythia8_RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1.txt',
+#    'Samples_Spring15MC/QCD_Pt-170to300_EMEnriched_TuneCUETP8M1_13TeV_pythia8_RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1.txt',
+#    'Samples_Spring15MC/QCD_Pt-300toInf_EMEnriched_TuneCUETP8M1_13TeV_pythia8_RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v2.txt',
+#    'Samples_Spring15MC/QCD_Pt-20to30_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8_RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v2.txt',
+#    'Samples_Spring15MC/QCD_Pt-30to50_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8_RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1.txt',
+#    'Samples_Spring15MC/QCD_Pt-50to80_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8_RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1.txt',
+#    'Samples_Spring15MC/QCD_Pt-80to120_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8_RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1.txt',
+#    'Samples_Spring15MC/QCD_Pt-120to170_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8_RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v2.txt',
+#    'Samples_Spring15MC/QCD_Pt-170to300_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8_RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v2.txt',
+#    'Samples_Spring15MC/QCD_Pt-300to470_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8_RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v2.txt',
+#    'Samples_Spring15MC/QCD_Pt-470to600_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8_RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v2.txt',
+#    'Samples_Spring15MC/QCD_Pt-600to800_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8_RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v2.txt',
+#    'Samples_Spring15MC/QCD_Pt-800to1000_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8_RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v2.txt',
+#    'Samples_Spring15MC/QCD_Pt-1000toInf_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8_RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v2.txt',
     ]
 
 if DONOMINAL=='True':

@@ -8,7 +8,7 @@ files_per_job = 1
 
 rel_base = os.environ['CMSSW_BASE']
 
-outdir = '/eos/uscms/store/user/lpctlbsm/clint/Run2015D/PreApproval/'
+outdir = '/eos/uscms/store/user/lpctlbsm/clint/Spring15/25ns/PreApproval/'
 
 ### What is the name of your FWLite Analyzer
 FWLiteAnalyzer = 'ljmet'
@@ -22,7 +22,7 @@ DOQCDMC = 'False'
 DOTTBARSYS = 'False'
 
 ### JSON file to use
-MYJSON = "'../data/json/Cert_246908-258750_13TeV_PromptReco_Collisions15_25ns_JSON.txt'"
+MYJSON = "''"
 
 ### Systematics flags
 BTAGUNCERTUP = 'False'
@@ -41,13 +41,26 @@ prefix = []
 
 if DONOMINAL=='True':
     prefix.extend([
-            'DoubleMuon_Run2015D_PromptReco_Oct5',
-            'DoubleEG_Run2015D_PromptReco_Oct5',
-            'MuonEG_Run2015D_PromptReco_Oct5',
-#            'DoubleMuon_Run2015D_PromptReco_v4',
-#            'DoubleEG_Run2015D_PromptReco_v4',
-#            'MuonEG_Run2015D_PromptReco_v4',            
-
+            'X53X53_LH_700',
+            'X53X53_RH_700',
+            'X53X53_LH_800',
+            'X53X53_RH_800',
+            'X53X53_LH_900',
+            'X53X53_RH_900',
+            'X53X53_LH_1000',
+            'X53X53_RH_1000',
+            'X53X53_LH_1100',
+            'X53X53_RH_1100',
+            'X53X53_LH_1200',
+            'X53X53_RH_1200',
+            'X53X53_LH_1300',
+            'X53X53_RH_1300',
+            'X53X53_LH_1400',
+            'X53X53_RH_1400',
+            'X53X53_LH_1500',
+            'X53X53_RH_1500',
+            'X53X53_LH_1600',
+            'X53X53_RH_1600',
     ])
 
 
@@ -65,12 +78,26 @@ for i in prefix:
 list = [] 
 
 listnom = [
-    'Samples_Run2015D/DoubleMuon_Run2015D_PromptReco_Oct5.txt',
-    'Samples_Run2015D/DoubleEG_Run2015D_PromptReco_Oct5.txt',
-    'Samples_Run2015D/MuonEG_Run2015D_PromptReco_Oct5.txt',
-#    'Samples_Run2015D/DoubleMuon_Run2015D_PromptReco_v4.txt',
-#    'Samples_Run2015D/DoubleEG_Run2015D_PromptReco_v4.txt',
-#    'Samples_Run2015D/MuonEG_Run2015D_PromptReco_v4.txt',
+'Samples_Spring15MC/X53X53_M-700_LH_TuneCUETP8M1_13TeV-madgraph-pythia8_RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1.txt',
+'Samples_Spring15MC/X53X53_M-700_RH_TuneCUETP8M1_13TeV-madgraph-pythia8_RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1.txt',
+'Samples_Spring15MC/X53X53_M-800_LH_TuneCUETP8M1_13TeV-madgraph-pythia8_RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1.txt',
+'Samples_Spring15MC/X53X53_M-800_RH_TuneCUETP8M1_13TeV-madgraph-pythia8_RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1.txt',
+'Samples_Spring15MC/X53X53_M-900_LH_TuneCUETP8M1_13TeV-madgraph-pythia8_RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1.txt',
+'Samples_Spring15MC/X53X53_M-900_RH_TuneCUETP8M1_13TeV-madgraph-pythia8_RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1.txt',
+'Samples_Spring15MC/X53X53_M-1000_LH_TuneCUETP8M1_13TeV-madgraph-pythia8_RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1.txt',
+'Samples_Spring15MC/X53X53_M-1000_RH_TuneCUETP8M1_13TeV-madgraph-pythia8_RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1.txt',
+'Samples_Spring15MC/X53X53_M-1100_LH_TuneCUETP8M1_13TeV-madgraph-pythia8_RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1.txt',
+'Samples_Spring15MC/X53X53_M-1100_RH_TuneCUETP8M1_13TeV-madgraph-pythia8_RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1.txt',
+'Samples_Spring15MC/X53X53_M-1200_LH_TuneCUETP8M1_13TeV-madgraph-pythia8_RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1.txt',
+'Samples_Spring15MC/X53X53_M-1200_RH_TuneCUETP8M1_13TeV-madgraph-pythia8_RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v2.txt',
+'Samples_Spring15MC/X53X53_M-1300_LH_TuneCUETP8M1_13TeV-madgraph-pythia8_RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1.txt',
+'Samples_Spring15MC/X53X53_M-1300_RH_TuneCUETP8M1_13TeV-madgraph-pythia8_RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1.txt',
+'Samples_Spring15MC/X53X53_M-1400_LH_TuneCUETP8M1_13TeV-madgraph-pythia8_RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1.txt',
+'Samples_Spring15MC/X53X53_M-1400_RH_TuneCUETP8M1_13TeV-madgraph-pythia8_RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1.txt',
+'Samples_Spring15MC/X53X53_M-1500_LH_TuneCUETP8M1_13TeV-madgraph-pythia8_RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1.txt',
+'Samples_Spring15MC/X53X53_M-1500_RH_TuneCUETP8M1_13TeV-madgraph-pythia8_RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1.txt',
+'Samples_Spring15MC/X53X53_M-1600_LH_TuneCUETP8M1_13TeV-madgraph-pythia8_RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1.txt',
+'Samples_Spring15MC/X53X53_M-1600_RH_TuneCUETP8M1_13TeV-madgraph-pythia8_RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1.txt',
     ]
 
 if DONOMINAL=='True':
@@ -107,7 +134,7 @@ for i in range(len(prefix)):
     nfiles = 1
 
         
-    FLAGTAG = 'TriggerResults'
+    FLAGTAG = 'TriggerResults::PAT'
     
     print 'CONDOR work dir: '+dir[i]
     #os.system('rm -rf '+dir[i])
@@ -126,7 +153,7 @@ for i in range(len(prefix)):
 
     while ( nfiles <= count ):    
 
-        py_templ_file = open(rel_base+"/src/LJMet/Com/condor/Dilepton_Data_Run2015D_python.templ")
+        py_templ_file = open(rel_base+"/src/LJMet/Com/condor/Dilepton_Spring15MC_25ns_python.templ")
         condor_templ_file = open(rel_base+"/src/LJMet/Com/condor/X53condor.templ")
         csh_templ_file    = open(rel_base+"/src/LJMet/Com/condor/X53csh.templ")
 
