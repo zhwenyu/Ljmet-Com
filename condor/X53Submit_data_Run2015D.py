@@ -41,12 +41,12 @@ prefix = []
 
 if DONOMINAL=='True':
     prefix.extend([
-            'DoubleMuon_Run2015D_PromptReco_Oct5',
-            'DoubleEG_Run2015D_PromptReco_Oct5',
-            'MuonEG_Run2015D_PromptReco_Oct5',
-#            'DoubleMuon_Run2015D_PromptReco_v4',
-#            'DoubleEG_Run2015D_PromptReco_v4',
-#            'MuonEG_Run2015D_PromptReco_v4',            
+#            'DoubleMuon_Run2015D_PromptReco_Oct5',
+#            'DoubleEG_Run2015D_PromptReco_Oct5',
+#            'MuonEG_Run2015D_PromptReco_Oct5',
+            'DoubleMuon_Run2015D_PromptReco_v4',
+            'DoubleEG_Run2015D_PromptReco_v4',
+            'MuonEG_Run2015D_PromptReco_v4',            
 
     ])
 
@@ -65,12 +65,12 @@ for i in prefix:
 list = [] 
 
 listnom = [
-    'Samples_Run2015D/DoubleMuon_Run2015D_PromptReco_Oct5.txt',
-    'Samples_Run2015D/DoubleEG_Run2015D_PromptReco_Oct5.txt',
-    'Samples_Run2015D/MuonEG_Run2015D_PromptReco_Oct5.txt',
-#    'Samples_Run2015D/DoubleMuon_Run2015D_PromptReco_v4.txt',
-#    'Samples_Run2015D/DoubleEG_Run2015D_PromptReco_v4.txt',
-#    'Samples_Run2015D/MuonEG_Run2015D_PromptReco_v4.txt',
+#    'Samples_Run2015D/DoubleMuon_Run2015D_PromptReco_Oct5.txt',
+#    'Samples_Run2015D/DoubleEG_Run2015D_PromptReco_Oct5.txt',
+#    'Samples_Run2015D/MuonEG_Run2015D_PromptReco_Oct5.txt',
+    'Samples_Run2015D/DoubleMuon_Run2015D_PromptReco_v4.txt',
+    'Samples_Run2015D/DoubleEG_Run2015D_PromptReco_v4.txt',
+    'Samples_Run2015D/MuonEG_Run2015D_PromptReco_v4.txt',
     ]
 
 if DONOMINAL=='True':
