@@ -102,7 +102,6 @@ public:
     TLorentzVector correctJetForMet(const pat::Jet & jet, edm::EventBase const & event);
     TLorentzVector correctJet(const pat::Jet & jet, edm::EventBase const & event, bool doAK8Corr = false, bool forceCorr = false);
     pat::Jet correctJetReturnPatJet(const pat::Jet & jet, edm::EventBase const & event, bool doAK8Corr = false, bool forceCorr = false);
-    TLorentzVector correctMetFromRaw(const pat::MET & met, edm::EventBase const & event);
     TLorentzVector correctMet(const pat::MET & met, edm::EventBase const & event);
     TLorentzVector correctMet(const pat::MET & met, edm::EventBase const & event, std::vector<pat::Jet> jets);
     TLorentzVector correctMet(const pat::MET & met, edm::EventBase const & event, std::vector<edm::Ptr<pat::Jet> > jets);

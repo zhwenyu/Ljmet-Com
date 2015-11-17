@@ -911,8 +911,6 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
         mvCorrJetsWithBTags.clear();
         mvSelBtagJets.clear();
 
-        TLorentzVector cleanedCorrMet;
-
         // try to get earlier produced data (in a calc)
         //std::cout << "Must be 2.34: " << GetTestValue() << std::endl;
 
@@ -1123,9 +1121,7 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
             //if ( mpType1CorrMet.isNonnull() && mpType1CorrMet.isAvailable() ) {
             if ( mpMet.isNonnull() && mpMet.isAvailable() ) {
                 pat::MET const & met = mhMet->at(0);
-                TLorentzVector corrMET;
-                corrMET.SetPtEtaPhiM(met.pt(),0.,met.phi(),0.);
-                if (mbPar["doNewJEC"]) corrMET = correctMetFromRaw(met, event);
+                TLorentzVector corrMET = correctMet(met, event);
                 if ( ignoreCut("Min MET") || corrMET.Pt()>cut("Min MET", double()) ) passCut(ret, "Min MET");
                 else break;
             }

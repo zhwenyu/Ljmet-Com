@@ -21,6 +21,7 @@
 #include "LJMet/Com/interface/MVAElectronSelector.h"
 #include "SimDataFormats/GeneratorProducts/interface/GenEventInfoProduct.h"
 #include "SimDataFormats/GeneratorProducts/interface/LHEEventProduct.h"
+#include "SimDataFormats/GeneratorProducts/interface/LHERunInfoProduct.h"
 
 #include "DataFormats/BTauReco/interface/CATopJetTagInfo.h"
 #include "LJMet/Com/interface/MiniIsolation.h"
@@ -781,7 +782,7 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
         _met = pMet->p4().pt();
         _met_phi = pMet->p4().phi();
             
-        TLorentzVector corrMET = selector->correctMetFromRaw(*pMet, event);
+        TLorentzVector corrMET = selector->correctMet(*pMet, event);
 
         if(corrMET.Pt()>0) {
             _corr_met = corrMET.Pt();
@@ -870,7 +871,7 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
 	    }
 	  }
 	}
-   
+
         //load genparticles collection
         edm::Handle<reco::GenParticleCollection> genParticles;
         event.getByLabel(genParticles_it, genParticles);
