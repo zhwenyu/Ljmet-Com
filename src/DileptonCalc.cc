@@ -318,6 +318,7 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
     std::vector <double> elSihih;
     std::vector <double> elHoE;
     std::vector <double> elD0;
+    std::vector <double> elSIP3D;
     std::vector <double> elDZ;
     std::vector <double> elOoemoop;
     std::vector <int>    elMHits;
@@ -479,6 +480,9 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
 	elSihih.push_back((*iel)->full5x5_sigmaIetaIeta());
 	elHoE.push_back((*iel)->hcalOverEcal());
 	elD0.push_back((*iel)->dB());
+	pat::Electron::IpType elIP3d = (pat::Electron::IpType) 1;
+	float sip3d = (*iel)->dB(elIP3d) / (*iel)->edB(elIP3d);
+	elSIP3D.push_back(sip3d);
 	elOoemoop.push_back(1.0/(*iel)->ecalEnergy() - (*iel)->eSuperClusterOverP()/(*iel)->ecalEnergy());
 	elMHits.push_back((*iel)->gsfTrack()->hitPattern().numberOfHits(reco::HitPattern::MISSING_INNER_HITS));
 	elVtxFitConv.push_back((*iel)->passConversionVeto());
@@ -624,6 +628,7 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
     SetValue("elSihih", elSihih);
     SetValue("elHoE", elHoE);
     SetValue("elD0", elD0);
+    SetValue("elSIP3D",elSIP3D);
     SetValue("elDZ", elDZ);
     SetValue("elOoemoop", elOoemoop);
     SetValue("elMHits", elMHits);
@@ -675,6 +680,7 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
     std::vector <double> muChi2;
     std::vector <double> muDxy;
     std::vector <double> muDz;
+    std::vector <double> muSIP3D;
     std::vector <double> muRelIso;
     std::vector <double> muMiniIsoEA;
     std::vector <double> muMiniIsoDB;
@@ -769,15 +775,22 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
             //get miniIso
 	    muMiniIsoEA.push_back(getPFMiniIsolation_EffectiveArea(packedPFCands, dynamic_cast<const reco::Candidate *>(imu->get()),0.05, 0.2, 10., false, false,myRhoJetsNC));
 	    muMiniIsoDB.push_back(getPFMiniIsolation_DeltaBeta(packedPFCands, dynamic_cast<const reco::Candidate *>(imu->get()), 0.05, 0.2, 10., false));            
+	    float musip3d;
+	    pat::Muon::IpType muIP3d = (pat::Muon::IpType) 1;
             //IP: for some reason this is with respect to the first vertex in the collection
             if (goodPVs.size() > 0){
 	      muDxy . push_back((*imu)->dB());
 	      muDz  . push_back((*imu)->muonBestTrack()->dz(goodPVs.at(0).position()));
+	      //muon sip3d;
+	      musip3d = (*imu)->dB(muIP3d) / (*imu)->edB(muIP3d);
+
             } 
 	    else {
 	      muDxy . push_back(-999);
 	      muDz  . push_back(-999);
+	      musip3d=-999;
             }
+	    muSIP3D.push_back(musip3d);
             //Numbers of hits
             muNValMuHits       . push_back((*imu)->globalTrack()->hitPattern().numberOfValidMuonHits());
             muNMatchedStations . push_back((*imu)->numberOfMatchedStations());
@@ -904,6 +917,7 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
     SetValue("muChi2"   , muChi2);
     SetValue("muDxy"    , muDxy);
     SetValue("muDz"     , muDz);
+    SetValue("muSIP3D", muSIP3D);
     SetValue("muRelIso" , muRelIso);
     SetValue("muMiniIsoEA", muMiniIsoEA);
     SetValue("muMiniIsoDB", muMiniIsoDB);
