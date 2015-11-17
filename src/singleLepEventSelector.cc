@@ -262,7 +262,7 @@ void singleLepEventSelector::BeginJob( std::map<std::string, edm::ParameterSet c
         miPar["min_electron"]              = par[_key].getParameter<int>          ("min_electron");
         if (par[_key].exists("UseElMVA")) {
             mvdPar["tight_electron_mva_cuts"] = par[_key].getParameter<std::vector<double>> ("tight_electron_mva_cuts");
-            mvdPar["loose_electron_mva_cuts"] = par[_key].getParameter<std::vector<double>> ("tight_electron_mva_cuts");
+            mvdPar["loose_electron_mva_cuts"] = par[_key].getParameter<std::vector<double>> ("loose_electron_mva_cuts");
         }
 
         miPar["min_lepton"]               = par[_key].getParameter<int>          ("min_lepton");
@@ -832,9 +832,9 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
 
                         if ( mbPar["UseElMVA"] ) {
                             bool mvapass = false;
-                            if ( fabs(_iel->superCluster()->eta())<=0.8) mvapass = mvaValue( *_iel, event) > mvdPar["tight_electron_mva_cuts"].at(0);
-                            else if ( fabs(_iel->superCluster()->eta())<=1.479 && fabs(_iel->superCluster()->eta())>0.8) mvapass = mvaValue( *_iel, event) > mvdPar["tight_electron_mva_cuts"].at(1);
-                            else if ( fabs(_iel->superCluster()->eta())>1.479) mvapass = mvaValue( *_iel, event) > mvdPar["tight_electron_mva_cuts"].at(2);
+                            if ( fabs(_iel->superCluster()->eta())<=0.8) mvapass = mvaValue( *_iel, event) > mvdPar["loose_electron_mva_cuts"].at(0);
+                            else if ( fabs(_iel->superCluster()->eta())<=1.479 && fabs(_iel->superCluster()->eta())>0.8) mvapass = mvaValue( *_iel, event) > mvdPar["loose_electron_mva_cuts"].at(1);
+                            else if ( fabs(_iel->superCluster()->eta())>1.479) mvapass = mvaValue( *_iel, event) > mvdPar["loose_electron_mva_cuts"].at(2);
                             if (!mvapass) break;
                         }
                         else {
