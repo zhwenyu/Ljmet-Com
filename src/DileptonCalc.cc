@@ -210,6 +210,8 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
     bool HLT_Mu27TkMu8=false;
     bool HLT_Mu30TkMu11=false;
     bool HLT_Mu40TkMu11=false;
+    bool HLT_Mu17_Iso_Mu8_Iso=false;
+    bool HLT_Mu17_Iso_TkMu8_Iso=false;
     bool HLT_DoubleMu8_Mass8_HT300 = false;
     bool HLT_Mu40=false;
     bool HLT_IsoTkMu24=false;
@@ -249,6 +251,8 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
 	  if(Path=="HLT_M40_v1" || Path=="HLT_M40_v2" || Path=="HLT_M40_v3") HLT_Mu40=true;
 	  if(Path=="HLT_IsoTkMu24_IterTrk02_v1" || Path=="HLT_IsoTkMu24_IterTrk02_v2" || Path=="HLT_IsoTkMu24_IterTrk02_v3") HLT_IsoTkMu24=true;
 	  if(Path=="HLT_DoubleMu33NoFiltersNoVtx_v1" || Path=="HLT_DoubleMu33NoFiltersNoVtx_v2" || Path=="HLT_DoubleMu33NoFiltersNoVtx_v3") HLT_DoubleMu33NoFiltersNoVtx=true;
+	  if(Path=="HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_v1" || Path=="HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_v2" || Path=="HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_v3") HLT_Mu17_Iso_Mu8_Iso=true;
+	  if(Path=="HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ_v1" || Path=="HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ_v2" || Path=="HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ_v3") HLT_Mu17_Iso_TkMu8_Iso=true;
 	  //cross paths
 	  if(Path=="HLT_Mu17_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v1" || Path=="HLT_Mu17_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v2" || Path=="HLT_Mu17_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v3") HLT_Mu17Ele12=true;
 	  if(Path=="HLT_Mu8_TrkIsoVVL_Ele17_CaloIdL_TrackIdL_IsoVL_v1" || Path=="HLT_Mu8_TrkIsoVVL_Ele17_CaloIdL_TrackIdL_IsoVL_v2" || Path=="HLT_Mu8_TrkIsoVVL_Ele17_CaloIdL_TrackIdL_IsoVL_v3") HLT_Mu8Ele17=true;
@@ -272,6 +276,8 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
     SetValue("HLT_Mu27TkMu8",HLT_Mu27TkMu8);
     SetValue("HLT_Mu30TkMu11",HLT_Mu30TkMu11);
     SetValue("HLT_Mu40TkMu11",HLT_Mu40TkMu11);
+    SetValue("HLT_Mu17_Iso_Mu8_Iso",HLT_Mu17_Iso_Mu8_Iso);
+    SetValue("HLT_Mu17_Iso_TkMu8_Iso",HLT_Mu17_Iso_TkMu8_Iso);
     SetValue("HLT_DoubleMu8_Mass8_HT300",HLT_DoubleMu8_Mass8_HT300);
     SetValue("HLT_Mu40",HLT_Mu40);
     SetValue("HLT_IsoTkMu24",HLT_IsoTkMu24);
