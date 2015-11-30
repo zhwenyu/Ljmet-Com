@@ -536,8 +536,10 @@ int PileUpCalc::AnalyzeEvent(edm::EventBase const & event,
     //_____ Pile-up ____________________________________________
     //
     // get pile up handle
-    edm::InputTag puInfoSrc("addPileupInfo");
-    edm::Handle<std::vector< PileupSummaryInfo > >  hvPuInfo;
+
+  edm::InputTag puInfoSrc("addPileupInfo");
+  edm::InputTag slimmedPuInfoSrc("slimmedAddPileupInfo");
+  edm::Handle<std::vector< PileupSummaryInfo > >  hvPuInfo;
     
     bool isMc = selector->IsMc();
     float nTrue = -1.;
@@ -550,7 +552,7 @@ int PileUpCalc::AnalyzeEvent(edm::EventBase const & event,
     double MyWeightABCD735 = 1;
     
     if ( isMc ){
-        event.getByLabel(puInfoSrc, hvPuInfo);
+        event.getByLabel(slimmedPuInfoSrc, hvPuInfo);
         for (std::vector<PileupSummaryInfo>::const_iterator iPu=hvPuInfo->begin();
              iPu != hvPuInfo->end();
              ++iPu) {
