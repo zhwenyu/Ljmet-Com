@@ -8,7 +8,7 @@ files_per_job = 1
 
 rel_base = os.environ['CMSSW_BASE']
 
-outdir = '/eos/uscms/store/user/lpctlbsm/clint/Spring15/25ns/FakeRate/PreApproval/'
+outdir = '/eos/uscms/store/user/lpctlbsm/clint/Spring15/25ns/FakeRate/Nov17/'
 
 ### What is the name of your FWLite Analyzer
 FWLiteAnalyzer = 'ljmet'
@@ -41,9 +41,11 @@ prefix = []
 
 if DONOMINAL=='True':
     prefix.extend([
+            'DYJets',
+#            'WJets',
             #'TTJets',
-            'TTbar-powheg',
-            'TTbar-powheg_ext',
+#            'TTbar-powheg',
+#            'TTbar-powheg_ext',
             #'QCD_Pt-20to30_EMEnriched',
             #'QCD_Pt-30to50_EMEnriched',
             #'QCD_Pt-50to80_EMEnriched',
@@ -79,9 +81,12 @@ for i in prefix:
 list = [] 
 
 listnom = [
+
+'Samples_Spring15MC/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1.txt',
+#'Samples_Spring15MC/WJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1.txt',
 #    'Samples_Spring15MC/TTJets_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_RunIISpring15DR74_Asympt25ns_MCRUN2_74_V9-v1.txt',
-    'Samples_Spring15MC/TT_TuneCUETP8M1_13TeV-powheg-pythia8_RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v2.txt',
-    'Samples_Spring15MC/TT_TuneCUETP8M1_13TeV-powheg-pythia8_RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9_ext3-v1.txt',
+#    'Samples_Spring15MC/TT_TuneCUETP8M1_13TeV-powheg-pythia8_RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1.txt',
+#    'Samples_Spring15MC/TT_TuneCUETP8M1_13TeV-powheg-pythia8_RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2_ext3-v1.txt',
 #    'Samples_Spring15MC/QCD_Pt-20to30_EMEnriched_TuneCUETP8M1_13TeV_pythia8_RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1.txt',
 #    'Samples_Spring15MC/QCD_Pt-30to50_EMEnriched_TuneCUETP8M1_13TeV_pythia8_RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1.txt',
 #    'Samples_Spring15MC/QCD_Pt-50to80_EMEnriched_TuneCUETP8M1_13TeV_pythia8_RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1.txt',
