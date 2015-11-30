@@ -328,6 +328,184 @@ void BaseEventSelector::Init( void )
     mpEc->SetHistogram(mName, "nBtagSfCorrections", 100, 0.0, 10.0);
 }
 
+TLorentzVector BaseEventSelector::correctJetForMet(const pat::Jet & jet, edm::EventBase const & event)
+{
+
+    TLorentzVector jetP4, oldJetP4, offJetP4, offOldJetP4;
+    jetP4.SetPtEtaPhiM(0.000001,1.,1.,0.000001);
+    oldJetP4 = jetP4;
+
+    if ( jet.chargedEmEnergyFraction() + jet.neutralEmEnergyFraction() > 0.90 ) {return jetP4-oldJetP4;}
+
+    double offOldCorr = jet.correctedJet(1).pt()/jet.correctedJet(0).pt();
+    double oldCorr = jet.pt()/jet.correctedJet(0).pt();
+
+    pat::Jet correctedJet = jet.correctedJet(0);                 //copy original jet
+
+    jetP4.SetPtEtaPhiM(correctedJet.pt(),correctedJet.eta(),correctedJet.phi(),correctedJet.mass());
+
+    const std::vector<reco::CandidatePtr> & cands = jet.daughterPtrVector();
+    for ( std::vector<reco::CandidatePtr>::const_iterator cand = cands.begin();
+        cand != cands.end(); ++cand ) {
+        const reco::PFCandidate *pfcand = dynamic_cast<const reco::PFCandidate *>(cand->get());
+        const reco::Candidate *mu = (pfcand != 0 ? ( pfcand->muonRef().isNonnull() ? pfcand->muonRef().get() : 0) : cand->get());
+        if ( mu != 0 && (mu->isGlobalMuon() || mu->isStandAloneMuon()) ) {
+	    TLorentzVector muonP4;
+            muonP4.SetPtEtaPhiM((*cand)->pt(),(*cand)->eta(),(*cand)->phi(),(*cand)->mass());
+	    jetP4 -= muonP4;
+        }
+    }
+    offJetP4 = jetP4;
+    oldJetP4 = jetP4;
+    offOldJetP4 = jetP4;
+    oldJetP4 *= oldCorr;
+    offOldJetP4 *= offOldCorr;
+
+    double ptscale = 1.0;
+    double unc = 1.0;
+    double pt = correctedJet.pt();
+    std::vector<float> corrVec;
+
+    edm::Handle<double> rhoHandle;
+    edm::InputTag rhoSrc_("fixedGridRhoFastjetAll", "");
+    event.getByLabel(rhoSrc_, rhoHandle);
+    double rho = std::max(*(rhoHandle.product()), 0.0);
+
+    if ( mbPar["isMc"] ){ 
+
+        JetCorrector->setJetEta(jetP4.Eta());
+  	JetCorrector->setJetPt(pt);
+        JetCorrector->setJetA(jet.jetArea());
+  	JetCorrector->setRho(rho); 
+    
+        try{
+    	    corrVec = JetCorrector->getSubCorrections();
+        }
+  	catch(...){
+    	    std::cout << mLegend << "WARNING! Exception thrown by JetCorrectionUncertainty!" << std::endl;
+    	    std::cout << mLegend << "WARNING! Possibly, trying to correct a jet/MET outside correction range." << std::endl;
+    	    std::cout << mLegend << "WARNING! Jet/MET will remain uncorrected." << std::endl;
+        }
+      
+        jetP4 *= corrVec[corrVec.size()-1];
+        offJetP4 *= corrVec[0];
+        pt = jetP4.Pt();
+
+        double factor = 0.0; // For Nominal Case
+        double theAbsJetEta = fabs(jetP4.Eta());
+        
+        if ( theAbsJetEta < 0.8 ) {
+            factor = .061;
+            if (mbPar["JERup"]) factor = 0.084;
+            if (mbPar["JERdown"]) factor = 0.038;
+        }
+        else if ( theAbsJetEta < 1.3) {
+            factor = 0.088;
+            if (mbPar["JERup"]) factor = 0.059;
+            if (mbPar["JERdown"]) factor = 0.117;
+        }
+        else if ( theAbsJetEta < 1.9) {
+            factor = 0.106;
+            if (mbPar["JERup"]) factor = 0.136;
+            if (mbPar["JERdown"]) factor = 0.076;
+        }
+        else if ( theAbsJetEta < 2.5) {
+            factor = 0.126;
+            if (mbPar["JERup"]) factor = 0.220;
+            if (mbPar["JERdown"]) factor = 0.032;
+            
+        }
+        else if (theAbsJetEta < 3.0) {
+            factor = 0.343;
+            if (mbPar["JERup"]) factor = 0.466;
+            if (mbPar["JERdown"]) factor = 0.220;
+        }
+        else if (theAbsJetEta < 3.2) {
+            factor = 0.303;
+            if (mbPar["JERup"]) factor = 0.414;
+            if (mbPar["JERdown"]) factor = 0.192;
+        }
+        else if (theAbsJetEta < 5.0) {
+            factor = 0.320;
+            if (mbPar["JERup"]) factor = 0.606;
+            if (mbPar["JERdown"]) factor = 0.034;
+        }
+
+        const reco::GenJet * genJet = jet.genJet();
+    	if (genJet && genJet->pt()>15. && (fabs(genJet->pt()/pt-1)<0.5)){
+      	    double gen_pt = genJet->pt();
+      	    double reco_pt = pt;
+            double deltapt = (reco_pt - gen_pt) * factor;
+            ptscale = max(0.0, (reco_pt + deltapt) / reco_pt);
+        }
+
+        if ( mbPar["JECup"] || mbPar["JECdown"]) {
+            jecUnc->setJetEta(jetP4.Eta());
+            jecUnc->setJetPt(jetP4.Pt()*ptscale);
+
+            if (mbPar["JECup"]) { 
+	        try{
+                    unc = jecUnc->getUncertainty(true);
+	        }
+	        catch(...){ // catch all exceptions. Jet Uncertainty tool throws when binning out of range
+	            std::cout << mLegend << "WARNING! Exception thrown by JetCorrectionUncertainty!" << std::endl;
+                    std::cout << mLegend << "WARNING! Possibly, trying to correct a jet/MET outside correction range." << std::endl;
+	            std::cout << mLegend << "WARNING! Jet/MET will remain uncorrected." << std::endl;
+	            unc = 0.0;
+	        }
+                unc = 1 + unc; 
+            }
+            else { 
+	        try{
+                    unc = jecUnc->getUncertainty(false);
+	        }
+	        catch(...){
+	            std::cout << mLegend << "WARNING! Exception thrown by JetCorrectionUncertainty!" << std::endl;
+	            std::cout << mLegend << "WARNING! Possibly, trying to correct a jet/MET outside correction range." << std::endl;
+	            std::cout << mLegend << "WARNING! Jet/MET will remain uncorrected." << std::endl;
+	            unc = 0.0;
+	        }
+                unc = 1 - unc; 
+            }
+
+            if (jetP4.Pt()*ptscale < 10.0 && mbPar["JECup"]) unc = 2.0;
+            if (jetP4.Pt()*ptscale < 10.0 && mbPar["JECdown"]) unc = 0.01;
+
+        }
+    }
+    else if (!mbPar["isMc"]) {
+      
+        JetCorrector->setJetEta(jetP4.Eta());
+  	JetCorrector->setJetPt(pt);
+        JetCorrector->setJetA(jet.jetArea());
+  	JetCorrector->setRho(rho); 
+    
+        try{
+    	    corrVec = JetCorrector->getSubCorrections();
+        }
+  	catch(...){
+    	    std::cout << mLegend << "WARNING! Exception thrown by JetCorrectionUncertainty!" << std::endl;
+    	    std::cout << mLegend << "WARNING! Possibly, trying to correct a jet/MET outside correction range." << std::endl;
+    	    std::cout << mLegend << "WARNING! Jet/MET will remain uncorrected." << std::endl;
+        }
+      
+        jetP4 *= corrVec[corrVec.size()-1];
+        offJetP4 *= corrVec[0];
+	
+    }
+
+    jetP4 *= unc*ptscale;
+    offJetP4 *= unc*ptscale;
+    oldJetP4 *= unc*ptscale;
+    offOldJetP4 *= unc*ptscale;
+    if (jetP4.Pt()<=15.) {
+        oldJetP4 = jetP4;
+        offOldJetP4 = offJetP4;
+    }
+
+    return oldJetP4-offOldJetP4-jetP4+offJetP4;
+}
+
 TLorentzVector BaseEventSelector::correctJet(const pat::Jet & jet, edm::EventBase const & event, bool doAK8Corr, bool forceCorr)
 {
 
@@ -391,34 +569,43 @@ TLorentzVector BaseEventSelector::correctJet(const pat::Jet & jet, edm::EventBas
 
         }
         double factor = 0.0; // For Nominal Case
-        //double theAbsJetEta = fabs(jet.eta());
-        double theAbsJetEta = 9.; // for now, force no smearing (instead of using 2012 numbers)
+        double theAbsJetEta = fabs(jet.eta());
         
-        if ( theAbsJetEta < 0.5 ) {
-            factor = .052;
-            if (mbPar["JERup"]) factor = 0.115;
-            if (mbPar["JERdown"]) factor = -0.011;
+        if ( theAbsJetEta < 0.8 ) {
+            factor = .061;
+            if (mbPar["JERup"]) factor = 0.084;
+            if (mbPar["JERdown"]) factor = 0.038;
         }
-        else if ( theAbsJetEta < 1.1) {
-            factor = 0.057;
-            if (mbPar["JERup"]) factor = 0.114;
-            if (mbPar["JERdown"]) factor = 0.0;
+        else if ( theAbsJetEta < 1.3) {
+            factor = 0.088;
+            if (mbPar["JERup"]) factor = 0.059;
+            if (mbPar["JERdown"]) factor = 0.117;
         }
-        else if ( theAbsJetEta < 1.7) {
-            factor = 0.096;
-            if (mbPar["JERup"]) factor = 0.161;
-            if (mbPar["JERdown"]) factor = 0.031;
+        else if ( theAbsJetEta < 1.9) {
+            factor = 0.106;
+            if (mbPar["JERup"]) factor = 0.136;
+            if (mbPar["JERdown"]) factor = 0.076;
         }
-        else if ( theAbsJetEta < 2.3) {
-            factor = 0.134;
-            if (mbPar["JERup"]) factor = 0.228;
-            if (mbPar["JERdown"]) factor = 0.040;
+        else if ( theAbsJetEta < 2.5) {
+            factor = 0.126;
+            if (mbPar["JERup"]) factor = 0.220;
+            if (mbPar["JERdown"]) factor = 0.032;
             
         }
+        else if (theAbsJetEta < 3.0) {
+            factor = 0.343;
+            if (mbPar["JERup"]) factor = 0.466;
+            if (mbPar["JERdown"]) factor = 0.220;
+        }
+        else if (theAbsJetEta < 3.2) {
+            factor = 0.303;
+            if (mbPar["JERup"]) factor = 0.414;
+            if (mbPar["JERdown"]) factor = 0.192;
+        }
         else if (theAbsJetEta < 5.0) {
-            factor = 0.288;
-            if (mbPar["JERup"]) factor = 0.488;
-            if (mbPar["JERdown"]) factor = 0.088;
+            factor = 0.320;
+            if (mbPar["JERup"]) factor = 0.606;
+            if (mbPar["JERdown"]) factor = 0.034;
         }
 
         const reco::GenJet * genJet = jet.genJet();
@@ -433,33 +620,33 @@ TLorentzVector BaseEventSelector::correctJet(const pat::Jet & jet, edm::EventBas
             jecUnc->setJetEta(jet.eta());
             jecUnc->setJetPt(pt*ptscale);
 
-        if (mbPar["JECup"]) { 
-	    try{
-                unc = jecUnc->getUncertainty(true);
-	    }
-	    catch(...){ // catch all exceptions. Jet Uncertainty tool throws when binning out of range
-	        std::cout << mLegend << "WARNING! Exception thrown by JetCorrectionUncertainty!" << std::endl;
-                std::cout << mLegend << "WARNING! Possibly, trying to correct a jet/MET outside correction range." << std::endl;
-	        std::cout << mLegend << "WARNING! Jet/MET will remain uncorrected." << std::endl;
-	        unc = 0.0;
-	    }
-            unc = 1 + unc; 
-        }
-        else { 
-	    try{
-                unc = jecUnc->getUncertainty(false);
-	    }
-	    catch(...){
-	        std::cout << mLegend << "WARNING! Exception thrown by JetCorrectionUncertainty!" << std::endl;
-	        std::cout << mLegend << "WARNING! Possibly, trying to correct a jet/MET outside correction range." << std::endl;
-	        std::cout << mLegend << "WARNING! Jet/MET will remain uncorrected." << std::endl;
-	        unc = 0.0;
-	    }
-            unc = 1 - unc; 
-        }
+            if (mbPar["JECup"]) { 
+	        try{
+                    unc = jecUnc->getUncertainty(true);
+	        }
+	        catch(...){ // catch all exceptions. Jet Uncertainty tool throws when binning out of range
+	            std::cout << mLegend << "WARNING! Exception thrown by JetCorrectionUncertainty!" << std::endl;
+                    std::cout << mLegend << "WARNING! Possibly, trying to correct a jet/MET outside correction range." << std::endl;
+	            std::cout << mLegend << "WARNING! Jet/MET will remain uncorrected." << std::endl;
+	            unc = 0.0;
+	        }
+                unc = 1 + unc; 
+            }
+            else { 
+	        try{
+                    unc = jecUnc->getUncertainty(false);
+	        }
+	        catch(...){
+	            std::cout << mLegend << "WARNING! Exception thrown by JetCorrectionUncertainty!" << std::endl;
+	            std::cout << mLegend << "WARNING! Possibly, trying to correct a jet/MET outside correction range." << std::endl;
+	            std::cout << mLegend << "WARNING! Jet/MET will remain uncorrected." << std::endl;
+	            unc = 0.0;
+	        }
+                unc = 1 - unc; 
+            }
 
-        if (pt*ptscale < 10.0 && mbPar["JECup"]) unc = 2.0;
-        if (pt*ptscale < 10.0 && mbPar["JECdown"]) unc = 0.01;
+            if (pt*ptscale < 10.0 && mbPar["JECup"]) unc = 2.0;
+            if (pt*ptscale < 10.0 && mbPar["JECdown"]) unc = 0.01;
 
         }
     }
@@ -594,34 +781,43 @@ pat::Jet BaseEventSelector::correctJetReturnPatJet(const pat::Jet & jet, edm::Ev
 
         }
         double factor = 0.0; // For Nominal Case
-        //double theAbsJetEta = fabs(jet.eta());
-        double theAbsJetEta = 9.; // for now, force no smearing (instead of using 2012 numbers)
+        double theAbsJetEta = fabs(jet.eta());
         
-        if ( theAbsJetEta < 0.5 ) {
-            factor = .052;
-            if (mbPar["JERup"]) factor = 0.115;
-            if (mbPar["JERdown"]) factor = -0.011;
+        if ( theAbsJetEta < 0.8 ) {
+            factor = .061;
+            if (mbPar["JERup"]) factor = 0.084;
+            if (mbPar["JERdown"]) factor = 0.038;
         }
-        else if ( theAbsJetEta < 1.1) {
-            factor = 0.057;
-            if (mbPar["JERup"]) factor = 0.114;
-            if (mbPar["JERdown"]) factor = 0.0;
+        else if ( theAbsJetEta < 1.3) {
+            factor = 0.088;
+            if (mbPar["JERup"]) factor = 0.059;
+            if (mbPar["JERdown"]) factor = 0.117;
         }
-        else if ( theAbsJetEta < 1.7) {
-            factor = 0.096;
-            if (mbPar["JERup"]) factor = 0.161;
-            if (mbPar["JERdown"]) factor = 0.031;
+        else if ( theAbsJetEta < 1.9) {
+            factor = 0.106;
+            if (mbPar["JERup"]) factor = 0.136;
+            if (mbPar["JERdown"]) factor = 0.076;
         }
-        else if ( theAbsJetEta < 2.3) {
-            factor = 0.134;
-            if (mbPar["JERup"]) factor = 0.228;
-            if (mbPar["JERdown"]) factor = 0.040;
+        else if ( theAbsJetEta < 2.5) {
+            factor = 0.126;
+            if (mbPar["JERup"]) factor = 0.220;
+            if (mbPar["JERdown"]) factor = 0.032;
             
         }
+        else if (theAbsJetEta < 3.0) {
+            factor = 0.343;
+            if (mbPar["JERup"]) factor = 0.466;
+            if (mbPar["JERdown"]) factor = 0.220;
+        }
+        else if (theAbsJetEta < 3.2) {
+            factor = 0.303;
+            if (mbPar["JERup"]) factor = 0.414;
+            if (mbPar["JERdown"]) factor = 0.192;
+        }
         else if (theAbsJetEta < 5.0) {
-            factor = 0.288;
-            if (mbPar["JERup"]) factor = 0.488;
-            if (mbPar["JERdown"]) factor = 0.088;
+            factor = 0.320;
+            if (mbPar["JERup"]) factor = 0.606;
+            if (mbPar["JERdown"]) factor = 0.034;
         }
 
         const reco::GenJet * genJet = jet.genJet();
@@ -636,33 +832,33 @@ pat::Jet BaseEventSelector::correctJetReturnPatJet(const pat::Jet & jet, edm::Ev
             jecUnc->setJetEta(jet.eta());
             jecUnc->setJetPt(pt*ptscale);
 
-        if (mbPar["JECup"]) { 
-	    try{
-                unc = jecUnc->getUncertainty(true);
-	    }
-	    catch(...){ // catch all exceptions. Jet Uncertainty tool throws when binning out of range
-	        std::cout << mLegend << "WARNING! Exception thrown by JetCorrectionUncertainty!" << std::endl;
-                std::cout << mLegend << "WARNING! Possibly, trying to correct a jet/MET outside correction range." << std::endl;
-	        std::cout << mLegend << "WARNING! Jet/MET will remain uncorrected." << std::endl;
-	        unc = 0.0;
-	    }
-            unc = 1 + unc; 
-        }
-        else { 
-	    try{
-                unc = jecUnc->getUncertainty(false);
-	    }
-	    catch(...){
-	        std::cout << mLegend << "WARNING! Exception thrown by JetCorrectionUncertainty!" << std::endl;
-	        std::cout << mLegend << "WARNING! Possibly, trying to correct a jet/MET outside correction range." << std::endl;
-	        std::cout << mLegend << "WARNING! Jet/MET will remain uncorrected." << std::endl;
-	        unc = 0.0;
-	    }
-            unc = 1 - unc; 
-        }
-
-        if (pt*ptscale < 10.0 && mbPar["JECup"]) unc = 2.0;
-        if (pt*ptscale < 10.0 && mbPar["JECdown"]) unc = 0.01;
+            if (mbPar["JECup"]) { 
+    	        try{
+                    unc = jecUnc->getUncertainty(true);
+                }
+    	        catch(...){ // catch all exceptions. Jet Uncertainty tool throws when binning out of range
+    	            std::cout << mLegend << "WARNING! Exception thrown by JetCorrectionUncertainty!" << std::endl;
+                    std::cout << mLegend << "WARNING! Possibly, trying to correct a jet/MET outside correction range." << std::endl;
+                    std::cout << mLegend << "WARNING! Jet/MET will remain uncorrected." << std::endl;
+    	            unc = 0.0;
+    	        }
+                unc = 1 + unc; 
+            }
+            else { 
+    	        try{
+                    unc = jecUnc->getUncertainty(false);
+    	        }
+    	        catch(...){
+    	            std::cout << mLegend << "WARNING! Exception thrown by JetCorrectionUncertainty!" << std::endl;
+    	            std::cout << mLegend << "WARNING! Possibly, trying to correct a jet/MET outside correction range." << std::endl;
+    	            std::cout << mLegend << "WARNING! Jet/MET will remain uncorrected." << std::endl;
+    	            unc = 0.0;
+    	        }
+                unc = 1 - unc; 
+            }
+    
+            if (pt*ptscale < 10.0 && mbPar["JECup"]) unc = 2.0;
+            if (pt*ptscale < 10.0 && mbPar["JECdown"]) unc = 0.01;
 
         }
     }
@@ -751,13 +947,13 @@ TLorentzVector BaseEventSelector::correctMet(const pat::MET & met, edm::EventBas
 {
     double correctedMET_px = met.px();
     double correctedMET_py = met.py();
-    
-    for (std::vector<edm::Ptr<pat::Jet> >::const_iterator ijet = mvAllJets.begin();
-         ijet != mvAllJets.end(); ++ijet) {
-        if ((**ijet).pt()<15) continue;
-        TLorentzVector lv = correctJet(**ijet, event);
-        correctedMET_px += (**ijet).px() -lv.Px();
-        correctedMET_py += (**ijet).py() -lv.Py();
+    if ( mbPar["doNewJEC"] ) {
+        for (std::vector<edm::Ptr<pat::Jet> >::const_iterator ijet = mvAllJets.begin();
+             ijet != mvAllJets.end(); ++ijet) {
+            TLorentzVector lv = correctJetForMet(**ijet, event);
+            correctedMET_px += lv.Px();
+            correctedMET_py += lv.Py();
+        }
     }
     
     correctedMET_p4.SetPxPyPzE(correctedMET_px, correctedMET_py, 0, sqrt(correctedMET_px*correctedMET_px+correctedMET_py*correctedMET_py));
@@ -773,15 +969,16 @@ TLorentzVector BaseEventSelector::correctMet(const pat::MET & met, edm::EventBas
 
 TLorentzVector BaseEventSelector::correctMet(const pat::MET & met, edm::EventBase const & event, std::vector<pat::Jet> jets)
 {
+    
     double correctedMET_px = met.px();
     double correctedMET_py = met.py();
-    
-    for (std::vector<pat::Jet>::const_iterator ijet = jets.begin();
-         ijet != jets.end(); ++ijet) {
-        if ((*ijet).pt()<15) continue;
-        TLorentzVector lv = correctJet(*ijet, event);
-        correctedMET_px += (*ijet).px() -lv.Px();
-        correctedMET_py += (*ijet).py() -lv.Py();
+    if ( mbPar["doNewJEC"] ) {
+        for (std::vector<pat::Jet>::const_iterator ijet = jets.begin();
+             ijet != jets.end(); ++ijet) {
+            TLorentzVector lv = correctJetForMet(*ijet, event);
+            correctedMET_px += lv.Px();
+            correctedMET_py += lv.Py();
+        }
     }
     
     correctedMET_p4.SetPxPyPzE(correctedMET_px, correctedMET_py, 0, sqrt(correctedMET_px*correctedMET_px+correctedMET_py*correctedMET_py));
