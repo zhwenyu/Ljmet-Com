@@ -937,12 +937,10 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
                     }
                 }
 
-                if (not bKeep){
-                    for (unsigned int uk = 0; uk < keepMomPDGID.size(); uk++){
-                        if (abs(mother->pdgId()) == (int) keepMomPDGID.at(uk)){
-                            bKeep = true;
-                            break;
-                        }
+                for (unsigned int uk = 0; uk < keepMomPDGID.size(); uk++){
+                    if (abs(mother->pdgId()) == (int) keepMomPDGID.at(uk)){
+                        bKeep = true;
+                        break;
                     }
                 }
 
