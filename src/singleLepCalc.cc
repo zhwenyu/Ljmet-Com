@@ -55,6 +55,7 @@ private:
     edm::InputTag             genJets_it;
     std::vector<unsigned int> keepPDGID;
     std::vector<unsigned int> keepMomPDGID;
+    std::vector<unsigned int> keepPDGIDForce;
     bool keepFullMChistory;
     bool cleanGenJets;
     bool UseElMVA;
@@ -118,6 +119,9 @@ int singleLepCalc::BeginJob()
 
     if (mPset.exists("keepMomPDGID")) keepMomPDGID = mPset.getParameter<std::vector<unsigned int> >("keepMomPDGID");
     else                              keepMomPDGID.clear();
+    
+    if (mPset.exists("keepPDGIDForce")) keepPDGIDForce = mPset.getParameter<std::vector<unsigned int> >("keepPDGIDForce");
+    else                              keepPDGIDForce.clear();
     
     if (mPset.exists("keepFullMChistory")) keepFullMChistory = mPset.getParameter<bool>("keepFullMChistory");
     else                                   keepFullMChistory = true;
@@ -886,6 +890,13 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
         for(size_t i = 0; i < genParticles->size(); i++){
             const reco::GenParticle & p = (*genParticles).at(i);
 
+            bool forceSave = false;
+            for (unsigned int ii = 0; ii < keepPDGIDForce.size(); ii++){
+                if (abs(p.pdgId()) == (int) keepPDGIDForce.at(ii)){
+                    forceSave = true;
+                    break;
+                }
+            }
             /*if (abs(p.pdgId())==11 || abs(p.pdgId())==13 || abs(p.pdgId())==15) {
 	        std::cout << i << "\t" << p.status() << "\t" << p.mass() << "\t" << p.pt() << "\t" << p.eta() << "\t" << p.phi() << "\t" << p.pdgId() << "\t";
 	        if (!(!(p.mother()))) {
@@ -929,18 +940,19 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
                 if (not mother)            continue;
 
                 bool bKeep = false;
-
-                for (unsigned int uk = 0; uk < keepPDGID.size(); uk++){
-                    if (abs(p.pdgId()) == (int) keepPDGID.at(uk)){
+                for (unsigned int uk = 0; uk < keepMomPDGID.size(); uk++){
+                    if (abs(mother->pdgId()) == (int) keepMomPDGID.at(uk)){
                         bKeep = true;
                         break;
                     }
                 }
 
-                for (unsigned int uk = 0; uk < keepMomPDGID.size(); uk++){
-                    if (abs(mother->pdgId()) == (int) keepMomPDGID.at(uk)){
-                        bKeep = true;
-                        break;
+                if (not bKeep) {
+                    for (unsigned int uk = 0; uk < keepPDGID.size(); uk++){
+                        if (abs(p.pdgId()) == (int) keepPDGID.at(uk)){
+                            bKeep = true;
+                            break;
+                        }
                     }
                 }
 
@@ -969,6 +981,20 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
                 genStatus        . push_back(p.status());
                 genMotherID      . push_back(mother->pdgId());
                 genMotherIndex   . push_back(mInd);
+            }
+            else if (forceSave) {
+                //Four vector
+                genPt     . push_back(p.pt());
+                genEta    . push_back(p.eta());
+                genPhi    . push_back(p.phi());
+                genEnergy . push_back(p.energy());
+
+                //Identity
+                genID            . push_back(p.pdgId());
+                genIndex         . push_back((int) i);
+                genStatus        . push_back(p.status());
+                genMotherID      . push_back(0);
+                genMotherIndex   . push_back(0);
             }
         }//End loop over gen particles
 	TLorentzVector tmpJet;
