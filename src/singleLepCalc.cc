@@ -56,6 +56,7 @@ private:
     std::vector<unsigned int> keepPDGID;
     std::vector<unsigned int> keepMomPDGID;
     std::vector<unsigned int> keepPDGIDForce;
+    std::vector<unsigned int> keepStatusForce;
     bool keepFullMChistory;
     bool cleanGenJets;
     bool UseElMVA;
@@ -122,6 +123,15 @@ int singleLepCalc::BeginJob()
     
     if (mPset.exists("keepPDGIDForce")) keepPDGIDForce = mPset.getParameter<std::vector<unsigned int> >("keepPDGIDForce");
     else                              keepPDGIDForce.clear();
+    
+    if (mPset.exists("keepStatusForce")) keepStatusForce = mPset.getParameter<std::vector<unsigned int> >("keepStatusForce");
+    else                              keepStatusForce.clear();
+
+    if (keepStatusForce.size() != keepPDGIDForce.size()) {
+        cout<<"Sizes of forced status and ID vectors do not match, ignoring input!!!"<<endl;
+        keepStatusForce.clear();
+        keepPDGIDForce.clear();
+    }
     
     if (mPset.exists("keepFullMChistory")) keepFullMChistory = mPset.getParameter<bool>("keepFullMChistory");
     else                                   keepFullMChistory = true;
@@ -892,18 +902,18 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
 
             bool forceSave = false;
             for (unsigned int ii = 0; ii < keepPDGIDForce.size(); ii++){
-                if (abs(p.pdgId()) == (int) keepPDGIDForce.at(ii)){
+                if (abs(p.pdgId()) == (int) keepPDGIDForce.at(ii) && p.status() == (int) keepStatusForce.at(ii)){
                     forceSave = true;
                     break;
                 }
             }
-            /*if (abs(p.pdgId())==11 || abs(p.pdgId())==13 || abs(p.pdgId())==15) {
-	        std::cout << i << "\t" << p.status() << "\t" << p.mass() << "\t" << p.pt() << "\t" << p.eta() << "\t" << p.phi() << "\t" << p.pdgId() << "\t";
-	        if (!(!(p.mother()))) {
-                    std::cout << p.mother()->pdgId() << "\t" << p.mother()->status() << "\t";
-	            if (!(!(p.mother()->mother()))) std::cout << p.mother()->mother()->pdgId() << "\t" << p.mother()->mother()->status() << "\t";
-                }
-            }*/
+            //if (abs(p.pdgId())==11 || abs(p.pdgId())==13 || abs(p.pdgId())==15) {
+	    //    std::cout << i << "\t" << p.status() << "\t" << p.mass() << "\t" << p.pt() << "\t" << p.eta() << "\t" << p.phi() << "\t" << p.pdgId() << "\t";
+	    //    if (!(!(p.mother()))) {
+            //        std::cout << p.mother()->pdgId() << "\t" << p.mother()->status() << "\t";
+	    //        if (!(!(p.mother()->mother()))) std::cout << p.mother()->mother()->pdgId() << "\t" << p.mother()->mother()->status() << "\t";
+            //    }
+            //}
 
 	    if (p.status() == 1 && (abs(p.pdgId()) == 11 || abs(p.pdgId()) == 13)){
 		if (!(!(p.mother()))) {
