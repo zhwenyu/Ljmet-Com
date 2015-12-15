@@ -30,6 +30,8 @@
 #include "LJMet/Com/interface/BtagHardcodedConditions.h"
 #include "CondFormats/JetMETObjects/interface/JetCorrectionUncertainty.h"
 #include "CondFormats/JetMETObjects/interface/FactorizedJetCorrector.h"
+#include "JetMETCorrections/Objects/interface/JetCorrector.h"
+#include "CondFormats/JetMETObjects/interface/JetCorrectorParameters.h"
 
 #include "RecoEgamma/EgammaTools/interface/ConversionTools.h"
 #include "TMath.h"
@@ -55,7 +57,24 @@ public:
     virtual ~BaseEventSelector() { };
     virtual void BeginJob(std::map<std::string, edm::ParameterSet const > par);
     virtual bool operator()( edm::EventBase const & event, pat::strbitset & ret) = 0;
-    virtual void EndJob() { }
+    virtual void EndJob() {
+
+      delete ResJetPar;
+      delete L3JetPar;
+      delete L2JetPar;
+      delete L1JetPar;
+
+      delete ResJetParAK8;
+      delete L3JetParAK8;
+      delete L2JetParAK8;
+      delete L1JetParAK8;
+
+      delete jecUnc;
+
+      delete JetCorrector;
+      delete JetCorrectorAK8;
+
+    }
     virtual void AnalyzeEvent( edm::EventBase const & event, LjmetEventContent & ec ) { }
     std::string GetName() { return mName; }
     /// Evaluates a signed perp components of v1 relative to v2. The sign is defined by Phi
@@ -153,6 +172,14 @@ private:
     BTagSFUtil mBtagSfUtil;
     BtagHardcodedConditions mBtagCond;
     JetCorrectionUncertainty *jecUnc;
+    JetCorrectorParameters *L3JetPar;
+    JetCorrectorParameters *L2JetPar;
+    JetCorrectorParameters *L1JetPar;    				   
+    JetCorrectorParameters *L3JetParAK8;
+    JetCorrectorParameters *L2JetParAK8;
+    JetCorrectorParameters *L1JetParAK8;
+    JetCorrectorParameters *ResJetPar; 
+    JetCorrectorParameters *ResJetParAK8; 
     FactorizedJetCorrector *JetCorrector;
     FactorizedJetCorrector *JetCorrectorAK8;
     LjmetEventContent * mpEc;
