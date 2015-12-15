@@ -200,11 +200,6 @@ void BaseEventSelector::BeginJob(std::map<std::string, edm::ParameterSet const >
     	vParAK8.push_back(*L3JetParAK8);
     	vParAK8.push_back(*ResJetParAK8);
 
-	// CAN I DELETE THE *L1, L2, etc HERE? WILL THAT KILL THE vPar CONTENTS?
-	//yes, that will kill them.
-	// but they are only "in scope" in this loop...make global?
-	//that's a property of the new operator. It makes objects created persistent out of their scope. That's why it's possible to return a poitner from a fucntoin that makes it using the new operator. 
-
     }
     if (mbPar["doNewJEC"]) std::cout << mLegend << "Applying new jet energy corrections" << std::endl;
     else std::cout << mLegend << "NOT applying new jet energy corrections - ARE YOU SURE?" << std::endl;
