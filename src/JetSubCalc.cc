@@ -60,6 +60,10 @@ private:
   std::string DataL2;
   std::string DataL2L3;
   FactorizedJetCorrector *jecak8;
+  JetCorrectorParameters *L3JetParAK8;
+  JetCorrectorParameters *L2JetParAK8;
+  JetCorrectorParameters *ResJetParAK8; 
+
 };
 
 static int reg = LjmetFactory::GetInstance()->Register(new JetSubCalc(), "JetSubCalc");
@@ -135,14 +139,14 @@ int JetSubCalc::BeginJob()
       std::vector<JetCorrectorParameters> vParAK8;
       
       if(isMc){
-	JetCorrectorParameters *L3JetParAK8  = new JetCorrectorParameters(MCL3);
-	JetCorrectorParameters *L2JetParAK8  = new JetCorrectorParameters(MCL2);
+	L3JetParAK8  = new JetCorrectorParameters(MCL3);
+	L2JetParAK8  = new JetCorrectorParameters(MCL2);
 	vParAK8.push_back(*L2JetParAK8);
 	vParAK8.push_back(*L3JetParAK8);
       }else{
-	JetCorrectorParameters *ResJetParAK8 = new JetCorrectorParameters(DataL2L3); 
-	JetCorrectorParameters *L3JetParAK8  = new JetCorrectorParameters(DataL3);
-	JetCorrectorParameters *L2JetParAK8  = new JetCorrectorParameters(DataL2);
+	ResJetParAK8 = new JetCorrectorParameters(DataL2L3); 
+	L3JetParAK8  = new JetCorrectorParameters(DataL3);
+	L2JetParAK8  = new JetCorrectorParameters(DataL2);
 	vParAK8.push_back(*L2JetParAK8);
 	vParAK8.push_back(*L3JetParAK8);
 	vParAK8.push_back(*ResJetParAK8);
@@ -869,5 +873,10 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * s
 
 int JetSubCalc::EndJob()
 {
-    return 0;
+
+  delete jecak8;
+  delete L2JetParAK8;
+  delete L3JetParAK8;
+  delete ResJetParAK8;
+  return 0;
 }
