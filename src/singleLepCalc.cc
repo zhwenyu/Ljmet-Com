@@ -21,6 +21,7 @@
 #include "LJMet/Com/interface/MVAElectronSelector.h"
 #include "SimDataFormats/GeneratorProducts/interface/GenEventInfoProduct.h"
 #include "SimDataFormats/GeneratorProducts/interface/LHEEventProduct.h"
+#include "SimDataFormats/GeneratorProducts/interface/LHERunInfoProduct.h"
 
 #include "DataFormats/BTauReco/interface/CATopJetTagInfo.h"
 #include "LJMet/Com/interface/MiniIsolation.h"
@@ -753,7 +754,7 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
         AK4JetBTag   . push_back(vCorrBtagJets[ii].second);
         //AK4JetRCN    . push_back(((*ijet)->chargedEmEnergy()+(*ijet)->chargedHadronEnergy()) / ((*ijet)->neutralEmEnergy()+(*ijet)->neutralHadronEnergy()));
         AK4JetBDisc  . push_back(vSelJets[ii]->bDiscriminator( "pfCombinedInclusiveSecondaryVertexV2BJetTags" ));
-        AK4JetFlav   . push_back(abs(vSelJets[ii]->partonFlavour()));
+        AK4JetFlav   . push_back(abs(vSelJets[ii]->hadronFlavour()));
  
         //HT
         AK4HT += lv.Pt(); 
@@ -781,8 +782,8 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
         _met = pMet->p4().pt();
         _met_phi = pMet->p4().phi();
             
-        TLorentzVector corrMET = selector->correctMet(*pMet, event) + selector->GetCleanedCorrMet();
-        //std::cout<<(selector->GetCleanedCorrMet()).Pt()<<std::endl;
+        TLorentzVector corrMET = selector->correctMet(*pMet, event);
+
         if(corrMET.Pt()>0) {
             _corr_met = corrMET.Pt();
             _corr_met_phi = corrMET.Phi();
@@ -870,7 +871,7 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
 	    }
 	  }
 	}
-   
+
         //load genparticles collection
         edm::Handle<reco::GenParticleCollection> genParticles;
         event.getByLabel(genParticles_it, genParticles);
