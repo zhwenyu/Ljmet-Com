@@ -26,6 +26,14 @@
 #include "DataFormats/BTauReco/interface/CATopJetTagInfo.h"
 #include "LJMet/Com/interface/MiniIsolation.h"
 
+#include "LHAPDF/LHAPDF.h"
+#include "LHAPDF/GridPDF.h"
+#include "LHAPDF/Info.h"
+#include "LHAPDF/Config.h"
+#include "LHAPDF/PDFInfo.h"
+#include "LHAPDF/PDFSet.h"
+#include "LHAPDF/Factories.h"
+
 using std::cout;
 using std::endl;
 
@@ -60,6 +68,9 @@ private:
     bool keepFullMChistory;
     bool cleanGenJets;
     bool UseElMVA;
+    bool orlhew;
+    std::string basePDFname;
+    std::string newPDFname;
 
     double rhoIso;
 
@@ -73,6 +84,20 @@ private:
 };
 
 static int reg = LjmetFactory::GetInstance()->Register(new singleLepCalc(), "singleLepCalc");
+
+/*namespace LHAPDF {
+      void initPDFSet(int nset, const std::string& filename, int member=0);
+      int numberPDF(int nset);
+      void usePDFMember(int nset, int member);
+      double xfx(int nset, double x, double Q, int fl);
+      double getXmin(int nset, int member);
+      double getXmax(int nset, int member);
+      double getQ2min(int nset, int member);
+      double getQ2max(int nset, int member);
+      void extrapolate(bool extrapolate=true);
+}*/
+using namespace LHAPDF;
+
 
 singleLepCalc::singleLepCalc()
 {
@@ -143,6 +168,20 @@ int singleLepCalc::BeginJob()
     if (mPset.exists("UseElMVA")) UseElMVA = mPset.getParameter<bool>("UseElMVA");
     else                          UseElMVA = false;
 
+    if (mPset.exists("OverrideLHEWeights")) orlhew = mPset.getParameter<bool>("OverrideLHEWeights");
+    else                                   orlhew = false;
+    if (mPset.exists("basePDFname")) basePDFname = mPset.getParameter<std::string>("basePDFname");
+    else                             basePDFname = "cteq6";
+    if (mPset.exists("newPDFname"))  newPDFname = mPset.getParameter<std::string>("newPDFname");
+    else                             newPDFname = "PDF4LHC15_nlo_mc_pdfas";
+    if (orlhew) {
+        cout << "Overriding LHE weights, using "<<newPDFname<<" as new and "<<basePDFname<<" as base PDF set." << endl;
+        LHAPDF::Info& cfg = LHAPDF::getConfig();
+        cfg.set_entry("Verbosity", 0);
+
+    }
+    else cout << "Writing LHE weights (no override)." << endl;
+
     return 0;
 }
 
@@ -172,8 +211,6 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
 
     SetValue("nPV", (int)goodPVs.size());
 
-
- 
      // _____ Primary dataset (from python cfg) _____________________
      //
      //   
@@ -861,30 +898,66 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
       
         evtWeightsMC=evtWeights;
         MCWeight = theWeight;
+        
+        if (orlhew) {
+          float x1 = genEvtInfo->pdf()->x.first;
+          float x2 = genEvtInfo->pdf()->x.second;
+          double Q = genEvtInfo->pdf()->scalePDF;
+          int id1 = genEvtInfo->pdf()->id.first;
+          int id2 = genEvtInfo->pdf()->id.second;
+          //std::cout<<x1<<" "<<x2<<" "<<Q<<" "<<id1<<" "<<id2<<std::endl;
 
-	edm::Handle<LHEEventProduct> EvtHandle;
-	edm::InputTag theSrc("externalLHEProducer");
-	if(event.getByLabel(theSrc,EvtHandle)){
-	  
-	  // Storing LHE weights https://twiki.cern.ch/twiki/bin/viewauth/CMS/LHEReaderCMSSW
-	  // for MC@NLO renormalization and factorization scale. 
-	  // ID numbers 1001 - 1009. (muR,muF) = 
-	  // 0 = 1001: (1,1)    3 = 1004: (2,1)    6 = 1007: (0.5,1)  
-	  // 1 = 1002: (1,2)    4 = 1005: (2,2)  	 7 = 1008: (0.5,2)  
-	  // 2 = 1003: (1,0.5)  5 = 1006: (2,0.5)	 8 = 1009: (0.5,0.5)
-	  // for PDF variations: ID numbers > 2000
+          //Initialize PDF sets
+          LHAPDF::PDF* basepdf1 = LHAPDF::mkPDF(basePDFname,0);
+          const LHAPDF::GridPDF& pdf1 = * dynamic_cast<const LHAPDF::GridPDF*>(basepdf1);
+  
+          // calculate central PDFs for generator set,
+          double pdf1_gen = pdf1.xfxQ(id1, x1, Q);
+          double pdf2_gen = pdf1.xfxQ(id2, x2, Q);
+          delete basepdf1;
+  
+          const LHAPDF::PDFSet newset(newPDFname);
+          const size_t nmem = newset.size();
+          const vector<LHAPDF::PDF*> newpdfs = newset.mkPDFs();
+          delete (newpdfs[0]);
+          for (size_t i = 1; i<nmem; i++) {
+            const LHAPDF::GridPDF& pdf2 = * dynamic_cast<const LHAPDF::GridPDF*>(newpdfs[i]);
 
-	  std::string weightidstr;
-	  int weightid;
-	  if(EvtHandle->weights().size() > 0){	  
-	    for(unsigned int i = 0; i < EvtHandle->weights().size(); i++){
-	      weightidstr = EvtHandle->weights()[i].id;
-	      weightid = std::stoi(weightidstr);
-	      LHEweights.push_back(EvtHandle->weights()[i].wgt/EvtHandle->originalXWGTUP());
-	      LHEweightids.push_back(weightid);
-	    }
-	  }
-	}
+            double pdf1_new = pdf2.xfxQ(id1, x1, Q);
+            double pdf2_new = pdf2.xfxQ(id2, x2, Q);
+  
+            //std::cout<<"weight"<<i<<" = "<<(pdf1_new*pdf2_new)/(pdf1_gen*pdf2_gen)<<std::endl;
+            LHEweights.push_back((pdf1_new*pdf2_new)/(pdf1_gen*pdf2_gen));
+            LHEweightids.push_back(2000+i);
+
+            delete (newpdfs[i]);
+          }
+        }
+        else {
+  	  edm::Handle<LHEEventProduct> EvtHandle;
+  	  edm::InputTag theSrc("externalLHEProducer");
+  	  if(event.getByLabel(theSrc,EvtHandle)){
+  	  
+  	    // Storing LHE weights https://twiki.cern.ch/twiki/bin/viewauth/CMS/LHEReaderCMSSW
+  	    // for MC@NLO renormalization and factorization scale. 
+  	    // ID numbers 1001 - 1009. (muR,muF) = 
+  	    // 0 = 1001: (1,1)    3 = 1004: (2,1)    6 = 1007: (0.5,1)  
+  	    // 1 = 1002: (1,2)    4 = 1005: (2,2)  	 7 = 1008: (0.5,2)  
+  	    // 2 = 1003: (1,0.5)  5 = 1006: (2,0.5)	 8 = 1009: (0.5,0.5)
+  	    // for PDF variations: ID numbers > 2000
+  
+  	    std::string weightidstr;
+  	    int weightid;
+  	    if(EvtHandle->weights().size() > 0){	  
+  	      for(unsigned int i = 0; i < EvtHandle->weights().size(); i++){
+  	        weightidstr = EvtHandle->weights()[i].id;
+  	        weightid = std::stoi(weightidstr);
+  	        LHEweights.push_back(EvtHandle->weights()[i].wgt/EvtHandle->originalXWGTUP());
+  	        LHEweightids.push_back(weightid);
+  	      }
+  	    }
+  	  }
+  	}
 
         //load genparticles collection
         edm::Handle<reco::GenParticleCollection> genParticles;
@@ -894,7 +967,7 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
         event.getByLabel(genJets_it, genJets);
 
 	//std::cout << "---------------------------------" << std::endl;
-	//std::cout << "\tStatus\tmass\tpt\teta\tphi\tID\tMomID\tMomStat\tGMomID\tGMomSt\tGGMomID\tGGMomSt" << std::endl;
+	//std::cout << "\tStatus\tmoment\tmass\tpt\teta\tphi\tID\tMomID\tMomStat\tGMomID\tGMomSt\tGGMomID\tGGMomSt" << std::endl;
 	//std::cout << std::endl;
 	
         for(size_t i = 0; i < genParticles->size(); i++){
@@ -908,7 +981,7 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
                 }
             }
             //if (abs(p.pdgId())==11 || abs(p.pdgId())==13 || abs(p.pdgId())==15) {
-	    //    std::cout << i << "\t" << p.status() << "\t" << p.mass() << "\t" << p.pt() << "\t" << p.eta() << "\t" << p.phi() << "\t" << p.pdgId() << "\t";
+	    //    std::cout << i << "\t" << p.status() << "\t" << p.p() << "\t" << p.mass() << "\t" << p.pt() << "\t" << p.eta() << "\t" << p.phi() << "\t" << p.pdgId() << "\t";
 	    //    if (!(!(p.mother()))) {
             //        std::cout << p.mother()->pdgId() << "\t" << p.mother()->status() << "\t";
 	    //        if (!(!(p.mother()->mother()))) std::cout << p.mother()->mother()->pdgId() << "\t" << p.mother()->mother()->status() << "\t";
