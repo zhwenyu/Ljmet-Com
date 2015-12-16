@@ -536,7 +536,8 @@ int PileUpCalc::AnalyzeEvent(edm::EventBase const & event,
     //_____ Pile-up ____________________________________________
     //
     // get pile up handle
-    edm::InputTag puInfoSrc("addPileupInfo");
+    edm::InputTag puInfoSrc("slimmedAddPileupInfo");
+    //edm::InputTag puInfoSrc("addPileupInfo");
     edm::Handle<std::vector< PileupSummaryInfo > >  hvPuInfo;
     
     bool isMc = selector->IsMc();
