@@ -114,7 +114,19 @@ double BtagHardcodedConditions::GetBtagEfficiency(double pt, double eta,
   //flat efficiencies from AN-12-187
   //if( tagger == "CSVM")
   //    return 0.685;
-  else if( tagger == "CSVL") return 0.844;
+  else if( tagger == "CSVL") {
+    if(pt < 40) return 0.563365;
+    else if(pt < 50) return 0.634109;
+    else if(pt < 60) return 0.671486;
+    else if(pt < 70) return 0.699899;
+    else if(pt < 100) return 0.712678;
+    else if(pt < 140) return 0.734276;
+    else if(pt < 200) return 0.754234;
+    else if(pt < 300) return 0.772274;
+    else if(pt < 670) return 0.760237;
+    else if(pt < 1000) return 0.711905;
+    else return 0.669356;
+  }
   
   // tag eff, x - discriminant
   // from https://twiki.cern.ch/twiki/pub/CMS/BtagPOG/eff_b_c-ttbar_payload.txt
@@ -297,8 +309,20 @@ double BtagHardcodedConditions::GetMistagRate(double pt, double eta,
   // values are measured using the 2012 madgraph ttbar sample
   //    if( tagger == "CSVM")
   //        return 0.013702*0.96;
-  else if( tagger == "CSVL") return 0.143422*0.96;
-    
+  else if( tagger == "CSVL") {
+    if(pt < 40) return 0.0844045;
+    else if(pt < 50) return 0.0972303;
+    else if(pt < 60) return 0.0939869;
+    else if(pt < 70) return 0.0935781;
+    else if(pt < 100) return 0.0902793;
+    else if(pt < 140) return 0.0935462;
+    else if(pt < 200) return 0.0970933;
+    else if(pt < 300) return 0.121798;
+    else if(pt < 670) return 0.145031;
+    else if(pt < 1000) return 0.174574;
+    else return 0.191074;
+  }
+
     // mistag, x-pT
     // from https://twiki.cern.ch/twiki/pub/CMS/BtagPOG/MistagFuncs.C
     

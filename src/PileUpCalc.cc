@@ -537,48 +537,51 @@ int PileUpCalc::AnalyzeEvent(edm::EventBase const & event,
     //
     // get pile up handle
 
-  edm::InputTag puInfoSrc("addPileupInfo");
   edm::InputTag slimmedPuInfoSrc("slimmedAddPileupInfo");
   edm::Handle<std::vector< PileupSummaryInfo > >  hvPuInfo;
-    
-    bool isMc = selector->IsMc();
-    float nTrue = -1.;
-    int nInteractions = -1;
-    int bunchXing = -1;
-    double MyWeightOct = 1;
-    double MyWeightABC = 1;
-    double MyWeightABC735 = 1;
-    double MyWeightABCD = 1;
-    double MyWeightABCD735 = 1;
-    
-    if ( isMc ){
-        event.getByLabel(slimmedPuInfoSrc, hvPuInfo);
-        for (std::vector<PileupSummaryInfo>::const_iterator iPu=hvPuInfo->begin();
-             iPu != hvPuInfo->end();
-             ++iPu) {
-            if ( iPu->getBunchCrossing() == 0 ){
-                bunchXing = iPu->getBunchCrossing();
-                nInteractions = iPu->getPU_NumInteractions();
-                nTrue = iPu->getTrueNumInteractions();
-                //hists["nInteractions"] -> Fill(iPu->getPU_NumInteractions());
-                //hists["nTrueInteractions"] -> Fill(iPu->getTrueNumInteractions());
-                MyWeightOct = LumiWeightsOct_.weight( nTrue );
-                MyWeightABC = LumiWeightsABC_.weight( nTrue );
-                MyWeightABC735 = LumiWeightsABC735_.weight( nTrue );
-                MyWeightABCD = LumiWeightsABCD_.weight( nTrue );
-                MyWeightABCD735 = LumiWeightsABCD735_.weight( nTrue );
-                break;
-            }
-        }
+  
+  //edm::InputTag puInfoSrc("slimmedAddPileupInfo");
+  edm::InputTag puInfoSrc("addPileupInfo");
+  // edm::Handle<std::vector< PileupSummaryInfo > >  hvPuInfo;
+  
+  bool isMc = selector->IsMc();
+  float nTrue = -1.;
+  int nInteractions = -1;
+  int bunchXing = -1;
+  double MyWeightOct = 1;
+  double MyWeightABC = 1;
+  double MyWeightABC735 = 1;
+  double MyWeightABCD = 1;
+  double MyWeightABCD735 = 1;
+  
+  if ( isMc ){
+    event.getByLabel(slimmedPuInfoSrc, hvPuInfo);
+    for (std::vector<PileupSummaryInfo>::const_iterator iPu=hvPuInfo->begin();
+	 iPu != hvPuInfo->end();
+	 ++iPu) {
+      if ( iPu->getBunchCrossing() == 0 ){
+	bunchXing = iPu->getBunchCrossing();
+	nInteractions = iPu->getPU_NumInteractions();
+	nTrue = iPu->getTrueNumInteractions();
+	//hists["nInteractions"] -> Fill(iPu->getPU_NumInteractions());
+	//hists["nTrueInteractions"] -> Fill(iPu->getTrueNumInteractions());
+	MyWeightOct = LumiWeightsOct_.weight( nTrue );
+	MyWeightABC = LumiWeightsABC_.weight( nTrue );
+	MyWeightABC735 = LumiWeightsABC735_.weight( nTrue );
+	MyWeightABCD = LumiWeightsABCD_.weight( nTrue );
+	MyWeightABCD735 = LumiWeightsABCD735_.weight( nTrue );
+	break;
+      }
     }
-    SetValue("bunchXing", bunchXing);
-    SetValue("nInteractions", nInteractions);
-    SetValue("nTrueInteractions", nTrue);
-    SetValue("weight_PU", MyWeightOct);
-    SetValue("weight_PU_ABC", MyWeightABC);
-    SetValue("weight_PU_ABC735", MyWeightABC735);
-    SetValue("weight_PU_ABCD", MyWeightABCD);
-    SetValue("weight_PU_ABCD735", MyWeightABCD735);
-    
-    return 0;
+  }
+  SetValue("bunchXing", bunchXing);
+  SetValue("nInteractions", nInteractions);
+  SetValue("nTrueInteractions", nTrue);
+  SetValue("weight_PU", MyWeightOct);
+  SetValue("weight_PU_ABC", MyWeightABC);
+  SetValue("weight_PU_ABC735", MyWeightABC735);
+  SetValue("weight_PU_ABCD", MyWeightABCD);
+  SetValue("weight_PU_ABCD735", MyWeightABCD735);
+  
+  return 0;
 }

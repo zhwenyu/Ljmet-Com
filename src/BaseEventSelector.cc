@@ -150,7 +150,7 @@ void BaseEventSelector::BeginJob(std::map<std::string, edm::ParameterSet const >
     std::cout << "b-tag check "<<msPar["btagOP"]<<" "<< msPar["btagger"]<<" "<<mdPar["btag_min_discr"]<<std::endl;
     
     if ( mbPar["isMc"] && ( mbPar["JECup"] || mbPar["JECdown"]))
-        jecUnc = new JetCorrectionUncertainty(msPar["JEC_txtfile"]);
+      jecUnc = new JetCorrectionUncertainty(msPar["JEC_txtfile"]);
 
     vector<JetCorrectorParameters> vPar;
     vector<JetCorrectorParameters> vParAK8;
@@ -158,13 +158,13 @@ void BaseEventSelector::BeginJob(std::map<std::string, edm::ParameterSet const >
     if ( mbPar["isMc"] ) {
         // Create the JetCorrectorParameter objects, the order does not matter.
 
-        JetCorrectorParameters *L3JetPar  = new JetCorrectorParameters(msPar["MCL3JetPar"]);
-        JetCorrectorParameters *L2JetPar  = new JetCorrectorParameters(msPar["MCL2JetPar"]);
-    	JetCorrectorParameters *L1JetPar  = new JetCorrectorParameters(msPar["MCL1JetPar"]);
-        
-	JetCorrectorParameters *L3JetParAK8  = new JetCorrectorParameters(msPar["MCL3JetParAK8"]);
-        JetCorrectorParameters *L2JetParAK8  = new JetCorrectorParameters(msPar["MCL2JetParAK8"]);
-    	JetCorrectorParameters *L1JetParAK8  = new JetCorrectorParameters(msPar["MCL1JetParAK8"]);
+        L3JetPar  = new JetCorrectorParameters(msPar["MCL3JetPar"]);
+        L2JetPar  = new JetCorrectorParameters(msPar["MCL2JetPar"]);
+    	L1JetPar  = new JetCorrectorParameters(msPar["MCL1JetPar"]);
+        	   
+	L3JetParAK8  = new JetCorrectorParameters(msPar["MCL3JetParAK8"]);
+        L2JetParAK8  = new JetCorrectorParameters(msPar["MCL2JetParAK8"]);
+    	L1JetParAK8  = new JetCorrectorParameters(msPar["MCL1JetParAK8"]);
     	// Load the JetCorrectorParameter objects into a vector,
     	// IMPORTANT: THE ORDER MATTERS HERE !!!! 
     	vPar.push_back(*L1JetPar);
@@ -179,15 +179,15 @@ void BaseEventSelector::BeginJob(std::map<std::string, edm::ParameterSet const >
     else if ( !mbPar["isMc"] ) {
         // Create the JetCorrectorParameter objects, the order does not matter.
 
-        JetCorrectorParameters *ResJetPar = new JetCorrectorParameters(msPar["DataResJetPar"]); 
-    	JetCorrectorParameters *L3JetPar  = new JetCorrectorParameters(msPar["DataL3JetPar"]);
-    	JetCorrectorParameters *L2JetPar  = new JetCorrectorParameters(msPar["DataL2JetPar"]);
-    	JetCorrectorParameters *L1JetPar  = new JetCorrectorParameters(msPar["DataL1JetPar"]);
+        ResJetPar = new JetCorrectorParameters(msPar["DataResJetPar"]); 
+    	L3JetPar  = new JetCorrectorParameters(msPar["DataL3JetPar"]);
+    	L2JetPar  = new JetCorrectorParameters(msPar["DataL2JetPar"]);
+    	L1JetPar  = new JetCorrectorParameters(msPar["DataL1JetPar"]);
 
-        JetCorrectorParameters *ResJetParAK8 = new JetCorrectorParameters(msPar["DataResJetParAK8"]); 
-    	JetCorrectorParameters *L3JetParAK8  = new JetCorrectorParameters(msPar["DataL3JetParAK8"]);
-    	JetCorrectorParameters *L2JetParAK8  = new JetCorrectorParameters(msPar["DataL2JetParAK8"]);
-    	JetCorrectorParameters *L1JetParAK8  = new JetCorrectorParameters(msPar["DataL1JetParAK8"]);
+        ResJetParAK8 = new JetCorrectorParameters(msPar["DataResJetParAK8"]); 
+    	L3JetParAK8  = new JetCorrectorParameters(msPar["DataL3JetParAK8"]);
+    	L2JetParAK8  = new JetCorrectorParameters(msPar["DataL2JetParAK8"]);
+    	L1JetParAK8  = new JetCorrectorParameters(msPar["DataL1JetParAK8"]);
     	// Load the JetCorrectorParameter objects into a vector,
     	// IMPORTANT: THE ORDER MATTERS HERE !!!! 
     	vPar.push_back(*L1JetPar);
