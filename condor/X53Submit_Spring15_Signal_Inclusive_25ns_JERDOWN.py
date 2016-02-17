@@ -8,7 +8,7 @@ files_per_job = 1
 
 rel_base = os.environ['CMSSW_BASE']
 
-outdir = '/eos/uscms/store/user/lpctlbsm/clint/Spring15/25ns/Approval/JESUP/'
+outdir = '/eos/uscms/store/user/lpctlbsm/clint/Spring15/25ns/Approval/JERDOWN/'
 
 ### What is the name of your FWLite Analyzer
 FWLiteAnalyzer = 'ljmet'
@@ -27,10 +27,10 @@ MYJSON = "''"
 ### Systematics flags
 BTAGUNCERTUP = 'False'
 BTAGUNCERTDOWN = 'False'
-JECUNCERTUP = 'True'
+JECUNCERTUP = 'False'
 JECUNCERTDOWN = 'False'
 JERUNCERTUP = 'False'
-JERUNCERTDOWN = 'False'
+JERUNCERTDOWN = 'True'
 
 
 #################################################
@@ -41,25 +41,26 @@ prefix = []
 
 if DONOMINAL=='True':
     prefix.extend([
-#            'DYJets',
-#            'TTJets',
-#            'TTbar-powheg',
-#            'TTbar-powheg_ext',
-#            'TTbar',
-#            'WJets',
-#            'WZ',
-#            'WZ_MiniAODv1',
-#            'ZZ',
-            'VH',
-#            'TTW',
-#            'TTZ',
-#            'TTH',
-            'ZZZ',
-#            'WZZ',
-#            'WWZ',
-#            'WpWp',
-            'WW-mpi',
-#            'TTTT',
+            'X53X53_LH_700',
+            'X53X53_RH_700',
+            'X53X53_LH_800',
+            'X53X53_RH_800',
+            'X53X53_LH_900',
+            'X53X53_RH_900',
+            'X53X53_LH_1000',
+            'X53X53_RH_1000',
+            'X53X53_LH_1100',
+            'X53X53_RH_1100',
+            'X53X53_LH_1200',
+            'X53X53_RH_1200',
+            'X53X53_LH_1300',
+            'X53X53_RH_1300',
+            'X53X53_LH_1400',
+            'X53X53_RH_1400',
+            'X53X53_LH_1500',
+            'X53X53_RH_1500',
+            'X53X53_LH_1600',
+            'X53X53_RH_1600',
     ])
 
 
@@ -77,24 +78,26 @@ for i in prefix:
 list = [] 
 
 listnom = [
- #   'Samples_Spring15MC/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v3.txt',
- #   'Samples_Spring15MC/TTJets_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_RunIISpring15DR74_Asympt25ns_MCRUN2_74_V9-v1.txt',
- #   'Samples_Spring15MC/TT_TuneCUETP8M1_13TeV-powheg-pythia8_RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1.txt',
- #   'Samples_Spring15MC/TT_TuneCUETP8M1_13TeV-powheg-pythia8_RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2_ext3-v1.txt',
- #   'Samples_Spring15MC/WJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1.txt',
- #   'Samples_Spring15MC/WZTo3LNu_TuneCUETP8M1_13TeV-powheg-pythia8_RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1.txt',
- #   'Samples_Spring15MC/WZTo3LNu_TuneCUETP8M1_13TeV-powheg-pythia8_RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1.txt',
- #   'Samples_Spring15MC/ZZTo4L_13TeV-amcatnloFXFX-pythia8_RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1.txt',
-    'Samples_Spring15MC/VHToNonbb_M125_13TeV_amcatnloFXFX_madspin_pythia8_RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1.txt',
- #   'Samples_Spring15MC/TTWJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-madspin-pythia8_RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1.txt',
- #   'Samples_Spring15MC/TTZToLLNuNu_M-10_TuneCUETP8M1_13TeV-amcatnlo-pythia8_RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v2.txt',
- #   'Samples_Spring15MC/ttHJetToNonbb_M125_13TeV_amcatnloFXFX_madspin_pythia8_mWCutfix_RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1.txt',
-    'Samples_Spring15MC/ZZZ_TuneCUETP8M1_13TeV-amcatnlo-pythia8_RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1.txt',
- #   'Samples_Spring15MC/WZZ_TuneCUETP8M1_13TeV-amcatnlo-pythia8_RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1.txt',
- #   'Samples_Spring15MC/WWZ_TuneCUETP8M1_13TeV-amcatnlo-pythia8_RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1.txt',
- #   'Samples_Spring15MC/WpWpJJ_EWK-QCD_TuneCUETP8M1_13TeV-madgraph-pythia8_RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1.txt',
-    'Samples_Spring15MC/WW_DoubleScattering_13TeV-pythia8_RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1.txt',
- #   'Samples_Spring15MC/TTTT_TuneCUETP8M1_13TeV-amcatnlo-pythia8_RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1.txt',
+'Samples_Spring15MC/X53X53_M-700_LH_TuneCUETP8M1_13TeV-madgraph-pythia8_RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v2.txt',
+'Samples_Spring15MC/X53X53_M-700_RH_TuneCUETP8M1_13TeV-madgraph-pythia8_RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1.txt',
+'Samples_Spring15MC/X53X53_M-800_LH_TuneCUETP8M1_13TeV-madgraph-pythia8_RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1.txt',
+'Samples_Spring15MC/X53X53_M-800_RH_TuneCUETP8M1_13TeV-madgraph-pythia8_RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1.txt',
+'Samples_Spring15MC/X53X53_M-900_LH_TuneCUETP8M1_13TeV-madgraph-pythia8_RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v2.txt',
+'Samples_Spring15MC/X53X53_M-900_RH_TuneCUETP8M1_13TeV-madgraph-pythia8_RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1.txt',
+'Samples_Spring15MC/X53X53_M-1000_LH_TuneCUETP8M1_13TeV-madgraph-pythia8_RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1.txt',
+'Samples_Spring15MC/X53X53_M-1000_RH_TuneCUETP8M1_13TeV-madgraph-pythia8_RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1.txt',
+'Samples_Spring15MC/X53X53_M-1100_LH_TuneCUETP8M1_13TeV-madgraph-pythia8_RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1.txt',
+'Samples_Spring15MC/X53X53_M-1100_RH_TuneCUETP8M1_13TeV-madgraph-pythia8_RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1.txt',
+'Samples_Spring15MC/X53X53_M-1200_LH_TuneCUETP8M1_13TeV-madgraph-pythia8_RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1.txt',
+'Samples_Spring15MC/X53X53_M-1200_RH_TuneCUETP8M1_13TeV-madgraph-pythia8_RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1.txt',
+'Samples_Spring15MC/X53X53_M-1300_LH_TuneCUETP8M1_13TeV-madgraph-pythia8_RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1.txt',
+'Samples_Spring15MC/X53X53_M-1300_RH_TuneCUETP8M1_13TeV-madgraph-pythia8_RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1.txt',
+'Samples_Spring15MC/X53X53_M-1400_LH_TuneCUETP8M1_13TeV-madgraph-pythia8_RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1.txt',
+'Samples_Spring15MC/X53X53_M-1400_RH_TuneCUETP8M1_13TeV-madgraph-pythia8_RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1.txt',
+'Samples_Spring15MC/X53X53_M-1500_LH_TuneCUETP8M1_13TeV-madgraph-pythia8_RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1.txt',
+'Samples_Spring15MC/X53X53_M-1500_RH_TuneCUETP8M1_13TeV-madgraph-pythia8_RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1.txt',
+'Samples_Spring15MC/X53X53_M-1600_LH_TuneCUETP8M1_13TeV-madgraph-pythia8_RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1.txt',
+'Samples_Spring15MC/X53X53_M-1600_RH_TuneCUETP8M1_13TeV-madgraph-pythia8_RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1.txt',
     ]
 
 if DONOMINAL=='True':
