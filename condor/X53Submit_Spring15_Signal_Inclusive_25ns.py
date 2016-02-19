@@ -8,7 +8,7 @@ files_per_job = 1
 
 rel_base = os.environ['CMSSW_BASE']
 
-outdir = '/eos/uscms/store/user/lpctlbsm/clint/Spring15/25ns/MuonIsoLepJetCleaning/'
+outdir = '/eos/uscms/store/user/lpctlbsm/clint/Spring15/25ns/Feb20/'
 
 ### What is the name of your FWLite Analyzer
 FWLiteAnalyzer = 'ljmet'
@@ -157,7 +157,9 @@ for i in range(len(prefix)):
         condor_templ_file = open(rel_base+"/src/LJMet/Com/condor/X53condor.templ")
         csh_templ_file    = open(rel_base+"/src/LJMet/Com/condor/X53csh.templ")
 
-        py_file = open(dir[i]+"/"+prefix[i]+"_"+str(j)+".py","w")
+        #open local version of file
+        localfile=prefix[i]+"_"+str(j)+".py"
+        py_file = open(localfile,"w")
         for line in py_templ_file:
             line=line.replace('DIRECTORY',dir[i])
             line=line.replace('PREFIX',prefix[i])
@@ -175,7 +177,15 @@ for i in range(len(prefix)):
             py_file.write(line)
         py_file.close()
 
-        condor_file = open(dir[i]+"/"+prefix[i]+"_"+str(j)+".condor","w")
+        #copy file to eos
+        eosfile =   "root://cmseos.fnal.gov/"+dir[i]+"/"+prefix[i]+"_"+str(j)+".py"
+        os.system("xrdcp %s %s"  % (localfile,eosfile))
+        #remove local version
+        os.system('rm %s' % localfile)
+
+        localcondor = prefix[i]+"_"+str(j)+".condor"
+        eoscondor = "root://cmseos.fnal.gov/"+dir[i]+"/"prefix[i]+"_"+str(j)+".condor"
+        condor_file = open(localcondor,"w")
         for line in condor_templ_file:
             line=line.replace('DIRECTORY',dir[i])
             line=line.replace('PREFIX',prefix[i])
@@ -183,7 +193,14 @@ for i in range(len(prefix)):
             condor_file.write(line)
         condor_file.close()
 
-        csh_file = open(dir[i]+"/"+prefix[i]+"_"+str(j)+".csh","w")
+        #copy local to eos
+        os.system('xrdcp %s %s' % (localcondor,eoscondor))
+        #remove local copy
+        os.system('rm %s' % localcondor)
+
+        eoscsh="root://cmseos.fnal.gov/"+dir[i]+"/"+prefix[i]+"_"+str(j)+".csh"
+        localcsh=prefix[i]+"_"+str(j)+".csh"
+        csh_file = open(localcsh,"w")
         for line in csh_templ_file:
             line=line.replace('CMSSWBASE',rel_base)
             line=line.replace('DIRECTORY',dir[i])
@@ -192,6 +209,9 @@ for i in range(len(prefix)):
             line=line.replace('FWLITEANALYZER',FWLiteAnalyzer)
             csh_file.write(line)
         csh_file.close()
+
+        os.system('xrdcp %s %s' % (localcsh,eoscsh))
+        os.system('rm %s' %localcsh)
 
         os.system('chmod u+x '+dir[i]+'/'+prefix[i]+'_'+str(j)+'.csh')
         os.system('cd '+dir[i]+'; condor_submit '+prefix[i]+'_'+str(j)+'.condor; cd -')
