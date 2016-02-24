@@ -745,6 +745,15 @@ bool DileptonEventSelector::operator()( edm::EventBase const & event, pat::strbi
 	      //clean of muons
 	      for(unsigned int ilep=0; ilep < mvSelMuons.size(); ilep++){
 		bool looseMuon; //bool to loop over only loose muons can easily do here since loose muon id so easy to implement
+		//get muon isolation
+		//new definition of iso based on muon pog page
+		const reco::MuonPFIsolation pfIsolationR04 = mvSelMuons[ilep]->pfIsolationR04();
+		double chIso  = pfIsolationR04.sumChargedHadronPt;
+		double nhIso  = pfIsolationR04.sumNeutralHadronEt;
+		double gIso   = pfIsolationR04.sumPhotonEt;
+		double puIso  = pfIsolationR04.sumPUPt;
+		double relIso = (chIso + std::max(0.,nhIso + gIso - 0.5*puIso)) / mvSelMuons[ilep]->pt();
+		if(relIso > 0.4) looseMuon=false;
 		if(!(mvSelMuons[ilep]->isPFMuon())) looseMuon=false;
 		else if(!( mvSelMuons[ilep]->isGlobalMuon() || mvSelMuons[ilep]->isTrackerMuon())) looseMuon=false;
 		else looseMuon=true;
