@@ -53,11 +53,11 @@ process.event_selector = cms.PSet(
     keepFullMChistory = cms.bool(True),
     # cuts
     #HLT
-    trigger_cut              = cms.bool(False),
+    trigger_cut              = cms.bool(True),
     dump_trigger             = cms.bool(True),
 
     #Can use same trigger paths for data and MC since MC is always one of the data versions
-    trigger_path_ee          = cms.vstring('HLT_Ele17_CaloIdL_TrackIdL_IsoVL_v1'),
+    trigger_path_ee          = cms.vstring('HLT_Ele12_CaloIdL_TrackIdL_IsoVL_v1'),
     
     trigger_path_em          = cms.vstring(''),
 
@@ -118,13 +118,13 @@ process.event_selector = cms.PSet(
     doNewJEC                 = cms.bool(True),
     doLepJetCleaning         = cms.bool(True),
 
-    MCL1JetPar               = cms.string("../data/Summer15_25nsV2_MC_L1FastJet_AK4PFchs.txt"),
-    MCL2JetPar               = cms.string("../data/Summer15_25nsV2_MC_L2Relative_AK4PFchs.txt"),
-    MCL3JetPar               = cms.string("../data/Summer15_25nsV2_MC_L3Absolute_AK4PFchs.txt"),
+    MCL1JetPar               = cms.string("../data/Summer15_25nsV6_MC_L1FastJet_AK4PFchs.txt"),
+    MCL2JetPar               = cms.string("../data/Summer15_25nsV6_MC_L2Relative_AK4PFchs.txt"),
+    MCL3JetPar               = cms.string("../data/Summer15_25nsV6_MC_L3Absolute_AK4PFchs.txt"),
 
-    MCL1JetParAK8            = cms.string("../data/Summer15_25nsV2_MC_L1FastJet_AK8PFchs.txt"),
-    MCL2JetParAK8            = cms.string("../data/Summer15_25nsV2_MC_L2Relative_AK8PFchs.txt"),
-    MCL3JetParAK8            = cms.string("../data/Summer15_25nsV2_MC_L3Absolute_AK8PFchs.txt"),
+    MCL1JetParAK8            = cms.string("../data/Summer15_25nsV6_MC_L1FastJet_AK8PFchs.txt"),
+    MCL2JetParAK8            = cms.string("../data/Summer15_25nsV6_MC_L2Relative_AK8PFchs.txt"),
+    MCL3JetParAK8            = cms.string("../data/Summer15_25nsV6_MC_L3Absolute_AK8PFchs.txt"),
 
     #triggerstudy info
     doTriggerStudy           = cms.bool(True),

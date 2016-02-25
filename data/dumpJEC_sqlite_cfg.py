@@ -14,18 +14,18 @@ process.jec = cms.ESSource("PoolDBESSource",
       toGet = cms.VPSet(
       cms.PSet(
             record = cms.string('JetCorrectionsRecord'),
-            tag    = cms.string('JetCorrectorParametersCollection_Summer15_50nsV5_DATA_AK4PFchs'),
+            tag    = cms.string('JetCorrectorParametersCollection_Summer15_25nsV6_MC_AK4PFchs'),
             label  = cms.untracked.string('AK4PFchs')
             ),
       cms.PSet(
             record = cms.string('JetCorrectionsRecord'),
-            tag    = cms.string('JetCorrectorParametersCollection_Summer15_50nsV5_DATA_AK8PFchs'),
+            tag    = cms.string('JetCorrectorParametersCollection_Summer15_25nsV6_MC_AK8PFchs'),
             label  = cms.untracked.string('AK8PFchs')
             ),
       ## here you add as many jet types as you need
       ## note that the tag name is specific for the particular sqlite file 
       ), 
-      connect = cms.string('sqlite:Summer15_50nsV5_DATA.db')
+      connect = cms.string('sqlite:Summer15_25nsV6_MC.db')
 )
 ## add an es_prefer statement to resolve a possible conflict from simultaneous connection to a global tag
 process.es_prefer_jec = cms.ESPrefer('PoolDBESSource','jec')
@@ -37,7 +37,7 @@ process.readAK4PF    = cms.EDAnalyzer('JetCorrectorDBReader',
       payloadName    = cms.untracked.string('AK4PFchs'),
       # this is used ONLY for the name of the printed txt files. You can use any name that you like, 
       # but it is recommended to use the GT name that you retrieved the files from.
-      globalTag      = cms.untracked.string('Summer15_50nsV5_DATA'),
+      globalTag      = cms.untracked.string('Summer15_25nsV6_MC'),
       printScreen    = cms.untracked.bool(False),
       createTextFile = cms.untracked.bool(True)
 )

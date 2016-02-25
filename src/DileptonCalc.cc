@@ -25,7 +25,10 @@
 #include "DataFormats/EgammaCandidates/interface/GsfElectron.h"
 #include "HLTrigger/HLTcore/interface/HLTConfigProvider.h"
 #include "SimDataFormats/GeneratorProducts/interface/GenEventInfoProduct.h"
+#include "SimDataFormats/GeneratorProducts/interface/LHEEventProduct.h"
 #include "LJMet/Com/interface/MiniIsolation.h"
+#include "HepPDT/ParticleID.hh"
+
 
 using std::cout;
 using std::endl;
@@ -201,11 +204,15 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
 
     bool HLT_DoubleEle33=false;
     bool HLT_DoubleEle33_MW=false;
+    bool HLT_DoubleEle8_Mass8_HT300 = false;
     bool HLT_Ele17_Ele12_DZ=false;
     bool HLT_Ele27WP85=false;
     bool HLT_Mu27TkMu8=false;
     bool HLT_Mu30TkMu11=false;
     bool HLT_Mu40TkMu11=false;
+    bool HLT_Mu17_Iso_Mu8_Iso=false;
+    bool HLT_Mu17_Iso_TkMu8_Iso=false;
+    bool HLT_DoubleMu8_Mass8_HT300 = false;
     bool HLT_Mu40=false;
     bool HLT_IsoTkMu24=false;
     bool HLT_DoubleMu33NoFiltersNoVtx=false;
@@ -213,6 +220,7 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
     bool HLT_Mu8Ele17=false;
     bool HLT_Mu23Ele12=false;
     bool HLT_Mu8Ele23=false;
+    bool HLT_Mu8_Ele8_Mass8_HT300 = false;
     bool HLT_Mu30Ele30=false;
     bool HLT_PFHT900=false;
     bool HLT_AK8PFJet360TrimMass30=false;
@@ -234,19 +242,24 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
 	  if(Path=="HLT_DoubleEle33_CaloIdL_GsfTrkIdVL_MW_v1"|| Path=="HLT_DoubleEle33_CaloIdL_GsfTrkIdVL_MW_v2" || Path=="HLT_DoubleEle33_CaloIdL_GsfTrkIdVL_MW_v3") HLT_DoubleEle33_MW=true;
 	  if(Path=="HLT_Ele27_eta2p1_WP85_Gsf_v1" || Path=="HLT_Ele27_eta2p1_WP85_Gsf_v2" || Path=="HLT_Ele27_eta2p1_WP85_Gsf_v3") HLT_Ele27WP85=true;
 	  if(Path=="HLT_Ele17_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v1" || Path=="HLT_Ele17_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v2" || Path=="HLT_Ele17_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v3")HLT_Ele17_Ele12_DZ=true;
+	  if(Path=="HLT_DoubleEle8_CaloIdM_TrackIdM_Mass8_PFHT300_v1" || Path=="HLT_DoubleEle8_CaloIdM_TrackIdM_Mass8_PFHT300_v2" || Path=="HLT_DoubleEle8_CaloIdM_TrackIdM_Mass8_PFHT300_v3") HLT_DoubleEle8_Mass8_HT300 = true;
 	  //Muon paths
 	  if(Path=="HLT_Mu27_TkMu8_v1" || Path=="HLT_Mu27_TkMu8_v2" || Path=="HLT_Mu27_TkMu8_v3") HLT_Mu27TkMu8=true;
 	  if(Path=="HLT_Mu30_TkMu11_v1" || Path=="HLT_Mu30_TkMu11_v2" || Path=="HLT_Mu30_TkMu11_v3") HLT_Mu30TkMu11=true;
 	  if(Path=="HLT_Mu40_TkMu11_v1" || Path=="HLT_Mu40_TkMu11_v2" || Path=="HLT_Mu40_TkMu11_v3") HLT_Mu40TkMu11=true;
+	  if(Path=="HLT_DoubleMu8_CaloIdM_TrackIdM_Mass8_PFHT300_v1" || Path=="HLT_DoubleMu8_CaloIdM_TrackIdM_Mass8_PFHT300_v2" || Path=="HLT_DoubleMu8_CaloIdM_TrackIdM_Mass8_PFHT300_v3") HLT_DoubleMu8_Mass8_HT300 = true;
 	  if(Path=="HLT_M40_v1" || Path=="HLT_M40_v2" || Path=="HLT_M40_v3") HLT_Mu40=true;
 	  if(Path=="HLT_IsoTkMu24_IterTrk02_v1" || Path=="HLT_IsoTkMu24_IterTrk02_v2" || Path=="HLT_IsoTkMu24_IterTrk02_v3") HLT_IsoTkMu24=true;
 	  if(Path=="HLT_DoubleMu33NoFiltersNoVtx_v1" || Path=="HLT_DoubleMu33NoFiltersNoVtx_v2" || Path=="HLT_DoubleMu33NoFiltersNoVtx_v3") HLT_DoubleMu33NoFiltersNoVtx=true;
+	  if(Path=="HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_v1" || Path=="HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_v2" || Path=="HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_v3") HLT_Mu17_Iso_Mu8_Iso=true;
+	  if(Path=="HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ_v1" || Path=="HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ_v2" || Path=="HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ_v3") HLT_Mu17_Iso_TkMu8_Iso=true;
 	  //cross paths
-	  if(Path=="HLT_Mu17_TrkIsoVVL_Ele12_Gsf_CaloId_TrackId_Iso_MediumWP_v1" || Path=="HLT_Mu17_TrkIsoVVL_Ele12_Gsf_CaloId_TrackId_Iso_MediumWP_v2" || Path=="HLT_Mu17_TrkIsoVVL_Ele12_Gsf_CaloId_TrackId_Iso_MediumWP_v3") HLT_Mu17Ele12=true;
-	  if(Path=="HLT_Mu8_TrkIsoVVL_Ele17_Gsf_CaloId_TrackId_Iso_MediumWP_v1" || Path=="HLT_Mu8_TrkIsoVVL_Ele17_Gsf_CaloId_TrackId_Iso_MediumWP_v2" || Path=="HLT_Mu8_TrkIsoVVL_Ele17_Gsf_CaloId_TrackId_Iso_MediumWP_v3") HLT_Mu8Ele17=true;
-	  if(Path=="HLT_Mu23_TrkIsoVVL_Ele12_Gsf_CaloId_TrackId_Iso_MediumWP_v1" || Path=="HLT_Mu23_TrkIsoVVL_Ele12_Gsf_CaloId_TrackId_Iso_MediumWP_v2" || Path=="HLT_Mu23_TrkIsoVVL_Ele12_Gsf_CaloId_TrackId_Iso_MediumWP_v3") HLT_Mu23Ele12=true;
-	  if(Path=="HLT_Mu8_TrkIsoVVL_Ele23_Gsf_CaloId_TrackId_Iso_MediumWP_v1" || Path=="HLT_Mu8_TrkIsoVVL_Ele23_Gsf_CaloId_TrackId_Iso_MediumWP_v2" || Path=="HLT_Mu8_TrkIsoVVL_Ele23_Gsf_CaloId_TrackId_Iso_MediumWP_v3") HLT_Mu8Ele23=true;
+	  if(Path=="HLT_Mu17_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v1" || Path=="HLT_Mu17_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v2" || Path=="HLT_Mu17_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v3") HLT_Mu17Ele12=true;
+	  if(Path=="HLT_Mu8_TrkIsoVVL_Ele17_CaloIdL_TrackIdL_IsoVL_v1" || Path=="HLT_Mu8_TrkIsoVVL_Ele17_CaloIdL_TrackIdL_IsoVL_v2" || Path=="HLT_Mu8_TrkIsoVVL_Ele17_CaloIdL_TrackIdL_IsoVL_v3") HLT_Mu8Ele17=true;
+	  if(Path=="HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v1" || Path=="HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v2" || Path=="HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v3") HLT_Mu23Ele12=true;
+	  if(Path=="HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_v1" || Path=="HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_v2" || Path=="HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_v3") HLT_Mu8Ele23=true;
 	  if(Path=="HLT_Mu30_Ele30_CaloIdL_GsfTrkIdVL_v1" || Path=="HLT_Mu30_Ele30_CaloIdL_GsfTrkIdVL_v2" || Path=="HLT_Mu30_Ele30_CaloIdL_GsfTrkIdVL_v3") HLT_Mu30Ele30=true;
+	  if(Path=="HLT_Mu8_Ele8_CaloIdM_TrackIdM_Mass8_PFHT300_v1" || Path=="HLT_Mu8_Ele8_CaloIdM_TrackIdM_Mass8_PFHT300_v2" || Path=="HLT_Mu8_Ele8_CaloIdM_TrackIdM_Mass8_PFHT300_v3") HLT_Mu8_Ele8_Mass8_HT300 = true;
 	  //HT/Jet
 	  if(Path=="HLT_PFHT900_v1" || Path=="HLT_PFHT900_v2" || Path=="HLT_PFHT900_v3") HLT_PFHT900=true;
 	  if(Path=="HLT_AK8PFJet360TrimMod_Mass30_v1" || Path=="HLT_AK8PFJet360TrimMod_Mass30_v2" || Path=="HLT_AK8PFJet360TrimMod_Mass30_v3") HLT_AK8PFJet360TrimMass30=true;
@@ -257,11 +270,15 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
 
     SetValue("HLT_DoubleEle33",HLT_DoubleEle33);
     SetValue("HLT_DoubleEle33_MW",HLT_DoubleEle33_MW);
+    SetValue("HLT_DoubleEle8_Mass8_HT300",HLT_DoubleEle8_Mass8_HT300);
     SetValue("HLT_Ele17_Ele12_DZ",HLT_Ele17_Ele12_DZ);
     SetValue("HLT_Ele27WP85",HLT_Ele27WP85);
     SetValue("HLT_Mu27TkMu8",HLT_Mu27TkMu8);
     SetValue("HLT_Mu30TkMu11",HLT_Mu30TkMu11);
     SetValue("HLT_Mu40TkMu11",HLT_Mu40TkMu11);
+    SetValue("HLT_Mu17_Iso_Mu8_Iso",HLT_Mu17_Iso_Mu8_Iso);
+    SetValue("HLT_Mu17_Iso_TkMu8_Iso",HLT_Mu17_Iso_TkMu8_Iso);
+    SetValue("HLT_DoubleMu8_Mass8_HT300",HLT_DoubleMu8_Mass8_HT300);
     SetValue("HLT_Mu40",HLT_Mu40);
     SetValue("HLT_IsoTkMu24",HLT_IsoTkMu24);
     SetValue("HLT_DoubleMu33NoFiltersNoVtx",HLT_DoubleMu33NoFiltersNoVtx);
@@ -270,6 +287,7 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
     SetValue("HLT_Mu23Ele12",HLT_Mu23Ele12);
     SetValue("HLT_Mu8Ele23",HLT_Mu8Ele23);
     SetValue("HLT_Mu30Ele30",HLT_Mu30Ele30);
+    SetValue("HLT_Mu8_Ele8_Mass8_HT300",HLT_Mu8_Ele8_Mass8_HT300);
     SetValue("HLT_PFHT900",HLT_PFHT900);
     SetValue("HLT_AK8PFJet360TrimMass30",HLT_AK8PFJet360TrimMass30);
 
@@ -315,6 +333,7 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
     std::vector <double> elSihih;
     std::vector <double> elHoE;
     std::vector <double> elD0;
+    std::vector <double> elSIP3D;
     std::vector <double> elDZ;
     std::vector <double> elOoemoop;
     std::vector <int>    elMHits;
@@ -476,6 +495,9 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
 	elSihih.push_back((*iel)->full5x5_sigmaIetaIeta());
 	elHoE.push_back((*iel)->hcalOverEcal());
 	elD0.push_back((*iel)->dB());
+	pat::Electron::IpType elIP3d = (pat::Electron::IpType) 1;
+	float sip3d = (*iel)->dB(elIP3d) / (*iel)->edB(elIP3d);
+	elSIP3D.push_back(sip3d);
 	elOoemoop.push_back(1.0/(*iel)->ecalEnergy() - (*iel)->eSuperClusterOverP()/(*iel)->ecalEnergy());
 	elMHits.push_back((*iel)->gsfTrack()->hitPattern().numberOfHits(reco::HitPattern::MISSING_INNER_HITS));
 	elVtxFitConv.push_back((*iel)->passConversionVeto());
@@ -621,6 +643,7 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
     SetValue("elSihih", elSihih);
     SetValue("elHoE", elHoE);
     SetValue("elD0", elD0);
+    SetValue("elSIP3D",elSIP3D);
     SetValue("elDZ", elDZ);
     SetValue("elOoemoop", elOoemoop);
     SetValue("elMHits", elMHits);
@@ -672,6 +695,7 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
     std::vector <double> muChi2;
     std::vector <double> muDxy;
     std::vector <double> muDz;
+    std::vector <double> muSIP3D;
     std::vector <double> muRelIso;
     std::vector <double> muMiniIsoEA;
     std::vector <double> muMiniIsoDB;
@@ -766,15 +790,22 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
             //get miniIso
 	    muMiniIsoEA.push_back(getPFMiniIsolation_EffectiveArea(packedPFCands, dynamic_cast<const reco::Candidate *>(imu->get()),0.05, 0.2, 10., false, false,myRhoJetsNC));
 	    muMiniIsoDB.push_back(getPFMiniIsolation_DeltaBeta(packedPFCands, dynamic_cast<const reco::Candidate *>(imu->get()), 0.05, 0.2, 10., false));            
+	    float musip3d;
+	    pat::Muon::IpType muIP3d = (pat::Muon::IpType) 1;
             //IP: for some reason this is with respect to the first vertex in the collection
             if (goodPVs.size() > 0){
 	      muDxy . push_back((*imu)->dB());
 	      muDz  . push_back((*imu)->muonBestTrack()->dz(goodPVs.at(0).position()));
+	      //muon sip3d;
+	      musip3d = (*imu)->dB(muIP3d) / (*imu)->edB(muIP3d);
+
             } 
 	    else {
 	      muDxy . push_back(-999);
 	      muDz  . push_back(-999);
+	      musip3d=-999;
             }
+	    muSIP3D.push_back(musip3d);
             //Numbers of hits
             muNValMuHits       . push_back((*imu)->globalTrack()->hitPattern().numberOfValidMuonHits());
             muNMatchedStations . push_back((*imu)->numberOfMatchedStations());
@@ -901,6 +932,7 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
     SetValue("muChi2"   , muChi2);
     SetValue("muDxy"    , muDxy);
     SetValue("muDz"     , muDz);
+    SetValue("muSIP3D", muSIP3D);
     SetValue("muRelIso" , muRelIso);
     SetValue("muMiniIsoEA", muMiniIsoEA);
     SetValue("muMiniIsoDB", muMiniIsoDB);
@@ -1310,10 +1342,16 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
     std::vector <int> genStatus;
     std::vector <int> genMotherID;
     std::vector <int> genMotherIndex;
-
+    std::vector<bool> genIsFromTau;
+    std::vector<bool> genIsPrompt;
+    std::vector<bool> genPMotherHasC;
+    std::vector<bool> genPMotherHasB;
+    std::vector<int> genPMother;
     //event weights
     std::vector<double> evtWeightsMC;
     float MCWeight=1;
+    std::vector<double> LHEweights;
+    std::vector<int> LHEweightids;
 
     if (isMc){
       //load info for event weight
@@ -1327,6 +1365,32 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
       evtWeightsMC=evtWeights;
       MCWeight = theWeight;
    
+
+      //weights for mc uncertainties
+      edm::Handle<LHEEventProduct> EvtHandle;
+      edm::InputTag theSrc("externalLHEProducer");
+      if(event.getByLabel(theSrc,EvtHandle)){
+	  
+	// Storing LHE weights https://twiki.cern.ch/twiki/bin/viewauth/CMS/LHEReaderCMSSW
+	// for MC@NLO renormalization and factorization scale. 
+	// ID numbers 1001 - 1009. (muR,muF) = 
+	// 0 = 1001: (1,1)    3 = 1004: (2,1)    6 = 1007: (0.5,1)  
+	// 1 = 1002: (1,2)    4 = 1005: (2,2)   7 = 1008: (0.5,2)  
+	// 2 = 1003: (1,0.5)  5 = 1006: (2,0.5) 8 = 1009: (0.5,0.5)
+	// for PDF variations: ID numbers > 2000
+
+	std::string weightidstr;
+	int weightid;
+	if(EvtHandle->weights().size() > 0){  
+	  for(unsigned int i = 0; i < EvtHandle->weights().size(); i++){
+	    weightidstr = EvtHandle->weights()[i].id;
+	    weightid = std::stoi(weightidstr);
+	    LHEweights.push_back(EvtHandle->weights()[i].wgt/EvtHandle->originalXWGTUP());
+	    LHEweightids.push_back(weightid);
+	  }
+	}
+      }
+
       //load genparticles collection
       edm::Handle<reco::GenParticleCollection> genParticles;
       event.getByLabel(genParticles_it, genParticles);
@@ -1335,6 +1399,15 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
             const reco::GenParticle & p = (*genParticles).at(i);
 
 	    bool keep=false;
+
+	    //attempt using mc gen particle flags
+	    if(p.status()==1) keep = true; //all stable out going particles
+	    else if( p.isPromptDecayed() ) keep = true; //keep prompt particles which have undergone decay (e.g. B-mesons)
+	    else if( p.statusFlags().isPrompt()) keep = true; // keep all prompt particles in case I want to do quark matching
+	    else if( p.isDirectPromptTauDecayProductFinalState()) keep = true; //log save leptons from tau decays since they are 'prompt' for us
+	    
+
+	    /* OLD METHOD USING STATUSES IS FAULTY
             //Find particles from hard scattering/stable
             if (p.status() >=20 && p.status()<=29) keep=true;
 	    else if(p.status()==1 && ( fabs(p.pdgId())>10 && fabs(p.pdgId())<19) ){
@@ -1343,9 +1416,34 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
 		reco::Candidate* mother = (reco::Candidate*) p.mother();
 		if( fabs(mother->pdgId())==24 && ( (mother->status()>=20 && mother->status()<=29) || (mother->status()>=50 && mother->status()<=59)) ) keep=true;
 	      }
-	    }
+	    }*/
+
+
 
             if(!keep) continue;    
+
+	    bool promptMotherHasB = false;
+	    bool promptMotherHasC = false;
+
+	    reco::GenParticle* mother = 0;
+	    if(p.status()==1){
+	      mother = (reco::GenParticle*) p.mother();
+	      while(mother){
+		if(mother->isPromptDecayed()) break;
+		else{ mother = (reco::GenParticle*) mother->mother();}
+	      }
+	    }
+
+	    if(mother){
+	      HepPDT::ParticleID heppdtid(mother->pdgId());
+	      promptMotherHasB = heppdtid.hasBottom();
+	      promptMotherHasC = heppdtid.hasCharm();
+	    }
+
+	    genPMotherHasB.push_back(promptMotherHasB);
+	    genPMotherHasC.push_back(promptMotherHasC);
+	    if(mother) genPMother.push_back(mother->pdgId());
+	    else       genPMother.push_back(-999);
 	    //Four vector
 	    genPt     . push_back(p.pt());
 	    genEta    . push_back(p.eta());
@@ -1356,7 +1454,8 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
 	    genID            . push_back(p.pdgId());
 	    genIndex         . push_back((int) i);
 	    genStatus        . push_back(p.status());
-	    
+	    genIsPrompt      . push_back(p.statusFlags().isPrompt());
+	    genIsFromTau     . push_back(p.isDirectPromptTauDecayProductFinalState()); //save whether or not a particle came from a prompt tau
 	    //mother info - stores mother pdgID if mother exists or -999 if mother doesn't exist. This way the entries will always be aligned with main gen particle entries
 	    if(p.mother()) genMotherID.push_back((p.mother())->pdgId());
 	    else genMotherID.push_back(-999);
@@ -1377,9 +1476,15 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
     SetValue("genStatus"     , genStatus);
     SetValue("genMotherID"   , genMotherID);
     SetValue("genMotherIndex", genMotherIndex);
-    
+    SetValue("genIsPrompt"   , genIsPrompt);
+    SetValue("genIsFromPromptTau", genIsFromTau);
     SetValue("evtWeightsMC", evtWeightsMC);
     SetValue("MCWeight",MCWeight);
+    SetValue("LHEWeights",LHEweights);
+    SetValue("LHEWeightIDs",LHEweightids);
+    SetValue("genPMotherHasC",genPMotherHasC);
+    SetValue("genPMotherHasB",genPMotherHasB);
+    SetValue("genPMother",genPMother);
 
     return 0;
 }

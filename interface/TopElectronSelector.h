@@ -299,11 +299,12 @@ public: // interface
 	if (version_ == HEEP) {
 	    Double_t heepPt = electron.ecalDrivenMomentum().pt();
 	    Double_t heepEta = electron.superCluster()->eta();
+            Int_t heepEcalDriven = electron.ecalDriven();
 	    Double_t heepDetainSeed = electron.deltaEtaSeedClusterTrackAtVtx();
 	    Double_t heepDphiin = electron.deltaPhiSuperClusterTrackAtVtx();
 	    Double_t heepSihih = electron.full5x5_sigmaIetaIeta();
 	    Double_t heepE2x5oE5x5 = electron.full5x5_e5x5()!=0 ? electron.full5x5_e2x5Max()/electron.full5x5_e5x5() : 0;
-	    Double_t heepE1x5oE5x5 = electron.full5x5_e5x5()!=0 ? electron.full5x5_e2x5Max()/electron.full5x5_e5x5() : 0;
+	    Double_t heepE1x5oE5x5 = electron.full5x5_e5x5()!=0 ? electron.full5x5_e1x5()/electron.full5x5_e5x5() : 0;
 	    Double_t heepEnergy = electron.superCluster()->energy();
 	    Double_t heepHoE = electron.hadronicOverEm();
 	    Double_t heepIsoTrkPt = electron.dr03TkSumPt();
@@ -315,11 +316,13 @@ public: // interface
 
             if ( heepPt > 35. && fabs(heepEta) < 1.4442 ) {
 		while (1) {
+                    if (heepEcalDriven == 1) {}
+                    else break;
 		    if (fabs(heepDetainSeed) < 0.004) {}
 		    else break;
 		    if (fabs(heepDphiin) < 0.06) {}
 		    else break;
-		    if (heepHoE*heepEnergy < 0.05*heepEnergy + 2.) {}
+		    if (heepHoE*heepEnergy < 0.05*heepEnergy + 1.) {}
 		    else break;
 		    if (heepE2x5oE5x5 > 0.94 || heepE1x5oE5x5 > 0.83) {}
 		    else break;
@@ -337,11 +340,13 @@ public: // interface
 	    }
 	    else if ( heepPt > 35. && fabs(heepEta) > 1.566 && fabs(heepEta) < 2.5 ) {
 		while (1) {
+                    if (heepEcalDriven == 1) {}
+                    else break;
 		    if (fabs(heepDetainSeed) < 0.006) {}
 		    else break;
 		    if (fabs(heepDphiin) < 0.06) {}
 		    else break;
-		    if (heepHoE*heepEnergy < 0.05*heepEnergy + 12.5) {}
+		    if (heepHoE*heepEnergy < 0.05*heepEnergy + 5.) {}
 		    else break;
 		    if (heepSihih < 0.03) {}
 		    else break;

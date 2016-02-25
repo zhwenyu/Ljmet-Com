@@ -8,7 +8,7 @@ files_per_job = 1
 
 rel_base = os.environ['CMSSW_BASE']
 
-outdir = '/eos/uscms/store/user/lpctlbsm/clint/Spring15/25ns/Oct15v2/'
+outdir = '/eos/uscms/store/user/lpctlbsm/clint/Spring15/25ns/PreApproval/'
 
 ### What is the name of your FWLite Analyzer
 FWLiteAnalyzer = 'ljmet'
@@ -41,26 +41,26 @@ prefix = []
 
 if DONOMINAL=='True':
     prefix.extend([
-            'X53X53To2L2Nu_LH_700',
-            'X53X53To2L2Nu_RH_700',
-            'X53X53To2L2Nu_LH_800',
-            'X53X53To2L2Nu_RH_800',
-            'X53X53To2L2Nu_LH_900',
-            'X53X53To2L2Nu_RH_900',
-            'X53X53To2L2Nu_LH_1000',
-            'X53X53To2L2Nu_RH_1000',
-            'X53X53To2L2Nu_LH_1100',
-            'X53X53To2L2Nu_RH_1100',
-            'X53X53To2L2Nu_LH_1200',
-            'X53X53To2L2Nu_RH_1200',
-            'X53X53To2L2Nu_LH_1300',
-            'X53X53To2L2Nu_RH_1300',
-            'X53X53To2L2Nu_LH_1400',
-            'X53X53To2L2Nu_RH_1400',
-            'X53X53To2L2Nu_LH_1500',
-            'X53X53To2L2Nu_RH_1500',
-            'X53X53To2L2Nu_LH_1600',
-            'X53X53To2L2Nu_RH_1600',
+#            'X53X53To2L2Nu_LH_700',
+#            'X53X53To2L2Nu_RH_700',
+#            'X53X53To2L2Nu_LH_800',
+#            'X53X53To2L2Nu_RH_800',
+#            'X53X53To2L2Nu_LH_900',
+#            'X53X53To2L2Nu_RH_900',
+#            'X53X53To2L2Nu_LH_1000',
+#            'X53X53To2L2Nu_RH_1000',
+#            'X53X53To2L2Nu_LH_1100',
+#            'X53X53To2L2Nu_RH_1100',
+#            'X53X53To2L2Nu_LH_1200',
+#            'X53X53To2L2Nu_RH_1200',
+#            'X53X53To2L2Nu_LH_1300',
+#            'X53X53To2L2Nu_RH_1300',
+#            'X53X53To2L2Nu_LH_1400',
+#            'X53X53To2L2Nu_RH_1400',
+#            'X53X53To2L2Nu_LH_1500',
+#            'X53X53To2L2Nu_RH_1500',
+#            'X53X53To2L2Nu_LH_1600',
+#            'X53X53To2L2Nu_RH_1600',
     ])
 
 
