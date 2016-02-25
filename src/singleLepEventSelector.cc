@@ -54,6 +54,7 @@
 #include "DataFormats/JetReco/interface/PFJetCollection.h"
 #include "DataFormats/METReco/interface/BeamHaloSummary.h"
 
+#include "LJMet/Com/interface/MiniIsolation.h"
 
 using trigger::TriggerObject;
 using namespace std;
@@ -253,13 +254,33 @@ void singleLepEventSelector::BeginJob( std::map<std::string, edm::ParameterSet c
         mdPar["loose_muon_minpt"]          = par[_key].getParameter<double>       ("loose_muon_minpt");
         mdPar["loose_muon_maxeta"]         = par[_key].getParameter<double>       ("loose_muon_maxeta");
         miPar["min_muon"]                  = par[_key].getParameter<int>          ("min_muon");
+        if (par[_key].exists("muon_useMiniIso")) {
+	  mbPar["muon_useMiniIso"]         = par[_key].getParameter<bool>         ("muon_useMiniIso");
+	  mdPar["muon_miniIso"]            = par[_key].getParameter<double>       ("muon_miniIso");
+	  mdPar["loose_muon_miniIso"]      = par[_key].getParameter<double>       ("loose_muon_miniIso");
+	}else{
+	  mbPar["muon_useMiniIso"]         = false;
+	  mdPar["muon_miniIso"]            = 999;
+	  mdPar["loose_muon_miniIso"]      = 999;
+	}
 
         mbPar["electron_cuts"]             = par[_key].getParameter<bool>         ("electron_cuts");
         mdPar["electron_minpt"]            = par[_key].getParameter<double>       ("electron_minpt");
         mdPar["electron_maxeta"]           = par[_key].getParameter<double>       ("electron_maxeta");
+        mdPar["electron_miniIso"]          = par[_key].getParameter<double>       ("electron_miniIso");
         mdPar["loose_electron_minpt"]      = par[_key].getParameter<double>       ("loose_electron_minpt");
         mdPar["loose_electron_maxeta"]     = par[_key].getParameter<double>       ("loose_electron_maxeta");
+        mdPar["loose_electron_miniIso"]    = par[_key].getParameter<double>       ("loose_electron_miniIso");
         miPar["min_electron"]              = par[_key].getParameter<int>          ("min_electron");
+        if (par[_key].exists("electron_useMiniIso")) {
+	  mbPar["electron_useMiniIso"]     = par[_key].getParameter<bool>         ("electron_useMiniIso");
+	  mdPar["electron_miniIso"]        = par[_key].getParameter<double>       ("electron_miniIso");
+	  mdPar["loose_electron_miniIso"]  = par[_key].getParameter<double>       ("loose_electron_miniIso");
+	}else{
+	  mbPar["electron_useMiniIso"]     = false;
+	  mdPar["electron_miniIso"]        = -999;
+	  mdPar["loose_electron_miniIso"]  = -999;
+	}
         if (par[_key].exists("UseElMVA")) {
             mvdPar["tight_electron_mva_cuts"] = par[_key].getParameter<std::vector<double>> ("tight_electron_mva_cuts");
             mvdPar["loose_electron_mva_cuts"] = par[_key].getParameter<std::vector<double>> ("loose_electron_mva_cuts");
@@ -267,11 +288,14 @@ void singleLepEventSelector::BeginJob( std::map<std::string, edm::ParameterSet c
 
         miPar["min_lepton"]               = par[_key].getParameter<int>          ("min_lepton");
         miPar["max_lepton"]               = par[_key].getParameter<int>          ("max_lepton");
+        miPar["min_loose_lepton"]         = par[_key].getParameter<int>          ("min_loose_lepton");
+        miPar["max_loose_lepton"]         = par[_key].getParameter<int>          ("max_loose_lepton");
         mbPar["second_lepton_veto"]       = par[_key].getParameter<bool>         ("second_lepton_veto");
         mbPar["tau_veto"]                 = par[_key].getParameter<bool>         ("tau_veto");
 
         mbPar["met_cuts"]                 = par[_key].getParameter<bool>         ("met_cuts");
         mdPar["min_met"]                  = par[_key].getParameter<double>       ("min_met");
+	mdPar["max_met"]                  = par[_key].getParameter<double>       ("max_met");
 
         mbPar["btag_cuts"]                = par[_key].getParameter<bool>         ("btag_cuts");
         mbPar["btag_1"]                   = par[_key].getParameter<bool>         ("btag_1");
@@ -328,10 +352,13 @@ void singleLepEventSelector::BeginJob( std::map<std::string, edm::ParameterSet c
     push_back("Max jet multiplicity");
     push_back("Leading jet pt");
     push_back("Min MET");
+    push_back("Max MET");
     push_back("Min muon");
     push_back("Min electron");
     push_back("Min lepton");
     push_back("Max lepton");
+    push_back("Min loose lepton");
+    push_back("Max loose lepton");
     //push_back("Trigger consistent");
     push_back("Second lepton veto");
     push_back("Tau veto");
@@ -367,12 +394,17 @@ void singleLepEventSelector::BeginJob( std::map<std::string, edm::ParameterSet c
         set("Leading jet pt", false);
     }
 
-    if (mbPar["met_cuts"]) set("Min MET", mdPar["min_met"]);
+    if (mbPar["met_cuts"]){
+      set("Min MET", mdPar["min_met"]);
+      set("Max MET", mdPar["max_met"]);    
+    }
 
     set("Min muon", miPar["min_muon"]);  
     set("Min electron", miPar["min_electron"]);  
     set("Min lepton", miPar["min_lepton"]);  
     set("Max lepton", miPar["max_lepton"]);  
+    set("Min loose lepton", miPar["min_loose_lepton"]);  
+    set("Max loose lepton", miPar["max_loose_lepton"]);  
     //set("Trigger consistent", mbPar["trigger_consistent"]);  
     set("Second lepton veto", mbPar["second_lepton_veto"]);
     set("Tau veto", mbPar["tau_veto"]);
@@ -663,6 +695,16 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
             event.getByLabel( mtPar["muon_collection"], mhMuons );      
 
             mvSelMuons.clear();
+	    mvLooseMuons.clear();
+	    //packed pf candidates and rho source needed miniIso
+	    edm::Handle<pat::PackedCandidateCollection> packedPFCands;
+	    edm::InputTag packedPFCandsLabel_("packedPFCandidates");
+	    event.getByLabel(packedPFCandsLabel_, packedPFCands);
+	    //rho isolation from susy recommendation
+	    edm::Handle<double> rhoJetsNC;
+	    event.getByLabel(edm::InputTag("fixedGridRhoFastjetCentralNeutral","") , rhoJetsNC);
+	    double myRhoJetsNC = *rhoJetsNC;
+
             for (std::vector<pat::Muon>::const_iterator _imu = mhMuons->begin(); _imu != mhMuons->end(); _imu++){
                 retMuon.set(false);	
                 bool pass = false;
@@ -679,6 +721,9 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
                         else if ( !mbPar["muon_selector_medium"] && (*_imu).isTightMuon(*mvSelPVs[0]) ){ }
 		        else break; // fail
 
+			pat::Muon* muptr = new pat::Muon(*_imu);
+			float miniIso = getPFMiniIsolation_EffectiveArea(packedPFCands, dynamic_cast<const reco::Candidate* > (muptr), 0.05, 0.2, 10., false, false,myRhoJetsNC);
+
                         double chIso = (*_imu).pfIsolationR04().sumChargedHadronPt;
                         double nhIso = (*_imu).pfIsolationR04().sumNeutralHadronEt;
                         double gIso  = (*_imu).pfIsolationR04().sumPhotonEt;
@@ -688,8 +733,9 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
 
 		        double pfIso = (chIso + std::max(0.,nhIso + gIso - 0.5*puIso))/pt;
 
-		        if ( pfIso<mdPar["muon_reliso"] ) {}
-		        else break;
+		        if (!mbPar["muon_useMiniIso"] && pfIso<mdPar["muon_reliso"] ) {delete muptr;}
+			else if (mbPar["muon_useMiniIso"] && miniIso<mdPar["muon_miniIso"] ) {delete muptr;}
+			else{delete muptr;  break;}
 		    }
                     
                     if ( _imu->pt()>mdPar["muon_minpt"] ){ }
@@ -707,6 +753,7 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
 
                     // save every good muon
                     mvSelMuons.push_back( edm::Ptr<pat::Muon>( mhMuons, _n_muons) );
+		    mvLooseMuons.push_back( edm::Ptr<pat::Muon>( mhMuons, _n_muons) );
                 }
 		else {
                     retLooseMuon.set(false);	
@@ -728,6 +775,10 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
                                 if ( (*_imu).isLooseMuon() ){ }
     		                else break; // fail
                             }
+
+			    pat::Muon* muptr = new pat::Muon(*_imu);
+			    float miniIso = getPFMiniIsolation_EffectiveArea(packedPFCands, dynamic_cast<const reco::Candidate* > (muptr), 0.05, 0.2, 10., false, false,myRhoJetsNC);
+
                             double chIso = (*_imu).pfIsolationR04().sumChargedHadronPt;
                             double nhIso = (*_imu).pfIsolationR04().sumNeutralHadronEt;
                             double gIso  = (*_imu).pfIsolationR04().sumPhotonEt;
@@ -736,8 +787,9 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
     
     		            double pfIso = (chIso + std::max(0.,nhIso + gIso - 0.5*puIso))/pt;
     
-    		            if ( pfIso<mdPar["loose_muon_reliso"] ) {}
-    		            else break;
+			    if (!mbPar["muon_useMiniIso"] && pfIso<mdPar["loose_muon_reliso"] ) {delete muptr;}
+			    else if (mbPar["muon_useMiniIso"] && miniIso<mdPar["loose_muon_miniIso"] ) {delete muptr;}
+			    else{ delete muptr;  break;}
     		        }
                         
                         if ( _imu->pt()>mdPar["loose_muon_minpt"] ){ }
@@ -750,7 +802,10 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
                         break;
                     }
     
-                    if ( pass_loose ) ++nLooseMuons; 
+                    if ( pass_loose ){
+		      mvLooseMuons.push_back( edm::Ptr<pat::Muon>( mhMuons, _n_muons) );
+		      ++nLooseMuons; 
+		    }
 		}
                 	
                 _n_muons++;
@@ -774,6 +829,16 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
             event.getByLabel( mtPar["electron_collection"], mhElectrons );
 
             mvSelElectrons.clear();
+	    mvLooseElectrons.clear();
+	    //packed pf candidates and rho source needed miniIso
+	    edm::Handle<pat::PackedCandidateCollection> packedPFCands;
+	    edm::InputTag packedPFCandsLabel_("packedPFCandidates");
+	    event.getByLabel(packedPFCandsLabel_, packedPFCands);
+	    //rho isolation from susy recommendation
+	    edm::Handle<double> rhoJetsNC;
+	    event.getByLabel(edm::InputTag("fixedGridRhoFastjetCentralNeutral","") , rhoJetsNC);
+	    double myRhoJetsNC = *rhoJetsNC;
+
 	    size_t j = 0;
             for (std::vector<pat::Electron>::const_iterator _iel = mhElectrons->begin(); _iel != mhElectrons->end(); _iel++){
 	        retElectron.set(false);
@@ -797,12 +862,22 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
                         else if ( fabs(_iel->superCluster()->eta())<=1.479 && fabs(_iel->superCluster()->eta())>0.8) mvapass = mvaValue( *_iel, event) > mvdPar["tight_electron_mva_cuts"].at(1);
                         else mvapass = mvaValue( *_iel, event) > mvdPar["tight_electron_mva_cuts"].at(2);
                         if (!mvapass) break;
+
+			if(mbPar["electron_useMiniIso"]){
+			  bool passIso = false;
+			  pat::Electron* elptr = new pat::Electron(*_iel);
+			  float miniIso = getPFMiniIsolation_EffectiveArea(packedPFCands, dynamic_cast<const reco::Candidate* > (elptr), 0.05, 0.2, 10., false, false,myRhoJetsNC);
+
+			  if(miniIso < mdPar["electron_miniIso"]) passIso = true;                      
+			  if(!passIso){delete elptr;  break;}
+			  delete elptr;
+			}
                     }
                     else {
-                        if ( (*electronSel_)( *_iel, event, retElectron ) ){ }
-                        else break; // fail
+		      if ( (*electronSel_)( *_iel, event, retElectron ) ){ }
+		      else break; // fail
                     }
-
+		    
                     pass = true; // success
                     break;
                 }
@@ -813,6 +888,7 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
                    
                     // save every good electron
                     mvSelElectrons.push_back( edm::Ptr<pat::Electron>( mhElectrons, _n_electrons) );
+		    mvLooseElectrons.push_back( edm::Ptr<pat::Electron>( mhElectrons, _n_electrons) );
                 }	
 		else {
     	            retLooseElectron.set(false);
@@ -836,6 +912,16 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
                             else if ( fabs(_iel->superCluster()->eta())<=1.479 && fabs(_iel->superCluster()->eta())>0.8) mvapass = mvaValue( *_iel, event) > mvdPar["loose_electron_mva_cuts"].at(1);
                             else if ( fabs(_iel->superCluster()->eta())>1.479) mvapass = mvaValue( *_iel, event) > mvdPar["loose_electron_mva_cuts"].at(2);
                             if (!mvapass) break;
+			    
+			    if(mbPar["electron_useMiniIso"]){
+			      bool passIso = false;
+			      pat::Electron* elptr = new pat::Electron(*_iel);
+			      float miniIso = getPFMiniIsolation_EffectiveArea(packedPFCands, dynamic_cast<const reco::Candidate* > (elptr), 0.05, 0.2, 10., false, false,myRhoJetsNC);
+			      
+			      if(miniIso < mdPar["loose_electron_miniIso"]) passIso = true;                      
+			      if(!passIso){delete elptr;  break;}
+			      delete elptr;
+			    }
                         }
                         else {
                             if ( (*looseElectronSel_)( *_iel, event, retLooseElectron ) ){ }
@@ -846,7 +932,10 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
                         break;
                     }
     
-                    if ( pass_loose ) ++nLooseElectrons;
+                    if ( pass_loose ){
+		      ++nLooseElectrons;
+		      mvLooseElectrons.push_back( edm::Ptr<pat::Electron>( mhElectrons, _n_electrons) );
+		    }
 		}
                  	
                 _n_electrons++;
@@ -869,28 +958,28 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
 
             for (std::vector<pat::Tau>::const_iterator _itau = mhTaus->begin(); _itau != mhTaus->end(); _itau++){
 
-                while(1){
+	      while(1){
 
-					//Tau cuts hardcoded here	
-					if(_itau->tauID("byMediumCombinedIsolationDeltaBetaCorr3Hits")){}
-					else break;
-					
-					if(_itau->tauID("againstElectronTight")){}
-					else break;
-					
-					if(_itau->tauID("againstMuonTight2")){}
-					else break;
-					
-					if(_itau->pt() > 20 && fabs(_itau->eta()) < 2.4 ){}
-					else break;
-					
-					++_n_taus;
-					break;
- 
-				}
-			}
-
-		}
+		//Tau cuts hardcoded here	
+		if(_itau->tauID("byMediumCombinedIsolationDeltaBetaCorr3Hits")){}
+		else break;
+		
+		if(_itau->tauID("againstElectronTightMVA5")){}
+		else break;
+		
+		if(_itau->tauID("againstMuonTight3")){}
+		else break;
+		
+		if(_itau->pt() > 20 && fabs(_itau->eta()) < 2.4 ){}
+		else break;
+		
+		++_n_taus;
+		break;
+		
+	      }
+	    }
+	    
+	}
         if (mbPar["debug"]) std::cout<<"finish tau cuts..."<<std::endl;
         
 	//
@@ -1124,6 +1213,10 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
                 TLorentzVector corrMET = correctMet(met, event);
                 if ( ignoreCut("Min MET") || corrMET.Pt()>cut("Min MET", double()) ) passCut(ret, "Min MET");
                 else break;
+
+                if ( ignoreCut("Max MET") || corrMET.Pt()<cut("Max MET", double()) ) passCut(ret, "Max MET");
+                else break;
+
             }
         } // end of MET cuts
         if (mbPar["debug"]) std::cout<<"finish met cuts..."<<std::endl;
@@ -1134,6 +1227,7 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
         if (mbPar["debug"]) std::cout<<"start lepton cuts..."<<std::endl;
 
         int nLeptons = nSelElectrons + nSelMuons;
+	int nTotalLeptons = nLooseElectrons + nLooseMuons + nSelElectrons + nSelMuons;
 
         if( nSelMuons >= cut("Min muon", int()) || ignoreCut("Min muon") ) passCut(ret, "Min muon");
         else break;
@@ -1142,6 +1236,11 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
         if( nLeptons >= cut("Min lepton", int()) || ignoreCut("Min lepton") ) passCut(ret, "Min lepton");
         else break;
         if( nLeptons <= cut("Max lepton", int()) || ignoreCut("Max lepton") ) passCut(ret, "Max lepton");
+        else break;
+
+        if( nTotalLeptons >= cut("Min loose lepton", int()) || ignoreCut("Min loose lepton") ) passCut(ret, "Min loose lepton");
+        else break;
+        if( nTotalLeptons <= cut("Max loose lepton", int()) || ignoreCut("Max loose lepton") ) passCut(ret, "Max loose lepton");
         else break;
 
         
