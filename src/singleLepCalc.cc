@@ -69,6 +69,7 @@ private:
     bool cleanGenJets;
     bool UseElMVA;
     bool orlhew;
+    bool saveLooseLeps;
     std::string basePDFname;
     std::string newPDFname;
 
@@ -182,6 +183,9 @@ int singleLepCalc::BeginJob()
     }
     else cout << "Writing LHE weights (no override)." << endl;
 
+    if (mPset.exists("saveLooseLeps")) saveLooseLeps = mPset.getParameter<bool>("saveLooseLeps");
+    else                               saveLooseLeps = false;
+
     return 0;
 }
 
@@ -191,13 +195,26 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
     std::vector<edm::Ptr<pat::Jet> >            const & vSelBtagJets = selector->GetSelectedBtagJets();
     std::vector<edm::Ptr<pat::Jet> >            const & vAllJets = selector->GetAllJets();
     std::vector<std::pair<TLorentzVector,bool>> const & vCorrBtagJets = selector->GetCorrJetsWithBTags();
-    std::vector<edm::Ptr<pat::Muon> >           const & vSelMuons = selector->GetSelectedMuons();
-    std::vector<edm::Ptr<pat::Electron> >       const & vSelElectrons = selector->GetSelectedElectrons();
+    std::vector<edm::Ptr<pat::Muon> >           const & vSelectedMuons = selector->GetSelectedMuons();
+    std::vector<edm::Ptr<pat::Electron> >       const & vSelectedElectrons = selector->GetSelectedElectrons();
+    std::vector<edm::Ptr<pat::Muon> >           const & vLooseMuons = selector->GetLooseMuons();
+    std::vector<edm::Ptr<pat::Electron> >       const & vLooseElectrons = selector->GetLooseElectrons();
     edm::Ptr<pat::MET>                          const & pMet = selector->GetMet();
     std::map<std::string, unsigned int>         const & mSelMCTriggersEl = selector->GetSelectedMCTriggersEl();
     std::map<std::string, unsigned int>         const & mSelTriggersEl = selector->GetSelectedTriggersEl();
     std::map<std::string, unsigned int>         const & mSelMCTriggersMu = selector->GetSelectedMCTriggersMu();
     std::map<std::string, unsigned int>         const & mSelTriggersMu = selector->GetSelectedTriggersMu();
+
+    std::vector<edm::Ptr<pat::Muon> > vSelMuons;
+    std::vector<edm::Ptr<pat::Electron> > vSelElectrons;
+    if(saveLooseLeps){
+      vSelMuons = vLooseMuons;
+      vSelElectrons = vLooseElectrons;
+    }else{
+      vSelMuons = vSelectedMuons;
+      vSelElectrons = vSelectedElectrons;
+    }
+
     // ----- Event kinematics -----
     int _nAllJets        = (int)vAllJets.size();
     int _nSelJets        = (int)vSelJets.size();
@@ -260,6 +277,12 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
     std::vector< TLorentzVector > vGenLep;
     TLorentzVector tmpLV;
 
+    //rho source for miniIso
+    edm::Handle<double> rhoJetsNC;
+    event.getByLabel(edm::InputTag("fixedGridRhoFastjetCentralNeutral","") , rhoJetsNC);
+    double myRhoJetsNC = *rhoJetsNC;
+    double _rhoNC = myRhoJetsNC;
+
     // Muon
    
     std::vector <int> muCharge;
@@ -275,6 +298,7 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
     std::vector <double> muDz;
     std::vector <double> muRelIso;
     std::vector <double> muMiniIso;
+    std::vector <double> muMiniIsoDB;
 
     std::vector <int> muNValMuHits;
     std::vector <int> muNMatchedStations;
@@ -342,7 +366,12 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
 
             edm::Handle<pat::PackedCandidateCollection> packedPFCands;
             event.getByLabel(packedPFCandsLabel_, packedPFCands);
-            double miniIso = getPFMiniIsolation_DeltaBeta(packedPFCands, dynamic_cast<const reco::Candidate *>(imu->get()), 0.05, 0.2, 10., false);
+            double miniIso = getPFMiniIsolation_EffectiveArea(packedPFCands, dynamic_cast<const reco::Candidate *>(imu->get()), 0.05, 0.2, 10., false, false,myRhoJetsNC);
+            double miniIsoDB = getPFMiniIsolation_DeltaBeta(packedPFCands, dynamic_cast<const reco::Candidate *>(imu->get()), 0.05, 0.2, 10., false);
+
+            muRelIso . push_back(relIso);
+            muMiniIso . push_back(miniIso);
+            muMiniIsoDB . push_back(miniIsoDB);
 
             muRelIso . push_back(relIso);
             muMiniIso . push_back(miniIso);
@@ -415,6 +444,7 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
     SetValue("muDz"     , muDz);
     SetValue("muRelIso" , muRelIso);
     SetValue("muMiniIso", muMiniIso);
+    SetValue("muMiniIsoDB", muMiniIsoDB);
 
     SetValue("muNValMuHits"       , muNValMuHits);
     SetValue("muNMatchedStations" , muNMatchedStations);
@@ -503,13 +533,6 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
     edm::Handle<double> rhoHandle;
     event.getByLabel(rhoSrc_, rhoHandle);
     double rhoIso = std::max(*(rhoHandle.product()), 0.0);
-
-    //rho source for miniIso
-    edm::Handle<double> rhoJetsNC;
-    event.getByLabel(edm::InputTag("fixedGridRhoFastjetCentralNeutral","") , rhoJetsNC);
-    double myRhoJetsNC = *rhoJetsNC;
-    double _rhoNC = myRhoJetsNC;
-
 
     //
     //_____Electrons______
@@ -845,6 +868,35 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
     SetValue("met_phi", _met_phi);
     SetValue("corr_met", _corr_met);
     SetValue("corr_met_phi", _corr_met_phi);
+
+    double _metnohf = -9999.0;
+    double _metnohf_phi = -9999.0;
+    // Corrected METNOHF
+    double _corr_metnohf = -9999.0;
+    double _corr_metnohf_phi = -9999.0;
+
+    edm::InputTag METnoHFColl = edm::InputTag("slimmedMETsNoHF");
+    edm::Handle<std::vector<pat::MET> > METnoHF;
+    if(event.getByLabel(METnoHFColl, METnoHF)){
+      edm::Ptr<pat::MET> metnohf = edm::Ptr<pat::MET>( METnoHF, 0);
+      
+      if(metnohf.isNonnull() && metnohf.isAvailable()) {
+        _metnohf = metnohf->p4().pt();
+        _metnohf_phi = metnohf->p4().phi();
+        
+        TLorentzVector corrMETNOHF = selector->correctMet(*metnohf, event);
+        //std::cout<<(selector->GetCleanedCorrMet()).Pt()<<std::endl;
+        if(corrMETNOHF.Pt()>0) {
+	  _corr_metnohf = corrMETNOHF.Pt();
+	  _corr_metnohf_phi = corrMETNOHF.Phi();
+        }
+      }
+    }
+    
+    SetValue("metnohf", _metnohf);
+    SetValue("metnohf_phi", _metnohf_phi);
+    SetValue("corr_metnohf", _corr_metnohf);
+    SetValue("corr_metnohf_phi", _corr_metnohf_phi);
 
     //_____ Gen Info ______________________________
     //

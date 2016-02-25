@@ -239,7 +239,6 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * s
 
     std::vector<int> theJetFlav;
     std::vector<int> theJetBTag;
-    std::vector<int> theJetBTagLoose;
     
     double theVtxMass, theVtxNtracks, theVtx3DVal, theVtx3DSig, thePileupJetId;
 
@@ -288,10 +287,6 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * s
       theJetCSV.push_back(corrak4.bDiscriminator( bDiscriminant ));
       theJetBTag.push_back(theCorrBtagJets[index].second);
       theJetFlav.push_back(abs(corrak4.partonFlavour()));
-
-      std::string tagger = "CSVL";
-      bool isTaggedLoose = selector->isJetTagged(corrak4, event, tagger, 0.605);
-      theJetBTagLoose.push_back(isTaggedLoose);
 
       theJetCEmEnergy.push_back(corrak4.chargedEmEnergy());
       theJetNEmEnergy.push_back(corrak4.neutralEmEnergy());
@@ -347,7 +342,6 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * s
     SetValue("theJetEnergy", theJetEnergy);
     SetValue("theJetCSV",    theJetCSV);
     SetValue("theJetBTag",   theJetBTag);
-    SetValue("theJetBTagLoose",   theJetBTagLoose);
     SetValue("theJetFlav",   theJetFlav);
 
     SetValue("theJetCEmEnergy", theJetCEmEnergy); 
@@ -617,8 +611,7 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * s
 	SDsubjetPhi       = lvsubjet.Phi();
 	SDsubjetMass      = corrsubjet.mass();
 	SDsubjetBdisc     = corrsubjet.bDiscriminator(bDiscriminant); 
-	std::string tagger = "CSVM";
-	SDsubjetBTag      = selector->isJetTagged(corrsubjet, event, tagger, 0.890);
+	SDsubjetBTag      = selector->isJetTagged(corrsubjet, event);
 	SDdeltaRsubjetJet = deltaR(lvak8.Eta(), lvak8.Phi(), SDsubjetEta, SDsubjetPhi);
 
 	if(SDsubjetBdisc > 0.605) nSDSubsCSVL++;
