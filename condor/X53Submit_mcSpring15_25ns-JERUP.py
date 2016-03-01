@@ -8,7 +8,7 @@ files_per_job = 1
 
 rel_base = os.environ['CMSSW_BASE']
 
-outdir = '/eos/uscms/store/user/lpctlbsm/clint/Spring15/25ns/Approval/JESUP/'
+outdir = '/eos/uscms/store/user/lpctlbsm/clint/Spring15/25ns/Approval/JERUP/'
 
 ### What is the name of your FWLite Analyzer
 FWLiteAnalyzer = 'ljmet'
@@ -27,9 +27,9 @@ MYJSON = "''"
 ### Systematics flags
 BTAGUNCERTUP = 'False'
 BTAGUNCERTDOWN = 'False'
-JECUNCERTUP = 'True'
+JECUNCERTUP = 'False'
 JECUNCERTDOWN = 'False'
-JERUNCERTUP = 'False'
+JERUNCERTUP = 'True'
 JERUNCERTDOWN = 'False'
 
 
@@ -50,15 +50,15 @@ if DONOMINAL=='True':
 #            'WZ',
 #            'WZ_MiniAODv1',
 #            'ZZ',
-            'VH',
+#            'VH',
 #            'TTW',
 #            'TTZ',
-#            'TTH',
+            'TTH',
             'ZZZ',
-#            'WZZ',
-#            'WWZ',
-#            'WpWp',
-            'WW-mpi',
+            'WZZ',
+            'WWZ',
+            'WpWp',
+#            'WW-mpi',
 #            'TTTT',
     ])
 
@@ -85,15 +85,15 @@ listnom = [
  #   'Samples_Spring15MC/WZTo3LNu_TuneCUETP8M1_13TeV-powheg-pythia8_RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1.txt',
  #   'Samples_Spring15MC/WZTo3LNu_TuneCUETP8M1_13TeV-powheg-pythia8_RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1.txt',
  #   'Samples_Spring15MC/ZZTo4L_13TeV-amcatnloFXFX-pythia8_RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1.txt',
-    'Samples_Spring15MC/VHToNonbb_M125_13TeV_amcatnloFXFX_madspin_pythia8_RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1.txt',
+ #   'Samples_Spring15MC/VHToNonbb_M125_13TeV_amcatnloFXFX_madspin_pythia8_RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1.txt',
  #   'Samples_Spring15MC/TTWJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-madspin-pythia8_RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1.txt',
  #   'Samples_Spring15MC/TTZToLLNuNu_M-10_TuneCUETP8M1_13TeV-amcatnlo-pythia8_RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v2.txt',
- #   'Samples_Spring15MC/ttHJetToNonbb_M125_13TeV_amcatnloFXFX_madspin_pythia8_mWCutfix_RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1.txt',
+    'Samples_Spring15MC/ttHJetToNonbb_M125_13TeV_amcatnloFXFX_madspin_pythia8_mWCutfix_RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1.txt',
     'Samples_Spring15MC/ZZZ_TuneCUETP8M1_13TeV-amcatnlo-pythia8_RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1.txt',
- #   'Samples_Spring15MC/WZZ_TuneCUETP8M1_13TeV-amcatnlo-pythia8_RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1.txt',
- #   'Samples_Spring15MC/WWZ_TuneCUETP8M1_13TeV-amcatnlo-pythia8_RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1.txt',
- #   'Samples_Spring15MC/WpWpJJ_EWK-QCD_TuneCUETP8M1_13TeV-madgraph-pythia8_RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1.txt',
-    'Samples_Spring15MC/WW_DoubleScattering_13TeV-pythia8_RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1.txt',
+    'Samples_Spring15MC/WZZ_TuneCUETP8M1_13TeV-amcatnlo-pythia8_RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1.txt',
+    'Samples_Spring15MC/WWZ_TuneCUETP8M1_13TeV-amcatnlo-pythia8_RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1.txt',
+    'Samples_Spring15MC/WpWpJJ_EWK-QCD_TuneCUETP8M1_13TeV-madgraph-pythia8_RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1.txt',
+ #   'Samples_Spring15MC/WW_DoubleScattering_13TeV-pythia8_RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1.txt',
  #   'Samples_Spring15MC/TTTT_TuneCUETP8M1_13TeV-amcatnlo-pythia8_RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1.txt',
     ]
 
