@@ -5,7 +5,7 @@
  *
  * Purpose      : Class containing generic methods for 
  *                      calculating topological variables 
- *                     (Instantiate using as argument: vector<TMBLorentzVector> 
+ *                     (Instantiate using as argument: std::vector<TMBLorentzVector> 
  *                      of all objects for which you want any variable 
  *                      to be calculated)  
  *
@@ -24,7 +24,7 @@
     class TopTopologicalVariables {
 	/**
 	   Contains generic methods for calculating topological variables
-           Constructor takes most containers (vector, list, Collection, etc.)
+           Constructor takes most containers (std::vector, list, Collection, etc.)
            of any object derived from TMBLorentzVector
 	*/
     public:
@@ -40,7 +40,7 @@
         TopTopologicalVariables& operator= (const TopTopologicalVariables& that);
         TopTopologicalVariables(const TopTopologicalVariables& that);
       
-      // Lambdas (eigen vectors of momentum tensor) and their combinations:
+      // Lambdas (eigen std::vectors of momentum tensor) and their combinations:
 	TVectorD GetMomentumTensorEigenvalues() const;
 	double Aplanarity() const;
 	double Sphericity() const;

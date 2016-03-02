@@ -196,7 +196,7 @@ int LjmetEventContent::createBranches()
             std::cout << mLegend << "Branch " << br->first << " std::vector<bool> created" << std::endl;
         }
     }
-    std::cout << mLegend << "vector<bool> branches created: " << mVectorBoolBranch.size() << std::endl;
+    std::cout << mLegend << "std::vector<bool> branches created: " << mVectorBoolBranch.size() << std::endl;
     
     // Vector-of-int branches
     for (std::map<std::string, std::vector<int>>::iterator br = mVectorIntBranch.begin(); br != mVectorIntBranch.end(); ++br) {
@@ -206,7 +206,7 @@ int LjmetEventContent::createBranches()
             std::cout << mLegend << "Branch " << br->first << " std::vector<int> created" << std::endl;
         }
     }
-    std::cout << mLegend << "vector<int> branches created: " << mVectorIntBranch.size() << std::endl;
+    std::cout << mLegend << "std::vector<int> branches created: " << mVectorIntBranch.size() << std::endl;
     
     // Vector-of-double branches
     for (std::map<std::string, std::vector<double>>::iterator br = mVectorDoubleBranch.begin(); br != mVectorDoubleBranch.end(); ++br) {
@@ -217,10 +217,10 @@ int LjmetEventContent::createBranches()
         }
     }
 
-    std::cout << mLegend << "vector<double> branches created: "
+    std::cout << mLegend << "std::vector<double> branches created: "
     << mVectorDoubleBranch.size() << std::endl;
 
-    // vector vector string branches
+    // std::vector std::vector std::string branches
     for(std::map<std::string,std::vector<std::string> >::iterator br = mVectorStringBranch.begin();
 	br != mVectorStringBranch.end();
 	++br){

@@ -114,7 +114,7 @@ int LjetsTopoCalc::FillLjetsBranches( std::vector<edm::Ptr<pat::Muon> > const & 
                                 vSelMuons[0]->energy() );
         
         
-        // make a vector of jets
+        // make a std::vector of jets
         std::vector<TLorentzVector> tlv_jets;
         for ( std::vector<edm::Ptr<pat::Jet> >::const_iterator iJet = vSelJets.begin();
              iJet != vSelJets.end();

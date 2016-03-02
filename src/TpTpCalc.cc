@@ -351,7 +351,7 @@ int TpTpCalc::AnalyzeEvent(edm::EventBase const & event,
 		    int W2daughterID = W2daughter->pdgId();
 		    
 		    WdecayID.push_back(W2daughterID);
-		    WdecayIndex.push_back(BosonIndex);  // vector index for the W boson om bosonID
+		    WdecayIndex.push_back(BosonIndex);  // std::vector index for the W boson om bosonID
 		    WdecayPt.push_back(W2daughter->pt());
 		    WdecayEta.push_back(W2daughter->eta());
 		    WdecayPhi.push_back(W2daughter->phi());
@@ -369,7 +369,7 @@ int TpTpCalc::AnalyzeEvent(edm::EventBase const & event,
 		  }
 		}else{
 		  WdecayID.push_back(WdaughterID);
-		  WdecayIndex.push_back(BosonIndex);  // vector index for the W boson om bosonID
+		  WdecayIndex.push_back(BosonIndex);  // std::vector index for the W boson om bosonID
 		  WdecayPt.push_back(Wdaughter->pt());
 		  WdecayEta.push_back(Wdaughter->eta());
 		  WdecayPhi.push_back(Wdaughter->phi());
@@ -409,7 +409,7 @@ int TpTpCalc::AnalyzeEvent(edm::EventBase const & event,
 			int Z3daughterID = Z3daughter->pdgId();
 			
 			ZdecayID.push_back(Z3daughterID);
-			ZdecayIndex.push_back(BosonIndex);  // vector index for the Z boson om bosonID
+			ZdecayIndex.push_back(BosonIndex);  // std::vector index for the Z boson om bosonID
 			ZdecayPt.push_back(Z3daughter->pt());
 			ZdecayEta.push_back(Z3daughter->eta());
 			ZdecayPhi.push_back(Z3daughter->phi());
@@ -418,7 +418,7 @@ int TpTpCalc::AnalyzeEvent(edm::EventBase const & event,
 		      }
 		    }else{
 		      ZdecayID.push_back(Z2daughterID);
-		      ZdecayIndex.push_back(BosonIndex);  // vector index for the Z boson om bosonID
+		      ZdecayIndex.push_back(BosonIndex);  // std::vector index for the Z boson om bosonID
 		      ZdecayPt.push_back(Z2daughter->pt());
 		      ZdecayEta.push_back(Z2daughter->eta());
 		      ZdecayPhi.push_back(Z2daughter->phi());
@@ -437,7 +437,7 @@ int TpTpCalc::AnalyzeEvent(edm::EventBase const & event,
 		  }
 		}else{
 		  ZdecayID.push_back(ZdaughterID);
-		  ZdecayIndex.push_back(BosonIndex);  // vector index for the Z boson om bosonID
+		  ZdecayIndex.push_back(BosonIndex);  // std::vector index for the Z boson om bosonID
 		  ZdecayPt.push_back(Zdaughter->pt());
 		  ZdecayEta.push_back(Zdaughter->eta());
 		  ZdecayPhi.push_back(Zdaughter->phi());
@@ -475,7 +475,7 @@ int TpTpCalc::AnalyzeEvent(edm::EventBase const & event,
 			const reco::Candidate *H3daughter = H2daughter->daughter(l);
 			int H3daughterID = H3daughter->pdgId();
 			HdecayID.push_back(H3daughterID);
-			HdecayIndex.push_back(BosonIndex);  // vector index for the H boson om bosonID
+			HdecayIndex.push_back(BosonIndex);  // std::vector index for the H boson om bosonID
 			HdecayPt.push_back(H3daughter->pt());
 			HdecayEta.push_back(H3daughter->eta());
 			HdecayPhi.push_back(H3daughter->phi());
@@ -483,7 +483,7 @@ int TpTpCalc::AnalyzeEvent(edm::EventBase const & event,
 		      }
 		    }else{
 		      HdecayID.push_back(H2daughterID);
-		      HdecayIndex.push_back(BosonIndex);  // vector index for the H boson om bosonID
+		      HdecayIndex.push_back(BosonIndex);  // std::vector index for the H boson om bosonID
 		      HdecayPt.push_back(H2daughter->pt());
 		      HdecayEta.push_back(H2daughter->eta());
 		      HdecayPhi.push_back(H2daughter->phi());
@@ -502,7 +502,7 @@ int TpTpCalc::AnalyzeEvent(edm::EventBase const & event,
 		  }
 		}else{
 		  HdecayID.push_back(HdaughterID);
-		  HdecayIndex.push_back(BosonIndex);  // vector index for the H boson om bosonID
+		  HdecayIndex.push_back(BosonIndex);  // std::vector index for the H boson om bosonID
 		  HdecayPt.push_back(Hdaughter->pt());
 		  HdecayEta.push_back(Hdaughter->eta());
 		  HdecayPhi.push_back(Hdaughter->phi());

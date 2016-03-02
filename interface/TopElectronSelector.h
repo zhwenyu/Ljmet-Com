@@ -397,7 +397,7 @@ public: // interface
             const reco::BeamSpot &beamspot = *bsHandle.product();
             Bool_t vtxFitConv = ConversionTools::hasMatchedConversion(electron, conversions, beamspot.position());
             reco::GsfElectron::PflowIsolationVariables pfIso = electron.pfIsolationVariables();
-            Double_t RelIso = ( pfIso.sumChargedHadronPt + max(0.0, pfIso.sumNeutralHadronEt + pfIso.sumPhotonEt - rhoIso*AEff) ) / electron.pt();
+            Double_t RelIso = ( pfIso.sumChargedHadronPt + std::max(0.0, pfIso.sumNeutralHadronEt + pfIso.sumPhotonEt - rhoIso*AEff) ) / electron.pt();
     	    bool verbosity =false;
     
     	    if (verbosity) {

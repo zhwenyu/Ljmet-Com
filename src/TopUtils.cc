@@ -26,11 +26,11 @@ namespace top_cafe {
     }
 
     //
-    /// this method adds together the elements of vector<TMBLorentzVector>
+    /// this method adds together the elements of std::vector<TMBLorentzVector>
     //
     TMBLorentzVector TopUtils::Sum(const std::vector<TMBLorentzVector> &myobjects) {
 	if(myobjects.size()==0) 	    
-	    cout << "In TopUtils\n  Error: Size of vector being summed is zero!\n";
+	    cout << "In TopUtils\n  Error: Size of std::vector being summed is zero!\n";
 	
 	TMBLorentzVector SummedElements;
 	SummedElements.SetXYZM(0.0, 0.0, 0.0, 0.0);

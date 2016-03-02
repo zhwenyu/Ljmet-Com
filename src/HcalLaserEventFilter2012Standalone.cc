@@ -14,7 +14,7 @@ HcalLaserEventFilter2012::HcalLaserEventFilter2012(const std::string & eventFile
     maxrun_=maxRunInFile;
 }
 
-void HcalLaserEventFilter2012::addEventString(const string & eventString)
+void HcalLaserEventFilter2012::addEventString(const std::string & eventString)
 {
     // Loop through list of bad events, and if run is in allowed range, add bad event to EventList
     int run=0;
@@ -62,14 +62,14 @@ void HcalLaserEventFilter2012::addEventString(const string & eventString)
 
 #define LENGTH 0x2000
 
-void HcalLaserEventFilter2012::readEventListFile(const string & eventFileName)
+void HcalLaserEventFilter2012::readEventListFile(const std::string & eventFileName)
 {
     gzFile  file = gzopen (eventFileName.c_str(), "r");
     if (! file) {
         cout<<"  Unable to open event list file "<<eventFileName;
         return;
     }
-    string b2;
+    std::string b2;
     int err;
     int bytes_read;
     char buffer[LENGTH];
@@ -128,7 +128,7 @@ HcalLaserEventFilter2012::filter(int run, int lumiSection, int event)
     if (minrun_>-1 && run<minrun_) return true;
     if (maxrun_>-1 && run>maxrun_) return true;
     
-    // Okay, now create a string object for this run:ls:event
+    // Okay, now create a std::string object for this run:ls:event
     std::stringstream thisevent;
     thisevent<<run<<":"<<lumiSection<<":"<<event;
     

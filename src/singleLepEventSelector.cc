@@ -573,13 +573,13 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
 	  bool run1Cut=false;
 	  bool run2LooseCut=false;
 	  bool run2TightCut=false;
-	  if(msPar["hbhe_cut_value"].find("Run1")!=string::npos){
+	  if(msPar["hbhe_cut_value"].find("Run1")!=std::string::npos){
 	    run1Cut=true;
 	  }
-	  else if(msPar["hbhe_cut_value"].find("Run2Loose")!=string::npos){
+	  else if(msPar["hbhe_cut_value"].find("Run2Loose")!=std::string::npos){
 	    run2LooseCut=true;
 	  }
-	  else if(msPar["hbhe_cut_value"].find("Run2Tight")!=string::npos){
+	  else if(msPar["hbhe_cut_value"].find("Run2Tight")!=std::string::npos){
 	    run2TightCut=true;
 	  }
 	  else{

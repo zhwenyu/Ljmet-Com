@@ -28,7 +28,7 @@ TMBVector3& TMBLorentzVector::Vect() {
 
 
 Double_t TMBLorentzVector::operator () (int i) const {
-// return i'th component of 4 vector
+// return i'th component of 4 std::vector
    switch (i)
    {
    case kX:
@@ -42,7 +42,7 @@ Double_t TMBLorentzVector::operator () (int i) const {
 }
 
 void TMBLorentzVector::Boost(const TVector3 & b) {
-// apply Lorentz boost by vector b
+// apply Lorentz boost by std::vector b
   Double_t b2 = b.Mag2 ();
   Double_t gamma = 1.0 / TMath::Sqrt (1.0 - b2);
   Double_t bp = b.Dot (Vect ());

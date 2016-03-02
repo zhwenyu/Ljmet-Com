@@ -223,7 +223,7 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * s
     std::vector<int> theJetIndex;
     std::vector<int> theJetnDaughters;
     
-    //Daughter four vector and index
+    //Daughter four std::vector and index
     std::vector<double> theJetDaughterPt;
     std::vector<double> theJetDaughterEta;
     std::vector<double> theJetDaughterPhi;
@@ -369,7 +369,7 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * s
     edm::Handle<std::vector<pat::Jet> > theAK8Jets;
     event.getByLabel(slimmedJetsAK8Coll_it, theAK8Jets);
 
-    // Four vector
+    // Four std::vector
     std::vector<double> theJetAK8Pt;
     std::vector<double> theJetAK8Eta;
     std::vector<double> theJetAK8Phi;

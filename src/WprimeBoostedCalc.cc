@@ -614,7 +614,7 @@ int WprimeBoostedCalc::AnalyzeEvent(edm::EventBase const & event,
      edm::Handle<std::vector<pat::Jet> > topJets;
      event.getByLabel(topJetColl, topJets);
      
-     //Four vector
+     //Four std::vector
      std::vector <double> CATopJetPt;
      std::vector <double> CATopJetEta;
      std::vector <double> CATopJetPhi;
@@ -648,7 +648,7 @@ int WprimeBoostedCalc::AnalyzeEvent(edm::EventBase const & event,
      
      }
      */
-    //Four vector
+    //Four std::vector
     //SetValue("CATopJetPt"     , CATopJetPt);
     SetValue("CATopJetPt"     , -1);
     //SetValue("CATopJetEta"    , CATopJetEta);

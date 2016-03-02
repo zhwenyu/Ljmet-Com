@@ -78,7 +78,7 @@ private:
     std::vector<reco::Vertex> goodPVs;
     int findMatch(const reco::GenParticleCollection & genParticles, int idToMatch, double eta, double phi);
     double mdeltaR(double eta1, double phi1, double eta2, double phi2);
-    void fillMotherInfo(const reco::Candidate *mother, int i, vector <int> & momid, vector <int> & momstatus, vector<double> & mompt, vector<double> & mometa, vector<double> & momphi, vector<double> & momenergy);
+    void fillMotherInfo(const reco::Candidate *mother, int i, std::vector <int> & momid, std::vector <int> & momstatus, std::vector<double> & mompt, std::vector<double> & mometa, std::vector<double> & momphi, std::vector<double> & momenergy);
 
     static bool SortLVByPt(const TLorentzVector a, const TLorentzVector b) {return a.Pt() > b.Pt();}
 
@@ -154,7 +154,7 @@ int singleLepCalc::BeginJob()
     else                              keepStatusForce.clear();
 
     if (keepStatusForce.size() != keepPDGIDForce.size()) {
-        cout<<"Sizes of forced status and ID vectors do not match, ignoring input!!!"<<endl;
+        cout<<"Sizes of forced status and ID std::vectors do not match, ignoring input!!!"<<endl;
         keepStatusForce.clear();
         keepPDGIDForce.clear();
     }
@@ -287,7 +287,7 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
    
     std::vector <int> muCharge;
     std::vector <int> muGlobal;
-    //Four vector
+    //Four std::vector
     std::vector <double> muPt;
     std::vector <double> muEta;
     std::vector <double> muPhi;
@@ -315,22 +315,22 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
     std::vector<int> muIsLoose;
 
     //Generator level information -- MC matching
-    vector<double> muGen_Reco_dr;
-    vector<int> muPdgId;
-    vector<int> muStatus;
-    vector<int> muMatched;
-    vector<int> muNumberOfMothers;
-    vector<double> muMother_pt;
-    vector<double> muMother_eta;
-    vector<double> muMother_phi;
-    vector<double> muMother_energy;
-    vector<int> muMother_id;
-    vector<int> muMother_status;
+    std::vector<double> muGen_Reco_dr;
+    std::vector<int> muPdgId;
+    std::vector<int> muStatus;
+    std::vector<int> muMatched;
+    std::vector<int> muNumberOfMothers;
+    std::vector<double> muMother_pt;
+    std::vector<double> muMother_eta;
+    std::vector<double> muMother_phi;
+    std::vector<double> muMother_energy;
+    std::vector<int> muMother_id;
+    std::vector<int> muMother_status;
     //Matched gen muon information:
-    vector<double> muMatchedPt;
-    vector<double> muMatchedEta;
-    vector<double> muMatchedPhi;
-    vector<double> muMatchedEnergy;
+    std::vector<double> muMatchedPt;
+    std::vector<double> muMatchedEta;
+    std::vector<double> muMatchedPhi;
+    std::vector<double> muMatchedEnergy;
 
     for (std::vector<edm::Ptr<pat::Muon> >::const_iterator imu = vSelMuons.begin(); imu != vSelMuons.end(); imu++) 
         //Protect against muons without tracks (should never happen, but just in case)
@@ -344,7 +344,7 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
 
             //charge
             muCharge.push_back((*imu)->charge());
-            // 4-vector 
+            // 4-std::vector 
             muPt     . push_back((*imu)->pt());
             muEta    . push_back((*imu)->eta());
             muPhi    . push_back((*imu)->phi());
@@ -476,7 +476,7 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
 
 
     // Electron
-    //Four vector
+    //Four std::vector
     std::vector <double> elPt;
     std::vector <double> elEta;
     std::vector <double> elPhi;
@@ -513,22 +513,22 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
 
     //mother-information
     //Generator level information -- MC matching
-    vector<double> elGen_Reco_dr;
-    vector<int> elPdgId;
-    vector<int> elStatus;
-    vector<int> elMatched;
-    vector<int> elNumberOfMothers;
-    vector<double> elMother_pt;
-    vector<double> elMother_eta;
-    vector<double> elMother_phi;
-    vector<double> elMother_energy;
-    vector<int> elMother_id;
-    vector<int> elMother_status;
+    std::vector<double> elGen_Reco_dr;
+    std::vector<int> elPdgId;
+    std::vector<int> elStatus;
+    std::vector<int> elMatched;
+    std::vector<int> elNumberOfMothers;
+    std::vector<double> elMother_pt;
+    std::vector<double> elMother_eta;
+    std::vector<double> elMother_phi;
+    std::vector<double> elMother_energy;
+    std::vector<int> elMother_id;
+    std::vector<int> elMother_status;
     //Matched gen electron information:
-    vector<double> elMatchedPt;
-    vector<double> elMatchedEta;
-    vector<double> elMatchedPhi;
-    vector<double> elMatchedEnergy;
+    std::vector<double> elMatchedPt;
+    std::vector<double> elMatchedEta;
+    std::vector<double> elMatchedPhi;
+    std::vector<double> elMatchedEnergy;
 
     edm::Handle<double> rhoHandle;
     event.getByLabel(rhoSrc_, rhoHandle);
@@ -547,7 +547,7 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
                 vGenLep.push_back(tmpLV);
             }
 
-            //Four vector
+            //Four std::vector
             elPt     . push_back((*iel)->pt()); //Must check: why ecalDrivenMomentum?
             elEta    . push_back((*iel)->superCluster()->eta());
             elPhi    . push_back((*iel)->superCluster()->phi());
@@ -648,7 +648,7 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
         }
     }
 
-    //Four vector
+    //Four std::vector
     SetValue("elPt"     , elPt);
     SetValue("elEta"    , elEta);
     SetValue("elPhi"    , elPhi);
@@ -773,7 +773,7 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
     edm::Handle<std::vector<pat::Jet> > AK8Jets;
     event.getByLabel(AK8JetColl, AK8Jets);
 
-    //Four vector
+    //Four std::vector
     std::vector <double> AK8JetPt;
     std::vector <double> AK8JetEta;
     std::vector <double> AK8JetPhi;
@@ -784,7 +784,7 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
     for (std::vector<pat::Jet>::const_iterator ijet = AK8Jets->begin(); ijet != AK8Jets->end(); ijet++){
 
         TLorentzVector lvak8 = selector->correctJet(*ijet, event,true);
-        //Four vector
+        //Four std::vector
         AK8JetPt     . push_back(lvak8.Pt());
         AK8JetEta    . push_back(lvak8.Eta());
         AK8JetPhi    . push_back(lvak8.Phi());
@@ -794,7 +794,7 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
         //     AK8JetRCN    . push_back((ijet->chargedEmEnergy()+ijet->chargedHadronEnergy()) / (ijet->neutralEmEnergy()+ijet->neutralHadronEnergy()));
     }
  
-    //Four vector
+    //Four std::vector
     SetValue("AK8JetPt"     , AK8JetPt);
     SetValue("AK8JetEta"    , AK8JetEta);
     SetValue("AK8JetPhi"    , AK8JetPhi);
@@ -803,7 +803,7 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
     SetValue("AK8JetCSV"    , AK8JetCSV);
     //   SetValue("AK8JetRCN"    , AK8JetRCN);
     //Get AK4 Jets
-    //Four vector
+    //Four std::vector
     std::vector <double> AK4JetPt;
     std::vector <double> AK4JetEta;
     std::vector <double> AK4JetPhi;
@@ -817,7 +817,7 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
     double AK4HT =.0;
     for (unsigned int ii = 0; ii < vCorrBtagJets.size(); ii++){
 
-        //Four vector
+        //Four std::vector
         TLorentzVector lv = vCorrBtagJets[ii].first;
 
         AK4JetPt     . push_back(lv.Pt());
@@ -834,7 +834,7 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
         AK4HT += lv.Pt(); 
     }
     
-    //Four vector
+    //Four std::vector
     SetValue("AK4JetPt"     , AK4JetPt);
     SetValue("AK4JetEta"    , AK4JetEta);
     SetValue("AK4JetPhi"    , AK4JetPhi);
@@ -901,7 +901,7 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
     //_____ Gen Info ______________________________
     //
 
-    //Four vector
+    //Four std::vector
     std::vector <double> genPt;
     std::vector <double> genEta;
     std::vector <double> genPhi;
@@ -970,7 +970,7 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
   
           const LHAPDF::PDFSet newset(newPDFname);
           const size_t nmem = newset.size();
-          const vector<LHAPDF::PDF*> newpdfs = newset.mkPDFs();
+          const std::vector<LHAPDF::PDF*> newpdfs = newset.mkPDFs();
           delete (newpdfs[0]);
           for (size_t i = 1; i<nmem; i++) {
             const LHAPDF::GridPDF& pdf2 = * dynamic_cast<const LHAPDF::GridPDF*>(newpdfs[i]);
@@ -1104,7 +1104,7 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
                     }
                 }
 
-                //Four vector
+                //Four std::vector
                 genPt     . push_back(p.pt());
                 genEta    . push_back(p.eta());
                 genPhi    . push_back(p.phi());
@@ -1118,7 +1118,7 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
                 genMotherIndex   . push_back(mInd);
             }
             else if (forceSave) {
-                //Four vector
+                //Four std::vector
                 genPt     . push_back(p.pt());
                 genEta    . push_back(p.eta());
                 genPhi    . push_back(p.phi());
@@ -1168,7 +1168,7 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
             genJetEnergy . push_back(tmpVec.at(i).Energy());
         }  //End loop over gen jets
     }  //End MC-only if
-    // Four vector
+    // Four std::vector
     SetValue("genPt"    , genPt);
     SetValue("genEta"   , genEta);
     SetValue("genPhi"   , genPhi);
@@ -1181,7 +1181,7 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
     SetValue("genMotherID"   , genMotherID);
     SetValue("genMotherIndex", genMotherIndex);
 
-    // Four vector
+    // Four std::vector
     SetValue("genJetPt"    , genJetPt);
     SetValue("genJetEta"   , genJetEta);
     SetValue("genJetPhi"   , genJetPhi);
@@ -1229,7 +1229,7 @@ double singleLepCalc::mdeltaR(double eta1, double phi1, double eta2, double phi2
     return std::sqrt(deltaR2 (eta1, phi1, eta2, phi2));
 }
 
-void singleLepCalc::fillMotherInfo(const reco::Candidate *mother, int i, vector <int> & momid, vector <int> & momstatus, vector<double> & mompt, vector<double> & mometa, vector<double> & momphi, vector<double> & momenergy)
+void singleLepCalc::fillMotherInfo(const reco::Candidate *mother, int i, std::vector <int> & momid, std::vector <int> & momstatus, std::vector<double> & mompt, std::vector<double> & mometa, std::vector<double> & momphi, std::vector<double> & momenergy)
 {
     if(mother) {
         momid.push_back(mother->pdgId());
