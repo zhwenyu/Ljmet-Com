@@ -154,7 +154,7 @@ class JetIDSelectionFunctor : public Selector<pat::Jet>  {
   using Selector<pat::Jet>::operator();
 
   // 
-  // Accessor from *CORRECTED* 4-vector, EMF, and Jet ID. 
+  // Accessor from *CORRECTED* 4-std::vector, EMF, and Jet ID. 
   // This can be used with reco quantities. 
   // 
   bool operator()( reco::PFJet const & jet, 

@@ -19,8 +19,8 @@ class BTagWeight
 
  BTagWeight(unsigned int nTaggers) : taggers(nTaggers) {}
    
-  // virtual bool filter(vector<int> tags);
-  template <class Filter> float weight(vector<vector<JetInfo> > jets);
+  // virtual bool filter(std::vector<int> tags);
+  template <class Filter> float weight(std::vector<std::vector<JetInfo> > jets);
  private:
   unsigned int taggers;
 
@@ -166,7 +166,7 @@ class BTagAntiMax0CustomFilter
 
 
 
-template <class Filter> float BTagWeight::weight(vector<vector<JetInfo> >jets)
+template <class Filter> float BTagWeight::weight(std::vector<std::vector<JetInfo> >jets)
 {
   unsigned int njets=jets.size();
   std::vector<unsigned int> comb(jets.size());

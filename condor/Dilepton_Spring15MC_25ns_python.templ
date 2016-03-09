@@ -108,11 +108,11 @@ process.event_selector = cms.PSet(
 
     #This is for uncertainty calculations
     #We will not use it in this exercise
-    JEC_txtfile = cms.string('../data/Summer15_25nsV2_MC_Uncertainty_AK4PFchs.txt'),
+    JEC_txtfile = cms.string('../data/Summer15_25nsV6_MC_Uncertainty_AK4PFchs.txt'),
     JECup		     = cms.bool(JECUNCERTUP),
     JECdown                  = cms.bool(JECUNCERTDOWN),
-    JERup                    = cms.bool(False),
-    JERdown                  = cms.bool(False),
+    JERup                    = cms.bool(JERUNCERTUP),
+    JERdown                  = cms.bool(JERUNCERTDOWN),
 
     #new jet energy corrections
     doNewJEC                 = cms.bool(True),

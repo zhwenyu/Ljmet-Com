@@ -23,11 +23,14 @@ JetSubCalc = cms.PSet(
                       selectedJetsCA15Coll = cms.InputTag("selectedPatJetsCA15PFCHSNoHF"),
                       useL2L3Mass = cms.bool(False),
                       isMc = cms.bool(True),
+                      JECup = cms.bool(False),
+                      JECdown = cms.bool(False),
                       MCL2JetParAK8 = cms.string('/uscms_data/d3/jmanagan/CMSSW_7_4_14/src/LJMet/Com/data/Summer15_25nsV2_MC_L2Relative_AK8PFchs.txt'),
                       MCL3JetParAK8 = cms.string('/uscms_data/d3/jmanagan/CMSSW_7_4_14/src/LJMet/Com/data/Summer15_25nsV2_MC_L3Absolute_AK8PFchs.txt'),
                       DataL2JetParAK8 = cms.string('/uscms_data/d3/jmanagan/CMSSW_7_4_14/src/LJMet/Com/data/Summer15_25nsV5_DATA_L2Relative_AK8PFchs.txt'),
                       DataL3JetParAK8 = cms.string('/uscms_data/d3/jmanagan/CMSSW_7_4_14/src/LJMet/Com/data/Summer15_25nsV5_DATA_L3Absolute_AK8PFchs.txt'),
-                      DataResJetParAK8 = cms.string('/uscms_data/d3/jmanagan/CMSSW_7_4_14/src/LJMet/Com/data/Summer15_25nsV5_DATA_L2L3Residual_AK8PFchs.txt')
+                      DataResJetParAK8 = cms.string('/uscms_data/d3/jmanagan/CMSSW_7_4_14/src/LJMet/Com/data/Summer15_25nsV5_DATA_L2L3Residual_AK8PFchs.txt'),
+                      UncertaintyAK8 = cms.string('/uscms_data/d3/jmanagan/CMSSW_7_4_14/src/LJMet/Com/data/Summer15_25nsV7_DATA_Uncertainty_AK8PFchs.txt')           
                       )
 
 #######################################################################

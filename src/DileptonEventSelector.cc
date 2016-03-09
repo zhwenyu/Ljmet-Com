@@ -375,13 +375,13 @@ bool DileptonEventSelector::operator()( edm::EventBase const & event, pat::strbi
 	  bool run1Cut=false;
 	  bool run2LooseCut=false;
 	  bool run2TightCut=false;
-	  if(msPar["hbhe_cut_value"].find("Run1")!=string::npos){
+	  if(msPar["hbhe_cut_value"].find("Run1")!=std::string::npos){
 	    run1Cut=true;
 	  }
-	  else if(msPar["hbhe_cut_value"].find("Run2Loose")!=string::npos){
+	  else if(msPar["hbhe_cut_value"].find("Run2Loose")!=std::string::npos){
 	    run2LooseCut=true;
 	  }
-	  else if(msPar["hbhe_cut_value"].find("Run2Tight")!=string::npos){
+	  else if(msPar["hbhe_cut_value"].find("Run2Tight")!=std::string::npos){
 	    run2TightCut=true;
 	  }
 	  else{
@@ -617,7 +617,7 @@ bool DileptonEventSelector::operator()( edm::EventBase const & event, pat::strbi
 	      double nhIso = pfIso.sumNeutralHadronEt;
 	      double phIso = pfIso.sumPhotonEt;
 	      double PUIso = pfIso.sumPUPt;
-	      double relIso = ( chIso + max(0.0, nhIso + phIso - rhoIso*AEff) ) / _iel->pt();
+	      double relIso = ( chIso + std::max(0.0, nhIso + phIso - rhoIso*AEff) ) / _iel->pt();
 	      
 	      //get d0 and dZ
 	      double d0=_iel->dB();
@@ -775,7 +775,7 @@ bool DileptonEventSelector::operator()( edm::EventBase const & event, pat::strbi
 		      cleanedJet.setP4( _ijet->p4() - mvSelMuons[ilep]->p4() );
 		      //get the correction for the cleaned jet and apply it
 		      jetP4 = correctJet(cleanedJet, event);
-		      //annoying thing to convert our tlorentzvector to root::math::lorentzvector
+		      //annoying thing to convert our tlorentzstd::vector to root::math::lorentzstd::vector
 		      ROOT::Math::LorentzVector<ROOT::Math::PtEtaPhiM4D<double > > rlv;
 		      rlv.SetXYZT(jetP4.X(),jetP4.Y(),jetP4.Z(),jetP4.T());
 		      cleanedJet.setP4(rlv);
@@ -817,9 +817,9 @@ bool DileptonEventSelector::operator()( edm::EventBase const & event, pat::strbi
 		  for ( std::vector<edm::Ptr<reco::Candidate> >::const_iterator _i_const = _ijet_consts.begin(); _i_const != _ijet_consts.end(); ++_i_const){
 		    /*if ( (*_i_const).key() == electronsForCleaning.at(ilep).originalObjectRef().key() ) {
 		      cleanedJet.setP4( _ijet->p4() - electronsForCleaning.at(ilep).p4() );
-		      //get the correct 4vector
+		      //get the correct 4std::vector
 		      jetP4 = correctJet(cleanedJet, event);
-		      //annoying thing to convert our tlorentzvector to root::math::lorentzvector
+		      //annoying thing to convert our tlorentzstd::vector to root::math::lorentzstd::vector
 		      ROOT::Math::LorentzVector<ROOT::Math::PtEtaPhiM4D<double > > rlv;
 		      rlv.SetXYZT(jetP4.X(),jetP4.Y(),jetP4.Z(),jetP4.T());
 		      cleanedJet.setP4(rlv);
@@ -842,18 +842,18 @@ bool DileptonEventSelector::operator()( edm::EventBase const & event, pat::strbi
 	      
 
 
-	      //if not cleaned just use first jet (remember if no cleaning then cleanedJet==*_ijet) to get corrected four vector and set the cleaned jet to have it
+	      //if not cleaned just use first jet (remember if no cleaning then cleanedJet==*_ijet) to get corrected four std::vector and set the cleaned jet to have it
 	      if (!_cleaned) {
 		jetP4 = correctJet(cleanedJet, event);
-		//annoying thing to convert our tlorentzvector to root::math::lorentzvector
+		//annoying thing to convert our tlorentzstd::vector to root::math::lorentzstd::vector
 		ROOT::Math::LorentzVector<ROOT::Math::PtEtaPhiM4D<double > > rlv;
 		rlv.SetXYZT(jetP4.X(),jetP4.Y(),jetP4.Z(),jetP4.T());
 		cleanedJet.setP4(rlv);
 	      }
 	      else{
-		//get the correct 4vector
+		//get the correct 4std::vector
 		jetP4 = correctJet(tmpJet, event);
-		//annoying thing to convert our tlorentzvector to root::math::lorentzvector
+		//annoying thing to convert our tlorentzstd::vector to root::math::lorentzstd::vector
 		ROOT::Math::LorentzVector<ROOT::Math::PtEtaPhiM4D<double > > rlv;
 		rlv.SetXYZT(jetP4.X(),jetP4.Y(),jetP4.Z(),jetP4.T());
 		cleanedJet.setP4(rlv);     

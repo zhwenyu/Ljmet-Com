@@ -116,17 +116,17 @@ protected:
     edm::InputTag BeamspotSrc_;
     
     edm::Handle<std::vector<reco::Vertex> >     h_primVtx;
-    edm::Handle<vector<pat::MET> >              h_met_;
-    edm::Handle<vector<pat::MET> >              h_tcMet_;
-    edm::Handle<vector<pat::MET> >              h_pfMet_;
-    edm::Handle<vector<reco::MET> >             h_pfTypeIMet_;
-    edm::Handle<vector<reco::CaloMET> >         h_caloMet_;
-    edm::Handle<vector<reco::CaloMET> >         h_caloMet2_;
-    edm::Handle<vector<pat::Jet> >              h_jets_;
-    edm::Handle<vector<pat::Jet> >              h_jetsPF_;
-    edm::Handle<vector<pat::Jet> >              h_jetsJPT_;
-    edm::Handle<vector<pat::Muon> >             h_muons_;
-    edm::Handle<vector<pat::Electron> >         h_electrons_;
+    edm::Handle<std::vector<pat::MET> >              h_met_;
+    edm::Handle<std::vector<pat::MET> >              h_tcMet_;
+    edm::Handle<std::vector<pat::MET> >              h_pfMet_;
+    edm::Handle<std::vector<reco::MET> >             h_pfTypeIMet_;
+    edm::Handle<std::vector<reco::CaloMET> >         h_caloMet_;
+    edm::Handle<std::vector<reco::CaloMET> >         h_caloMet2_;
+    edm::Handle<std::vector<pat::Jet> >              h_jets_;
+    edm::Handle<std::vector<pat::Jet> >              h_jetsPF_;
+    edm::Handle<std::vector<pat::Jet> >              h_jetsJPT_;
+    edm::Handle<std::vector<pat::Muon> >             h_muons_;
+    edm::Handle<std::vector<pat::Electron> >         h_electrons_;
     edm::Handle<double>                         h_rho;
     edm::Handle<std::vector<pat::TriggerPath> > hltresults_;
     edm::Handle<edm::TriggerResults>            hlt_;
@@ -623,7 +623,7 @@ bool TopDiLeptonEventSelector::operator()( edm::EventBase const & event, pat::st
             int nVtx = 0;
             int nSelVtx = 0;
             good_pvs_.clear();
-            for ( vector<reco::Vertex>::const_iterator v_ = h_primVtx->begin();
+            for ( std::vector<reco::Vertex>::const_iterator v_ = h_primVtx->begin();
                  v_ != h_primVtx->end(); ++v_){
                 
                 retPv.set(false);
@@ -632,7 +632,7 @@ bool TopDiLeptonEventSelector::operator()( edm::EventBase const & event, pat::st
                 if (pass){
                     ++nSelVtx;
                     
-                    // return a vector of refs to good primary vertices
+                    // return a std::vector of refs to good primary vertices
                     good_pvs_.push_back( edm::Ptr<reco::Vertex>(h_primVtx, nVtx) );
                 }
                 
@@ -673,7 +673,7 @@ bool TopDiLeptonEventSelector::operator()( edm::EventBase const & event, pat::st
             //////////////
             
             event.getByLabel( jetSrcPF_, h_jetsPF_ );
-            for (vector<pat::Jet>::const_iterator jetPF = h_jetsPF_->begin();
+            for (std::vector<pat::Jet>::const_iterator jetPF = h_jetsPF_->begin();
                  jetPF != h_jetsPF_->end(); ++jetPF){
                 
                 retJet.set(false);
@@ -718,7 +718,7 @@ bool TopDiLeptonEventSelector::operator()( edm::EventBase const & event, pat::st
             event.getByLabel( muonSrc_, h_muons_ );
             
             // loop over muons
-            for ( vector<pat::Muon>::const_iterator mu = h_muons_->begin();
+            for ( std::vector<pat::Muon>::const_iterator mu = h_muons_->begin();
                  mu != h_muons_->end(); mu++){
                 
                 retMuon.set(false);
@@ -785,7 +785,7 @@ bool TopDiLeptonEventSelector::operator()( edm::EventBase const & event, pat::st
             event.getByLabel( electronSrc_, h_electrons_ );
             
             // loop over electrons
-            for ( vector<pat::Electron>::const_iterator el = h_electrons_->begin();
+            for ( std::vector<pat::Electron>::const_iterator el = h_electrons_->begin();
                  el != h_electrons_->end(); el++){
                 
                 retElectron.set(false);

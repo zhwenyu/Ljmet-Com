@@ -52,7 +52,7 @@ namespace kinem {
     // Calculate deltaR
     inline double delta_R(double eta1, double phi1, double eta2, double phi2);
     
-    // Calculate unit vectors given two points
+    // Calculate unit std::vectors given two points
     inline void uvectors(double u[3], double xyz1[3], double xyz2[3]);
     inline void uvectors(float u[3], float xyz1[3], float xyz2[3]);
     

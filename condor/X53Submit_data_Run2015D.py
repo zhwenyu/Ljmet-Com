@@ -8,7 +8,7 @@ files_per_job = 1
 
 rel_base = os.environ['CMSSW_BASE']
 
-outdir = '/eos/uscms/store/user/lpctlbsm/clint/Run2015D/Nov17/'
+outdir = '/eos/uscms/store/user/lpctlbsm/clint/Run2015D/MuonIsoLepJetCleaning/'
 
 ### What is the name of your FWLite Analyzer
 FWLiteAnalyzer = 'ljmet'
@@ -41,12 +41,12 @@ prefix = []
 
 if DONOMINAL=='True':
     prefix.extend([
-            'DoubleMuon_Run2015D_PromptReco_Oct5',
-            'DoubleEG_Run2015D_PromptReco_Oct5',
-            'MuonEG_Run2015D_PromptReco_Oct5',
-#            'DoubleMuon_Run2015D_PromptReco_v4',
-#            'DoubleEG_Run2015D_PromptReco_v4',
-#            'MuonEG_Run2015D_PromptReco_v4',            
+#            'DoubleMuon_Run2015D_PromptReco_Oct5',
+#            'DoubleEG_Run2015D_PromptReco_Oct5',
+#            'MuonEG_Run2015D_PromptReco_Oct5',
+            'DoubleMuon_Run2015D_PromptReco_v4',
+            'DoubleEG_Run2015D_PromptReco_v4',
+            'MuonEG_Run2015D_PromptReco_v4',            
 
     ])
 
@@ -65,12 +65,12 @@ for i in prefix:
 list = [] 
 
 listnom = [
-'Samples_Run2015D/DoubleMuon_Run2015D-05Oct2015-v1.txt',
-'Samples_Run2015D/DoubleEG_Run2015D-05Oct2015-v1.txt',
-'Samples_Run2015D/MuonEG_Run2015D-05Oct2015-v2.txt',
-#'Samples_Run2015D/DoubleMuon_Run2015D-PromptReco-v4.txt',
-#'Samples_Run2015D/DoubleEG_Run2015D-PromptReco-v4.txt',
-#'Samples_Run2015D/MuonEG_Run2015D-PromptReco-v4.txt',  
+#'Samples_Run2015D/DoubleMuon_Run2015D-05Oct2015-v1.txt',
+#'Samples_Run2015D/DoubleEG_Run2015D-05Oct2015-v1.txt',
+#'Samples_Run2015D/MuonEG_Run2015D-05Oct2015-v2.txt',
+'Samples_Run2015D/DoubleMuon_Run2015D-PromptReco-v4.txt',
+'Samples_Run2015D/DoubleEG_Run2015D-PromptReco-v4.txt',
+'Samples_Run2015D/MuonEG_Run2015D-PromptReco-v4.txt',  
   ]
 
 if DONOMINAL=='True':

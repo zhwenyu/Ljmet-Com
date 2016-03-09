@@ -32,7 +32,7 @@ void PUWeighting::setPUHisto(const TH1D * thehistData){
 
 }
 
-void PUWeighting::setPUHisto(const string filename){
+void PUWeighting::setPUHisto(const std::string filename){
 cout << filename<<endl;
   TFile file(filename.c_str(),"READ");
   if (!file.IsOpen()) {
@@ -892,7 +892,7 @@ double PUWeighting::weight_Spring11(int npu){
 
 
 
-vector<double> PUWeighting::generate_flat10_weights(const TH1D* data_npu_estimated){
+std::vector<double> PUWeighting::generate_flat10_weights(const TH1D* data_npu_estimated){
 
     // distri verte
     // see SimGeneral/MixingModule/python/mix_E7TeV_FlatDist10_2011EarlyData_inTimeOnly_cfi.py; copy and paste from there: 
@@ -910,7 +910,7 @@ vector<double> PUWeighting::generate_flat10_weights(const TH1D* data_npu_estimat
     const double npu_probs[25] = {0.0795275, 0.0761536, 0.069365, 0.0730743, 0.0699924, 0.075654, 0.076423, 0.0684544, 0.0732846, 0.0748051, 0.0669443, 0.0582711, 0.0484596, 0.0348441, 0.0204753, 0.0157868, 0.00964813, 0.00537668, 0.00266835, 0.000791556, 0, 0, 0, 0, 0};
 */
 
-    vector<double> result(25);
+    std::vector<double> result(25);
     double s = 0.0;
     for(int inpu=0; inpu<25; ++inpu){
         double npu_estimated = data_npu_estimated->GetBinContent(data_npu_estimated->GetXaxis()->FindBin(inpu));                              
@@ -930,7 +930,7 @@ vector<double> PUWeighting::generate_flat10_weights(const TH1D* data_npu_estimat
 
 
 
-vector<double> PUWeighting::reweight2011_inputOnly(const TH1D* data_npu_estimated){
+std::vector<double> PUWeighting::reweight2011_inputOnly(const TH1D* data_npu_estimated){
     // distri verte
     // see SimGeneral/MixingModule/python/mix_E7TeV_FlatDist10_2011EarlyData_inTimeOnly_cfi.py; copy and paste from there: 
 
@@ -968,7 +968,7 @@ vector<double> PUWeighting::reweight2011_inputOnly(const TH1D* data_npu_estimate
   cout <<"Start\n";
   data_npu_estimated->Print();
 
-    vector<double> result(25);
+    std::vector<double> result(25);
     double s = 0.0;
     for(int inpu=0; inpu<25; ++inpu){
         double npu_estimated = data_npu_estimated->GetBinContent(data_npu_estimated->GetXaxis()->FindBin(inpu));                              

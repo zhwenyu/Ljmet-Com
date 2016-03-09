@@ -54,7 +54,7 @@ namespace WDecay{
   /// the package
   enum LeptonType {kNone, kElec, kMuon, kTau};
 }
-  /// supported modes to fill the new vectors 
+  /// supported modes to fill the new std::vectors 
   /// of gen particles
   enum  FillMode {kStable, kME};
   /// classification of potential shower types
@@ -80,8 +80,8 @@ private:
   double nuDecayFractionSource_;
   double nuDecayFractionTarget_;
 
-  string fragSourceFile_;
-  string fragTargetFile_;
+  std::string fragSourceFile_;
+  std::string fragTargetFile_;
 
   TFile* sourceFile;
   TFile* targetFile;
@@ -128,8 +128,8 @@ int TopEventReweightCalc::BeginJob(){
       nuDecayFractionTarget_ = mPset.getParameter<double>("nuDecayFractionTarget");
     }
     if (reweightBfragmentation){
-      fragSourceFile_ = mPset.getParameter<string>("fragSourceFile");
-      fragTargetFile_ = mPset.getParameter<string>("fragTargetFile");
+      fragSourceFile_ = mPset.getParameter<std::string>("fragSourceFile");
+      fragTargetFile_ = mPset.getParameter<std::string>("fragTargetFile");
       fexists(fragSourceFile_, true);
       fexists(fragTargetFile_, true);
       genJetsIT_ = edm::InputTag("selectedPatJetsPFlow","genJets");
@@ -195,7 +195,7 @@ int TopEventReweightCalc::AnalyzeEvent(edm::EventBase const & event,
   //_____ Gen Info ______________________________
   //
 
-  //Four vector
+  //Four std::vector
   std::vector <double> genPt;
   std::vector <double> genEta;
   std::vector <double> genPhi;
@@ -229,7 +229,7 @@ int TopEventReweightCalc::AnalyzeEvent(edm::EventBase const & event,
 //     cout << " ok "<< t->pt() << " "<<t->eta()<< " "<<t->phi();
 //     cout << " " << exp(0.148-0.00129*t->pt())<<endl;
       if (ptReweight) eventWeight *= exp(0.148-0.00129*t->pt());
-	//Four vector
+	//Four std::vector
       genPt     . push_back(t->pt());
       genEta    . push_back(t->eta());
       genPhi    . push_back(t->phi());
@@ -247,7 +247,7 @@ int TopEventReweightCalc::AnalyzeEvent(edm::EventBase const & event,
 
   }  //End MC-only if
 
-  //Four vector
+  //Four std::vector
   SetValue("genPt"     , genPt);
   SetValue("genEta"    , genEta);
   SetValue("genPhi"    , genPhi);

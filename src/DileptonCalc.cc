@@ -68,7 +68,7 @@ private:
     std::vector<reco::Vertex> goodPVs;
     int findMatch(const reco::GenParticleCollection & genParticles, int idToMatch, double eta, double phi);
     double mdeltaR(double eta1, double phi1, double eta2, double phi2);
-    void fillMotherInfo(const reco::Candidate *mother, int i, vector <int> & momid, vector <int> & momstatus, vector<double> & mompt, vector<double> & mometa, vector<double> & momphi, vector<double> & momenergy);
+    void fillMotherInfo(const reco::Candidate *mother, int i, std::vector <int> & momid, std::vector <int> & momstatus, std::vector<double> & mompt, std::vector<double> & mometa, std::vector<double> & momphi, std::vector<double> & momenergy);
 };
 
 static int reg = LjmetFactory::GetInstance()->Register(new DileptonCalc(), "DileptonCalc");
@@ -233,7 +233,7 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
       
       
       for (unsigned int i=0; i!=triggerBits->size(); ++i) {
-	string Path = names.triggerName(i);
+	std::string Path = names.triggerName(i);
 	
 	const unsigned int triggerIndex(i);
 	if(triggerBits->accept(triggerIndex)){
@@ -307,7 +307,7 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
     //_____ Electrons _________________________
     //
     
-    //Four vector
+    //Four std::vector
     std::vector <double> elPt;
     std::vector <double> elEta;
     std::vector <double> elPhi;
@@ -355,27 +355,27 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
     
     //mother-information
     //Generator level information -- MC matching
-    vector<double> elGen_Reco_dr;
-    vector<int> elPdgId;
-    vector<int> elStatus;
-    vector<int> elMatched;
-    vector<int> elNumberOfMothers;
-    vector<double> elMother_pt;
-    vector<double> elMother_eta;
-    vector<double> elMother_phi;
-    vector<double> elMother_energy;
-    vector<int> elMother_id;
-    vector<int> elMother_status;
+    std::vector<double> elGen_Reco_dr;
+    std::vector<int> elPdgId;
+    std::vector<int> elStatus;
+    std::vector<int> elMatched;
+    std::vector<int> elNumberOfMothers;
+    std::vector<double> elMother_pt;
+    std::vector<double> elMother_eta;
+    std::vector<double> elMother_phi;
+    std::vector<double> elMother_energy;
+    std::vector<int> elMother_id;
+    std::vector<int> elMother_status;
     //Matched gen electron information:
-    vector<double> elMatchedPt;
-    vector<double> elMatchedEta;
-    vector<double> elMatchedPhi;
-    vector<double> elMatchedEnergy;
-    vector<std::string> TriggerElectronFilters;
-    vector<double> TriggerElectronPts;
-    vector<double> TriggerElectronEtas;
-    vector<double> TriggerElectronPhis;
-    vector<double> TriggerElectronEnergies;
+    std::vector<double> elMatchedPt;
+    std::vector<double> elMatchedEta;
+    std::vector<double> elMatchedPhi;
+    std::vector<double> elMatchedEnergy;
+    std::vector<std::string> TriggerElectronFilters;
+    std::vector<double> TriggerElectronPts;
+    std::vector<double> TriggerElectronEtas;
+    std::vector<double> TriggerElectronPhis;
+    std::vector<double> TriggerElectronEnergies;
     
     edm::Handle<double> rhoHandle;
     event.getByLabel(rhoSrc_it, rhoHandle);
@@ -408,7 +408,7 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
       //Protect against electrons without tracks (should never happen, but just in case)
       if ((*iel)->gsfTrack().isNonnull() and (*iel)->gsfTrack().isAvailable()){
 	
-	//Four vector
+	//Four std::vector
 	elPt     . push_back((*iel)->ecalDrivenMomentum().pt()); //Must check: why ecalDrivenMomentum?
 	elEta    . push_back((*iel)->ecalDrivenMomentum().eta());
 	elPhi    . push_back((*iel)->ecalDrivenMomentum().phi());
@@ -450,7 +450,7 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
 	double nhIso = pfIso.sumNeutralHadronEt;
 	double phIso = pfIso.sumPhotonEt;
 	double PUIso = pfIso.sumPUPt;
-	double relIso = ( chIso + max(0.0, nhIso + phIso - rhoIso*AEff) ) / (*iel)->pt();
+	double relIso = ( chIso + std::max(0.0, nhIso + phIso - rhoIso*AEff) ) / (*iel)->pt();
 	
 	elChIso  . push_back(chIso);
 	elNhIso  . push_back(nhIso);
@@ -509,7 +509,7 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
 	elMiniIsoDB.push_back(getPFMiniIsolation_DeltaBeta(packedPFCands, dynamic_cast<const reco::Candidate *>(iel->get()), 0.05, 0.2, 10., false));
 
 
-	//Trigger Matching - store 4-vector and filter information for all trigger objects deltaR matched to electrons
+	//Trigger Matching - store 4-std::vector and filter information for all trigger objects deltaR matched to electrons
 	/*if(doTriggerStudy_){
 	  
 	  //read in trigger objects
@@ -610,7 +610,7 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
     SetValue("TrigElEnergy",TriggerElectronEnergies);
     SetValue("TrigElFilters",TriggerElectronFilters);
 
-    //Four vector
+    //Four std::vector
     SetValue("elPt"     , elPt);
     SetValue("elEta"    , elEta);
     SetValue("elPhi"    , elPhi);
@@ -685,7 +685,7 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
     std::vector <bool> muGlobal;
     std::vector <bool> muTracker;
     std::vector <bool> muPF;
-    //Four vector
+    //Four std::vector
     std::vector <double> muPt;
     std::vector <double> muEta;
     std::vector <double> muPhi;
@@ -716,28 +716,28 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
     std::vector<int> muIsLoose;
     
     //Generator level information -- MC matching
-    vector<double> muGen_Reco_dr;
-    vector<int> muPdgId;
-    vector<int> muStatus;
-    vector<int> muMatched;
-    vector<int> muNumberOfMothers;
-    vector<double> muMother_pt;
-    vector<double> muMother_eta;
-    vector<double> muMother_phi;
-    vector<double> muMother_energy;
-    vector<int> muMother_id;
-    vector<int> muMother_status;
+    std::vector<double> muGen_Reco_dr;
+    std::vector<int> muPdgId;
+    std::vector<int> muStatus;
+    std::vector<int> muMatched;
+    std::vector<int> muNumberOfMothers;
+    std::vector<double> muMother_pt;
+    std::vector<double> muMother_eta;
+    std::vector<double> muMother_phi;
+    std::vector<double> muMother_energy;
+    std::vector<int> muMother_id;
+    std::vector<int> muMother_status;
     //Matched gen muon information:
-    vector<double> muMatchedPt;
-    vector<double> muMatchedEta;
-    vector<double> muMatchedPhi;
-    vector<double> muMatchedEnergy;
+    std::vector<double> muMatchedPt;
+    std::vector<double> muMatchedEta;
+    std::vector<double> muMatchedPhi;
+    std::vector<double> muMatchedEnergy;
 
-    vector<std::string> TriggerMuonFilters;
-    vector<double> TriggerMuonPts;
-    vector<double> TriggerMuonEtas;
-    vector<double> TriggerMuonPhis;
-    vector<double> TriggerMuonEnergies;
+    std::vector<std::string> TriggerMuonFilters;
+    std::vector<double> TriggerMuonPts;
+    std::vector<double> TriggerMuonEtas;
+    std::vector<double> TriggerMuonPhis;
+    std::vector<double> TriggerMuonEnergies;
     
 
     //make index for muons
@@ -751,7 +751,7 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
             //charge
             muCharge.push_back((*imu)->charge());
             
-            //Four vector
+            //Four std::vector
             muPt     . push_back((*imu)->pt());
             muEta    . push_back((*imu)->eta());
             muPhi    . push_back((*imu)->phi());
@@ -813,7 +813,7 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
             muNTrackerLayers   . push_back((*imu)->innerTrack()->hitPattern().trackerLayersWithMeasurement());
 
 	   
-	    //Trigger Matching - store 4-vector and filter information for all trigger objects deltaR matched to electrons
+	    //Trigger Matching - store 4-std::vector and filter information for all trigger objects deltaR matched to electrons
 	    /*if(doTriggerStudy_){
 	  
 	      //read in trigger objects
@@ -918,7 +918,7 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
     SetValue("muTracker",muTracker);
     SetValue("muPF",muPF);
 
-    //Four vector
+    //Four std::vector
     SetValue("muPt"     , muPt);
     SetValue("muEta"    , muEta);
     SetValue("muPhi"    , muPhi);
@@ -1010,7 +1010,7 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
     edm::Handle<std::vector<pat::Jet> > topJets;
     event.getByLabel(topJetColl, topJets);
     
-    //Four vector -- COMMENT OUT BECAUSE FOR NOW WE CAN'T ACCESS THESE
+    //Four std::vector -- COMMENT OUT BECAUSE FOR NOW WE CAN'T ACCESS THESE
     std::vector <double> CATopJetPt;
     std::vector <double> CATopJetEta;
     std::vector <double> CATopJetPhi;
@@ -1027,7 +1027,7 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
     std::vector <double> CATopJetTopMass;
     std::vector <double> CATopJetMinPairMass;
     
-    //Daughter four vector and index
+    //Daughter four std::vector and index
     std::vector <double> CATopDaughterPt;
     std::vector <double> CATopDaughterEta;
     std::vector <double> CATopDaughterPhi;
@@ -1074,7 +1074,7 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
 	//cout<<"finished top daughter loop"<<endl;
     }
     
-    //Four vector
+    //Four std::vector
     SetValue("CATopJetPt"    , CATopJetPt);
     SetValue("CATopJetEta"   , CATopJetEta);
     SetValue("CATopJetPhi"   , CATopJetPhi);
@@ -1091,7 +1091,7 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
     SetValue("CATopJetTopMass"     , CATopJetTopMass);
     SetValue("CATopJetMinPairMass" , CATopJetMinPairMass);
     //cout<<"setting values for top daughters"<<endl;
-    //Daughter four vector and index
+    //Daughter four std::vector and index
     SetValue("CATopDaughterPt"     , CATopDaughterPt);
     SetValue("CATopDaughterEta"    , CATopDaughterEta);
     SetValue("CATopDaughterPhi"    , CATopDaughterPhi);
@@ -1104,7 +1104,7 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
     edm::Handle<std::vector<pat::Jet> > CAWJets;
     event.getByLabel(CAWJetColl, CAWJets);
     
-    //Four vector
+    //Four std::vector
     std::vector <double> CAWJetPt;
     std::vector <double> CAWJetEta;
     std::vector <double> CAWJetPhi;
@@ -1128,7 +1128,7 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
     std::vector<double> CAWJetTau3;
 
 
-    //Daughter four vector and index -- THESE ARE CURRENTLY IDENTICAL TO THOSE FOR TOP DAUGHTERS BECAUSE THE JET IS ALWAYS THE SLIMMED AK8JET
+    //Daughter four std::vector and index -- THESE ARE CURRENTLY IDENTICAL TO THOSE FOR TOP DAUGHTERS BECAUSE THE JET IS ALWAYS THE SLIMMED AK8JET
     std::vector <double> CAWDaughterPt;
     std::vector <double> CAWDaughterEta;
     std::vector <double> CAWDaughterPhi;
@@ -1140,7 +1140,7 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
         
         int index = (int)(ijet-CAWJets->begin());
         
-        //Four vector
+        //Four std::vector
 	CAWJetPt     . push_back(ijet->pt());
         CAWJetEta    . push_back(ijet->eta());
         CAWJetPhi    . push_back(ijet->phi());
@@ -1173,7 +1173,7 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
         }
     }
     
-    //Four vector
+    //Four std::vector
     SetValue("CAWJetPt"     , CAWJetPt);
     SetValue("CAWJetEta"    , CAWJetEta);
     SetValue("CAWJetPhi"    , CAWJetPhi);
@@ -1191,7 +1191,7 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
     SetValue("CAWJetPrunedMass"     , CAWJetPrunedMass);
     SetValue("CAWJetFilteredMass"     , CAWJetFilteredMass);
     
-    //Daughter four vector and index
+    //Daughter four std::vector and index
     SetValue("CAWDaughterPt"     , CAWDaughterPt);
     SetValue("CAWDaughterEta"    , CAWDaughterEta);
     SetValue("CAWDaughterPhi"    , CAWDaughterPhi);
@@ -1205,7 +1205,7 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
     event.getByLabel(CA8JetColl, CA8Jets);
 
     
-    //Four vector
+    //Four std::vector
     std::vector <double> CA8JetPt;
     std::vector <double> CA8JetEta;
     std::vector <double> CA8JetPhi;
@@ -1216,7 +1216,7 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
     
     for (std::vector<pat::Jet>::const_iterator ijet = CA8Jets->begin(); ijet != CA8Jets->end(); ijet++){
         
-        //Four vector
+        //Four std::vector
         CA8JetPt     . push_back(ijet->pt());
         CA8JetEta    . push_back(ijet->eta());
         CA8JetPhi    . push_back(ijet->phi());
@@ -1226,7 +1226,7 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
         //     CA8JetRCN    . push_back((ijet->chargedEmEnergy()+ijet->chargedHadronEnergy()) / (ijet->neutralEmEnergy()+ijet->neutralHadronEnergy()));
     }
     
-    //Four vector
+    //Four std::vector
     SetValue("CA8JetPt"     , CA8JetPt);
     SetValue("CA8JetEta"    , CA8JetEta);
     SetValue("CA8JetPhi"    , CA8JetPhi);
@@ -1236,7 +1236,7 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
     //   SetValue("CA8JetRCN"    , CA8JetRCN);
     
     //Get AK4 Jets
-    //Four vector
+    //Four std::vector
     std::vector <double> AK4JetPt;
     std::vector <double> AK4JetEta;
     std::vector <double> AK4JetPhi;
@@ -1248,7 +1248,7 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
     for (std::vector<edm::Ptr<pat::Jet> >::const_iterator ijet = vSelJets.begin();
          ijet != vSelJets.end(); ijet++){
         
-        //Four vector
+        //Four std::vector
         TLorentzVector lv = selector->correctJet(**ijet, event);
         
         AK4JetPt     . push_back(lv.Pt());
@@ -1260,7 +1260,7 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
         AK4JetRCN    . push_back(((*ijet)->chargedEmEnergy()+(*ijet)->chargedHadronEnergy()) / ((*ijet)->neutralEmEnergy()+(*ijet)->neutralHadronEnergy()));
     }
     
-    //Four vector
+    //Four std::vector
     SetValue("AK4JetPt"     , AK4JetPt);
     SetValue("AK4JetEta"    , AK4JetEta);
     SetValue("AK4JetPhi"    , AK4JetPhi);
@@ -1270,7 +1270,7 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
     SetValue("AK4JetRCN"    , AK4JetRCN);
 
     //Get cleaned AK4 Jets
-    //Four vector
+    //Four std::vector
     std::vector <double> cleanedAK4JetPt;
     std::vector <double> cleanedAK4JetEta;
     std::vector <double> cleanedAK4JetPhi;
@@ -1292,7 +1292,7 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
       cleanedAK4JetRCN    . push_back(((*ijet).chargedEmEnergy()+(*ijet).chargedHadronEnergy()) / ((*ijet).neutralEmEnergy()+(*ijet).neutralHadronEnergy()));
     }
     
-    //Four vector
+    //Four std::vector
     SetValue("cleanedAK4JetPt"     , cleanedAK4JetPt);
     SetValue("cleanedAK4JetEta"    , cleanedAK4JetEta);
     SetValue("cleanedAK4JetPhi"    , cleanedAK4JetPhi);
@@ -1330,7 +1330,7 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
     //_____ Gen Info ______________________________
     //
     
-    //Four vector
+    //Four std::vector
     std::vector <double> genPt;
     std::vector <double> genEta;
     std::vector <double> genPhi;
@@ -1444,7 +1444,7 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
 	    genPMotherHasC.push_back(promptMotherHasC);
 	    if(mother) genPMother.push_back(mother->pdgId());
 	    else       genPMother.push_back(-999);
-	    //Four vector
+	    //Four std::vector
 	    genPt     . push_back(p.pt());
 	    genEta    . push_back(p.eta());
 	    genPhi    . push_back(p.phi());
@@ -1464,7 +1464,7 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
 	}//End loop over gen particles
     }  //End MC-only if
     
-    // Four vector
+    // Four std::vector
     SetValue("genPt"    , genPt);
     SetValue("genEta"   , genEta);
     SetValue("genPhi"   , genPhi);
@@ -1511,7 +1511,7 @@ double DileptonCalc::mdeltaR(double eta1, double phi1, double eta2, double phi2)
     return std::sqrt(deltaR2 (eta1, phi1, eta2, phi2));
 }
 
-void DileptonCalc::fillMotherInfo(const reco::Candidate *mother, int i, vector <int> & momid, vector <int> & momstatus, vector<double> & mompt, vector<double> & mometa, vector<double> & momphi, vector<double> & momenergy)
+void DileptonCalc::fillMotherInfo(const reco::Candidate *mother, int i, std::vector <int> & momid, std::vector <int> & momstatus, std::vector<double> & mompt, std::vector<double> & mometa, std::vector<double> & momphi, std::vector<double> & momenergy)
 {
     if(mother) {
         momid.push_back(mother->pdgId());

@@ -25,7 +25,7 @@ using namespace top_cafe;
 //			    TLorentzVector & met,
 //			    bool isMuon){
 
-int LJetsTopoVarsNew::setEvent(const vector<std::pair<TLorentzVector,bool> > jets,
+int LJetsTopoVarsNew::setEvent(const std::vector<std::pair<TLorentzVector,bool> > jets,
                                TLorentzVector & lepton,
                                TLorentzVector & met,
                                bool isMuon,
@@ -63,7 +63,7 @@ int LJetsTopoVarsNew::setEvent(const vector<std::pair<TLorentzVector,bool> > jet
     int cnt = -1;
     
     //for (std::vector<TLorentzVector>::const_iterator jet=jets.begin(); (jet!=jets.end()) && (m_jets.size()!=4); jet++){
-    for (vector<std::pair<TLorentzVector,bool>>::const_iterator jet = jets.begin(); jet != jets.end(); ++jet){
+    for (std::vector<std::pair<TLorentzVector,bool>>::const_iterator jet = jets.begin(); jet != jets.end(); ++jet){
         
         ++cnt;
         
@@ -294,7 +294,7 @@ int LJetsTopoVarsNew::setEventMetFixed(TLorentzVector& Jet1, TLorentzVector& Jet
     _mtOK = false;
     
     //
-    // calculate neutrino lorentz vector (from Tobi's TopSvtAnalysis)
+    // calculate neutrino lorentz std::vector (from Tobi's TopSvtAnalysis)
     //
     double nu_pz = 0.;
     double nu_e  = sqrt(pow(nu_px,2)+pow(nu_py,2));
@@ -352,7 +352,7 @@ double LJetsTopoVarsNew::pzothernu() const
 
 double LJetsTopoVarsNew::aplanarity() const
 {
-    vector<TMBLorentzVector> objects(m_jets);
+    std::vector<TMBLorentzVector> objects(m_jets);
     objects.push_back(m_lepton);
     TopTopologicalVariables jetsPlusLepton(objects);
     return jetsPlusLepton.Aplanarity();
@@ -366,7 +366,7 @@ double LJetsTopoVarsNew::centrality() const
 
 double LJetsTopoVarsNew::sphericity() const
 {
-    vector<TMBLorentzVector> objects(m_jets);
+    std::vector<TMBLorentzVector> objects(m_jets);
     objects.push_back(m_lepton);
     TopTopologicalVariables jetsPlusLepton(objects);
     return jetsPlusLepton.Sphericity();
@@ -380,7 +380,7 @@ double LJetsTopoVarsNew::ht() const
 
 double LJetsTopoVarsNew::htpluslepton() const
 {
-    vector<TMBLorentzVector> objects(m_jets);
+    std::vector<TMBLorentzVector> objects(m_jets);
     objects.push_back(m_lepton);
     TopTopologicalVariables jetsPlusLepton(objects);
     return jetsPlusLepton.Ht();
@@ -388,7 +388,7 @@ double LJetsTopoVarsNew::htpluslepton() const
 
 double LJetsTopoVarsNew::methtpluslepton() const
 {
-    vector<TMBLorentzVector> objects(m_jets);
+    std::vector<TMBLorentzVector> objects(m_jets);
     objects.push_back(m_lepton);
     objects.push_back(m_met);
     TopTopologicalVariables metjetsPlusLepton(objects);
@@ -522,18 +522,18 @@ double LJetsTopoVarsNew::minDijetDeltaR() const
 
 
 double LJetsTopoVarsNew::Hz() {
-    vector<TMBLorentzVector> objects;
+    std::vector<TMBLorentzVector> objects;
     objects.assign(m_jets.begin(), m_jets.end());
     objects.push_back(m_lepton);
     objects.push_back(_neutrino);
     double pz = 0;
-    for (vector<TMBLorentzVector>::iterator obj = objects.begin(); obj!=objects.end(); ++obj) pz += abs((*obj).Pz());
+    for (std::vector<TMBLorentzVector>::iterator obj = objects.begin(); obj!=objects.end(); ++obj) pz += abs((*obj).Pz());
     return pz;
 }
 
 double LJetsTopoVarsNew::HT2() {
     if (m_jets.size()==0) return 0.;
-    vector<TMBLorentzVector> objects;
+    std::vector<TMBLorentzVector> objects;
     objects.assign(++m_jets.begin(), m_jets.end());
     TopTopologicalVariables topo(objects);
     return topo.Ht();
@@ -554,7 +554,7 @@ double  LJetsTopoVarsNew::AllJets_MinusBestJet_Pt(){
     if(m_jets.size()>1) {
         std::vector<TMBLorentzVector> GoodJetsMinusBestJet;
         GoodJetsMinusBestJet=_GoodJetsMinusBestJet;
-        vector<TMBLorentzVector> objects;
+        std::vector<TMBLorentzVector> objects;
         //if(debug) cout << "alljptGoodJetsMinusBestJet   " << GoodJetsMinusBestJet.size() << endl;
         for (unsigned int i=0; i<GoodJetsMinusBestJet.size(); i++) {
             objects.push_back(GoodJetsMinusBestJet.at(i));
@@ -566,13 +566,13 @@ double  LJetsTopoVarsNew::AllJets_MinusBestJet_Pt(){
 }
 
 double  LJetsTopoVarsNew::J1_NotBestJet_Pt(){
-    vector<TMBLorentzVector> objects;
+    std::vector<TMBLorentzVector> objects;
     //if(debug) cout << "m_jets.size()    " << m_jets.size()<< endl;
     if(m_jets.size()>1) {
         std::vector<TMBLorentzVector> GoodJetsMinusBestJet;
         GoodJetsMinusBestJet=_GoodJetsMinusBestJet;
         //if(debug) cout << "j1ptGoodJetsMinusBestJet   " << GoodJetsMinusBestJet.size() << endl;
-        vector<TMBLorentzVector> objects;
+        std::vector<TMBLorentzVector> objects;
         objects.push_back(GoodJetsMinusBestJet.at(0));
         TopTopologicalVariables topo(objects);
         //if(debug) cout << "top.pt    " << topo.Pt() << endl;
@@ -606,12 +606,12 @@ double  LJetsTopoVarsNew::J1_NotBestJet_Phi(){
 
 
 double  LJetsTopoVarsNew::J2_NotBestJet_Pt(){
-    vector<TMBLorentzVector> objects;
+    std::vector<TMBLorentzVector> objects;
     //if(debug) cout << "m_jets.size()    " << m_jets.size()<< endl;
     if(m_jets.size()>2) {
         std::vector<TMBLorentzVector> GoodJetsMinusBestJet;
         GoodJetsMinusBestJet=_GoodJetsMinusBestJet;
-        vector<TMBLorentzVector> objects;
+        std::vector<TMBLorentzVector> objects;
         objects.push_back(GoodJetsMinusBestJet.at(1));
         TopTopologicalVariables topo(objects);
         return topo.Pt();
@@ -631,7 +631,7 @@ double  LJetsTopoVarsNew::J2_NotBestJet_Eta(){
 
 
 double LJetsTopoVarsNew::W_MT() {
-    vector<TMBLorentzVector> objects;
+    std::vector<TMBLorentzVector> objects;
     //objects.push_back(_neutrino);  //_neutrino was made with W mass constraint; use MET instead
     objects.push_back(m_met);
     objects.push_back(m_lepton);
@@ -640,7 +640,7 @@ double LJetsTopoVarsNew::W_MT() {
 }
 
 double LJetsTopoVarsNew::W_Pt() {
-    vector<TMBLorentzVector> objects;
+    std::vector<TMBLorentzVector> objects;
     //objects.push_back(_neutrino);  //_neutrino was made with W mass constraint; use MET instead
     objects.push_back(m_met);
     objects.push_back(m_lepton);
@@ -649,7 +649,7 @@ double LJetsTopoVarsNew::W_Pt() {
 }
 
 double LJetsTopoVarsNew::W_M() {
-    vector<TMBLorentzVector> objects;
+    std::vector<TMBLorentzVector> objects;
     objects.push_back(_neutrino);  //_neutrino was made with W mass constraint; use MET instead
     //	objects.push_back(m_met);
     objects.push_back(m_lepton);
@@ -659,7 +659,7 @@ double LJetsTopoVarsNew::W_M() {
 
 double LJetsTopoVarsNew::Jet1Jet2_M() {
     if(m_jets.size()>=2) {
-        vector<TMBLorentzVector> objects;
+        std::vector<TMBLorentzVector> objects;
         objects.push_back(m_jets.at(0));
         objects.push_back(m_jets.at(1));
         TopTopologicalVariables topo(objects);
@@ -669,7 +669,7 @@ double LJetsTopoVarsNew::Jet1Jet2_M() {
 
 double LJetsTopoVarsNew::Jet1Jet2_Pt() {
     if(m_jets.size()>=2) {
-        vector<TMBLorentzVector> objects;
+        std::vector<TMBLorentzVector> objects;
         objects.push_back(m_jets.at(0));
         objects.push_back(m_jets.at(1));
         TopTopologicalVariables topo(objects);
@@ -685,7 +685,7 @@ double LJetsTopoVarsNew::Jet1Jet2_DeltaR() {
 
 double LJetsTopoVarsNew::Jet1Jet2W_M() {
     if(m_jets.size()>=2) {
-        vector<TMBLorentzVector> objects;
+        std::vector<TMBLorentzVector> objects;
         objects.push_back(_neutrino);  //_neutrino was made with W mass constraint; use MET instead
         //	objects.push_back(m_met);
         objects.push_back(m_lepton);
@@ -698,7 +698,7 @@ double LJetsTopoVarsNew::Jet1Jet2W_M() {
 
 double LJetsTopoVarsNew::Jet1Jet2W_Pt() {
     if(m_jets.size()>=2) {
-        vector<TMBLorentzVector> objects;
+        std::vector<TMBLorentzVector> objects;
         objects.push_back(_neutrino);  //_neutrino was made with W mass constraint; use MET instead
         //	objects.push_back(m_met);
         objects.push_back(m_lepton);
@@ -773,7 +773,7 @@ double LJetsTopoVarsNew::BestTop() {
     double TopMass=0.0;
     double BestTopMass = -99999.0;
     //std::cout<< " Topovar calc TestBestTop njets = " <<m_jets.size() << std::endl;
-    vector<TMBLorentzVector> objects;
+    std::vector<TMBLorentzVector> objects;
     SetBestTop_JetIndex(-1);
     std::vector<TMBLorentzVector> GoodJetsMinusBestJet;
     SetGoodJetsMinusBestJet(GoodJetsMinusBestJet);
@@ -859,7 +859,7 @@ double LJetsTopoVarsNew::BestTopBJet_Phi() {
     double TopMass=0.0;
     double BestTopMass = 5000.0;
     double BestTopBJetPhi = -100.;
-    vector<TMBLorentzVector> objects;
+    std::vector<TMBLorentzVector> objects;
     for (unsigned int i=0; i< m_jets.size(); i++ ) {
         Top = W + m_jets[i];
         TopMass = Top.M();
@@ -887,7 +887,7 @@ double LJetsTopoVarsNew::BestTopBJet_Pt() {
     double TopMass=0.0;
     double BestTopMass = 5000.0;
     double BestTopBJetPt = -100.;
-    vector<TMBLorentzVector> objects;
+    std::vector<TMBLorentzVector> objects;
     for (unsigned int i=0; i< m_jets.size(); i++ ) {
         Top = W + m_jets[i];
         TopMass = Top.M();
@@ -916,7 +916,7 @@ double LJetsTopoVarsNew::BestTopBJet_Eta() {
     double TopMass=0.0;
     double BestTopMass = 5000.0;
     double BestTopBJetEta = -100.;
-    vector<TMBLorentzVector> objects;
+    std::vector<TMBLorentzVector> objects;
     for (unsigned int i=0; i< m_jets.size(); i++ ) {
         Top = W + m_jets[i];
         TopMass = Top.M();
@@ -945,7 +945,7 @@ double LJetsTopoVarsNew::BestTop_Pt() {
     double TopMass=0.0;
     double BestTopMass = 5000.0;
     double BestTopPt = -10.;
-    vector<TMBLorentzVector> objects;
+    std::vector<TMBLorentzVector> objects;
     for (unsigned int i=0; i< m_jets.size(); i++ ) {
         Top = W + m_jets[i];
         TopMass = Top.M();
@@ -1024,7 +1024,7 @@ double LJetsTopoVarsNew::SecBTagTop_Pt()
 
 double LJetsTopoVarsNew::Jet1TagJet2TagW_M(){
     if(m_jets.size()>=2) {
-        vector<TMBLorentzVector> objects;
+        std::vector<TMBLorentzVector> objects;
         objects.push_back(_neutrino);  //_neutrino was made with W mass constraint; use MET instead
         //	objects.push_back(m_met);
         objects.push_back(m_lepton);
@@ -1040,7 +1040,7 @@ double LJetsTopoVarsNew::Jet1TagJet2TagW_M(){
 double LJetsTopoVarsNew::BestJetJet2W_M() {
     if(m_jets.size()>=2) {
         
-        vector<TMBLorentzVector> objects;
+        std::vector<TMBLorentzVector> objects;
         objects.push_back(_neutrino);
         objects.push_back(m_lepton);
         unsigned int index = GetBestTop_JetIndex();
@@ -1125,7 +1125,7 @@ double LJetsTopoVarsNew::BestJet_Phi() {
 
 double LJetsTopoVarsNew::AllJets_M() {
     if(m_jets.size()) {
-        vector<TMBLorentzVector> objects;
+        std::vector<TMBLorentzVector> objects;
         for (unsigned int i=0; i<m_jets.size(); i++) {
             objects.push_back(m_jets.at(i));
         }
@@ -1136,7 +1136,7 @@ double LJetsTopoVarsNew::AllJets_M() {
 
 double LJetsTopoVarsNew::AllJetsW_M() {//sqrt_shat
     if(m_jets.size()>=2) {
-        vector<TMBLorentzVector> objects;
+        std::vector<TMBLorentzVector> objects;
         objects.push_back(_neutrino);  //_neutrino was made with W mass constraint; use MET instead
         //	objects.push_back(m_met);
         objects.push_back(m_lepton);
@@ -1153,7 +1153,7 @@ double LJetsTopoVarsNew::AllJetsW_M() {//sqrt_shat
 /*
  int LJetsTopoVarsNew::LeptonMETxy() {
  std::cout<<"in leptonmetxy"<<std::endl;
- vector<TMBLorentzVector> LeptonMETxy;
+ std::vector<TMBLorentzVector> LeptonMETxy;
  LeptonMETxy.clear();
  LeptonMETxy.push_back(m_lepton[0]);
  TMBLorentzVector nu;
@@ -1169,7 +1169,7 @@ double LJetsTopoVarsNew::Cos_BestJetLepton_BestTop() {
     
     double Cos_BestJetLepton_Besttop=-10.0;
     
-    vector<TMBLorentzVector> LeptonMETxy;
+    std::vector<TMBLorentzVector> LeptonMETxy;
     LeptonMETxy.clear();
     LeptonMETxy.push_back(m_lepton[0]);
     TMBLorentzVector nu;
@@ -1196,7 +1196,7 @@ double LJetsTopoVarsNew::Cos_LightjetJetLepton_BestTop() {
     
     double Cos_LightjetJetLepton_BestTop=-10.0;
     
-    vector<TMBLorentzVector> LeptonMETxy;
+    std::vector<TMBLorentzVector> LeptonMETxy;
     LeptonMETxy.clear();
     LeptonMETxy.push_back(m_lepton[0]);
     TMBLorentzVector nu;
@@ -1217,7 +1217,7 @@ double LJetsTopoVarsNew::Cos_LightjetJetLepton_BTagTop() {
     
     double Cos_LightjetJetLepton_BTagTop=-10.0;
     
-    vector<TMBLorentzVector> LeptonMETxy;
+    std::vector<TMBLorentzVector> LeptonMETxy;
     LeptonMETxy.clear();
     LeptonMETxy.push_back(m_lepton[0]);
     TMBLorentzVector nu;

@@ -25,11 +25,11 @@ for CLHEP see:  http://wwwinfo.cern.ch/asd/lhc++/clhep/
 
 <H2>
 TVector3</H2>
-<TT>TVector3</TT> is a general three vector class, which can be used for
-the description of different vectors in 3D.
+<TT>TVector3</TT> is a general three std::vector class, which can be used for
+the description of different std::vectors in 3D.
 <H3>
 Declaration / Access to the components</H3>
-<TT>TVector3</TT> has been implemented as a vector of three <TT>Double_t</TT>
+<TT>TVector3</TT> has been implemented as a std::vector of three <TT>Double_t</TT>
 variables, representing the cartesian coordinates. By default all components
 are initialized to zero:
 
@@ -77,7 +77,7 @@ or cylindrical (z,r,theta) coordinates, the
 squared</TT>
 
 <P>It is also possible to get the transverse component with respect to
-another vector:
+another std::vector:
 
 <P><TT>&nbsp; Double_t ppv1 = v.Perp(v1);</TT>
 <BR><TT>&nbsp; Double_t pp2v1 = v.Perp2(v1);</TT>
@@ -97,7 +97,7 @@ or <TT>PseudoRapidity()</TT>:
 <H3>
 Arithmetic / Comparison</H3>
 The <TT>TVector3</TT> class provides the operators to add, subtract, scale and compare
-vectors:
+std::vectors:
 
 <P><TT>&nbsp; v3&nbsp; = -v1;</TT>
 <BR><TT>&nbsp; v1&nbsp; = v2+v3;</TT>
@@ -113,15 +113,15 @@ vectors:
 <H3>
 Related Vectors</H3>
 <TT>&nbsp; v2 = v1.Unit();&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // get unit
-vector parallel to v1</TT>
-<BR><TT>&nbsp; v2 = v1.Orthogonal(); // get vector orthogonal to v1</TT>
+std::vector parallel to v1</TT>
+<BR><TT>&nbsp; v2 = v1.Orthogonal(); // get std::vector orthogonal to v1</TT>
 <H3>
-Scalar and vector products</H3>
+Scalar and std::vector products</H3>
 <TT>&nbsp; s = v1.Dot(v2);&nbsp;&nbsp; // scalar product</TT>
 <BR><TT>&nbsp; s = v1 * v2;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // scalar product</TT>
-<BR><TT>&nbsp; v = v1.Cross(v2); // vector product</TT>
+<BR><TT>&nbsp; v = v1.Cross(v2); // std::vector product</TT>
 <H3>
-&nbsp;Angle between two vectors</H3>
+&nbsp;Angle between two std::vectors</H3>
 <TT>&nbsp; Double_t a = v1.Angle(v2);</TT>
 <H3>
 Rotations</H3>
@@ -132,7 +132,7 @@ Rotation around axes</H5>
 <BR><TT>&nbsp; v.RotateY(TMath::Pi());</TT>
 <BR><TT>&nbsp; v.RotateZ(angle);</TT>
 <H5>
-Rotation around a vector</H5>
+Rotation around a std::vector</H5>
 <TT>&nbsp; v1.Rotate(TMath::Pi()/4, v2); // rotation around v2</TT>
 <H5>
 Rotation by TRotation</H5>
@@ -321,7 +321,7 @@ public:
     //   TVector2 EtaPhiVector() { /// return TVector2(eta,phi)
     //      return TVector2 (Eta(),Phi()); }
 
-   Double_t Angle(const TVector3 & q) const { /// Angle wrt. another vector.
+   Double_t Angle(const TVector3 & q) const { /// Angle wrt. another std::vector.
       Double_t ptot2 = Mag32()*q.Mag2();
       if(ptot2 <= 0.) return .0;
       Double_t arg = Dot(q)/TMath::Sqrt(ptot2);
@@ -347,7 +347,7 @@ public:
   inline void SetMag3(Double_t ma) { /// Set magnitude keeping theta and phi constant
      Double_t factor = Mag3();
      if (factor == 0) {
-        Warning("SetMag3","zero vector can't be stretched");
+        Warning("SetMag3","zero std::vector can't be stretched");
      }else{
         factor = ma/factor;
         SetX(fX*factor);
@@ -359,7 +359,7 @@ public:
      /// The transverse component squared (R^2 in cylindrical coordinate system)
      return fX*fX + fY*fY; }
   inline Double_t Pt() const { 
-     /// transverse component; projection of 3 vector onto XY plane (R in cylindrical coords)
+     /// transverse component; projection of 3 std::vector onto XY plane (R in cylindrical coords)
      return Perp(); }
   inline Double_t Perp() const { 
      /// The transverse component (R in cylindrical coordinate system)
@@ -432,7 +432,7 @@ public:
      return *this;
   }
 
-  inline TMBVector3 Unit() const { /// Unit vector parallel to this.
+  inline TMBVector3 Unit() const { /// Unit std::vector parallel to this.
      Double_t  tot = Mag32();
      TMBVector3 p(fX,fY,fZ);
      return tot>.0 ? p *= (1.0/TMath::Sqrt(tot)) : p;
@@ -491,7 +491,7 @@ public:
   }
 
   void RotateUz(const TMBVector3& NewUzVector) {
-     /// Rotates reference frame from Uz to newUz (must be unit vector!)
+     /// Rotates reference frame from Uz to newUz (must be unit std::vector!)
      Double_t u1 = NewUzVector.fX;
      Double_t u2 = NewUzVector.fY;
      Double_t u3 = NewUzVector.fZ;
@@ -509,7 +509,7 @@ public:
   }
 
   void Rotate(Double_t angle, const TMBVector3 &axis) {
-     /// Rotates around the axis specified by another vector
+     /// Rotates around the axis specified by another std::vector
      TRotation trans;
      trans.Rotate(angle, (TVector3)axis);
      operator*=(trans);
@@ -547,33 +547,33 @@ private:
    Double32_t fY; ///< Y component (up-down)
    Double32_t fZ; ///< Z component (along the beam)
 
-     //ClassDef(TMBVector3,1) // A 3D physics vector
+     //ClassDef(TMBVector3,1) // A 3D physics std::vector
 
 };
 
 inline
 TMBVector3 operator + (const TMBVector3 &a, const TMBVector3 &b) {
-   /// Addition of 3-vectors.
+   /// Addition of 3-std::vectors.
   return TVector3(a.X() + b.X(), a.Y() + b.Y(), a.Z() + b.Z()); }
 
 inline
 TMBVector3 operator - (const TMBVector3 &a, const TMBVector3 &b) {
-   /// Subtraction of 3-vectors.
+   /// Subtraction of 3-std::vectors.
    return TVector3(a.X() - b.X(), a.Y() - b.Y(), a.Z() - b.Z()); }
 
 inline
 Double_t operator * (const TMBVector3 &a, const TMBVector3 &b) {
-   /// Dot product of two vectors
+   /// Dot product of two std::vectors
    return a.Dot(b); }
 
 inline
 TMBVector3 operator * (const TMBVector3 &p, Double_t a) {
-   /// Scalar product of 3-vectors.
+   /// Scalar product of 3-std::vectors.
    return TVector3(a*p.X(), a*p.Y(), a*p.Z()); }
 
 inline
 TMBVector3 operator * (Double_t a, const TMBVector3 &p) {
-   /// Scaling of 3-vectors with a real number
+   /// Scaling of 3-std::vectors with a real number
    return TVector3(a*p.X(), a*p.Y(), a*p.Z()); }
 
 inline
