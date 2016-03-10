@@ -131,7 +131,7 @@ int CATopoCalc::FillBranches( std::vector<edm::Ptr<pat::Muon> > const & vSelMuon
                              )
 {
     while(1) {
-        //Create lepton and met four vectors
+        //Create lepton and met four std::vectors
         TLorentzVector tlv_lepton;
         
         if ( vSelMuons.size() == 0 && vSelElectrons.size() == 0) break;
@@ -171,7 +171,7 @@ int CATopoCalc::FillBranches( std::vector<edm::Ptr<pat::Muon> > const & vSelMuon
         std::vector <double> bJetPhi;
         
         //Remove jets/bjets overlapping with leading CA Jet
-        for (vector<std::pair<TLorentzVector,bool>>::const_iterator jet = vCorrBtagJets.begin(); jet != vCorrBtagJets.end(); ++jet){
+        for (std::vector<std::pair<TLorentzVector,bool>>::const_iterator jet = vCorrBtagJets.begin(); jet != vCorrBtagJets.end(); ++jet){
             
             if( vCAWJets.size() > 0 ){
                 double CAtoAKJetDR = vCAWJets[0].DeltaR((*jet).first);

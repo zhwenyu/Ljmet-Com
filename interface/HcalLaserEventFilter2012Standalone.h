@@ -25,7 +25,7 @@ private:
     bool verbose_;  // if set to true, then the run:LS:event for any event failing the cut will be printed out
     
     // Set run range of events in the BAD LASER LIST.
-    // The purpose of these values is to shorten the length of the EventList_ vector when running on only a subset of data
+    // The purpose of these values is to shorten the length of the EventList_ std::vector when running on only a subset of data
     int minrun_;
     int maxrun_;  // if specified (i.e., values > -1), then only events in the given range will be filtered
     int minRunInFile, maxRunInFile;

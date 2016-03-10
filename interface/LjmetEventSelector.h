@@ -208,25 +208,25 @@ class LjmetEventSelector : public EventSelector {
   reco::CaloMET const & caloMet()  const { return *caloMet_; }
   reco::CaloMET const & caloMet2() const { return *caloMet2_; }
 
-  vector<pat::Jet>            const & allJets()  const { return *h_jets_; }
-  vector<edm::Ptr<reco::Vertex> >  const   selected_PVs() const { return good_pvs_; }
-  vector<edm::Ptr<pat::Jet> >  const   goodJets() const { return good_jets_; }
-  vector<edm::Ptr<pat::Jet> >  const   goodJetsPF() const { return good_jetsPF_; }
-  vector<edm::Ptr<pat::Jet> >  const   allJetsPF() const { return all_jetsPF_; }
-  vector<edm::Ptr<pat::Jet> >  const   goodJetsJPT() const { return good_jetsJPT_; }
-  vector<edm::Ptr<pat::Muon> > const  goodMuons() const { return good_muons_; }
-  vector<edm::Ptr<pat::Electron> > const  goodElectrons() const { return good_electrons_; }
+  std::vector<pat::Jet>            const & allJets()  const { return *h_jets_; }
+  std::vector<edm::Ptr<reco::Vertex> >  const   selected_PVs() const { return good_pvs_; }
+  std::vector<edm::Ptr<pat::Jet> >  const   goodJets() const { return good_jets_; }
+  std::vector<edm::Ptr<pat::Jet> >  const   goodJetsPF() const { return good_jetsPF_; }
+  std::vector<edm::Ptr<pat::Jet> >  const   allJetsPF() const { return all_jetsPF_; }
+  std::vector<edm::Ptr<pat::Jet> >  const   goodJetsJPT() const { return good_jetsJPT_; }
+  std::vector<edm::Ptr<pat::Muon> > const  goodMuons() const { return good_muons_; }
+  std::vector<edm::Ptr<pat::Electron> > const  goodElectrons() const { return good_electrons_; }
   pat::Jet                    const & jet0()     const { return *jet0_; }
   pat::Jet                    const & jet1()     const { return *jet1_; }
   pat::Jet                    const & jet2()     const { return *jet2_; }
   pat::Jet                    const & jet3()     const { return *jet3_; }
 
-  vector<pat::Muon> const & allMuons() const { return *h_muons_; }
+  std::vector<pat::Muon> const & allMuons() const { return *h_muons_; }
   pat::Muon         const & muon0()    const { return *muon0_; }
   pat::Muon         const & muon1()    const { return *muon1_; }
   double                    dimuonMass()     { return _dimuon_mass; }
 
-  vector<pat::Electron> const & allElectrons () const { return *h_electrons_; }
+  std::vector<pat::Electron> const & allElectrons () const { return *h_electrons_; }
   pat::Electron         const & electron0()     const { return *electron0_; }
   pat::Electron         const & electron1()    const { return *electron1_; }
 
@@ -260,17 +260,17 @@ protected:
 
 
   edm::Handle<std::vector<reco::Vertex> >     h_primVtx;
-  edm::Handle<vector<pat::MET> >              h_met_;
-  edm::Handle<vector<pat::MET> >              h_tcMet_;
-  edm::Handle<vector<pat::MET> >              h_pfMet_;
-  edm::Handle<vector<reco::MET> >             h_pfTypeIMet_;
-  edm::Handle<vector<reco::CaloMET> >         h_caloMet_;
-  edm::Handle<vector<reco::CaloMET> >         h_caloMet2_;
-  edm::Handle<vector<pat::Jet> >              h_jets_;
-  edm::Handle<vector<pat::Jet> >              h_jetsPF_;
-  edm::Handle<vector<pat::Jet> >              h_jetsJPT_;
-  edm::Handle<vector<pat::Muon> >             h_muons_;
-  edm::Handle<vector<pat::Electron> >         h_electrons_;
+  edm::Handle<std::vector<pat::MET> >              h_met_;
+  edm::Handle<std::vector<pat::MET> >              h_tcMet_;
+  edm::Handle<std::vector<pat::MET> >              h_pfMet_;
+  edm::Handle<std::vector<reco::MET> >             h_pfTypeIMet_;
+  edm::Handle<std::vector<reco::CaloMET> >         h_caloMet_;
+  edm::Handle<std::vector<reco::CaloMET> >         h_caloMet2_;
+  edm::Handle<std::vector<pat::Jet> >              h_jets_;
+  edm::Handle<std::vector<pat::Jet> >              h_jetsPF_;
+  edm::Handle<std::vector<pat::Jet> >              h_jetsJPT_;
+  edm::Handle<std::vector<pat::Muon> >             h_muons_;
+  edm::Handle<std::vector<pat::Electron> >         h_electrons_;
   edm::Handle<double>                         h_rho;
   edm::Handle<std::vector<pat::TriggerPath> > hltresults_;
   edm::Handle<edm::TriggerResults>            hlt_;

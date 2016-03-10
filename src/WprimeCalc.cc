@@ -200,7 +200,7 @@ int WprimeCalc::AnalyzeEvent(edm::EventBase const & event,
         double chIso = vSelElectrons[0]->chargedHadronIso();
         double nhIso = vSelElectrons[0]->neutralHadronIso();
         double phIso = vSelElectrons[0]->photonIso();
-        _electron_1_RelIso  = ( chIso + max(0.0, nhIso + phIso - rhoIso*AEff) )/ vSelElectrons[0]->ecalDrivenMomentum().pt();
+        _electron_1_RelIso  = ( chIso + std::max(0.0, nhIso + phIso - rhoIso*AEff) )/ vSelElectrons[0]->ecalDrivenMomentum().pt();
         
         _electron_1_Deta  = vSelElectrons[0]->deltaEtaSuperClusterTrackAtVtx();
         _electron_1_Dphi  = vSelElectrons[0]->deltaPhiSuperClusterTrackAtVtx();
@@ -210,7 +210,7 @@ int WprimeCalc::AnalyzeEvent(edm::EventBase const & event,
         _electron_1_DZ    = vSelElectrons[0]->gsfTrack()->dz(PVtx);
         
         _electron_1_Ooemoop = (1.0/vSelElectrons[0]->ecalEnergy() - vSelElectrons[0]->eSuperClusterOverP()/vSelElectrons[0]->ecalEnergy());
-        _electron_1_RelIso  = ( chIso + max(0.0, nhIso + phIso - rhoIso*AEff) )/ vSelElectrons[0]->ecalDrivenMomentum().pt();
+        _electron_1_RelIso  = ( chIso + std::max(0.0, nhIso + phIso - rhoIso*AEff) )/ vSelElectrons[0]->ecalDrivenMomentum().pt();
         _electron_1_mHits   =  vSelElectrons[0]->gsfTrack()->hitPattern().numberOfHits(reco::HitPattern::MISSING_INNER_HITS);
         _electron_1_vtxFitConv = vSelElectrons[0]->passConversionVeto();
         
@@ -248,7 +248,7 @@ int WprimeCalc::AnalyzeEvent(edm::EventBase const & event,
         double chIso = vSelElectrons[1]->chargedHadronIso();
         double nhIso = vSelElectrons[1]->neutralHadronIso();
         double phIso = vSelElectrons[1]->photonIso();
-        _electron_2_RelIso  = ( chIso + max(0.0, nhIso + phIso - rhoIso*AEff) )/ vSelElectrons[1]->ecalDrivenMomentum().pt();
+        _electron_2_RelIso  = ( chIso + std::max(0.0, nhIso + phIso - rhoIso*AEff) )/ vSelElectrons[1]->ecalDrivenMomentum().pt();
         
     }
     

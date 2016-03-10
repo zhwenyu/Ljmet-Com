@@ -152,8 +152,8 @@ void BaseEventSelector::BeginJob(std::map<std::string, edm::ParameterSet const >
     if ( mbPar["isMc"] && ( mbPar["JECup"] || mbPar["JECdown"]))
       jecUnc = new JetCorrectionUncertainty(msPar["JEC_txtfile"]);
 
-    vector<JetCorrectorParameters> vPar;
-    vector<JetCorrectorParameters> vParAK8;
+    std::vector<JetCorrectorParameters> vPar;
+    std::vector<JetCorrectorParameters> vParAK8;
 
     if ( mbPar["isMc"] ) {
         // Create the JetCorrectorParameter objects, the order does not matter.
@@ -165,7 +165,7 @@ void BaseEventSelector::BeginJob(std::map<std::string, edm::ParameterSet const >
 	L3JetParAK8  = new JetCorrectorParameters(msPar["MCL3JetParAK8"]);
         L2JetParAK8  = new JetCorrectorParameters(msPar["MCL2JetParAK8"]);
     	L1JetParAK8  = new JetCorrectorParameters(msPar["MCL1JetParAK8"]);
-    	// Load the JetCorrectorParameter objects into a vector,
+    	// Load the JetCorrectorParameter objects into a std::vector,
     	// IMPORTANT: THE ORDER MATTERS HERE !!!! 
     	vPar.push_back(*L1JetPar);
     	vPar.push_back(*L2JetPar);
@@ -188,7 +188,7 @@ void BaseEventSelector::BeginJob(std::map<std::string, edm::ParameterSet const >
     	L3JetParAK8  = new JetCorrectorParameters(msPar["DataL3JetParAK8"]);
     	L2JetParAK8  = new JetCorrectorParameters(msPar["DataL2JetParAK8"]);
     	L1JetParAK8  = new JetCorrectorParameters(msPar["DataL1JetParAK8"]);
-    	// Load the JetCorrectorParameter objects into a vector,
+    	// Load the JetCorrectorParameter objects into a std::vector,
     	// IMPORTANT: THE ORDER MATTERS HERE !!!! 
     	vPar.push_back(*L1JetPar);
    	vPar.push_back(*L2JetPar);

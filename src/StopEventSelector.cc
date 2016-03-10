@@ -111,7 +111,7 @@ protected:
     edm::Ptr<pat::Electron> electron0_;
     edm::Ptr<pat::Electron> electron1_;
     
-    map<int,map<int,vector<int> > > mmvBadLaserCalEvents;
+    map<int,map<int,std::vector<int> > > mmvBadLaserCalEvents;
     
     
     
@@ -344,7 +344,7 @@ void StopEventSelector::BeginJob( std::map<std::string, edm::ParameterSet const>
         
         //std::ifstream inFile("../data/badLaserCalFiltEvents.txt");
         std::ifstream inFile("badLaserCalFiltEvents.txt");
-        string line,subString;
+        std::string line,subString;
         int begin,end;
         int _events = 0;
         while(inFile.good()){
@@ -362,8 +362,8 @@ void StopEventSelector::BeginJob( std::map<std::string, edm::ParameterSet const>
             subString=line.substr(begin,end-begin);
             int event=atoi(subString.c_str());
             
-            if(mmvBadLaserCalEvents.find(run)==mmvBadLaserCalEvents.end()) mmvBadLaserCalEvents[run]=map<int,vector<int> >();
-            if(mmvBadLaserCalEvents[run].find(lumi)==mmvBadLaserCalEvents[run].end()) mmvBadLaserCalEvents[run][lumi]=vector<int>();
+            if(mmvBadLaserCalEvents.find(run)==mmvBadLaserCalEvents.end()) mmvBadLaserCalEvents[run]=map<int,std::vector<int> >();
+            if(mmvBadLaserCalEvents[run].find(lumi)==mmvBadLaserCalEvents[run].end()) mmvBadLaserCalEvents[run][lumi]=std::vector<int>();
             mmvBadLaserCalEvents[run][lumi].push_back(event);
             ++_events;
         }

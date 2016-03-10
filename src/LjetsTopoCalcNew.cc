@@ -163,7 +163,7 @@ int LjetsTopoCalcNew::FillLjetsBranches( std::vector<edm::Ptr<pat::Muon> > const
                                   vSelElectrons[0]->energy() );
         }
         
-        // make a vector of jets
+        // make a std::vector of jets
         /*
          std::vector<TLorentzVector> tlv_jets;
          for ( std::vector<std::pair<TLorentzVector,bool>>::const_iterator iJet = vCorrBtagJets.begin();

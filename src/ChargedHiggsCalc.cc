@@ -156,7 +156,7 @@ int ChargedHiggsCalc::AnalyzeEvent(edm::EventBase const & event,
         double chIso = vSelElectrons[0]->chargedHadronIso();
         double nhIso = vSelElectrons[0]->neutralHadronIso();
         double phIso = vSelElectrons[0]->photonIso();
-        _electron_1_RelIso  = ( chIso + max(0.0, nhIso + phIso - rhoIso*AEff) )/ vSelElectrons[0]->ecalDrivenMomentum().pt();
+        _electron_1_RelIso  = ( chIso + std::max(0.0, nhIso + phIso - rhoIso*AEff) )/ vSelElectrons[0]->ecalDrivenMomentum().pt();
         
     }
     
@@ -179,7 +179,7 @@ int ChargedHiggsCalc::AnalyzeEvent(edm::EventBase const & event,
         double chIso = vSelElectrons[1]->chargedHadronIso();
         double nhIso = vSelElectrons[1]->neutralHadronIso();
         double phIso = vSelElectrons[1]->photonIso();
-        _electron_2_RelIso  = ( chIso + max(0.0, nhIso + phIso - rhoIso*AEff) )/ vSelElectrons[1]->ecalDrivenMomentum().pt();
+        _electron_2_RelIso  = ( chIso + std::max(0.0, nhIso + phIso - rhoIso*AEff) )/ vSelElectrons[1]->ecalDrivenMomentum().pt();
         
     }
     

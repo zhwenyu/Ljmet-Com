@@ -5,7 +5,7 @@
  *
  * Purpose      : Class containing generic methods for 
  *                       calculating topological variables 
- *                       (Instantiate using as argument: vector<TMBLorentzVector> 
+ *                       (Instantiate using as argument: std::vector<TMBLorentzVector> 
  *                        of all objects for which you want any variable 
  *                        to be calculated)  
  *
@@ -90,7 +90,7 @@ using namespace std;
       return *_pv; // implicit copy and cast
     } // GetMomentumTensorEigenvalues()
 
-  /// internal method to prepare and cache the eigenvectors
+  /// internal method to prepare and cache the eigenstd::vectors
   void TopTopologicalVariables::ensurePV () const
   {
     if (_pv) return;

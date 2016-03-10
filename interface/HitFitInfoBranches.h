@@ -76,7 +76,7 @@ class HitFitInfoBranches {
     // 20: unknown, can also be gluon
     //
     // A permutation hypothesis is written in the following notation:
-    // a series of integer (in an array or vector), starting from the highest
+    // a series of integer (in an array or std::vector), starting from the highest
     // pT jet.
     //
     // Parton-level assigned jet types: For each jet considered in the fit,
