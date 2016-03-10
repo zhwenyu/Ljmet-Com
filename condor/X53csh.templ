@@ -14,12 +14,20 @@
 #setenv PATH /bin:/usr/bin:/usr/local/bin:/usr/krb5/bin:/usr/afsws/bin:/usr/krb5/bin/aklog
 
 #source /uscmst1/prod/sw/cms/cshrc prod
-cd CMSSWBASE/src/
-pwd
+#cd CMSSWBASE/src/
+#pwd
+source /cvmfs/cms.cern.ch/cmsset_default.csh
+cmsrel CMSSWVERSION
+cd CMSSWVERSION/src/
 setenv SCRAM_ARCH slc6_amd64_gcc472
 eval `scram runtime -csh`
-
-
+cmsenv
+#get setup ljmet area
+mkdir -p LJMet/Com
+cd LJMet/Com
+xrdcp root://cmseos.fnal.gov//store/user/clint/ljmet.tar ./ljmet.tar
+tar -xvf ljmet.tar
+scram b -j 4
 #
 #_____ check if we are running on a condor or on fbsng batch system _____
 #
@@ -38,7 +46,11 @@ else
     exit
 endif
 
-cd CMSSWBASE/src/LJMet/Com/python/
+#cd CMSSWBASE/src/LJMet/Com/python/
 
 rehash
-FWLITEANALYZER DIRECTORY/PREFIX_JOBID.py
+xrdcp EOSPY LOCPY
+FWLITEANALYZER LOCPY
+
+#move output to eos
+xrdcp LOCOUT EOSOUT
