@@ -169,8 +169,8 @@ try: scratchDir=os.environ['_CONDOR_SCRATCH_DIR']
 except: scratchDir='.'
 if not os.path.isdir(scratchDir): os.system("mkdir -p "+scratchDir)
 process.outputs = cms.PSet (
-    outputName = cms.string(scratchDir+'/PREFIX_JOBID'),
-    #outputName = cms.string('PREFIX_JOBID'),
+    #outputName = cms.string(scratchDir+'/PREFIX_JOBID'),
+    outputName = cms.string('PREFIX_JOBID'),
     treeName   = cms.string('ljmet'),
 )
 
