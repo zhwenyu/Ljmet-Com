@@ -559,7 +559,6 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
                 mvSelPVs.push_back(edm::Ptr<reco::Vertex>(h_primVtx, _n_pvs));
                 ++_n_pvs;
             }
-          
         } // end of PV cuts
 
 
@@ -998,6 +997,7 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
         mvSelJets.clear();
         mvAllJets.clear();
         mvCorrJetsWithBTags.clear();
+	mvSelCorrJets.clear();
         mvSelBtagJets.clear();
 
         // try to get earlier produced data (in a calc)
@@ -1016,6 +1016,7 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
 	    TLorentzVector jetP4;
 
 	    pat::Jet tmpJet = _ijet->correctedJet(0);
+	    pat::Jet corrJet = *_ijet;
 
 	    if ( mbPar["doLepJetCleaning"] ){
 		if (mbPar["debug"]) std::cout << "Checking Overlap" << std::endl;
@@ -1044,6 +1045,7 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
 				    tmpJet.setP4( tmpJet.p4() - muDaughters[muI]->p4() );
 				    if (mbPar["debug"]) std::cout << "  Cleaned Jet : pT = " << tmpJet.pt() << " eta = " << tmpJet.eta() << " phi = " << tmpJet.phi() << std::endl;
 				    jetP4 = correctJet(tmpJet, event, false, true);
+				    corrJet = correctJetReturnPatJet(tmpJet, event, false, true);
 				    if (mbPar["debug"]) std::cout << "Corrected Jet : pT = " << jetP4.Pt() << " eta = " << jetP4.Eta() << " phi = " << jetP4.Phi() << std::endl;
 			            _cleaned = true;
                                     muDaughters.erase( muDaughters.begin()+muI );
@@ -1096,6 +1098,7 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
 				    tmpJet.setP4( tmpJet.p4() - elDaughters[elI]->p4() );
 				    if (mbPar["debug"]) std::cout << "  Cleaned Jet : pT = " << tmpJet.pt() << " eta = " << tmpJet.eta() << " phi = " << tmpJet.phi() << std::endl;
 				    jetP4 = correctJet(tmpJet, event, false, true);
+				    corrJet = correctJetReturnPatJet(tmpJet, event, false, true);
 				    if (mbPar["debug"]) std::cout << "Corrected Jet : pT = " << jetP4.Pt() << " eta = " << jetP4.Eta() << " phi = " << jetP4.Phi() << std::endl;
 			            _cleaned = true;
                                     elDaughters.erase( elDaughters.begin()+elI );
@@ -1121,6 +1124,7 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
 	    }
 	    if (!_cleaned) {
                 jetP4 = correctJet(*_ijet, event);
+		corrJet = correctJetReturnPatJet(*_ijet, event);
             }
 
             _isTagged = isJetTagged(*_ijet, event);
@@ -1154,6 +1158,7 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
                 // save all the good jets
                 ++_n_good_jets;
                 mvSelJets.push_back(edm::Ptr<pat::Jet>( mhJets, _n_jets)); 
+		mvSelCorrJets.push_back(corrJet);
                 mvCorrJetsWithBTags.push_back(jetwithtag);
 
                 if (jetP4.Pt() > _leading_jet_pt) _leading_jet_pt = jetP4.Pt();                         

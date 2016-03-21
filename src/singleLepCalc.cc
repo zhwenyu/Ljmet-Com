@@ -192,6 +192,7 @@ int singleLepCalc::BeginJob()
 int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * selector)
 {     // ----- Get objects from the selector -----
     std::vector<edm::Ptr<pat::Jet> >            const & vSelJets = selector->GetSelectedJets();
+    std::vector<pat::Jet>                       const & vSelCorrJets = selector->GetSelectedCorrJets();
     std::vector<edm::Ptr<pat::Jet> >            const & vSelBtagJets = selector->GetSelectedBtagJets();
     std::vector<edm::Ptr<pat::Jet> >            const & vAllJets = selector->GetAllJets();
     std::vector<std::pair<TLorentzVector,bool>> const & vCorrBtagJets = selector->GetCorrJetsWithBTags();
@@ -222,6 +223,7 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
     int _nCorrBtagJets   = (int)vCorrBtagJets.size();
     int _nSelMuons       = (int)vSelMuons.size();
     int _nSelElectrons   = (int)vSelElectrons.size();
+
     edm::Handle<std::vector<reco::Vertex> > pvHandle;
     event.getByLabel(pvCollection_it, pvHandle);
     goodPVs = *(pvHandle.product());
@@ -810,28 +812,35 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
     std::vector <double> AK4JetEnergy;
 
     std::vector <int>    AK4JetBTag;
+    std::vector <int>    AK4JetBTag_bSFup;
+    std::vector <int>    AK4JetBTag_bSFdn;
+    std::vector <int>    AK4JetBTag_lSFup;
+    std::vector <int>    AK4JetBTag_lSFdn;
     std::vector <double> AK4JetBDisc;
     std::vector <int>    AK4JetFlav;
 
     //std::vector <double> AK4JetRCN;   
     double AK4HT =.0;
-    for (unsigned int ii = 0; ii < vCorrBtagJets.size(); ii++){
+    for (std::vector<pat::Jet>::const_iterator ii = vSelCorrJets.begin(); ii != vSelCorrJets.end(); ii++){
+      int index = (int)(ii-vSelCorrJets.begin());
 
-        //Four std::vector
-        TLorentzVector lv = vCorrBtagJets[ii].first;
+      AK4JetPt     . push_back(ii->pt());
+      AK4JetEta    . push_back(ii->eta());
+      AK4JetPhi    . push_back(ii->phi());
+      AK4JetEnergy . push_back(ii->energy());
 
-        AK4JetPt     . push_back(lv.Pt());
-        AK4JetEta    . push_back(lv.Eta());
-        AK4JetPhi    . push_back(lv.Phi());
-        AK4JetEnergy . push_back(lv.Energy());
-        
-        AK4JetBTag   . push_back(vCorrBtagJets[ii].second);
-        //AK4JetRCN    . push_back(((*ijet)->chargedEmEnergy()+(*ijet)->chargedHadronEnergy()) / ((*ijet)->neutralEmEnergy()+(*ijet)->neutralHadronEnergy()));
-        AK4JetBDisc  . push_back(vSelJets[ii]->bDiscriminator( "pfCombinedInclusiveSecondaryVertexV2BJetTags" ));
-        AK4JetFlav   . push_back(abs(vSelJets[ii]->hadronFlavour()));
- 
-        //HT
-        AK4HT += lv.Pt(); 
+      AK4JetBTag   . push_back(vCorrBtagJets[index].second);
+      AK4JetBTag_bSFup.push_back(selector->isJetTagged(*ii, event, true, 1));
+      AK4JetBTag_bSFdn.push_back(selector->isJetTagged(*ii, event, true, 2));
+      AK4JetBTag_lSFup.push_back(selector->isJetTagged(*ii, event, true, 3));
+      AK4JetBTag_lSFdn.push_back(selector->isJetTagged(*ii, event, true, 4));
+
+      //AK4JetRCN    . push_back(((*ijet)->chargedEmEnergy()+(*ijet)->chargedHadronEnergy()) / ((*ijet)->neutralEmEnergy()+(*ijet)->neutralHadronEnergy()));
+      AK4JetBDisc  . push_back(ii->bDiscriminator( "pfCombinedInclusiveSecondaryVertexV2BJetTags" ));
+      AK4JetFlav   . push_back(abs(ii->hadronFlavour()));
+
+      //HT
+      AK4HT += ii->pt(); 
     }
     
     //Four std::vector
@@ -841,6 +850,10 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
     SetValue("AK4JetEnergy" , AK4JetEnergy);
     SetValue("AK4HT"        , AK4HT);
     SetValue("AK4JetBTag"   , AK4JetBTag);
+    SetValue("AK4JetBTag_bSFup"   , AK4JetBTag_bSFup);
+    SetValue("AK4JetBTag_bSFdn"   , AK4JetBTag_bSFdn);
+    SetValue("AK4JetBTag_lSFup"   , AK4JetBTag_lSFup);
+    SetValue("AK4JetBTag_lSFdn"   , AK4JetBTag_lSFdn);
     //SetValue("AK4JetRCN"    , AK4JetRCN);
     SetValue("AK4JetBDisc"  , AK4JetBDisc);
     SetValue("AK4JetFlav"   , AK4JetFlav);
