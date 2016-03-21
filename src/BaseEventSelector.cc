@@ -408,6 +408,7 @@ TLorentzVector BaseEventSelector::correctJetForMet(const pat::Jet & jet, edm::Ev
         double factor = 0.0; // For Nominal Case
         double theAbsJetEta = fabs(jetP4.Eta());
         
+	//https://twiki.cern.ch/twiki/bin/view/CMS/JetResolution#JER_Scaling_factors_and_Uncertai
         if ( theAbsJetEta < 0.5 ) {
             factor = .095;
             if (mbPar["JERup"]) factor = 0.113;
@@ -431,8 +432,7 @@ TLorentzVector BaseEventSelector::correctJetForMet(const pat::Jet & jet, edm::Ev
         else if ( theAbsJetEta < 1.7) {
             factor = 0.118;
             if (mbPar["JERup"]) factor = 0.132;
-            if (mbPar["JERdown"]) factor = 0.104;
-            
+            if (mbPar["JERdown"]) factor = 0.104;            
         }
         else if (theAbsJetEta < 1.9) {
             factor = 0.100;
@@ -614,7 +614,8 @@ TLorentzVector BaseEventSelector::correctJet(const pat::Jet & jet, edm::EventBas
         }
         double factor = 0.0; // For Nominal Case
         double theAbsJetEta = fabs(jet.eta());
-        
+
+	//https://twiki.cern.ch/twiki/bin/view/CMS/JetResolution#JER_Scaling_factors_and_Uncertai        
         if ( theAbsJetEta < 0.5 ) {
             factor = .095;
             if (mbPar["JERup"]) factor = 0.113;
@@ -639,8 +640,7 @@ TLorentzVector BaseEventSelector::correctJet(const pat::Jet & jet, edm::EventBas
             factor = 0.118;
             if (mbPar["JERup"]) factor = 0.132;
             if (mbPar["JERdown"]) factor = 0.104;
-            
-        }
+	}
         else if (theAbsJetEta < 1.9) {
             factor = 0.100;
             if (mbPar["JERup"]) factor = 0.133;
@@ -856,7 +856,8 @@ pat::Jet BaseEventSelector::correctJetReturnPatJet(const pat::Jet & jet, edm::Ev
         }
         double factor = 0.0; // For Nominal Case
         double theAbsJetEta = fabs(jet.eta());
-        
+
+	//https://twiki.cern.ch/twiki/bin/view/CMS/JetResolution#JER_Scaling_factors_and_Uncertai                
         if ( theAbsJetEta < 0.5 ) {
             factor = .095;
             if (mbPar["JERup"]) factor = 0.113;
@@ -880,8 +881,7 @@ pat::Jet BaseEventSelector::correctJetReturnPatJet(const pat::Jet & jet, edm::Ev
         else if ( theAbsJetEta < 1.7) {
             factor = 0.118;
             if (mbPar["JERup"]) factor = 0.132;
-            if (mbPar["JERdown"]) factor = 0.104;
-            
+            if (mbPar["JERdown"]) factor = 0.104;            
         }
         else if (theAbsJetEta < 1.9) {
             factor = 0.100;
