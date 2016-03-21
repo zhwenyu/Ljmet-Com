@@ -65,7 +65,7 @@ void BTagSFUtil::modifyBTagsWithSF(bool& isBTagged, int pdgIdPart,
     newBTag = applySF(isBTagged, Btag_SF, bctag_eff);
 
   // light quarks:
-  } else if( abs( pdgIdPart )>0 ) { //in data it is 0 (save computing time)
+  } else { // need 0's with hadronFlavor
 
     newBTag = applySF(isBTagged, Bmistag_SF, Bmistag_eff);
     

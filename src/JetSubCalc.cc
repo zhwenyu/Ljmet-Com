@@ -178,7 +178,7 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * s
 {
     // ----- Get AK4 jet objects from the selector -----
     // This is updated -- original version used all AK4 jets without selection 
-    std::vector<edm::Ptr<pat::Jet>>             const & theJets = selector->GetSelectedJets();
+    std::vector<pat::Jet>                       const & theJets = selector->GetSelectedCorrJets();
     std::vector<std::pair<TLorentzVector,bool>> const & theCorrBtagJets = selector->GetCorrJetsWithBTags();
 
     // Old version
@@ -242,32 +242,23 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * s
     
     double theVtxMass, theVtxNtracks, theVtx3DVal, theVtx3DSig, thePileupJetId;
 
-    for (std::vector<edm::Ptr<pat::Jet>>::const_iterator ijet = theJets.begin(); ijet != theJets.end(); ijet++) {
+    //    for (std::vector<edm::Ptr<pat::Jet>>::const_iterator ijet = theJets.begin(); ijet != theJets.end(); ijet++) {
+    for (std::vector<pat::Jet>::const_iterator ijet = theJets.begin(); ijet != theJets.end(); ijet++) {
       int index = (int)(ijet-theJets.begin());
 
-      TLorentzVector lvak4;
-      pat::Jet corrak4;
-      if(doNewJEC){
-	corrak4 = selector->correctJetReturnPatJet(*ijet, event, false);
-	lvak4 = selector->correctJet(*ijet, event, false); // the uncertainty shifts aren't stored in the pat::Jet!
-      }else{
-	corrak4 = *ijet;
-	lvak4.SetPtEtaPhiE(corrak4.pt(),corrak4.eta(),corrak4.phi(),corrak4.energy());
-      }
-
-      if(killHF && fabs(lvak4.Eta()) > 2.4) continue;
+      if(killHF && fabs(ijet->eta()) > 2.4) continue;
 
       theVtxNtracks  = -std::numeric_limits<double>::max();
-      theVtxNtracks  = (double)corrak4.userFloat("vtxNtracks");
+      theVtxNtracks  = (double)ijet->userFloat("vtxNtracks");
 				
       if (theVtxNtracks > 0) {
 	theVtxMass     = -std::numeric_limits<double>::max();
 	theVtx3DVal    = -std::numeric_limits<double>::max();
 	theVtx3DSig    = -std::numeric_limits<double>::max();
 	
-	theVtxMass     = (double)corrak4.userFloat("vtxMass");
-	theVtx3DVal    = (double)corrak4.userFloat("vtx3DVal");
-	theVtx3DSig    = (double)corrak4.userFloat("vtx3DSig");
+	theVtxMass     = (double)ijet->userFloat("vtxMass");
+	theVtx3DVal    = (double)ijet->userFloat("vtx3DVal");
+	theVtx3DSig    = (double)ijet->userFloat("vtx3DSig");
         
 	theJetVtxNtracks.push_back(theVtxNtracks);
 	theJetVtxMass.push_back(theVtxMass);
@@ -276,63 +267,51 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * s
       }
       
       thePileupJetId = -std::numeric_limits<double>::max();
-      thePileupJetId = (double)corrak4.userFloat("pileupJetId:fullDiscriminant");
+      thePileupJetId = (double)ijet->userFloat("pileupJetId:fullDiscriminant");
       theJetPileupJetId.push_back(thePileupJetId);
 
-      theJetPt     . push_back(lvak4.Pt());
-      theJetEta    . push_back(lvak4.Eta());
-      theJetPhi    . push_back(lvak4.Phi());
-      theJetEnergy . push_back(lvak4.Energy());
+      theJetPt     . push_back(ijet->pt());
+      theJetEta    . push_back(ijet->eta());
+      theJetPhi    . push_back(ijet->phi());
+      theJetEnergy . push_back(ijet->energy());
       
-      theJetCSV.push_back(corrak4.bDiscriminator( bDiscriminant ));
+      theJetCSV.push_back(ijet->bDiscriminator( bDiscriminant ));
       theJetBTag.push_back(theCorrBtagJets[index].second);
-      theJetFlav.push_back(abs(corrak4.partonFlavour()));
+      theJetFlav.push_back(abs(ijet->partonFlavour()));
 
-      theJetCEmEnergy.push_back(corrak4.chargedEmEnergy());
-      theJetNEmEnergy.push_back(corrak4.neutralEmEnergy());
-      theJetCEmEFrac.push_back(corrak4.chargedEmEnergyFraction());
-      theJetNEmEFrac.push_back(corrak4.neutralEmEnergyFraction());	    
+      theJetCEmEnergy.push_back(ijet->chargedEmEnergy());
+      theJetNEmEnergy.push_back(ijet->neutralEmEnergy());
+      theJetCEmEFrac.push_back(ijet->chargedEmEnergyFraction());
+      theJetNEmEFrac.push_back(ijet->neutralEmEnergyFraction());	    
 
-      theJetCHadEnergy.push_back(corrak4.chargedHadronEnergy());
-      theJetNHadEnergy.push_back(corrak4.neutralHadronEnergy());
-      theJetCHadEFrac.push_back(corrak4.chargedHadronEnergyFraction());
-      theJetNHadEFrac.push_back(corrak4.neutralHadronEnergyFraction());
+      theJetCHadEnergy.push_back(ijet->chargedHadronEnergy());
+      theJetNHadEnergy.push_back(ijet->neutralHadronEnergy());
+      theJetCHadEFrac.push_back(ijet->chargedHadronEnergyFraction());
+      theJetNHadEFrac.push_back(ijet->neutralHadronEnergyFraction());
       
-      theJetMuonEFrac.push_back(corrak4.muonEnergyFraction());
+      theJetMuonEFrac.push_back(ijet->muonEnergyFraction());
 
       theJetIndex.push_back(index);
-      theJetnDaughters.push_back((int)corrak4.numberOfDaughters());
- 
+      theJetnDaughters.push_back((int)ijet->numberOfDaughters());
+      
       //HT
-      theJetHT += corrak4.pt(); 
+      theJetHT += ijet->pt(); 
 
     }
     
     double leading_pt = -999.;
-    for (std::vector<edm::Ptr<pat::Jet>>::const_iterator ijet = theJets.begin(); ijet != theJets.end(); ijet++) { 
-      TLorentzVector lvak4;
-      if(doNewJEC) lvak4 = selector->correctJet(*ijet, event, false);
-      else{
-	pat::Jet corrak4 = *ijet;
-	lvak4.SetPtEtaPhiE(corrak4.pt(),corrak4.eta(),corrak4.phi(),corrak4.energy());
-      }
+    for (std::vector<pat::Jet>::const_iterator ijet = theJets.begin(); ijet != theJets.end(); ijet++) { 
 
-      if(killHF && fabs(lvak4.Eta()) > 2.4) continue;
-      if (lvak4.Pt() > leading_pt){leading_pt = lvak4.Pt();}
+      if(killHF && fabs(ijet->eta()) > 2.4) continue;
+      if (ijet->pt() > leading_pt){leading_pt = ijet->pt();}
     }
 
     double second_leading_pt =-999.;
-    for (std::vector<edm::Ptr<pat::Jet>>::const_iterator ijet = theJets.begin(); ijet != theJets.end(); ijet++) { 
-      TLorentzVector lvak4;
-      if(doNewJEC) lvak4 = selector->correctJet(*ijet, event, false);
-      else{
-	pat::Jet corrak4 = *ijet;
-	lvak4.SetPtEtaPhiE(corrak4.pt(),corrak4.eta(),corrak4.phi(),corrak4.energy());
-      }
+    for (std::vector<pat::Jet>::const_iterator ijet = theJets.begin(); ijet != theJets.end(); ijet++) { 
 
-      if(killHF && fabs(lvak4.Eta()) > 2.4) continue;
-      if(lvak4.Pt() > second_leading_pt && lvak4.Pt() < leading_pt){
-	second_leading_pt = lvak4.Pt();
+      if(killHF && fabs(ijet->eta()) > 2.4) continue;
+      if(ijet->pt() > second_leading_pt && ijet->pt() < leading_pt){
+	second_leading_pt = ijet->pt();
       }
     }
 
