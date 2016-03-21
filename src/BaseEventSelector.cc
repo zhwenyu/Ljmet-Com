@@ -936,7 +936,7 @@ bool BaseEventSelector::isJetTagged(const pat::Jet & jet, edm::EventBase const &
         
         double _lightSf = mBtagCond.GetMistagScaleFactor(lvjet.Et(), lvjet.Eta(), msPar["btagOP"]);
         if (shiftflag == 3 || mbPar["MistagUncertUp"] ) _lightSf += mBtagCond.GetMistagSFUncertUp(lvjet.Et(), lvjet.Eta(), msPar["btagOP"]);
-        else if (shiftflag == 4 ||  mbPar["MisagUncertDown"] ) _lightSf -= mBtagCond.GetMistagSFUncertDown(lvjet.Et(), lvjet.Eta(), msPar["btagOP"]);
+        else if (shiftflag == 4 ||  mbPar["MistagUncertDown"] ) _lightSf -= mBtagCond.GetMistagSFUncertDown(lvjet.Et(), lvjet.Eta(), msPar["btagOP"]);
         double _lightEff = mBtagCond.GetMistagRate(lvjet.Et(), lvjet.Eta(), msPar["btagOP"]);
         
         int _jetFlavor = abs(jet.hadronFlavour());
