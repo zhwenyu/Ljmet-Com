@@ -48,6 +48,7 @@ private:
   edm::InputTag slimmedJetsAK8SDColl_it;
   edm::InputTag slimmedJetsAK8CTTColl_it;
   edm::InputTag selectedPatJetsCA15Coll_it;
+  edm::InputTag genParticles_it;
   edm::InputTag httTagInfo_it;
   std::string bDiscriminant;
   std::string tagInfo;
@@ -97,6 +98,9 @@ int JetSubCalc::BeginJob()
     
     if (mPset.exists("slimmedJetsAK8Coll")) slimmedJetsAK8Coll_it = mPset.getParameter<edm::InputTag>("slimmedJetsAK8Coll");
     else slimmedJetsAK8Coll_it = edm::InputTag("slimmedJetsAK8");
+
+    if (mPset.exists("genParticles")) genParticles_it = mPset.getParameter<edm::InputTag>("genParticles");
+    else                              genParticles_it = edm::InputTag("prunedGenParticles");
 
     if (mPset.exists("bDiscriminant")) bDiscriminant = mPset.getParameter<std::string>("bDiscriminant");
     else bDiscriminant = "pfCombinedInclusiveSecondaryVertexV2BJetTags";
@@ -655,6 +659,92 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * s
     SetValue("theJetAK8SDSubjetNCSVL",theJetAK8SDSubjetNCSVL);
     SetValue("theJetAK8SDSubjetNCSVM",theJetAK8SDSubjetNCSVM);
     SetValue("theJetAK8SDSubjetNCSVMSF",theJetAK8SDSubjetNCSVMSF);
+
+
+    //////////////// TRUE HADRONIC W/Z/H/Top decays //////////////////
+    std::vector<int>    HadronicVHtID;
+    std::vector<int>    HadronicVHtStatus;
+    std::vector<int>    HadronicVHtNDaughters;
+    std::vector<double> HadronicVHtMass;
+    std::vector<double> HadronicVHtPt;
+    std::vector<double> HadronicVHtEta;
+    std::vector<double> HadronicVHtPhi;
+    std::vector<double> HadronicVHtEnergy;
+    std::vector<double> HadronicVHtDecayDR;
+
+    TLorentzVector quark1;
+    TLorentzVector quark2;
+
+    if(isMc){
+      
+      // Get the generated particle collection
+      edm::Handle<reco::GenParticleCollection> genParticles;
+      if(event.getByLabel(genParticles_it, genParticles)){
+	for(size_t i = 0; i < genParticles->size(); i++){
+	  const reco::GenParticle &p = (*genParticles).at(i);
+	  int id = p.pdgId();
+	  
+	  if(abs(id) == 23 || abs(id) == 24 || abs(id) == 25 || abs(id) == 6){
+	  
+	    size_t nDs = p.numberOfDaughters();
+	    bool hasRadiation = false;
+	    bool hasLepton = false;
+	    for(size_t j = 0; j < nDs; j++){
+	      int dauId = (p.daughter(j))->pdgId();
+	      const reco::Candidate *d = p.daughter(j);
+	      if(d->pdgId() != dauId) std::cout << "making daughter GenParticle didn't work" << std::endl;
+	    
+	      if(abs(dauId) == abs(id)) hasRadiation = true;
+	      else if(abs(dauId) > 10 && abs(dauId) < 17) hasLepton = true;	    
+
+	      if(abs(id) == 6 && abs(dauId) == 24){
+		for(size_t k = 0; k < d->numberOfDaughters(); k++){
+		  int dau2Id = (d->daughter(k))->pdgId();
+		  const reco::Candidate *d2 = d->daughter(k);
+		  if(d2->pdgId() != dau2Id) std::cout << "making daughter GenParticle didn't work" << std::endl;
+		  
+		  if(abs(dau2Id) > 10 && abs(dau2Id) < 17) hasLepton = true;
+		}
+	      }
+	    }
+	  
+	    if(hasRadiation) continue;	  
+	    if(hasLepton) continue;	  
+	    if(p.pt() < 175) continue;
+	  
+	    HadronicVHtStatus.push_back( p.status() );
+	    HadronicVHtID.push_back( p.pdgId() );
+	    HadronicVHtMass.push_back( p.mass() );
+	    HadronicVHtPt.push_back( p.pt() );
+	    HadronicVHtEta.push_back( p.eta() );
+	    HadronicVHtPhi.push_back( p.phi() );
+	    HadronicVHtEnergy.push_back( p.energy() );
+	    HadronicVHtNDaughters.push_back( nDs );
+	    
+	    quark1.SetPtEtaPhiE(0,0,0,0);
+	    quark2.SetPtEtaPhiE(0,0,0,0);
+	    
+	    const reco::Candidate *d = p.daughter(0);
+	    quark1.SetPtEtaPhiE(d->pt(),d->eta(),d->phi(),d->energy());
+	    
+	    d = p.daughter(1);
+	    quark2.SetPtEtaPhiE(d->pt(),d->eta(),d->phi(),d->energy());
+	    
+	    HadronicVHtDecayDR.push_back(quark1.DeltaR(quark2));
+	  }
+	}
+      }
+    }
+
+    SetValue("HadronicVHtStatus",HadronicVHtStatus);
+    SetValue("HadronicVHtID",HadronicVHtID);
+    SetValue("HadronicVHtMass",HadronicVHtMass);
+    SetValue("HadronicVHtPt",HadronicVHtPt);
+    SetValue("HadronicVHtEta",HadronicVHtEta);
+    SetValue("HadronicVHtPhi",HadronicVHtPhi);
+    SetValue("HadronicVHtEnergy",HadronicVHtEnergy);
+    SetValue("HadronicVHtNDaughters",HadronicVHtNDaughters);
+    SetValue("HadronicVHtDecayDR",HadronicVHtDecayDR);
 
     if(useHTT){
 
