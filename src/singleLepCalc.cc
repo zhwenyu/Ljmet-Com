@@ -785,7 +785,25 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
     //   std::vector <double> AK8JetRCN;       
     for (std::vector<pat::Jet>::const_iterator ijet = AK8Jets->begin(); ijet != AK8Jets->end(); ijet++){
 
+	// PF Loose
+	bool looseJetID = false;
+	pat::Jet rawJet = ijet->correctedJet(0);
+	if(abs(rawJet.eta()) <= 3.0){
+	  looseJetID = (rawJet.neutralHadronEnergyFraction() < 0.99 && 
+			rawJet.neutralEmEnergyFraction() < 0.99 && 
+			(rawJet.chargedMultiplicity()+rawJet.neutralMultiplicity()) > 0) && 
+	    ((abs(rawJet.eta()) <= 2.4 && 
+	      rawJet.chargedHadronEnergyFraction() > 0 && 
+	      rawJet.chargedEmEnergyFraction() < 0.99 && 
+	      rawJet.chargedMultiplicity() > 0) || 
+	     abs(rawJet.eta()) > 2.4);
+	}else{
+	  looseJetID = rawJet.neutralEmEnergyFraction() < 0.9 && rawJet.neutralMultiplicity() > 10;
+	}
+	if(!looseJetID) continue;	
+
         TLorentzVector lvak8 = selector->correctJet(*ijet, event,true);
+
         //Four std::vector
         AK8JetPt     . push_back(lvak8.Pt());
         AK8JetEta    . push_back(lvak8.Eta());

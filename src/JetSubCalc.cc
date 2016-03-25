@@ -234,9 +234,6 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * s
     std::vector<double> theJetDaughterEnergy;
     
     std::vector<int> theJetDaughterMotherIndex;
-    
-    std::vector<int> theJetIsME;
-
     std::vector<int> theJetCSVLSubJets;
     std::vector<int> theJetCSVMSubJets;
     std::vector<int> theJetCSVTSubJets;
@@ -246,7 +243,6 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * s
     
     double theVtxMass, theVtxNtracks, theVtx3DVal, theVtx3DSig, thePileupJetId;
 
-    //    for (std::vector<edm::Ptr<pat::Jet>>::const_iterator ijet = theJets.begin(); ijet != theJets.end(); ijet++) {
     for (std::vector<pat::Jet>::const_iterator ijet = theJets.begin(); ijet != theJets.end(); ijet++) {
       int index = (int)(ijet-theJets.begin());
 
@@ -291,8 +287,7 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * s
       theJetCHadEnergy.push_back(ijet->chargedHadronEnergy());
       theJetNHadEnergy.push_back(ijet->neutralHadronEnergy());
       theJetCHadEFrac.push_back(ijet->chargedHadronEnergyFraction());
-      theJetNHadEFrac.push_back(ijet->neutralHadronEnergyFraction());
-      
+      theJetNHadEFrac.push_back(ijet->neutralHadronEnergyFraction());      
       theJetMuonEFrac.push_back(ijet->muonEnergyFraction());
 
       theJetIndex.push_back(index);
@@ -420,22 +415,35 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * s
     for (std::vector<pat::Jet>::const_iterator ijet = theAK8Jets->begin(); ijet != theAK8Jets->end(); ijet++) {
       int index = (int)(ijet-theAK8Jets->begin());
 
+      pat::Jet rawJet = ijet->correctedJet(0);
+      bool looseJetID = false;
+      if(abs(rawJet.eta()) <= 3.0){
+	looseJetID = (rawJet.neutralHadronEnergyFraction() < 0.99 && 
+		      rawJet.neutralEmEnergyFraction() < 0.99 && 
+		      (rawJet.chargedMultiplicity()+rawJet.neutralMultiplicity()) > 0) && 
+	  ((abs(rawJet.eta()) <= 2.4 && 
+	    rawJet.chargedHadronEnergyFraction() > 0 && 
+	    rawJet.chargedEmEnergyFraction() < 0.99 && 
+	    rawJet.chargedMultiplicity() > 0) || 
+	   abs(rawJet.eta()) > 2.4);
+      }else{
+	looseJetID = rawJet.neutralEmEnergyFraction() < 0.9 && rawJet.neutralMultiplicity() > 10;
+      }
+      if(!looseJetID) continue;	
+
       pat::Jet corrak8;
-      TLorentzVector lvak8;
       if(doNewJEC){
 	corrak8 = selector->correctJetReturnPatJet(*ijet, event, true);
-	lvak8 = selector->correctJet(*ijet, event, true);
       }else{
 	corrak8 = *ijet;
-	lvak8.SetPtEtaPhiE(corrak8.pt(),corrak8.eta(),corrak8.phi(),corrak8.energy());
       }
 
-      if(killHF && fabs(lvak8.Eta()) > 2.4) continue;
+      if(killHF && fabs(corrak8.eta()) > 2.4) continue;
 
-      theJetAK8Pt    .push_back(lvak8.Pt());
-      theJetAK8Eta   .push_back(lvak8.Eta());
-      theJetAK8Phi   .push_back(lvak8.Phi());
-      theJetAK8Energy.push_back(lvak8.Energy());
+      theJetAK8Pt    .push_back(corrak8.pt());
+      theJetAK8Eta   .push_back(corrak8.eta());
+      theJetAK8Phi   .push_back(corrak8.phi());
+      theJetAK8Energy.push_back(corrak8.energy());
       theJetAK8Mass  .push_back(corrak8.mass());
 
       thePrunedMass   = -std::numeric_limits<double>::max();
@@ -460,8 +468,8 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * s
 	double unc = 1.0;
         if (isMc && (JECup || JECdn)){
 	  // uncertainty in BaseEventSelector takes the corrected pT
-	  jecUnc->setJetEta(lvak8.Eta());
-	  jecUnc->setJetPt(lvak8.Pt());
+	  jecUnc->setJetEta(corrak8.eta());
+	  jecUnc->setJetPt(corrak8.pt());
 	  
 	  if (JECup) { 
 	    try{unc = jecUnc->getUncertainty(true);}
@@ -573,13 +581,10 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * s
       for ( auto const & it : sdSubjets ) {
 
 	pat::Jet corrsubjet;
-	TLorentzVector lvsubjet;
 	if(doNewJEC){
 	  corrsubjet = selector->correctJetReturnPatJet(*it, event, false);
-	  lvsubjet = selector->correctJet(*it, event, false);
 	}else{
 	  corrsubjet = *it;
-	  lvsubjet.SetPtEtaPhiE(corrsubjet.pt(),corrsubjet.eta(),corrsubjet.phi(),corrsubjet.energy());
 	}
 
 	SDsubjetPt        = -std::numeric_limits<double>::max();
@@ -589,13 +594,13 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * s
 	SDsubjetBdisc     = -std::numeric_limits<double>::max();
 	SDdeltaRsubjetJet = std::numeric_limits<double>::max();
       
-	SDsubjetPt        = lvsubjet.Pt();
-	SDsubjetEta       = lvsubjet.Eta();
-	SDsubjetPhi       = lvsubjet.Phi();
+	SDsubjetPt        = corrsubjet.pt();
+	SDsubjetEta       = corrsubjet.eta();
+	SDsubjetPhi       = corrsubjet.phi();
 	SDsubjetMass      = corrsubjet.mass();
 	SDsubjetBdisc     = corrsubjet.bDiscriminator(bDiscriminant); 
 	SDsubjetBTag      = selector->isJetTagged(corrsubjet, event);
-	SDdeltaRsubjetJet = deltaR(lvak8.Eta(), lvak8.Phi(), SDsubjetEta, SDsubjetPhi);
+	SDdeltaRsubjetJet = deltaR(corrak8.eta(), corrak8.phi(), SDsubjetEta, SDsubjetPhi);
 
 	if(SDsubjetBdisc > 0.605) nSDSubsCSVL++;
 	if(SDsubjetBdisc > 0.890) nSDSubsCSVM++;
