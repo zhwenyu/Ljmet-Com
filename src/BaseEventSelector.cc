@@ -4,6 +4,7 @@
 #include "JetMETCorrections/Objects/interface/JetCorrector.h"
 #include "CondFormats/JetMETObjects/interface/JetCorrectorParameters.h"
 #include "CondFormats/JetMETObjects/interface/FactorizedJetCorrector.h"
+#include "DataFormats/Candidate/interface/Candidate.h"
 
 using namespace std;
 
@@ -41,6 +42,19 @@ void BaseEventSelector::BeginJob(std::map<std::string, edm::ParameterSet const >
         else mbPar["BTagUncertUp"] = false;
         if (par[_key].exists("BTagUncertDown")) mbPar["BTagUncertDown"] = par[_key].getParameter<bool> ("BTagUncertDown");
         else mbPar["BTagUncertDown"] = false;
+
+        if (par[_key].exists("MistagUncertUp")) mbPar["MistagUncertUp"] = par[_key].getParameter<bool> ("MistagUncertUp");
+        else{
+	  // default to the correlated version, uncertainty will be too large (better than too small)
+	  if (par[_key].exists("BTagUncertUp")) mbPar["MistagUncertUp"] = par[_key].getParameter<bool> ("BTagUncertUp");
+	  else mbPar["MistagUncertUp"] = false;
+	}
+        if (par[_key].exists("MistagUncertDown")) mbPar["MistagUncertDown"] = par[_key].getParameter<bool> ("MistagUncertDown");
+        else{
+	  // default to the correlated version, uncertainty will be too large (better than too small)
+	  if (par[_key].exists("BTagUncertDown")) mbPar["MistagUncertDown"] = par[_key].getParameter<bool> ("BTagUncertDown");
+	  else mbPar["MistagUncertDown"] = false;
+	}
         
         if (par[_key].exists("MCL1JetPar")) msPar["MCL1JetPar"] = par[_key].getParameter<std::string> ("MCL1JetPar");
         else{
@@ -394,41 +408,71 @@ TLorentzVector BaseEventSelector::correctJetForMet(const pat::Jet & jet, edm::Ev
         double factor = 0.0; // For Nominal Case
         double theAbsJetEta = fabs(jetP4.Eta());
         
-        if ( theAbsJetEta < 0.8 ) {
-            factor = .061;
-            if (mbPar["JERup"]) factor = 0.084;
-            if (mbPar["JERdown"]) factor = 0.038;
+	//https://twiki.cern.ch/twiki/bin/view/CMS/JetResolution#JER_Scaling_factors_and_Uncertai
+        if ( theAbsJetEta < 0.5 ) {
+            factor = .095;
+            if (mbPar["JERup"]) factor = 0.113;
+            if (mbPar["JERdown"]) factor = 0.077;
+        }
+        else if ( theAbsJetEta < 0.8) {
+            factor = 0.120;
+            if (mbPar["JERup"]) factor = 0.148;
+            if (mbPar["JERdown"]) factor = 0.092;
+        }
+        else if (theAbsJetEta < 1.1) {
+            factor = 0.097;
+            if (mbPar["JERup"]) factor = 0.114;
+            if (mbPar["JERdown"]) factor = 0.080;
         }
         else if ( theAbsJetEta < 1.3) {
-            factor = 0.088;
-            if (mbPar["JERup"]) factor = 0.059;
-            if (mbPar["JERdown"]) factor = 0.117;
-        }
-        else if ( theAbsJetEta < 1.9) {
-            factor = 0.106;
+            factor = 0.103;
             if (mbPar["JERup"]) factor = 0.136;
-            if (mbPar["JERdown"]) factor = 0.076;
+            if (mbPar["JERdown"]) factor = 0.070;
         }
-        else if ( theAbsJetEta < 2.5) {
-            factor = 0.126;
-            if (mbPar["JERup"]) factor = 0.220;
-            if (mbPar["JERdown"]) factor = 0.032;
-            
+        else if ( theAbsJetEta < 1.7) {
+            factor = 0.118;
+            if (mbPar["JERup"]) factor = 0.132;
+            if (mbPar["JERdown"]) factor = 0.104;            
+        }
+        else if (theAbsJetEta < 1.9) {
+            factor = 0.100;
+            if (mbPar["JERup"]) factor = 0.133;
+            if (mbPar["JERdown"]) factor = 0.067;
+        }
+        else if (theAbsJetEta < 2.1) {
+            factor = 0.162;
+            if (mbPar["JERup"]) factor = 0.206;
+            if (mbPar["JERdown"]) factor = 0.118;
+        }
+        else if (theAbsJetEta < 2.3) {
+            factor = 0.160;
+            if (mbPar["JERup"]) factor = 0.208;
+            if (mbPar["JERdown"]) factor = 0.112;
+        }
+        else if (theAbsJetEta < 2.5) {
+            factor = 0.161;
+            if (mbPar["JERup"]) factor = 0.221;
+            if (mbPar["JERdown"]) factor = 0.101;
+        }
+        else if (theAbsJetEta < 2.8) {
+            factor = 0.209;
+            if (mbPar["JERup"]) factor = 0.268;
+            if (mbPar["JERdown"]) factor = 0.150;
         }
         else if (theAbsJetEta < 3.0) {
-            factor = 0.343;
-            if (mbPar["JERup"]) factor = 0.466;
-            if (mbPar["JERdown"]) factor = 0.220;
+            factor = 0.564;
+            if (mbPar["JERup"]) factor = 0.885;
+            if (mbPar["JERdown"]) factor = 0.243;
         }
         else if (theAbsJetEta < 3.2) {
-            factor = 0.303;
-            if (mbPar["JERup"]) factor = 0.414;
-            if (mbPar["JERdown"]) factor = 0.192;
+            factor = 0.384;
+            if (mbPar["JERup"]) factor = 0.417;
+            if (mbPar["JERdown"]) factor = 0.351;
         }
         else if (theAbsJetEta < 5.0) {
-            factor = 0.320;
-            if (mbPar["JERup"]) factor = 0.606;
-            if (mbPar["JERdown"]) factor = 0.034;
+            factor = 0.216;
+            if (mbPar["JERup"]) factor = 0.266;
+            if (mbPar["JERdown"]) factor = 0.166;
         }
 
         const reco::GenJet * genJet = jet.genJet();
@@ -570,42 +614,72 @@ TLorentzVector BaseEventSelector::correctJet(const pat::Jet & jet, edm::EventBas
         }
         double factor = 0.0; // For Nominal Case
         double theAbsJetEta = fabs(jet.eta());
-        
-        if ( theAbsJetEta < 0.8 ) {
-            factor = .061;
-            if (mbPar["JERup"]) factor = 0.084;
-            if (mbPar["JERdown"]) factor = 0.038;
+
+	//https://twiki.cern.ch/twiki/bin/view/CMS/JetResolution#JER_Scaling_factors_and_Uncertai        
+        if ( theAbsJetEta < 0.5 ) {
+            factor = .095;
+            if (mbPar["JERup"]) factor = 0.113;
+            if (mbPar["JERdown"]) factor = 0.077;
+        }
+        else if ( theAbsJetEta < 0.8) {
+            factor = 0.120;
+            if (mbPar["JERup"]) factor = 0.148;
+            if (mbPar["JERdown"]) factor = 0.092;
+        }
+        else if (theAbsJetEta < 1.1) {
+            factor = 0.097;
+            if (mbPar["JERup"]) factor = 0.114;
+            if (mbPar["JERdown"]) factor = 0.080;
         }
         else if ( theAbsJetEta < 1.3) {
-            factor = 0.088;
-            if (mbPar["JERup"]) factor = 0.059;
-            if (mbPar["JERdown"]) factor = 0.117;
-        }
-        else if ( theAbsJetEta < 1.9) {
-            factor = 0.106;
+            factor = 0.103;
             if (mbPar["JERup"]) factor = 0.136;
-            if (mbPar["JERdown"]) factor = 0.076;
+            if (mbPar["JERdown"]) factor = 0.070;
         }
-        else if ( theAbsJetEta < 2.5) {
-            factor = 0.126;
-            if (mbPar["JERup"]) factor = 0.220;
-            if (mbPar["JERdown"]) factor = 0.032;
-            
+        else if ( theAbsJetEta < 1.7) {
+            factor = 0.118;
+            if (mbPar["JERup"]) factor = 0.132;
+            if (mbPar["JERdown"]) factor = 0.104;
+	}
+        else if (theAbsJetEta < 1.9) {
+            factor = 0.100;
+            if (mbPar["JERup"]) factor = 0.133;
+            if (mbPar["JERdown"]) factor = 0.067;
+        }
+        else if (theAbsJetEta < 2.1) {
+            factor = 0.162;
+            if (mbPar["JERup"]) factor = 0.206;
+            if (mbPar["JERdown"]) factor = 0.118;
+        }
+        else if (theAbsJetEta < 2.3) {
+            factor = 0.160;
+            if (mbPar["JERup"]) factor = 0.208;
+            if (mbPar["JERdown"]) factor = 0.112;
+        }
+        else if (theAbsJetEta < 2.5) {
+            factor = 0.161;
+            if (mbPar["JERup"]) factor = 0.221;
+            if (mbPar["JERdown"]) factor = 0.101;
+        }
+        else if (theAbsJetEta < 2.8) {
+            factor = 0.209;
+            if (mbPar["JERup"]) factor = 0.268;
+            if (mbPar["JERdown"]) factor = 0.150;
         }
         else if (theAbsJetEta < 3.0) {
-            factor = 0.343;
-            if (mbPar["JERup"]) factor = 0.466;
-            if (mbPar["JERdown"]) factor = 0.220;
+            factor = 0.564;
+            if (mbPar["JERup"]) factor = 0.885;
+            if (mbPar["JERdown"]) factor = 0.243;
         }
         else if (theAbsJetEta < 3.2) {
-            factor = 0.303;
-            if (mbPar["JERup"]) factor = 0.414;
-            if (mbPar["JERdown"]) factor = 0.192;
+            factor = 0.384;
+            if (mbPar["JERup"]) factor = 0.417;
+            if (mbPar["JERdown"]) factor = 0.351;
         }
         else if (theAbsJetEta < 5.0) {
-            factor = 0.320;
-            if (mbPar["JERup"]) factor = 0.606;
-            if (mbPar["JERdown"]) factor = 0.034;
+            factor = 0.216;
+            if (mbPar["JERup"]) factor = 0.266;
+            if (mbPar["JERdown"]) factor = 0.166;
         }
 
         const reco::GenJet * genJet = jet.genJet();
@@ -782,42 +856,72 @@ pat::Jet BaseEventSelector::correctJetReturnPatJet(const pat::Jet & jet, edm::Ev
         }
         double factor = 0.0; // For Nominal Case
         double theAbsJetEta = fabs(jet.eta());
-        
-        if ( theAbsJetEta < 0.8 ) {
-            factor = .061;
-            if (mbPar["JERup"]) factor = 0.084;
-            if (mbPar["JERdown"]) factor = 0.038;
+
+	//https://twiki.cern.ch/twiki/bin/view/CMS/JetResolution#JER_Scaling_factors_and_Uncertai                
+        if ( theAbsJetEta < 0.5 ) {
+            factor = .095;
+            if (mbPar["JERup"]) factor = 0.113;
+            if (mbPar["JERdown"]) factor = 0.077;
+        }
+        else if ( theAbsJetEta < 0.8) {
+            factor = 0.120;
+            if (mbPar["JERup"]) factor = 0.148;
+            if (mbPar["JERdown"]) factor = 0.092;
+        }
+        else if (theAbsJetEta < 1.1) {
+            factor = 0.097;
+            if (mbPar["JERup"]) factor = 0.114;
+            if (mbPar["JERdown"]) factor = 0.080;
         }
         else if ( theAbsJetEta < 1.3) {
-            factor = 0.088;
-            if (mbPar["JERup"]) factor = 0.059;
-            if (mbPar["JERdown"]) factor = 0.117;
-        }
-        else if ( theAbsJetEta < 1.9) {
-            factor = 0.106;
+            factor = 0.103;
             if (mbPar["JERup"]) factor = 0.136;
-            if (mbPar["JERdown"]) factor = 0.076;
+            if (mbPar["JERdown"]) factor = 0.070;
         }
-        else if ( theAbsJetEta < 2.5) {
-            factor = 0.126;
-            if (mbPar["JERup"]) factor = 0.220;
-            if (mbPar["JERdown"]) factor = 0.032;
-            
+        else if ( theAbsJetEta < 1.7) {
+            factor = 0.118;
+            if (mbPar["JERup"]) factor = 0.132;
+            if (mbPar["JERdown"]) factor = 0.104;            
+        }
+        else if (theAbsJetEta < 1.9) {
+            factor = 0.100;
+            if (mbPar["JERup"]) factor = 0.133;
+            if (mbPar["JERdown"]) factor = 0.067;
+        }
+        else if (theAbsJetEta < 2.1) {
+            factor = 0.162;
+            if (mbPar["JERup"]) factor = 0.206;
+            if (mbPar["JERdown"]) factor = 0.118;
+        }
+        else if (theAbsJetEta < 2.3) {
+            factor = 0.160;
+            if (mbPar["JERup"]) factor = 0.208;
+            if (mbPar["JERdown"]) factor = 0.112;
+        }
+        else if (theAbsJetEta < 2.5) {
+            factor = 0.161;
+            if (mbPar["JERup"]) factor = 0.221;
+            if (mbPar["JERdown"]) factor = 0.101;
+        }
+        else if (theAbsJetEta < 2.8) {
+            factor = 0.209;
+            if (mbPar["JERup"]) factor = 0.268;
+            if (mbPar["JERdown"]) factor = 0.150;
         }
         else if (theAbsJetEta < 3.0) {
-            factor = 0.343;
-            if (mbPar["JERup"]) factor = 0.466;
-            if (mbPar["JERdown"]) factor = 0.220;
+            factor = 0.564;
+            if (mbPar["JERup"]) factor = 0.885;
+            if (mbPar["JERdown"]) factor = 0.243;
         }
         else if (theAbsJetEta < 3.2) {
-            factor = 0.303;
-            if (mbPar["JERup"]) factor = 0.414;
-            if (mbPar["JERdown"]) factor = 0.192;
+            factor = 0.384;
+            if (mbPar["JERup"]) factor = 0.417;
+            if (mbPar["JERdown"]) factor = 0.351;
         }
         else if (theAbsJetEta < 5.0) {
-            factor = 0.320;
-            if (mbPar["JERup"]) factor = 0.606;
-            if (mbPar["JERdown"]) factor = 0.034;
+            factor = 0.216;
+            if (mbPar["JERup"]) factor = 0.266;
+            if (mbPar["JERdown"]) factor = 0.166;
         }
 
         const reco::GenJet * genJet = jet.genJet();
@@ -906,10 +1010,12 @@ pat::Jet BaseEventSelector::correctJetReturnPatJet(const pat::Jet & jet, edm::Ev
         }
     }
 
+    reco::Candidate::PolarLorentzVector jetP4(correctedJet.pt()*unc*ptscale, correctedJet.eta(),correctedJet.phi(), correctedJet.mass());
+    correctedJet.setP4(jetP4);
     return correctedJet;
 }
 
-bool BaseEventSelector::isJetTagged(const pat::Jet & jet, edm::EventBase const & event, bool applySF)
+bool BaseEventSelector::isJetTagged(const pat::Jet & jet, edm::EventBase const & event, bool applySF, int shiftflag)
 {
     bool _isTagged = false;
     
@@ -919,14 +1025,14 @@ bool BaseEventSelector::isJetTagged(const pat::Jet & jet, edm::EventBase const &
         TLorentzVector lvjet = correctJet(jet, event);
         
         double _lightSf = mBtagCond.GetMistagScaleFactor(lvjet.Et(), lvjet.Eta(), msPar["btagOP"]);
-        if ( mbPar["BTagUncertUp"] ) _lightSf += mBtagCond.GetMistagSFUncertUp(lvjet.Et(), lvjet.Eta(), msPar["btagOP"]);
-        else if ( mbPar["BTagUncertDown"] ) _lightSf -= mBtagCond.GetMistagSFUncertDown(lvjet.Et(), lvjet.Eta(), msPar["btagOP"]);
+        if (shiftflag == 3 || mbPar["MistagUncertUp"] ) _lightSf += mBtagCond.GetMistagSFUncertUp(lvjet.Et(), lvjet.Eta(), msPar["btagOP"]);
+        else if (shiftflag == 4 ||  mbPar["MistagUncertDown"] ) _lightSf -= mBtagCond.GetMistagSFUncertDown(lvjet.Et(), lvjet.Eta(), msPar["btagOP"]);
         double _lightEff = mBtagCond.GetMistagRate(lvjet.Et(), lvjet.Eta(), msPar["btagOP"]);
         
         int _jetFlavor = abs(jet.hadronFlavour());
         double _btagSf = mBtagCond.GetBtagScaleFactor(lvjet.Et(), lvjet.Eta(), msPar["btagOP"]);
-        if ( mbPar["BTagUncertUp"] ) _btagSf += (mBtagCond.GetBtagSFUncertUp(lvjet.Et(), lvjet.Eta(), msPar["btagOP"])*(_jetFlavor==4?2:1));
-        else if ( mbPar["BTagUncertDown"] ) _btagSf -= (mBtagCond.GetBtagSFUncertDown(lvjet.Et(), lvjet.Eta(), msPar["btagOP"])*(_jetFlavor==4?2:1));
+        if (shiftflag == 1 ||  mbPar["BTagUncertUp"] ) _btagSf += (mBtagCond.GetBtagSFUncertUp(lvjet.Et(), lvjet.Eta(), msPar["btagOP"])*(_jetFlavor==4?2:1));
+        else if (shiftflag == 2 ||  mbPar["BTagUncertDown"] ) _btagSf -= (mBtagCond.GetBtagSFUncertDown(lvjet.Et(), lvjet.Eta(), msPar["btagOP"])*(_jetFlavor==4?2:1));
         double _btagEff = mBtagCond.GetBtagEfficiency(lvjet.Et(), lvjet.Eta(), msPar["btagOP"]);
         
         mBtagSfUtil.SetSeed(abs(static_cast<int>(sin(jet.phi())*1e5)));

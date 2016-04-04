@@ -166,10 +166,10 @@ double getPFMiniIsolation_EffectiveArea(edm::Handle<pat::PackedCandidateCollecti
   
   if(em){
     if( TMath::Abs( ptcl->eta() ) < 0.8 ) CorrectedTerm = rho * Aeff_Fall15Anal[1][ 0 ]*(riso2/0.09);
-    else if( TMath::Abs( ptcl->eta() ) > 0.8 && TMath::Abs( ptcl->eta() ) < 1.3  )   CorrectedTerm = rho * Aeff[em][ 1 ]*(riso2/0.09);
-    else if( TMath::Abs( ptcl->eta() ) > 1.3 && TMath::Abs( ptcl->eta() ) < 2.0  )   CorrectedTerm = rho * Aeff[em][ 2 ]*(riso2/0.09);
-    else if( TMath::Abs( ptcl->eta() ) > 2.0 && TMath::Abs( ptcl->eta() ) < 2.2  )   CorrectedTerm = rho * Aeff[em][ 3 ]*(riso2/0.09);
-    else if( TMath::Abs( ptcl->eta() ) > 2.2 && TMath::Abs( ptcl->eta() ) < 2.5  )   CorrectedTerm = rho * Aeff[em][ 4 ]*(riso2/0.09);
+    else if( TMath::Abs( ptcl->eta() ) > 0.8 && TMath::Abs( ptcl->eta() ) < 1.3  )   CorrectedTerm = rho * Aeff_Fall15Anal[1][ 1 ]*(riso2/0.09);
+    else if( TMath::Abs( ptcl->eta() ) > 1.3 && TMath::Abs( ptcl->eta() ) < 2.0  )   CorrectedTerm = rho * Aeff_Fall15Anal[1][ 2 ]*(riso2/0.09);
+    else if( TMath::Abs( ptcl->eta() ) > 2.0 && TMath::Abs( ptcl->eta() ) < 2.2  )   CorrectedTerm = rho * Aeff_Fall15Anal[1][ 3 ]*(riso2/0.09);
+    else if( TMath::Abs( ptcl->eta() ) > 2.2 && TMath::Abs( ptcl->eta() ) < 2.5  )   CorrectedTerm = rho * Aeff_Fall15Anal[1][ 4 ]*(riso2/0.09);
   }
   else{
     if( TMath::Abs( dynamic_cast<const pat::Electron *>(ptcl)->superCluster()->eta() ) < 1.0 ) CorrectedTerm = rho * Aeff_Fall15Anal[0][ 0 ]*(riso2/0.09);
