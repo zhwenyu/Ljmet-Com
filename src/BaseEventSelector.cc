@@ -1058,8 +1058,6 @@ bool BaseEventSelector::isJetTagged(const pat::Jet & jet, edm::EventBase const &
 
 TLorentzVector BaseEventSelector::correctMet(const pat::MET & met, edm::EventBase const & event)
 {
-    //double correctedMET_px = met.px();
-    //double correctedMET_py = met.py();
     double correctedMET_px = met.uncorPx();
     double correctedMET_py = met.uncorPy();
     //std::cout<<"Original MET = "<<met.pt()<<", phi = "<<met.phi()<<std::endl;
@@ -1089,8 +1087,8 @@ TLorentzVector BaseEventSelector::correctMet(const pat::MET & met, edm::EventBas
 TLorentzVector BaseEventSelector::correctMet(const pat::MET & met, edm::EventBase const & event, std::vector<pat::Jet> jets)
 {
     
-    double correctedMET_px = met.px();
-    double correctedMET_py = met.py();
+    double correctedMET_px = met.uncorPx();
+    double correctedMET_py = met.uncorPy();
     if ( mbPar["doNewJEC"] ) {
         for (std::vector<pat::Jet>::const_iterator ijet = jets.begin();
              ijet != jets.end(); ++ijet) {
