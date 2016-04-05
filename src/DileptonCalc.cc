@@ -1099,105 +1099,109 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
     
     SetValue("CATopDaughterMotherIndex"      , CATopDaughterMotherIndex);
     
-    //Get CA8 jets for W's
-    edm::InputTag CAWJetColl = edm::InputTag("slimmedJetsAK8");
-    edm::Handle<std::vector<pat::Jet> > CAWJets;
-    event.getByLabel(CAWJetColl, CAWJets);
+    //Get AK8 jets for W's
+    edm::InputTag AK8JetColl = edm::InputTag("slimmedJetsAK8");
+    edm::Handle<std::vector<pat::Jet> > AK8Jets;
+    event.getByLabel(AK8JetColl, AK8Jets);
     
     //Four std::vector
-    std::vector <double> CAWJetPt;
-    std::vector <double> CAWJetEta;
-    std::vector <double> CAWJetPhi;
-    std::vector <double> CAWJetEnergy;
+    std::vector <double> AK8JetPt;
+    std::vector <double> AK8JetEta;
+    std::vector <double> AK8JetPhi;
+    std::vector <double> AK8JetEnergy;
     
-    std::vector <double> CAWJetCSV;
-    //   std::vector <double> CAWJetRCN;
+    std::vector <double> AK8JetCSV;
+    //   std::vector <double> AK8JetRCN;
     
     //Identity
-    std::vector <int> CAWJetIndex;
-    std::vector <int> CAWJetnDaughters;
+    std::vector <int> AK8JetIndex;
+    std::vector <int> AK8JetnDaughters;
     
     //Mass
-    std::vector <double> CAWJetTrimmedMass;
-    std::vector <double> CAWJetPrunedMass;
-    std::vector <double> CAWJetFilteredMass;
+    std::vector <double> AK8JetTrimmedMass;
+    std::vector <double> AK8JetPrunedMass;
+    std::vector <double> AK8JetFilteredMass;
+    std::vector <double> AK8JetSoftDropMass;
     
     //nsubjettiness
-    std::vector<double> CAWJetTau1;
-    std::vector<double> CAWJetTau2;
-    std::vector<double> CAWJetTau3;
+    std::vector<double> AK8JetTau1;
+    std::vector<double> AK8JetTau2;
+    std::vector<double> AK8JetTau3;
 
 
     //Daughter four std::vector and index -- THESE ARE CURRENTLY IDENTICAL TO THOSE FOR TOP DAUGHTERS BECAUSE THE JET IS ALWAYS THE SLIMMED AK8JET
-    std::vector <double> CAWDaughterPt;
-    std::vector <double> CAWDaughterEta;
-    std::vector <double> CAWDaughterPhi;
-    std::vector <double> CAWDaughterEnergy;
+    std::vector <double> AK8DaughterPt;
+    std::vector <double> AK8DaughterEta;
+    std::vector <double> AK8DaughterPhi;
+    std::vector <double> AK8DaughterEnergy;
     
-    std::vector <int> CAWDaughterMotherIndex;
+    std::vector <int> AK8DaughterMotherIndex;
     
-    for (std::vector<pat::Jet>::const_iterator ijet = CAWJets->begin(); ijet != CAWJets->end(); ijet++){
+    for (std::vector<pat::Jet>::const_iterator ijet = AK8Jets->begin(); ijet != AK8Jets->end(); ijet++){
         
-        int index = (int)(ijet-CAWJets->begin());
+        int index = (int)(ijet-AK8Jets->begin());
         
         //Four std::vector
-	CAWJetPt     . push_back(ijet->pt());
-        CAWJetEta    . push_back(ijet->eta());
-        CAWJetPhi    . push_back(ijet->phi());
-        CAWJetEnergy . push_back(ijet->energy());
+	AK8JetPt     . push_back(ijet->pt());
+        AK8JetEta    . push_back(ijet->eta());
+        AK8JetPhi    . push_back(ijet->phi());
+        AK8JetEnergy . push_back(ijet->energy());
         
-        CAWJetCSV    . push_back(ijet->bDiscriminator( "combinedSecondaryVertexBJetTags"));
-        //     CAWJetRCN    . push_back((ijet->chargedEmEnergy()+ijet->chargedHadronEnergy()) / (ijet->neutralEmEnergy()+ijet->neutralHadronEnergy()));
+        AK8JetCSV    . push_back(ijet->bDiscriminator( "combinedSecondaryVertexBJetTags"));
+        //     AK8JetRCN    . push_back((ijet->chargedEmEnergy()+ijet->chargedHadronEnergy()) / (ijet->neutralEmEnergy()+ijet->neutralHadronEnergy()));
         
         //Identity
-        CAWJetIndex      . push_back(index);
-        CAWJetnDaughters . push_back((int)ijet->numberOfDaughters());
+        AK8JetIndex      . push_back(index);
+        AK8JetnDaughters . push_back((int)ijet->numberOfDaughters());
 	//cout<<"about to set w masses"<<endl;
         //Mass
-        CAWJetTrimmedMass . push_back(ijet->userFloat("ak8PFJetsCHSTrimmedLinks"));
-        CAWJetPrunedMass . push_back(ijet->userFloat("ak8PFJetsCHSPrunedLinks"));
-        CAWJetFilteredMass . push_back(ijet->userFloat("ak8PFJetsCHSFilteredLinks"));
+        AK8JetTrimmedMass . push_back(ijet->userFloat("ak8PFJetsCHSTrimmedMass"));
+        AK8JetPrunedMass . push_back(ijet->userFloat("ak8PFJetsCHSPrunedMass"));
+        AK8JetFilteredMass . push_back(ijet->userFloat("ak8PFJetsCHSFilteredMass"));
+        AK8JetSoftDropMass . push_back(ijet->userFloat("ak8PFJetsCHSSoftDropMass"));
 	//cout<<"set w masses"<<endl;
 	//nsubjettiness
-	CAWJetTau1.push_back( ijet->userFloat("NjettinessAK8:tau1"));
-	CAWJetTau2.push_back( ijet->userFloat("NjettinessAK8:tau2"));
-	CAWJetTau3.push_back( ijet->userFloat("NjettinessAK8:tau3"));
+	AK8JetTau1.push_back( ijet->userFloat("NjettinessAK8:tau1"));
+	AK8JetTau2.push_back( ijet->userFloat("NjettinessAK8:tau2"));
+	AK8JetTau3.push_back( ijet->userFloat("NjettinessAK8:tau3"));
 	//cout<<"set n subjettiness"<<endl;
         for (size_t ui = 0; ui < ijet->numberOfDaughters(); ui++){
-            CAWDaughterPt     . push_back(ijet->daughter(ui)->pt());
-            CAWDaughterEta    . push_back(ijet->daughter(ui)->eta());
-            CAWDaughterPhi    . push_back(ijet->daughter(ui)->phi());
-            CAWDaughterEnergy . push_back(ijet->daughter(ui)->energy());
+            AK8DaughterPt     . push_back(ijet->daughter(ui)->pt());
+            AK8DaughterEta    . push_back(ijet->daughter(ui)->eta());
+            AK8DaughterPhi    . push_back(ijet->daughter(ui)->phi());
+            AK8DaughterEnergy . push_back(ijet->daughter(ui)->energy());
             
-            CAWDaughterMotherIndex . push_back(index);
+            AK8DaughterMotherIndex . push_back(index);
         }
     }
     
     //Four std::vector
-    SetValue("CAWJetPt"     , CAWJetPt);
-    SetValue("CAWJetEta"    , CAWJetEta);
-    SetValue("CAWJetPhi"    , CAWJetPhi);
-    SetValue("CAWJetEnergy" , CAWJetEnergy);
+    SetValue("AK8JetPt"     , AK8JetPt);
+    SetValue("AK8JetEta"    , AK8JetEta);
+    SetValue("AK8JetPhi"    , AK8JetPhi);
+    SetValue("AK8JetEnergy" , AK8JetEnergy);
     
-    SetValue("CAWJetCSV"    , CAWJetCSV);
-    //   SetValue("CAWJetRCN"    , CAWJetRCN);
+    SetValue("AK8JetCSV"    , AK8JetCSV);
+    //   SetValue("AK8JetRCN"    , AK8JetRCN);
     
     //Identity
-    SetValue("CAWJetIndex"      , CAWJetIndex);
-    SetValue("CAWJetnDaughters" , CAWJetnDaughters);
+    SetValue("AK8JetIndex"      , AK8JetIndex);
+    SetValue("AK8JetnDaughters" , AK8JetnDaughters);
     
     //Mass
-    SetValue("CAWJetTrimmedMass"     , CAWJetTrimmedMass);
-    SetValue("CAWJetPrunedMass"     , CAWJetPrunedMass);
-    SetValue("CAWJetFilteredMass"     , CAWJetFilteredMass);
+    SetValue("AK8JetTrimmedMass"     , AK8JetTrimmedMass);
+    SetValue("AK8JetPrunedMass"     , AK8JetPrunedMass);
+    SetValue("AK8JetFilteredMass"     , AK8JetFilteredMass);
+    SetValue("AK8JetSoftDropMass"     , AK8JetSoftDropMass);
+
     
     //Daughter four std::vector and index
-    SetValue("CAWDaughterPt"     , CAWDaughterPt);
-    SetValue("CAWDaughterEta"    , CAWDaughterEta);
-    SetValue("CAWDaughterPhi"    , CAWDaughterPhi);
-    SetValue("CAWDaughterEnergy" , CAWDaughterEnergy);
+    SetValue("AK8DaughterPt"     , AK8DaughterPt);
+    SetValue("AK8DaughterEta"    , AK8DaughterEta);
+    SetValue("AK8DaughterPhi"    , AK8DaughterPhi);
+    SetValue("AK8DaughterEnergy" , AK8DaughterEnergy);
     
-    SetValue("CAWDaughterMotherIndex" , CAWDaughterMotherIndex);
+    SetValue("AK8DaughterMotherIndex" , AK8DaughterMotherIndex);
     
     //Get all CA8 jets (not just for W and Top)
     edm::InputTag CA8JetColl = edm::InputTag("slimmedJetsAK8");
