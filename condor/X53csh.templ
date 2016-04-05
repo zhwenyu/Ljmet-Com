@@ -27,7 +27,7 @@ mkdir -p LJMet/Com
 cd LJMet/Com
 xrdcp root://cmseos.fnal.gov//store/user/clint/ljmet.tar ./ljmet.tar
 tar -xvf ljmet.tar
-scram b -j 4
+scram b
 #
 #_____ check if we are running on a condor or on fbsng batch system _____
 #
@@ -47,10 +47,10 @@ else
 endif
 
 #cd CMSSWBASE/src/LJMet/Com/python/
-
+cd python
 rehash
 xrdcp EOSPY LOCPY
 FWLITEANALYZER LOCPY
 
 #move output to eos
-xrdcp LOCOUT EOSOUT
+xrdcp -f LOCOUT EOSOUT
