@@ -345,14 +345,14 @@ void BaseEventSelector::Init( void )
 TLorentzVector BaseEventSelector::correctJetForMet(const pat::Jet & jet, edm::EventBase const & event)
 {
 
-    TLorentzVector jetP4, oldJetP4, offJetP4, offOldJetP4;
+    TLorentzVector jetP4, rawJetP4, offJetP4;
     jetP4.SetPtEtaPhiM(0.000001,1.,1.,0.000001);
-    oldJetP4 = jetP4;
+    rawJetP4 = jetP4;
 
-    if ( jet.chargedEmEnergyFraction() + jet.neutralEmEnergyFraction() > 0.90 ) {return jetP4-oldJetP4;}
-
-    double offOldCorr = jet.correctedJet(1).pt()/jet.correctedJet(0).pt();
-    double oldCorr = jet.pt()/jet.correctedJet(0).pt();
+    if ( jet.chargedEmEnergyFraction() + jet.neutralEmEnergyFraction() > 0.90 ) {
+        //std::cout<<"EM jet found, no correction..."<<std::endl;
+        return jetP4-rawJetP4;
+    }
 
     pat::Jet correctedJet = jet.correctedJet(0);                 //copy original jet
 
@@ -366,14 +366,13 @@ TLorentzVector BaseEventSelector::correctJetForMet(const pat::Jet & jet, edm::Ev
         if ( mu != 0 && (mu->isGlobalMuon() || mu->isStandAloneMuon()) ) {
 	    TLorentzVector muonP4;
             muonP4.SetPtEtaPhiM((*cand)->pt(),(*cand)->eta(),(*cand)->phi(),(*cand)->mass());
+            //TESTING
+            //std::cout << "Subtracted " << muonP4.Pt() << " GeV muon from jet in correctJetForMet..." << std::endl;
 	    jetP4 -= muonP4;
         }
     }
     offJetP4 = jetP4;
-    oldJetP4 = jetP4;
-    offOldJetP4 = jetP4;
-    oldJetP4 *= oldCorr;
-    offOldJetP4 *= offOldCorr;
+    rawJetP4 = jetP4;
 
     double ptscale = 1.0;
     double unc = 1.0;
@@ -387,7 +386,7 @@ TLorentzVector BaseEventSelector::correctJetForMet(const pat::Jet & jet, edm::Ev
 
     if ( mbPar["isMc"] ){ 
 
-        JetCorrector->setJetEta(jetP4.Eta());
+        JetCorrector->setJetEta(correctedJet.eta());
   	JetCorrector->setJetPt(pt);
         JetCorrector->setJetA(jet.jetArea());
   	JetCorrector->setRho(rho); 
@@ -401,6 +400,8 @@ TLorentzVector BaseEventSelector::correctJetForMet(const pat::Jet & jet, edm::Ev
     	    std::cout << mLegend << "WARNING! Jet/MET will remain uncorrected." << std::endl;
         }
       
+        //for (unsigned int testi = 0; testi < corrVec.size(); testi++) {std::cout<<testi<<" ==> "<<corrVec[testi]<<std::endl;}
+
         jetP4 *= corrVec[corrVec.size()-1];
         offJetP4 *= corrVec[0];
         pt = jetP4.Pt();
@@ -516,10 +517,11 @@ TLorentzVector BaseEventSelector::correctJetForMet(const pat::Jet & jet, edm::Ev
             if (jetP4.Pt()*ptscale < 10.0 && mbPar["JECdown"]) unc = 0.01;
 
         }
+
     }
     else if (!mbPar["isMc"]) {
       
-        JetCorrector->setJetEta(jetP4.Eta());
+        JetCorrector->setJetEta(correctedJet.eta());
   	JetCorrector->setJetPt(pt);
         JetCorrector->setJetA(jet.jetArea());
   	JetCorrector->setRho(rho); 
@@ -533,21 +535,24 @@ TLorentzVector BaseEventSelector::correctJetForMet(const pat::Jet & jet, edm::Ev
     	    std::cout << mLegend << "WARNING! Jet/MET will remain uncorrected." << std::endl;
         }
       
+        //for (unsigned int testi = 0; testi < corrVec.size(); testi++) {std::cout<<testi<<" ==> "<<corrVec[testi]<<std::endl;}
+
         jetP4 *= corrVec[corrVec.size()-1];
         offJetP4 *= corrVec[0];
+        pt = jetP4.Pt();
 	
     }
 
+    //TESTING
+    ptscale = 1.;
+
     jetP4 *= unc*ptscale;
     offJetP4 *= unc*ptscale;
-    oldJetP4 *= unc*ptscale;
-    offOldJetP4 *= unc*ptscale;
     if (jetP4.Pt()<=15.) {
-        oldJetP4 = jetP4;
-        offOldJetP4 = offJetP4;
+        offJetP4 = jetP4;
     }
 
-    return oldJetP4-offOldJetP4-jetP4+offJetP4;
+    return offJetP4-jetP4;
 }
 
 TLorentzVector BaseEventSelector::correctJet(const pat::Jet & jet, edm::EventBase const & event, bool doAK8Corr, bool forceCorr)
@@ -765,6 +770,8 @@ TLorentzVector BaseEventSelector::correctJet(const pat::Jet & jet, edm::EventBas
 	}
 	correctedJet.scaleEnergy(correction);
 	pt = correctedJet.pt();
+
+        //std::cout<<"Correcting jet with raw pT = "<<pt_raw<<" and eta = "<<jet.eta()<<" to corrected pT = "<<pt<<std::endl;
 	
       }
     }
@@ -1051,8 +1058,12 @@ bool BaseEventSelector::isJetTagged(const pat::Jet & jet, edm::EventBase const &
 
 TLorentzVector BaseEventSelector::correctMet(const pat::MET & met, edm::EventBase const & event)
 {
-    double correctedMET_px = met.px();
-    double correctedMET_py = met.py();
+    //double correctedMET_px = met.px();
+    //double correctedMET_py = met.py();
+    double correctedMET_px = met.uncorPx();
+    double correctedMET_py = met.uncorPy();
+    //std::cout<<"Original MET = "<<met.pt()<<", phi = "<<met.phi()<<std::endl;
+    //std::cout<<"  Uncorr MET = "<<met.uncorPt()<<std::endl;
     if ( mbPar["doNewJEC"] ) {
         for (std::vector<edm::Ptr<pat::Jet> >::const_iterator ijet = mvAllJets.begin();
              ijet != mvAllJets.end(); ++ijet) {
@@ -1070,6 +1081,8 @@ TLorentzVector BaseEventSelector::correctMet(const pat::MET & met, edm::EventBas
         _orig_met = 1.e-9;
     }
     SetHistValue("met_correction", correctedMET_p4.Pt()/_orig_met);
+    
+    //std::cout<<"    Corr MET = "<<correctedMET_p4.Pt()<<std::endl;
     return correctedMET_p4;
 }
 
