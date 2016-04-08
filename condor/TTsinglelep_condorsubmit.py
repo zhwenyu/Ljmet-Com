@@ -16,7 +16,7 @@ files_per_job = 10
 if (socket.gethostname().find('fnal')>=0):
     brux=bool(False)
     print "Submitting jobs at FNAL"
-    sePath='\'root://cmseos.fnal.gov/'         # stored on LPC
+    sePath='\'root://cmseos.fnal.gov/'         # stored on LPC, most of our samples
 #    sePath='\'root://cmsxrootd.fnal.gov/'      # stored elsewhere
     storePath=''
     setupString='source \/cvmfs\/cms.cern.ch\/cmsset_default.csh'
@@ -29,22 +29,18 @@ else:
 #Configuration options parsed from arguments
 #Switching to getopt for compatibility with older python
 try:
-    opts, args = getopt.getopt(sys.argv[1:], "", ["useMC=", "sample=","dataType=","fileList=", "outDir=","shift=","submit=","json=","inputTar="]) #"jec=","jer=","btag=",
+    opts, args = getopt.getopt(sys.argv[1:], "", ["useMC=", "sample=","fileList=", "outDir=","shift=","submit=","json=","inputTar="])
 except getopt.GetoptError as err:
     print str(err)
     sys.exit(1)
 
 useMC    = bool(False)
 prefix   = str('None')
-dataType = str('None')
 fileList = str('None')
 outDir   = str('None')
 shift    = str('None')
 json     = str('None')
 submit   = bool(False)
-#jec      = str('False')
-#jer      = str('False')
-#btag     = str('False')
 changeJEC= bool(False)
 tarfile  = str('None')
 
@@ -59,24 +55,13 @@ for o, a in opts:
             useMC = a
             print 'useMC = ' + useMC
     elif o == "--sample":   prefix   = str(a)
-    elif o == "--dataType": dataType = str(a)
     elif o == "--fileList": fileList = str(a)
     elif o == "--outDir":   outDir   = str(a)
     elif o == "--shift":    shift    = str(a)
     elif o == "--inputTar": tarfile = str(a).split('.')[0]
     elif o == "--json":     json   = str(a)
-#    elif o == "--jec":      jec   = str(a)
-#    elif o == "--jer":      jer   = str(a)
-#    elif o == "--btag":     btag   = str(a)
     elif o == "--submit":
         if a == 'True':     submit = True
-
-if dataType == 'MuEl': dataType = 'ElMu'
-checkDataType = dataType in ['ElEl', 'ElMu', 'MuMu']
-
-if (not checkDataType and not useMC):
-    print '--dataType for real data must be ElEl, ElMu or MuMu!'
-    sys.exit(1)
 
 relBase = os.environ['CMSSW_BASE']
 
@@ -103,7 +88,7 @@ else:
     if dir[:4] == '/eos':
         print 'Making outputDir via eos command'
         os.system('eos root://cmseos.fnal.gov/ mkdir -p '+dir[10:])
-    else:
+    else:        
         os.system('mkdir -p '+dir)
     
 def get_input(num, list):
@@ -124,9 +109,7 @@ def get_input(num, list):
 j = 1
 nfiles = 1
 
-cTime=datetime.datetime.now()
-date='%i_%i_%i'%(cTime.year,cTime.month,cTime.day)
-time='%i_%i_%i'%(cTime.hour,cTime.minute,cTime.second)
+#### CHANGE ME #####
 tempdir = '/uscms_data/d3/jmanagan/'+outputdir.split('/')[-1]+'_logs/'+shift+'/'+prefix
 os.makedirs(tempdir)
 
@@ -142,12 +125,11 @@ for line in file_list:
 
 file_list.close()
 
-os.system('sed -e \'s/SETUP/'+setupString+'/g\' template.sh > '+tempdir+'/'+prefix+'.sh')
+os.system('sed -e \'s/SETUP/'+setupString+'/g\' TTsinglelep_template.sh > '+tempdir+'/'+prefix+'.sh')
 
 while ( nfiles <= count ):    
 
-    # ADD YOUR CONFIG FILE HERE!!
-    py_templ_file = open(relBase+'/src/LJMet/Com/condor_1lep_120715/ljmet_cfg.py')
+    py_templ_file = open(relBase+'/src/LJMet/Com/condor/ljmet_cfg.py')
     
     py_file = open(tempdir+'/'+prefix+'_'+str(j)+'.py','w')
 
@@ -156,7 +138,6 @@ while ( nfiles <= count ):
     
     for line in py_templ_file:
         line=line.replace('CONDOR_ISMC',     useMC)
-        line=line.replace('CONDOR_DATATYPE', dataType)
         line=line.replace('CONDOR_JSON',     json)
         line=line.replace('CONDOR_FILELIST', singleFileList)
         line=line.replace('CONDOR_OUTFILE',  prefix+'_'+str(j))
@@ -164,12 +145,10 @@ while ( nfiles <= count ):
         if 'JECdown' in shift and 'JECdown' in line: line=line.replace('False',  'True')
         if 'JERup' in shift and 'JERup' in line: line=line.replace('False',  'True')
         if 'JERdown' in shift and 'JERdown' in line: line=line.replace('False',  'True')
-        if 'BTAGup' in shift and 'BTagUncertUp' in line: line=line.replace('False',  'True')
-        if 'BTAGdown' in shift and 'BTagUncertDown' in line: line=line.replace('False',  'True')
         py_file.write(line)
     py_file.close()
 
-    jdl_templ_file = open(relBase+'/src/LJMet/Com/condor_1lep_120715/template.jdl')
+    jdl_templ_file = open(relBase+'/src/LJMet/Com/condor/TTsinglelep_template.jdl')
     jdl_file       = open(tempdir+'/'+prefix+'_'+str(j)+'.jdl','w')
     
     for line in jdl_templ_file:
@@ -190,8 +169,6 @@ njobs = j - 1
 
 if (submit):
     savedPath = os.getcwd()
-#    os.system('xrdcp -R '+tempdir+' '+xrddir+'/logfiles/')
-#    os.chdir(dir+'/logfiles/')
     os.chdir(tempdir)
     print njobs
     proc = subprocess.Popen(['condor_submit', prefix+'_1.jdl'], stdout=subprocess.PIPE) 
@@ -202,6 +179,4 @@ if (submit):
         os.system('condor_submit '+prefix+'_'+str(k)+'.jdl')
 
     os.chdir(savedPath)
-
-#os.system('rm -r '+tempdir)
 
