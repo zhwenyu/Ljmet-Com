@@ -49,8 +49,8 @@ process.JetSubCalc.useL2L3Mass = cms.bool(True)
 process.JetSubCalc.isMc = cms.bool(condorIsMC)
 process.JetSubCalc.JECup = cms.bool(False)
 process.JetSubCalc.JECdown = cms.bool(False)
-process.JetSubCalc.MCL2JetParAK8 = cms.string(relBase+'/src/LJMet/Com/data/Fall15_25nsV2_MC_L2Relative_AK8PFchs.txt')
-process.JetSubCalc.MCL3JetParAK8 = cms.string(relBase+'/src/LJMet/Com/data/Fall15_25nsV2_MC_L3Absolute_AK8PFchs.txt')
+process.JetSubCalc.MCL2JetParAK8 = cms.string(relBase+'/src/LJMet/Com/data/Fall15_25nsV1_MC_L2Relative_AK8PFchs.txt')
+process.JetSubCalc.MCL3JetParAK8 = cms.string(relBase+'/src/LJMet/Com/data/Fall15_25nsV1_MC_L3Absolute_AK8PFchs.txt')
 process.JetSubCalc.DataL2JetParAK8 = cms.string(relBase+'/src/LJMet/Com/data/Fall15_25nsV2_DATA_L2Relative_AK8PFchs.txt')
 process.JetSubCalc.DataL3JetParAK8 = cms.string(relBase+'/src/LJMet/Com/data/Fall15_25nsV2_DATA_L3Absolute_AK8PFchs.txt')
 process.JetSubCalc.DataL2L3JetParAK8 = cms.string(relBase+'/src/LJMet/Com/data/Fall15_25nsV2_DATA_L2L3Residual_AK8PFchs.txt')
@@ -241,19 +241,24 @@ process.event_selector = cms.PSet(
     JECdown                  = cms.bool(False),
     JERup                    = cms.bool(False),
     JERdown                  = cms.bool(False),
-    JEC_txtfile = cms.string(relBase+'/src/LJMet/Com/data/Fall15_25nsV2_DATA_Uncertainty_AK4PFchs.txt'),
     doNewJEC                 = cms.bool(True),
     doLepJetCleaning         = cms.bool(True),
     LepJetDR                 = cms.double(0.4),
-    CleanLooseLeptons        = cms.bool(True),
-    
-    MCL1JetPar               = cms.string(relBase+'/src/LJMet/Com/data/Fall15_25nsV2_MC_L1FastJet_AK4PFchs.txt'),
-    MCL2JetPar               = cms.string(relBase+'/src/LJMet/Com/data/Fall15_25nsV2_MC_L2Relative_AK4PFchs.txt'),
-    MCL3JetPar               = cms.string(relBase+'/src/LJMet/Com/data/Fall15_25nsV2_MC_L3Absolute_AK4PFchs.txt'),
+    CleanLooseLeptons        = cms.bool(False),
 
-    MCL1JetParAK8            = cms.string(relBase+'/src/LJMet/Com/data/Fall15_25nsV2_MC_L1FastJet_AK8PFchs.txt'),
-    MCL2JetParAK8            = cms.string(relBase+'/src/LJMet/Com/data/Fall15_25nsV2_MC_L2Relative_AK8PFchs.txt'),
-    MCL3JetParAK8            = cms.string(relBase+'/src/LJMet/Com/data/Fall15_25nsV2_MC_L3Absolute_AK8PFchs.txt'),
+    # As of Fall15_25nsV2, JEC uncertainty and JERSF are identical for AK4 & AK8 PFchs
+    JEC_txtfile = cms.string(relBase+'/src/LJMet/Com/data/Fall15_25nsV2_DATA_Uncertainty_AK4PFchs.txt'),
+    JERSF_txtfile = cms.string(relBase+'/src/LJMet/Com/data/Fall15_25nsV2_MC_SF_AK4PFchs.txt'),
+    JER_txtfile = cms.string(relBase+'/src/LJMet/Com/data/Fall15_25nsV2_MC_PtResolution_AK4PFchs.txt'),
+    JERAK8_txtfile = cms.string(relBase+'/src/LJMet/Com/data/Fall15_25nsV2_MC_PtResolution_AK8PFchs.txt'),
+    
+    MCL1JetPar               = cms.string(relBase+'/src/LJMet/Com/data/Fall15_25nsV1_MC_L1FastJet_AK4PFchs.txt'),
+    MCL2JetPar               = cms.string(relBase+'/src/LJMet/Com/data/Fall15_25nsV1_MC_L2Relative_AK4PFchs.txt'),
+    MCL3JetPar               = cms.string(relBase+'/src/LJMet/Com/data/Fall15_25nsV1_MC_L3Absolute_AK4PFchs.txt'),
+
+    MCL1JetParAK8            = cms.string(relBase+'/src/LJMet/Com/data/Fall15_25nsV1_MC_L1FastJet_AK8PFchs.txt'),
+    MCL2JetParAK8            = cms.string(relBase+'/src/LJMet/Com/data/Fall15_25nsV1_MC_L2Relative_AK8PFchs.txt'),
+    MCL3JetParAK8            = cms.string(relBase+'/src/LJMet/Com/data/Fall15_25nsV1_MC_L3Absolute_AK8PFchs.txt'),
 
     DataL1JetPar             = cms.string(relBase+'/src/LJMet/Com/data/Fall15_25nsV2_DATA_L1FastJet_AK4PFchs.txt'),
     DataL2JetPar             = cms.string(relBase+'/src/LJMet/Com/data/Fall15_25nsV2_DATA_L2Relative_AK4PFchs.txt'),
