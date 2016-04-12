@@ -24,6 +24,7 @@
 <use name="RecoBTag/Records"/>
 <use name="JetMETCorrections/Objects"/>
 <use name="JetMETCorrections/Algorithms"/>
+<use name="JetMETCorrections/Modules"/>
 <use name="CondFormats/JetMETObjects"/>
 <use name="RecoEgamma/EgammaTools"/>
 <use name="DataFormats/METReco"/>

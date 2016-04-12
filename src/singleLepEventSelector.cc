@@ -310,13 +310,6 @@ void singleLepEventSelector::BeginJob( std::map<std::string, edm::ParameterSet c
         mtPar["tau_collection"]           = par[_key].getParameter<edm::InputTag>("tau_collection");
         mtPar["met_collection"]           = par[_key].getParameter<edm::InputTag>("met_collection");
 
-        mbPar["BTagUncertUp"]             = par[_key].getParameter<bool>         ("BTagUncertUp");
-        mbPar["BTagUncertDown"]           = par[_key].getParameter<bool>         ("BTagUncertDown");
-        mbPar["JECup"]                    = par[_key].getParameter<bool>         ("JECup");
-        mbPar["JECdown"]                  = par[_key].getParameter<bool>         ("JECdown");
-        mbPar["JERup"]                    = par[_key].getParameter<bool>         ("JERup");
-        mbPar["JERdown"]                  = par[_key].getParameter<bool>         ("JERdown");
-        msPar["JEC_txtfile"]              = par[_key].getParameter<std::string>  ("JEC_txtfile");
         mbPar["doNewJEC"]                 = par[_key].getParameter<bool>         ("doNewJEC");
         mbPar["doLepJetCleaning"]         = par[_key].getParameter<bool>         ("doLepJetCleaning");
         if (par[_key].exists("CleanLooseLeptons")) mbPar["CleanLooseLeptons"] = par[_key].getParameter<bool> ("CleanLooseLeptons");
