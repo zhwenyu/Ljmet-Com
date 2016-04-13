@@ -229,11 +229,7 @@ void singleLepEventSelector::BeginJob( std::map<std::string, edm::ParameterSet c
 
         mtPar["flag_tag"]                 = par[_key].getParameter<edm::InputTag>("flag_tag");
         mbPar["pv_cut"]                   = par[_key].getParameter<bool>         ("pv_cut");
-        mbPar["hbhe_cut"]                 = par[_key].getParameter<bool>         ("hbhe_cut");
-        mbPar["hbheiso_cut"]              = par[_key].getParameter<bool>         ("hbheiso_cut");
-        msPar["hbhe_cut_value"]           = par[_key].getParameter<std::string>  ("hbhe_cut_value");
-        mbPar["csc_cut"]                  = par[_key].getParameter<bool>         ("csc_cut");
-        mbPar["eesc_cut"]                 = par[_key].getParameter<bool>         ("eesc_cut");
+        mbPar["metfilters"]               = par[_key].getParameter<bool>         ("metfilters");
 
         mbPar["jet_cuts"]                 = par[_key].getParameter<bool>         ("jet_cuts");
         mdPar["jet_minpt"]                = par[_key].getParameter<double>       ("jet_minpt");
@@ -338,10 +334,7 @@ void singleLepEventSelector::BeginJob( std::map<std::string, edm::ParameterSet c
   
     push_back("Trigger");
     push_back("Primary vertex");
-    push_back("HBHE noise and scraping filter");
-    push_back("HBHE Iso noise filter");
-    push_back("CSC Tight Halo filter");
-    push_back("EE Bad SC filter");
+    push_back("MET filters");
     push_back("One jet or more");
     push_back("Two jets or more");
     push_back("Three jets or more");
@@ -369,10 +362,7 @@ void singleLepEventSelector::BeginJob( std::map<std::string, edm::ParameterSet c
 
     set("Trigger", mbPar["trigger_cut"]); 
     set("Primary vertex", mbPar["pv_cut"]);
-    set("HBHE noise and scraping filter", mbPar["hbhe_cut"]); 
-    set("HBHE Iso noise filter", mbPar["hbheiso_cut"]); 
-    set("CSC Tight Halo filter", mbPar["csc_cut"]); 
-    set("EE Bad SC filter", mbPar["eesc_cut"]); 
+    set("MET filters", mbPar["metfilters"]); 
  
     if (mbPar["jet_cuts"]){
         set("One jet or more", true);
@@ -559,120 +549,34 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
         } // end of PV cuts
 
 
-   
-        //
-        //_____ HBHE noise and scraping filter________________________
-        //
-        if ( considerCut("HBHE noise and scraping filter") || considerCut("HBHE Iso noise filter")) {
-            
-	  //set cut value considered
-	  bool run1Cut=false;
-	  bool run2LooseCut=false;
-	  bool run2TightCut=false;
-	  if(msPar["hbhe_cut_value"].find("Run1")!=std::string::npos){
-	    run1Cut=true;
+	//
+	//______ MET Filters ___________________
+	//
+	if (considerCut("MET filters")) {
+	  /// In 76X all flags can come from MiniAOD:
+	  edm::Handle<edm::TriggerResults > PatTriggerResults;
+	  event.getByLabel( mtPar["flag_tag"], PatTriggerResults );
+	  const edm::TriggerNames patTrigNames = event.triggerNames(*PatTriggerResults);
+	  
+	  bool hbhenoisepass = false;
+	  bool hbhenoiseisopass = false;
+	  bool csctighthalopass = false;
+	  bool ecaldeadcellpass = false;
+	  bool eebadscpass = false;
+	  
+	  for (unsigned int i=0; i<PatTriggerResults->size(); i++){
+	    if (patTrigNames.triggerName(i) == "Flag_HBHENoiseFilter") hbhenoisepass = PatTriggerResults->accept(patTrigNames.triggerIndex(patTrigNames.triggerName(i)));
+	    if (patTrigNames.triggerName(i) == "Flag_HBHENoiseIsoFilter") hbhenoiseisopass = PatTriggerResults->accept(patTrigNames.triggerIndex(patTrigNames.triggerName(i)));
+	    if (patTrigNames.triggerName(i) == "Flag_CSCTightHaloFilter") csctighthalopass = PatTriggerResults->accept(patTrigNames.triggerIndex(patTrigNames.triggerName(i)));
+	    if (patTrigNames.triggerName(i) == "Flag_EcalDeadCellTriggerPrimitiveFilter") ecaldeadcellpass = PatTriggerResults->accept(patTrigNames.triggerIndex(patTrigNames.triggerName(i)));
+	    if (patTrigNames.triggerName(i) == "Flag_eeBadScFilter") eebadscpass = PatTriggerResults->accept(patTrigNames.triggerIndex(patTrigNames.triggerName(i)));
 	  }
-	  else if(msPar["hbhe_cut_value"].find("Run2Loose")!=std::string::npos){
-	    run2LooseCut=true;
+	  
+	  if(hbhenoisepass && hbhenoiseisopass && csctighthalopass && ecaldeadcellpass && eebadscpass){
+	    passCut(ret, "MET filters");
 	  }
-	  else if(msPar["hbhe_cut_value"].find("Run2Tight")!=std::string::npos){
-	    run2TightCut=true;
-	  }
-	  else{
-	    std::cout<<"HBHE cut not configured correctly!...exiting..."<<std::endl;
-	    std::exit(-1);
-	  }
-
-	  if (mbPar["debug"]) std::cout<<"HBHE cuts..."<<std::endl;
-
-	  //taken from http://cmslxr.fnal.gov/lxr/source/CommonTools/RecoAlgos/plugins/HBHENoiseFilterResultProducer.cc?v=CMSSW_7_4_1
-	  //and http://cmslxr.fnal.gov/lxr/source/CommonTools/RecoAlgos/python/HBHENoiseFilterResultProducer_cfi.py?v=CMSSW_7_4_1
-
-	  edm::InputTag noiselabel ("hcalnoise");
-	  int minHPDHits = 17;
-	  int minHPDNoOtherHits = 10;
-	  //int minZeros = 10;
-	  int minZeros = 999999.;
-	  bool IgnoreTS4TS5ifJetInLowBVRegion = false;
-
-          int minNumIsolatedNoiseChannels = 10;
-          double minIsolatedNoiseSumE = 50.0;
-          double minIsolatedNoiseSumEt = 25.0;
-
-	  // get the Noise summary object
-	  edm::Handle<HcalNoiseSummary> summary_h;
-	  event.getByLabel(noiselabel, summary_h);
-	  if(!summary_h.isValid()) {
-	    std::cout << "Could not find HcalNoiseSummary.\n";
-	  }
-	  const HcalNoiseSummary& summary(*summary_h);
-
-	  bool goodJetFoundInLowBVRegion = false;
-	  if (IgnoreTS4TS5ifJetInLowBVRegion) goodJetFoundInLowBVRegion = summary.goodJetFoundInLowBVRegion();
-
-	  const bool failCommon = summary.maxHPDHits() >= minHPDHits || summary.maxHPDNoOtherHits() >= minHPDNoOtherHits || summary.maxZeros() >= minZeros;
-
-	  //const bool failFull = failCommon || (summary.HasBadRBXTS4TS5() && !goodJetFoundInLowBVRegion);
-
-	  const bool failRun1 = failCommon || (summary.HasBadRBXTS4TS5() && !goodJetFoundInLowBVRegion);
-
-	  const bool failRun2Loose = failCommon || (summary.HasBadRBXRechitR45Loose() && !goodJetFoundInLowBVRegion);
-
-	  const bool failRun2Tight = failCommon || (summary.HasBadRBXRechitR45Tight() && !goodJetFoundInLowBVRegion);
-
-          if (considerCut("HBHE noise and scraping filter")) {
-  	    if(run1Cut){
-  	      if (!failRun1) passCut(ret, "HBHE noise and scraping filter"); // HBHE cuts total
-              else break;
-  	    }
-  	    else if(run2LooseCut){
-  	      if (!failRun2Loose) passCut(ret, "HBHE noise and scraping filter"); // HBHE cuts total
-              else break;
-  	    }
-  	    else if(run2TightCut){
-  	      if (!failRun2Tight) passCut(ret, "HBHE noise and scraping filter"); // HBHE cuts total
-              else break;
-  	    }
-  	    else {std::cout<<"No HBHE cut!"<<std::endl; passCut(ret, "HBHE noise and scraping filter");} // HBHE cuts total
-          }
-
-	  // Check isolation requirements
-	  const bool failIsolation = summary.numIsolatedNoiseChannels() >= minNumIsolatedNoiseChannels || summary.isolatedNoiseSumE() >= minIsolatedNoiseSumE || summary.isolatedNoiseSumEt() >= minIsolatedNoiseSumEt;
-          if (considerCut("HBHE Iso noise filter")) {
-	    if (!failIsolation) passCut(ret, "HBHE Iso noise filter"); // HBHE Iso cut
-            else break;
-          }
-
-        } // end of hbhe cuts
-
-        if ( considerCut("CSC Tight Halo filter") || considerCut("EE Bad SC filter") ) {
-            edm::Handle<edm::TriggerResults > PatTriggerResults;
-            event.getByLabel( mtPar["flag_tag"], PatTriggerResults );
-            const edm::TriggerNames patTrigNames = event.triggerNames(*PatTriggerResults);
-            if ( considerCut("CSC Tight Halo filter") ) {
-    	    
-                bool cscpass = false;
-    
-                for (unsigned int i=0; i<PatTriggerResults->size(); i++){
-                    if (patTrigNames.triggerName(i) == "Flag_CSCTightHaloFilter") cscpass = PatTriggerResults->accept(patTrigNames.triggerIndex(patTrigNames.triggerName(i)));
-                }
-    
-                if (cscpass) passCut(ret, "CSC Tight Halo filter"); // CSC cut
-                else break;
-            } // end of CSC cuts
-    
-            if ( considerCut("EE Bad SC filter") ) {
-    	    
-                bool eescpass = false;
-    
-                for (unsigned int i=0; i<PatTriggerResults->size(); i++){
-                    if (patTrigNames.triggerName(i) == "Flag_eeBadScFilter") eescpass = PatTriggerResults->accept(patTrigNames.triggerIndex(patTrigNames.triggerName(i)));
-                }
-    
-                if (eescpass) passCut(ret, "EE Bad SC filter"); // EE Bad SC cut
-                else break;
-            } // end of EE Bad SC cuts
-        }
+	  else break;
+	}
 
         //======================================================
         //

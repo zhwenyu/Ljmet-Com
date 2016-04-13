@@ -148,12 +148,8 @@ process.event_selector = cms.PSet(
     
     # PV cuts
     pv_cut         = cms.bool(True),
-    hbhe_cut       = cms.bool(True),
-    hbheiso_cut    = cms.bool(True),
-    hbhe_cut_value = cms.string('Run2Loose'),
-    csc_cut        = cms.bool(False),
+    metfilters     = cms.bool(True),
     flag_tag       = cms.InputTag('TriggerResults::PAT'),
-    eesc_cut       = cms.bool(True),
     
     # Jet cuts
     jet_cuts                 = cms.bool(True),
