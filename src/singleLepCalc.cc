@@ -22,6 +22,7 @@
 #include "SimDataFormats/GeneratorProducts/interface/GenEventInfoProduct.h"
 #include "SimDataFormats/GeneratorProducts/interface/LHEEventProduct.h"
 #include "SimDataFormats/GeneratorProducts/interface/LHERunInfoProduct.h"
+#include "SimDataFormats/PileupSummaryInfo/interface/PileupSummaryInfo.h"
 
 #include "DataFormats/BTauReco/interface/CATopJetTagInfo.h"
 #include "LJMet/Com/interface/MiniIsolation.h"
@@ -229,6 +230,25 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
     goodPVs = *(pvHandle.product());
 
     SetValue("nPV", (int)goodPVs.size());
+
+    int NumTrueInts = -1;
+    int NumPUInts = -1;
+    if(isMc){
+      edm::Handle<std::vector<PileupSummaryInfo>> PupInfo;
+      if(!event.getByLabel(edm::InputTag("addPileupInfo"), PupInfo)){
+	event.getByLabel(edm::InputTag("slimmedAddPileupInfo"), PupInfo);
+      }
+      
+      for(std::vector<PileupSummaryInfo>::const_iterator PVI = PupInfo->begin(); PVI != PupInfo->end(); ++PVI){
+	int BX = PVI->getBunchCrossing();
+	if(BX == 0){
+	  NumTrueInts = PVI->getTrueNumInteractions();
+	  NumPUInts = PVI->getPU_NumInteractions();
+	}
+      }
+    }
+    SetValue("nTrueInteractions",NumTrueInts);
+    SetValue("nPileupInteractions",NumPUInts);
 
      // _____ Primary dataset (from python cfg) _____________________
      //
