@@ -238,8 +238,13 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * s
     std::vector<int> theJetCSVMSubJets;
     std::vector<int> theJetCSVTSubJets;
 
-    std::vector<int> theJetFlav;
+    std::vector<int> theJetPFlav;
+    std::vector<int> theJetHFlav;
     std::vector<int> theJetBTag;
+    std::vector<int> theJetBTag_bSFup;
+    std::vector<int> theJetBTag_bSFdn;
+    std::vector<int> theJetBTag_lSFup;
+    std::vector<int> theJetBTag_lSFdn;
     
     double theVtxMass, theVtxNtracks, theVtx3DVal, theVtx3DSig, thePileupJetId;
 
@@ -276,8 +281,13 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * s
       theJetEnergy . push_back(ijet->energy());
       
       theJetCSV.push_back(ijet->bDiscriminator( bDiscriminant ));
-      theJetBTag.push_back(theCorrBtagJets[index].second);
-      theJetFlav.push_back(abs(ijet->partonFlavour()));
+      theJetBTag.push_back(selector->isJetTagged(*ijet, event, true, 0));
+      theJetBTag_bSFup.push_back(selector->isJetTagged(*ijet, event, true, 1));
+      theJetBTag_bSFdn.push_back(selector->isJetTagged(*ijet, event, true, 2));
+      theJetBTag_lSFup.push_back(selector->isJetTagged(*ijet, event, true, 3));
+      theJetBTag_lSFdn.push_back(selector->isJetTagged(*ijet, event, true, 4));
+      theJetPFlav.push_back(abs(ijet->partonFlavour()));
+      theJetHFlav.push_back(abs(ijet->hadronFlavour()));
 
       theJetCEmEnergy.push_back(ijet->chargedEmEnergy());
       theJetNEmEnergy.push_back(ijet->neutralEmEnergy());
@@ -319,8 +329,13 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * s
     SetValue("theJetPhi",    theJetPhi);
     SetValue("theJetEnergy", theJetEnergy);
     SetValue("theJetCSV",    theJetCSV);
+    SetValue("theJetPFlav",  theJetPFlav);
+    SetValue("theJetHFlav",  theJetHFlav);
     SetValue("theJetBTag",   theJetBTag);
-    SetValue("theJetFlav",   theJetFlav);
+    SetValue("theJetBTag_bSFup",   theJetBTag_bSFup);
+    SetValue("theJetBTag_bSFdn",   theJetBTag_bSFdn);
+    SetValue("theJetBTag_lSFup",   theJetBTag_lSFup);
+    SetValue("theJetBTag_lSFdn",   theJetBTag_lSFdn);
 
     SetValue("theJetCEmEnergy", theJetCEmEnergy); 
     SetValue("theJetNEmEnergy", theJetNEmEnergy); 
@@ -390,8 +405,11 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * s
     std::vector<int> theJetAK8SDSubjetIndex;
     std::vector<int> theJetAK8SDSubjetSize;
     std::vector<int> theJetAK8SDSubjetNCSVL;
-    std::vector<int> theJetAK8SDSubjetNCSVM;
     std::vector<int> theJetAK8SDSubjetNCSVMSF;
+    std::vector<int> theJetAK8SDSubjetNCSVM_lSFup;
+    std::vector<int> theJetAK8SDSubjetNCSVM_lSFdn;
+    std::vector<int> theJetAK8SDSubjetNCSVM_bSFup;
+    std::vector<int> theJetAK8SDSubjetNCSVM_bSFdn;
     
     double topMass, minMass, jetCharge;
     int nSubJets;
@@ -410,6 +428,10 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * s
     int nSDSubsCSVL;
     int nSDSubsCSVM;
     int nSDSubsCSVMSF;
+    int nSDSubsCSVM_bSFup;
+    int nSDSubsCSVM_bSFdn;
+    int nSDSubsCSVM_lSFup;
+    int nSDSubsCSVM_lSFdn;
     int SDSubJetIndex;
 
     for (std::vector<pat::Jet>::const_iterator ijet = theAK8Jets->begin(); ijet != theAK8Jets->end(); ijet++) {
@@ -572,8 +594,11 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * s
       SDSubJetIndex = (int)theJetAK8SDSubjetPt.size();
       nSDSubJets  = std::numeric_limits<int>::min();
       nSDSubsCSVL = 0;
-      nSDSubsCSVM = 0;
       nSDSubsCSVMSF = 0;
+      nSDSubsCSVM_bSFup = 0;
+      nSDSubsCSVM_bSFdn = 0;
+      nSDSubsCSVM_lSFup = 0;
+      nSDSubsCSVM_lSFdn = 0;
       double maxSubCSV = 0;
 
       auto const & sdSubjets = corrak8.subjets("SoftDrop");
@@ -602,9 +627,12 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * s
 	SDsubjetBTag      = selector->isJetTagged(corrsubjet, event);
 	SDdeltaRsubjetJet = deltaR(corrak8.eta(), corrak8.phi(), SDsubjetEta, SDsubjetPhi);
 
-	if(SDsubjetBdisc > 0.605) nSDSubsCSVL++;
-	if(SDsubjetBdisc > 0.890) nSDSubsCSVM++;
+	if(SDsubjetBdisc > 0.460) nSDSubsCSVL++;
 	if(SDsubjetBTag > 0) nSDSubsCSVMSF++;
+	if(selector->isJetTagged(corrsubjet, event, true, 1) > 0) nSDSubsCSVM_bSFup++;
+	if(selector->isJetTagged(corrsubjet, event, true, 2) > 0) nSDSubsCSVM_bSFdn++;
+	if(selector->isJetTagged(corrsubjet, event, true, 3) > 0) nSDSubsCSVM_lSFup++;
+	if(selector->isJetTagged(corrsubjet, event, true, 4) > 0) nSDSubsCSVM_lSFdn++;
 
 	theJetAK8SDSubjetPt.push_back(SDsubjetPt);
 	theJetAK8SDSubjetEta.push_back(SDsubjetEta);
@@ -618,7 +646,6 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * s
       theJetAK8SDSubjetIndex.push_back(SDSubJetIndex);
       theJetAK8SDSubjetSize.push_back(nSDSubJets);
       theJetAK8SDSubjetNCSVL.push_back(nSDSubsCSVL);
-      theJetAK8SDSubjetNCSVM.push_back(nSDSubsCSVM);
       theJetAK8SDSubjetNCSVMSF.push_back(nSDSubsCSVMSF);
 
     }
@@ -662,80 +689,140 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * s
     SetValue("theJetAK8SDSubjetIndex",theJetAK8SDSubjetIndex);
     SetValue("theJetAK8SDSubjetSize", theJetAK8SDSubjetSize); 
     SetValue("theJetAK8SDSubjetNCSVL",theJetAK8SDSubjetNCSVL);
-    SetValue("theJetAK8SDSubjetNCSVM",theJetAK8SDSubjetNCSVM);
     SetValue("theJetAK8SDSubjetNCSVMSF",theJetAK8SDSubjetNCSVMSF);
+    SetValue("theJetAK8SDSubjetNCSVM_bSFup",theJetAK8SDSubjetNCSVM_bSFup);
+    SetValue("theJetAK8SDSubjetNCSVM_bSFdn",theJetAK8SDSubjetNCSVM_bSFdn);
+    SetValue("theJetAK8SDSubjetNCSVM_lSFup",theJetAK8SDSubjetNCSVM_lSFup);
+    SetValue("theJetAK8SDSubjetNCSVM_lSFdn",theJetAK8SDSubjetNCSVM_lSFdn);
 
 
     //////////////// TRUE HADRONIC W/Z/H/Top decays //////////////////
     std::vector<int>    HadronicVHtID;
     std::vector<int>    HadronicVHtStatus;
-    std::vector<int>    HadronicVHtNDaughters;
-    std::vector<double> HadronicVHtMass;
     std::vector<double> HadronicVHtPt;
     std::vector<double> HadronicVHtEta;
     std::vector<double> HadronicVHtPhi;
     std::vector<double> HadronicVHtEnergy;
-    std::vector<double> HadronicVHtDecayDR;
-
-    TLorentzVector quark1;
-    TLorentzVector quark2;
-
-    if(isMc){
+    std::vector<double> HadronicVHtD0Pt;
+    std::vector<double> HadronicVHtD0Eta;
+    std::vector<double> HadronicVHtD0Phi;
+    std::vector<double> HadronicVHtD0E;
+    std::vector<double> HadronicVHtD1Pt;
+    std::vector<double> HadronicVHtD1Eta;
+    std::vector<double> HadronicVHtD1Phi;
+    std::vector<double> HadronicVHtD1E;
+    std::vector<double> HadronicVHtD2Pt;
+    std::vector<double> HadronicVHtD2Eta;
+    std::vector<double> HadronicVHtD2Phi;
+    std::vector<double> HadronicVHtD2E;
+  
+    // Get the generated particle collection
+    edm::Handle<reco::GenParticleCollection> genParticles;
+    if(isMc && event.getByLabel(genParticles_it, genParticles)){
       
-      // Get the generated particle collection
-      edm::Handle<reco::GenParticleCollection> genParticles;
-      if(event.getByLabel(genParticles_it, genParticles)){
-	for(size_t i = 0; i < genParticles->size(); i++){
-	  const reco::GenParticle &p = (*genParticles).at(i);
-	  int id = p.pdgId();
-	  
-	  if(abs(id) == 23 || abs(id) == 24 || abs(id) == 25 || abs(id) == 6){
-	  
-	    size_t nDs = p.numberOfDaughters();
-	    bool hasRadiation = false;
-	    bool hasLepton = false;
-	    for(size_t j = 0; j < nDs; j++){
-	      int dauId = (p.daughter(j))->pdgId();
-	      const reco::Candidate *d = p.daughter(j);
-	      if(d->pdgId() != dauId) std::cout << "making daughter GenParticle didn't work" << std::endl;
-	    
-	      if(abs(dauId) == abs(id)) hasRadiation = true;
-	      else if(abs(dauId) > 10 && abs(dauId) < 17) hasLepton = true;	    
+      for(size_t i = 0; i < genParticles->size(); i++){
+	const reco::GenParticle &p = (*genParticles).at(i);
+	int id = p.pdgId();
 
-	      if(abs(id) == 6 && abs(dauId) == 24){
-		for(size_t k = 0; k < d->numberOfDaughters(); k++){
-		  int dau2Id = (d->daughter(k))->pdgId();
-		  const reco::Candidate *d2 = d->daughter(k);
-		  if(d2->pdgId() != dau2Id) std::cout << "making daughter GenParticle didn't work" << std::endl;
-		  
-		  if(abs(dau2Id) > 10 && abs(dau2Id) < 17) hasLepton = true;
-		}
+	bool hasRadiation = false;
+	bool hasLepton = false;
+	  
+	if(abs(id) == 23 || abs(id) == 24 || abs(id) == 25 || abs(id) == 6){
+	    
+	  size_t nDs = p.numberOfDaughters();
+	  for(size_t j = 0; j < nDs; j++){
+	    int dauId = (p.daughter(j))->pdgId();
+	    const reco::Candidate *d = p.daughter(j);
+	    if(d->pdgId() != dauId) std::cout << "making daughter GenParticle didn't work" << std::endl;
+	    
+	    if(abs(dauId) == abs(id)) hasRadiation = true;
+	    else if(abs(dauId) > 10 && abs(dauId) < 17) hasLepton = true;	    
+	    
+	  }
+	  
+	  if(hasRadiation) continue;	  
+	  if(hasLepton) continue;	  
+	  if(p.pt() < 175) continue;
+	  
+	  if(abs(id) == 24){
+	    double dRWb = 1000;
+	    double dRWW = 1000;
+	    
+	    const reco::Candidate *mother = p.mother();
+	    while(abs(mother->pdgId()) == 24) mother = mother->mother();
+	    
+	    if(abs(mother->pdgId()) == 6){
+	      double dr = reco::deltaR(p.p4(),mother->daughter(1)->p4());
+	      if(dr < dRWb) dRWb = dr;
+	    }else if(abs(mother->pdgId()) == 25){
+	      double dr = 1000;
+	      if(p.pdgId()*mother->daughter(0)->pdgId() > 0){
+		double dr = reco::deltaR(p.p4(),mother->daughter(1)->p4());
+	      }else{
+		double dr = reco::deltaR(p.p4(),mother->daughter(0)->p4());
 	      }
+	      if(dr < dRWW) dRWW = dr;
+	    }		
+	    
+	    if(dRWW < 0.8) continue; // W from merged H
+	    if(dRWb < 0.8) continue; // W from merged t
+	  }
+	  
+	  if(abs(id) == 23){
+	    double dRZZ = 1000;
+	    
+	    const reco::Candidate *mother = p.mother();
+	    while(abs(mother->pdgId()) == 23) mother = mother->mother();
+	    
+	    if(abs(mother->pdgId()) == 25){
+	      double dr = 1000;
+	      if(p.pdgId()*mother->daughter(0)->pdgId() > 0){
+		double dr = reco::deltaR(p.p4(),mother->daughter(1)->p4());
+	      }else{
+		double dr = reco::deltaR(p.p4(),mother->daughter(0)->p4());
+	      }
+	      if(dr < dRZZ) dRZZ = dr;
 	    }
+	    
+	    if(dRZZ < 0.8) continue; // Z from merged H
+	  }
 	  
-	    if(hasRadiation) continue;	  
-	    if(hasLepton) continue;	  
-	    if(p.pt() < 175) continue;
+	  if(p.numberOfDaughters() < 2){
+	    std::cout << p.numberOfDaughters() << " daughters from " << p.pdgId() << std::endl;
+	    continue;
+	  }
+
+	  HadronicVHtStatus.push_back( p.status() );
+	  HadronicVHtID.push_back( p.pdgId() );
+	  HadronicVHtPt.push_back( p.pt() );
+	  HadronicVHtEta.push_back( p.eta() );
+	  HadronicVHtPhi.push_back( p.phi() );
+	  HadronicVHtEnergy.push_back( p.energy() );
+	  HadronicVHtD0Pt.push_back( p.daughter(1)->pt());
+	  HadronicVHtD0Eta.push_back( p.daughter(1)->eta());
+	  HadronicVHtD0Phi.push_back( p.daughter(1)->phi());
+	  HadronicVHtD0E.push_back( p.daughter(1)->energy());
 	  
-	    HadronicVHtStatus.push_back( p.status() );
-	    HadronicVHtID.push_back( p.pdgId() );
-	    HadronicVHtMass.push_back( p.mass() );
-	    HadronicVHtPt.push_back( p.pt() );
-	    HadronicVHtEta.push_back( p.eta() );
-	    HadronicVHtPhi.push_back( p.phi() );
-	    HadronicVHtEnergy.push_back( p.energy() );
-	    HadronicVHtNDaughters.push_back( nDs );
-	    
-	    quark1.SetPtEtaPhiE(0,0,0,0);
-	    quark2.SetPtEtaPhiE(0,0,0,0);
-	    
-	    const reco::Candidate *d = p.daughter(0);
-	    quark1.SetPtEtaPhiE(d->pt(),d->eta(),d->phi(),d->energy());
-	    
-	    d = p.daughter(1);
-	    quark2.SetPtEtaPhiE(d->pt(),d->eta(),d->phi(),d->energy());
-	    
-	    HadronicVHtDecayDR.push_back(quark1.DeltaR(quark2));
+	  if(abs(id) != 6){
+	    HadronicVHtD1Pt.push_back( p.daughter(0)->pt());	    
+	    HadronicVHtD2Pt.push_back( 0);
+	    HadronicVHtD1Eta.push_back( p.daughter(0)->eta());
+	    HadronicVHtD2Eta.push_back( 0);
+	    HadronicVHtD1Phi.push_back( p.daughter(0)->phi());
+	    HadronicVHtD2Phi.push_back( 0);
+	    HadronicVHtD1E.push_back( p.daughter(0)->energy());
+	    HadronicVHtD2E.push_back( 0);
+	  }else{
+	    const reco::Candidate *W = p.daughter(0);
+	    while(W->numberOfDaughters() == 1) W = W->daughter(0);
+	    HadronicVHtD1Pt.push_back( W->daughter(0)->pt());
+	    HadronicVHtD2Pt.push_back( W->daughter(1)->pt());
+	    HadronicVHtD1Eta.push_back( W->daughter(0)->eta());
+	    HadronicVHtD2Eta.push_back( W->daughter(1)->eta());
+	    HadronicVHtD1Phi.push_back( W->daughter(0)->phi());
+	    HadronicVHtD2Phi.push_back( W->daughter(1)->phi());
+	    HadronicVHtD1E.push_back( W->daughter(0)->energy());
+	    HadronicVHtD2E.push_back( W->daughter(1)->energy());
 	  }
 	}
       }
@@ -743,13 +830,22 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * s
 
     SetValue("HadronicVHtStatus",HadronicVHtStatus);
     SetValue("HadronicVHtID",HadronicVHtID);
-    SetValue("HadronicVHtMass",HadronicVHtMass);
     SetValue("HadronicVHtPt",HadronicVHtPt);
     SetValue("HadronicVHtEta",HadronicVHtEta);
     SetValue("HadronicVHtPhi",HadronicVHtPhi);
     SetValue("HadronicVHtEnergy",HadronicVHtEnergy);
-    SetValue("HadronicVHtNDaughters",HadronicVHtNDaughters);
-    SetValue("HadronicVHtDecayDR",HadronicVHtDecayDR);
+    SetValue("HadronicVHtD0Pt",HadronicVHtD0Pt);
+    SetValue("HadronicVHtD0Eta",HadronicVHtD0Eta);
+    SetValue("HadronicVHtD0Phi",HadronicVHtD0Phi);
+    SetValue("HadronicVHtD0E",HadronicVHtD0E);
+    SetValue("HadronicVHtD1Pt",HadronicVHtD1Pt);
+    SetValue("HadronicVHtD1Eta",HadronicVHtD1Eta);
+    SetValue("HadronicVHtD1Phi",HadronicVHtD1Phi);
+    SetValue("HadronicVHtD1E",HadronicVHtD1E);
+    SetValue("HadronicVHtD2Pt",HadronicVHtD2Pt);
+    SetValue("HadronicVHtD2Eta",HadronicVHtD2Eta);
+    SetValue("HadronicVHtD2Phi",HadronicVHtD2Phi);
+    SetValue("HadronicVHtD2E",HadronicVHtD2E);
 
     if(useHTT){
 

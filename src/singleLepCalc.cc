@@ -484,6 +484,11 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
     std::vector <double> elPhi;
     std::vector <double> elEnergy;
 
+    std::vector <double> elEtaVtx;
+    std::vector <double> elPhiVtx;
+    std::vector <double> elDEtaSCTkAtVtx;
+    std::vector <double> elDPhiSCTkAtVtx;
+
     //Quality criteria
     std::vector <double> elRelIso;
     std::vector <double> elMiniIso;
@@ -512,6 +517,9 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
     std::vector <double> elPhIso;
     std::vector <double> elAEff;
     std::vector <double> elRhoIso;
+    std::vector <double> elEcalPFClusterIso;
+    std::vector <double> elHcalPFClusterIso;
+    std::vector <double> elDR03TkSumPt;
 
     //mother-information
     //Generator level information -- MC matching
@@ -555,6 +563,10 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
             elPhi    . push_back((*iel)->superCluster()->phi());
             elEnergy . push_back((*iel)->energy());
 
+	    elEtaVtx.push_back((*iel)->trackMomentumAtVtxWithConstraint().Eta());
+	    elPhiVtx.push_back((*iel)->trackMomentumAtVtxWithConstraint().Phi());
+	    elDEtaSCTkAtVtx.push_back((*iel)->deltaEtaSuperClusterTrackAtVtx());
+	    elDPhiSCTkAtVtx.push_back((*iel)->deltaPhiSuperClusterTrackAtVtx());
 
             //Isolation
             double scEta = (*iel)->superCluster()->eta();
@@ -577,6 +589,10 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
             elPhIso  . push_back(phIso);
             elAEff   . push_back(AEff);
             elRhoIso . push_back(rhoIso);
+
+	    elEcalPFClusterIso.push_back((*iel)->ecalPFClusterIso());
+	    elHcalPFClusterIso.push_back((*iel)->hcalPFClusterIso());
+	    elDR03TkSumPt.push_back((*iel)->dr03TkSumPt());
 
             edm::Handle<pat::PackedCandidateCollection> packedPFCands;
             event.getByLabel(packedPFCandsLabel_, packedPFCands);
@@ -656,6 +672,11 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
     SetValue("elPhi"    , elPhi);
     SetValue("elEnergy" , elEnergy);
 
+    SetValue("elEtaVtx" , elEtaVtx);
+    SetValue("elPhiVtx" , elPhiVtx);
+    SetValue("elDEtaSCTkAtVtx" , elDEtaSCTkAtVtx);
+    SetValue("elDPhiSCTkAtVtx" , elDPhiSCTkAtVtx);
+
     SetValue("elCharge", elCharge);
     //Quality requirements
     SetValue("elRelIso" , elRelIso); //Isolation
@@ -684,6 +705,9 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
     SetValue("elPhIso" , elPhIso);
     SetValue("elAEff"  , elAEff);
     SetValue("elRhoIso", elRhoIso);
+    SetValue("elEcalPFClusterIso", elEcalPFClusterIso);
+    SetValue("elHcalPFClusterIso", elHcalPFClusterIso);
+    SetValue("elDR03TkSumPt", elDR03TkSumPt);
 
     //MC matching -- mother information
     SetValue("elNumberOfMothers", elNumberOfMothers);
@@ -810,7 +834,7 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
         AK8JetPhi    . push_back(lvak8.Phi());
         AK8JetEnergy . push_back(lvak8.Energy());
 
-        AK8JetCSV    . push_back(ijet->bDiscriminator( "combinedInclusiveSecondaryVertexV2BJetTags" ));
+        AK8JetCSV    . push_back(ijet->bDiscriminator( "pfCombinedInclusiveSecondaryVertexV2BJetTags" ));
         //     AK8JetRCN    . push_back((ijet->chargedEmEnergy()+ijet->chargedHadronEnergy()) / (ijet->neutralEmEnergy()+ijet->neutralHadronEnergy()));
     }
  
