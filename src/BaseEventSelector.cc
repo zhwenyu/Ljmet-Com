@@ -535,7 +535,7 @@ TLorentzVector BaseEventSelector::correctJetForMet(const pat::Jet & jet, edm::Ev
     	    std::cout << mLegend << "WARNING! Jet/MET will remain uncorrected." << std::endl;
         }
       
-        //for (unsigned int testi = 0; testi < corrVec.size(); testi++) {std::cout<<testi<<" ==> "<<corrVec[testi]<<std::endl;}
+        for (unsigned int testi = 0; testi < corrVec.size(); testi++) {std::cout<<testi<<" ==> "<<corrVec[testi]<<std::endl;}
 
         jetP4 *= corrVec[corrVec.size()-1];
         offJetP4 *= corrVec[0];
