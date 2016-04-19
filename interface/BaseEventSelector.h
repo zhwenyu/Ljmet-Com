@@ -32,6 +32,7 @@
 #include "CondFormats/JetMETObjects/interface/FactorizedJetCorrector.h"
 #include "JetMETCorrections/Objects/interface/JetCorrector.h"
 #include "CondFormats/JetMETObjects/interface/JetCorrectorParameters.h"
+#include "JetMETCorrections/Modules/interface/JetResolution.h"
 
 #include "RecoEgamma/EgammaTools/interface/ConversionTools.h"
 #include "TMath.h"
@@ -171,6 +172,10 @@ private:
     double bTagCut;
     BTagSFUtil mBtagSfUtil;
     BtagHardcodedConditions mBtagCond;
+    JME::JetResolution resolution;
+    JME::JetResolution resolutionAK8;
+    JME::JetResolutionScaleFactor resolution_SF;
+    Variation JERsystematic;
     JetCorrectionUncertainty *jecUnc;
     JetCorrectorParameters *L3JetPar;
     JetCorrectorParameters *L2JetPar;
