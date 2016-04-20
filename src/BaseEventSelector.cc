@@ -424,6 +424,7 @@ TLorentzVector BaseEventSelector::correctJetForMet(const pat::Jet & jet, edm::Ev
 	double factor = resolution_SF.getScaleFactor(parameters,JERsystematic) - 1;
 
         const reco::GenJet * genJet = jet.genJet();
+        bool smeared = false;
 	if(genJet){
 	  TLorentzVector genP4;
 	  genP4.SetPtEtaPhiE(genJet->pt(),genJet->eta(),genJet->phi(),genJet->energy());
@@ -434,8 +435,13 @@ TLorentzVector BaseEventSelector::correctJetForMet(const pat::Jet & jet, edm::Ev
       	    double reco_pt = pt;
             double deltapt = (reco_pt - gen_pt) * factor;
             ptscale = max(0.0, (reco_pt + deltapt) / reco_pt);
+            smeared = true;
 	  }
 	}
+        if (!smeared && factor>1) {
+          JERrand.SetSeed(abs(static_cast<int>(jet.phi()*1e4)));
+          ptscale = max(0.0, JERrand.Gaus(pt,sqrt(factor*(factor+2))*res)/pt);
+        }
 
         if ( mbPar["JECup"] || mbPar["JECdown"]) {
             jecUnc->setJetEta(jetP4.Eta());
@@ -576,6 +582,7 @@ TLorentzVector BaseEventSelector::correctJet(const pat::Jet & jet, edm::EventBas
 	double factor = resolution_SF.getScaleFactor(parameters,JERsystematic) - 1;
 
         const reco::GenJet * genJet = jet.genJet();
+        bool smeared = false;
 	if(genJet){
 	  double deltaPt = fabs(genJet->pt() - pt);
 	  double deltaR = reco::deltaR(genJet->p4(),correctedJet.p4());	
@@ -584,8 +591,13 @@ TLorentzVector BaseEventSelector::correctJet(const pat::Jet & jet, edm::EventBas
       	    double reco_pt = pt;
             double deltapt = (reco_pt - gen_pt) * factor;
             ptscale = max(0.0, (reco_pt + deltapt) / reco_pt);
+            smeared = true;
 	  }
 	}
+        if (!smeared && factor>1) {
+          JERrand.SetSeed(abs(static_cast<int>(jet.phi()*1e4)));
+          ptscale = max(0.0, JERrand.Gaus(pt,sqrt(factor*(factor+2))*res)/pt);
+        }
 
         if ( mbPar["JECup"] || mbPar["JECdown"]) {
             jecUnc->setJetEta(jet.eta());
@@ -764,6 +776,7 @@ pat::Jet BaseEventSelector::correctJetReturnPatJet(const pat::Jet & jet, edm::Ev
 	double factor = resolution_SF.getScaleFactor(parameters,JERsystematic) - 1;
 
         const reco::GenJet * genJet = jet.genJet();
+        bool smeared = false;
 	if(genJet){
 	  double deltaPt = fabs(genJet->pt() - pt);
 	  double deltaR = reco::deltaR(genJet->p4(),correctedJet.p4());	
@@ -772,8 +785,13 @@ pat::Jet BaseEventSelector::correctJetReturnPatJet(const pat::Jet & jet, edm::Ev
       	    double reco_pt = pt;
             double deltapt = (reco_pt - gen_pt) * factor;
             ptscale = max(0.0, (reco_pt + deltapt) / reco_pt);
+            smeared = true;
 	  }
 	}
+        if (!smeared && factor>1) {
+          JERrand.SetSeed(abs(static_cast<int>(jet.phi()*1e4)));
+          ptscale = max(0.0, JERrand.Gaus(pt,sqrt(factor*(factor+2))*res)/pt);
+        }
 
         if ( mbPar["JECup"] || mbPar["JECdown"]) {
             jecUnc->setJetEta(jet.eta());
