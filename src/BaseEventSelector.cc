@@ -579,7 +579,7 @@ TLorentzVector BaseEventSelector::correctJet(const pat::Jet & jet, edm::EventBas
 	if(genJet){
 	  double deltaPt = fabs(genJet->pt() - pt);
 	  double deltaR = reco::deltaR(genJet->p4(),correctedJet.p4());	
-	  if (deltaR < 0.2 && deltaPt <= 3*pt*res){
+	  if (deltaR < ((doAK8Corr) ? 0.4 : 0.2) && deltaPt <= 3*pt*res){
       	    double gen_pt = genJet->pt();
       	    double reco_pt = pt;
             double deltapt = (reco_pt - gen_pt) * factor;
@@ -767,7 +767,7 @@ pat::Jet BaseEventSelector::correctJetReturnPatJet(const pat::Jet & jet, edm::Ev
 	if(genJet){
 	  double deltaPt = fabs(genJet->pt() - pt);
 	  double deltaR = reco::deltaR(genJet->p4(),correctedJet.p4());	
-	  if (deltaR < 0.2 && deltaPt <= 3*pt*res){
+	  if (deltaR < ((doAK8Corr) ? 0.4 : 0.2) && deltaPt <= 3*pt*res){
       	    double gen_pt = genJet->pt();
       	    double reco_pt = pt;
             double deltapt = (reco_pt - gen_pt) * factor;
