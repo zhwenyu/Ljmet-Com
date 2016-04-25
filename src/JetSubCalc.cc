@@ -647,6 +647,10 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * s
       theJetAK8SDSubjetSize.push_back(nSDSubJets);
       theJetAK8SDSubjetNCSVL.push_back(nSDSubsCSVL);
       theJetAK8SDSubjetNCSVMSF.push_back(nSDSubsCSVMSF);
+      theJetAK8SDSubjetNCSVM_bSFup.push_back(nSDSubsCSVM_bSFup);
+      theJetAK8SDSubjetNCSVM_bSFdn.push_back(nSDSubsCSVM_bSFdn);
+      theJetAK8SDSubjetNCSVM_lSFup.push_back(nSDSubsCSVM_lSFup);
+      theJetAK8SDSubjetNCSVM_lSFdn.push_back(nSDSubsCSVM_lSFdn);
 
     }
 
