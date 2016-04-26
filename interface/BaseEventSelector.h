@@ -192,6 +192,7 @@ private:
     TMVA::Reader tmpTMVAReader_EB;
     TMVA::Reader tmpTMVAReader_EE;
     
+    TRandom3 JERrand;
     
     /// Private init method to be called by LjmetFactory when registering the selector
     void init() { mLegend = "[" + mName + "]: "; std::cout << mLegend << "registering " << mName << std::endl; }
