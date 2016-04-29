@@ -740,6 +740,16 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * s
 	    if(d->pdgId() != dauId) std::cout << "making daughter GenParticle didn't work" << std::endl;
 	    
 	    if(abs(dauId) == abs(id)) hasRadiation = true;
+	    else if(abs(dauId) == 24){  // check t->Wb->leptons and H->WW->leptons
+	      while(d->numberOfDaughters() == 1) d = d->daughter(0);
+	      if(abs(d->daughter(0)->pdgId()) > 10 && abs(d->daughter(0)->pdgId()) < 17) hasLepton = true;
+	      if(abs(d->daughter(1)->pdgId()) > 10 && abs(d->daughter(1)->pdgId()) < 17) hasLepton = true;
+	    }
+	    else if(abs(dauId) == 23){  // check H->ZZ->leptons
+	      while(d->numberOfDaughters() == 1) d = d->daughter(0);
+	      if(abs(d->daughter(0)->pdgId()) > 10 && abs(d->daughter(0)->pdgId()) < 17) hasLepton = true;
+	      if(abs(d->daughter(1)->pdgId()) > 10 && abs(d->daughter(1)->pdgId()) < 17) hasLepton = true;
+	    }
 	    else if(abs(dauId) > 10 && abs(dauId) < 17) hasLepton = true;	    
 	    
 	  }
@@ -757,6 +767,7 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * s
 	    
 	    if(abs(mother->pdgId()) == 6){
 	      double dr = reco::deltaR(p.p4(),mother->daughter(1)->p4());
+	      if(abs(mother->daughter(1)->pdgId()) == 24) dr = reco::deltaR(p.p4(),mother->daughter(0)->p4());
 	      if(dr < dRWb) dRWb = dr;
 	    }else if(abs(mother->pdgId()) == 25){
 	      double dr = 1000;
@@ -818,6 +829,7 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * s
 	    HadronicVHtD2E.push_back( 0);
 	  }else{
 	    const reco::Candidate *W = p.daughter(0);
+	    if(fabs(W->pdgId()) != 24) W = p.daughter(1);
 	    while(W->numberOfDaughters() == 1) W = W->daughter(0);
 	    HadronicVHtD1Pt.push_back( W->daughter(0)->pt());
 	    HadronicVHtD2Pt.push_back( W->daughter(1)->pt());
