@@ -354,7 +354,7 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
     std::vector<double> muMatchedPhi;
     std::vector<double> muMatchedEnergy;
 
-    for (std::vector<edm::Ptr<pat::Muon> >::const_iterator imu = vSelMuons.begin(); imu != vSelMuons.end(); imu++) 
+    for (std::vector<edm::Ptr<pat::Muon> >::const_iterator imu = vSelMuons.begin(); imu != vSelMuons.end(); imu++) {
         //Protect against muons without tracks (should never happen, but just in case)
         if ((*imu)->globalTrack().isNonnull() and (*imu)->globalTrack().isAvailable() and
             (*imu)->innerTrack().isNonnull()  and (*imu)->innerTrack().isAvailable()){
@@ -450,7 +450,7 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
                 }
             }
         }
-     // }
+    }
     SetValue("muCharge", muCharge);
     SetValue("muGlobal", muGlobal);
     SetValue("muPt"     , muPt);
@@ -501,7 +501,11 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
     //Four std::vector
     std::vector <double> elPt;
     std::vector <double> elEta;
+    std::vector <double> elPFEta;
     std::vector <double> elPhi;
+    std::vector <double> elSCE;
+    std::vector <double> elSCPt;
+    std::vector <double> elPFPhi;
     std::vector <double> elEnergy;
 
     std::vector <double> elEtaVtx;
@@ -580,7 +584,11 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
             //Four std::vector
             elPt     . push_back((*iel)->pt()); //Must check: why ecalDrivenMomentum?
             elEta    . push_back((*iel)->superCluster()->eta());
+            elPFEta  . push_back((*iel)->eta());
             elPhi    . push_back((*iel)->superCluster()->phi());
+            elSCE    . push_back((*iel)->superCluster()->energy());
+            elSCPt   . push_back((*iel)->superCluster()->pt());
+            elPFPhi  . push_back((*iel)->phi());
             elEnergy . push_back((*iel)->energy());
 
 	    elEtaVtx.push_back((*iel)->trackMomentumAtVtxWithConstraint().Eta());
@@ -689,7 +697,11 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
     //Four std::vector
     SetValue("elPt"     , elPt);
     SetValue("elEta"    , elEta);
+    SetValue("elPFEta"  , elPFEta);
     SetValue("elPhi"    , elPhi);
+    SetValue("elSCE"    , elSCE);
+    SetValue("elSCPt"   , elSCPt);
+    SetValue("elPFPhi"  , elPFPhi);
     SetValue("elEnergy" , elEnergy);
 
     SetValue("elEtaVtx" , elEtaVtx);
