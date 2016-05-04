@@ -14,7 +14,7 @@ import re
 import sys
 
 
-dirpre = 'Apr05/'
+dirpre = 'Apr20/'
 
 files = 0
 rootfiles = 0
