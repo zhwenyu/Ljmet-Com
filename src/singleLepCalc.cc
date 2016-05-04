@@ -62,6 +62,7 @@ private:
     edm::InputTag             genParticles_it;
     edm::InputTag             packedPFCandsLabel_;
     edm::InputTag             genJets_it;
+    edm::InputTag             elec_it;
     std::vector<unsigned int> keepPDGID;
     std::vector<unsigned int> keepMomPDGID;
     std::vector<unsigned int> keepPDGIDForce;
@@ -69,6 +70,7 @@ private:
     bool keepFullMChistory;
     bool cleanGenJets;
     bool UseElMVA;
+    bool doElSCMETCorr;
     bool orlhew;
     bool saveLooseLeps;
     std::string basePDFname;
@@ -169,6 +171,11 @@ int singleLepCalc::BeginJob()
 
     if (mPset.exists("UseElMVA")) UseElMVA = mPset.getParameter<bool>("UseElMVA");
     else                          UseElMVA = false;
+
+    if (mPset.exists("doElSCMETCorr")) doElSCMETCorr = mPset.getParameter<bool>("doElSCMETCorr");
+    else                               doElSCMETCorr = false;
+    if (mPset.exists("electronCollection"))      elec_it = mPset.getParameter<edm::InputTag>("electronCollection");
+    else                                         elec_it = edm::InputTag("slimmedElectrons");
 
     if (mPset.exists("OverrideLHEWeights")) orlhew = mPset.getParameter<bool>("OverrideLHEWeights");
     else                                   orlhew = false;
@@ -504,7 +511,6 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
     std::vector <double> elPFEta;
     std::vector <double> elPhi;
     std::vector <double> elSCE;
-    std::vector <double> elSCPt;
     std::vector <double> elPFPhi;
     std::vector <double> elEnergy;
 
@@ -587,7 +593,6 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
             elPFEta  . push_back((*iel)->eta());
             elPhi    . push_back((*iel)->superCluster()->phi());
             elSCE    . push_back((*iel)->superCluster()->energy());
-            elSCPt   . push_back((*iel)->superCluster()->pt());
             elPFPhi  . push_back((*iel)->phi());
             elEnergy . push_back((*iel)->energy());
 
@@ -700,7 +705,6 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
     SetValue("elPFEta"  , elPFEta);
     SetValue("elPhi"    , elPhi);
     SetValue("elSCE"    , elSCE);
-    SetValue("elSCPt"   , elSCPt);
     SetValue("elPFPhi"  , elPFPhi);
     SetValue("elEnergy" , elEnergy);
 
@@ -945,11 +949,26 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
             
         TLorentzVector corrMET = selector->correctMet(*pMet, event);
 
+        if (doElSCMETCorr) {
+            TLorentzVector tmpPF, tmpSC;
+            edm::Handle< std::vector<pat::Electron> > mhElectrons;
+            event.getByLabel( elec_it, mhElectrons );
+            std::cout<<"----------------------------"<<std::endl;
+            std::cout<<"Orig MET: met="<<corrMET.Pt()<<", phi="<<corrMET.Phi()<<std::endl;
+            for (std::vector<pat::Electron>::const_iterator _iel = mhElectrons->begin(); _iel != mhElectrons->end(); _iel++){
+                tmpSC.SetPtEtaPhiE(_iel->superCluster()->energy()/TMath::CosH(_iel->superCluster()->eta()),_iel->superCluster()->eta(),_iel->superCluster()->phi(),_iel->superCluster()->energy());
+                std::cout<<"SC vec: pt="<<tmpSC.Pt()<<", eta="<<tmpSC.Eta()<<", phi="<<tmpSC.Phi()<<", e="<<tmpSC.Energy()<<std::endl;
+                tmpPF.SetPtEtaPhiE(_iel->pt(),_iel->eta(),_iel->phi(),_iel->energy());
+                std::cout<<"PF vec: pt="<<tmpPF.Pt()<<", eta="<<tmpPF.Eta()<<", phi="<<tmpPF.Phi()<<", e="<<tmpPF.Energy()<<std::endl;
+                corrMET += tmpPF - tmpSC;
+                std::cout<<"Corr MET: met="<<corrMET.Pt()<<", phi="<<corrMET.Phi()<<std::endl;
+            }
+        }
+
         if(corrMET.Pt()>0) {
             _corr_met = corrMET.Pt();
             _corr_met_phi = corrMET.Phi();
         }
-
     }
     SetValue("met", _met);
     SetValue("met_phi", _met_phi);
