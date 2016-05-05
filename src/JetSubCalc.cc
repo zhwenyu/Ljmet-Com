@@ -137,8 +137,10 @@ int JetSubCalc::BeginJob()
     if(mPset.exists("isMc")) isMc = mPset.getParameter<bool>("isMc");
     else isMc = false;
 
-    JECup = mPset.getParameter<bool>("JECup");
-    JECdn = mPset.getParameter<bool>("JECdown");
+    if(mPset.exists("JECup")) JECup = mPset.getParameter<bool>("JECup");
+    else JECup=false;
+    if(mPset.exists("JECdown")) JECdn = mPset.getParameter<bool>("JECdown");
+    else JECdn = false;
 
     if(useL2L3Mass){
       cout << "JetSubCalc: using L2+L3 corrected groomed masses" << endl;
