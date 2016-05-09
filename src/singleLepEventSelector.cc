@@ -608,6 +608,51 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
             for (std::vector<pat::Muon>::const_iterator _imu = mhMuons->begin(); _imu != mhMuons->end(); _imu++){
                 retMuon.set(false);	
                 bool pass = false;
+    
+                /*if ((*_imu).globalTrack().isNonnull() and (*_imu).globalTrack().isAvailable()) {
+                    reco::TrackRef tunePBestTrack = (*_imu).tunePMuonBestTrack();
+                    reco::TrackRef globalTrack = (*_imu).globalTrack();
+                    reco::TrackRef combinedTrack;
+                    if ((*_imu).combinedMuon().isNonnull() and (*_imu).combinedMuon().isAvailable()) combinedTrack = (*_imu).combinedMuon();
+                    reco::TrackRef innerTrack;
+                    if ((*_imu).innerTrack().isNonnull() and (*_imu).innerTrack().isAvailable()) innerTrack = (*_imu).innerTrack();
+                    reco::TrackRef outerTrack;
+                    if ((*_imu).outerTrack().isNonnull() and (*_imu).outerTrack().isAvailable()) outerTrack = (*_imu).outerTrack();
+                    reco::TrackRef pickyTrack;
+                    if ((*_imu).pickyTrack().isNonnull() and (*_imu).pickyTrack().isAvailable()) pickyTrack = (*_imu).pickyTrack();
+        
+                    reco::Muon::MuonTrackType tunePBestTrackType = (*_imu).tunePMuonBestTrackType();
+                    std::cout<<"Best track type is ";
+                    switch (int(tunePBestTrackType)) {
+                        case 1:
+                            std::cout<<"InnerTrack"<<std::endl;
+                            break;
+                        case 2:
+                            std::cout<<"OuterTrack"<<std::endl;
+                            break;
+                        case 3:
+                            std::cout<<"CombinedTrack"<<std::endl;
+                            break;
+                        case 4:
+                            std::cout<<"TPFMS"<<std::endl;
+                            break;
+                        case 5:
+                            std::cout<<"Picky"<<std::endl;
+                            break;
+                        case 6:
+                            std::cout<<"DYT"<<std::endl;
+                            break;
+                        default:
+                            std::cout<<"Unknown("<<tunePBestTrackType<<")"<<std::endl;
+                    }
+                    std::cout<<"PF       : "<<(*_imu).pt()<<std::endl;
+                    std::cout<<"tuneP    : "<<tunePBestTrack->pt()<<" w/ quality "<<tunePBestTrack->qualityMask()<<std::endl;
+                    std::cout<<"global   : "<<globalTrack->pt()<<" w/ quality "<<globalTrack->qualityMask()<<std::endl;
+                    if ((*_imu).combinedMuon().isNonnull() and (*_imu).combinedMuon().isAvailable()) std::cout<<"combined : "<<combinedTrack->pt()<<" w/ quality "<<combinedTrack->qualityMask()<<std::endl;
+                    if ((*_imu).innerTrack().isNonnull() and (*_imu).innerTrack().isAvailable()) std::cout<<"inner    : "<<innerTrack->pt()<<" w/ quality "<<innerTrack->qualityMask()<<std::endl;
+                    if ((*_imu).outerTrack().isNonnull() and (*_imu).outerTrack().isAvailable()) std::cout<<"outer    : "<<outerTrack->pt()<<" w/ quality "<<outerTrack->qualityMask()<<std::endl;
+                    if ((*_imu).pickyTrack().isNonnull() and (*_imu).pickyTrack().isAvailable()) std::cout<<"picky    : "<<pickyTrack->pt()<<" w/ quality "<<pickyTrack->qualityMask()<<std::endl;
+                }*/
 
                 //muon cuts
                 while(1){
