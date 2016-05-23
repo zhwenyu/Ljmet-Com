@@ -369,6 +369,8 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * s
     std::vector<double> theJetAK8Energy;
     std::vector<double> theJetAK8CSV;
     std::vector<double> theJetAK8JetCharge;
+    std::vector<double> theJetAK8GenPt;
+    std::vector<double> theJetAK8GenDR;
 
     std::vector<double> theJetAK8CEmEnergy;
     std::vector<double> theJetAK8NEmEnergy;
@@ -467,6 +469,20 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * s
       theJetAK8Phi   .push_back(corrak8.phi());
       theJetAK8Energy.push_back(corrak8.energy());
       theJetAK8Mass  .push_back(corrak8.mass());
+
+      double genDR = -99;
+      double genpt = -99;
+      TLorentzVector ak8jet;
+      ak8jet.SetPtEtaPhiE(corrak8.pt(),corrak8.eta(),corrak8.phi(),corrak8.energy());
+      const reco::GenJet * genJet = corrak8.genJet();
+      if(genJet){
+	TLorentzVector genP4;
+	genP4.SetPtEtaPhiE(genJet->pt(),genJet->eta(),genJet->phi(),genJet->energy());
+	genDR = ak8jet.DeltaR(genP4);	
+	genpt = genJet->pt();
+      }
+      theJetAK8GenPt.push_back(genpt);
+      theJetAK8GenDR.push_back(genDR);
 
       thePrunedMass   = -std::numeric_limits<double>::max();
       theTrimmedMass  = -std::numeric_limits<double>::max();
@@ -660,6 +676,8 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * s
     SetValue("theJetAK8Energy", theJetAK8Energy);
     SetValue("theJetAK8CSV",    theJetAK8CSV);
     SetValue("theJetAK8JetCharge", theJetAK8JetCharge);
+    SetValue("theJetAK8GenPt",  theJetAK8GenPt);
+    SetValue("theJetAK8GenDR",  theJetAK8GenDR);
 
     SetValue("theJetAK8CEmEnergy", theJetAK8CEmEnergy); 
     SetValue("theJetAK8NEmEnergy", theJetAK8NEmEnergy); 
