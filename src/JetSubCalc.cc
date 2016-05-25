@@ -1,7 +1,7 @@
 /*
  Calculator for substructure variables
- 
- Author: Joshua Swanson, 2014. Updated Julie Hogan, 2015. 
+
+ Author: Joshua Swanson, 2014. Updated Julie Hogan, 2015.
  */
 
 #include <iostream>
@@ -34,14 +34,14 @@ using namespace std;
 class LjmetFactory;
 
 class JetSubCalc : public BaseCalc {
-    
+
 public:
     JetSubCalc();
     virtual ~JetSubCalc();
     virtual int BeginJob();
     virtual int AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * selector);
     virtual int EndJob();
-    
+
 private:
   edm::InputTag slimmedJetColl_it;
   edm::InputTag slimmedJetsAK8Coll_it;
@@ -68,7 +68,7 @@ private:
   FactorizedJetCorrector *jecak8;
   JetCorrectorParameters *L3JetParAK8;
   JetCorrectorParameters *L2JetParAK8;
-  JetCorrectorParameters *ResJetParAK8; 
+  JetCorrectorParameters *ResJetParAK8;
   JetCorrectionUncertainty *jecUnc;
 };
 
@@ -95,7 +95,7 @@ int JetSubCalc::BeginJob()
 
     if (mPset.exists("slimmedJetColl")){ slimmedJetColl_it = mPset.getParameter<edm::InputTag>("slimmedJetColl");}
     else slimmedJetColl_it = edm::InputTag("slimmedJets");
-    
+
     if (mPset.exists("slimmedJetsAK8Coll")) slimmedJetsAK8Coll_it = mPset.getParameter<edm::InputTag>("slimmedJetsAK8Coll");
     else slimmedJetsAK8Coll_it = edm::InputTag("slimmedJetsAK8");
 
@@ -104,9 +104,9 @@ int JetSubCalc::BeginJob()
 
     if (mPset.exists("bDiscriminant")) bDiscriminant = mPset.getParameter<std::string>("bDiscriminant");
     else bDiscriminant = "pfCombinedInclusiveSecondaryVertexV2BJetTags";
-    
+
     std::cout << " JetSubCalc Bdisc = " << bDiscriminant << std::endl;
-    
+
     if (mPset.exists("tagInfo")) tagInfo = mPset.getParameter<std::string>("tagInfo");
     else tagInfo = "CATop";
 
@@ -126,7 +126,7 @@ int JetSubCalc::BeginJob()
 
       if (mPset.exists("httTagInfo")) httTagInfo_it = mPset.getParameter<edm::InputTag>("httTagInfo");
       else httTagInfo_it = edm::InputTag("HTT");
-  
+
       if (mPset.exists("selectedJetsCA15Coll")) selectedPatJetsCA15Coll_it = mPset.getParameter<edm::InputTag>("selectedJetsCA15Coll");
       else selectedPatJetsCA15Coll_it = edm::InputTag("selectedPatJetsCA15PFCHSNoHF");
     }
@@ -153,23 +153,23 @@ int JetSubCalc::BeginJob()
       else DataL3 = "/uscms_data/d3/jmanagan/CMSSW_7_4_14/src/LJMet/Com/data/Summer15_25nsV5_Data_L1FastJet";
       if(mPset.exists("DataL2L3JetParAK8")) DataL2L3 = mPset.getParameter<std::string>("DataL2L3JetParAK8");
       else DataL2L3 = "/uscms_data/d3/jmanagan/CMSSW_7_4_14/src/LJMet/Com/data/Summer15_25nsV5_Data_L1FastJet";
- 
+
       std::vector<JetCorrectorParameters> vParAK8;
-      
+
       if(isMc){
 	L3JetParAK8  = new JetCorrectorParameters(MCL3);
 	L2JetParAK8  = new JetCorrectorParameters(MCL2);
 	vParAK8.push_back(*L2JetParAK8);
 	vParAK8.push_back(*L3JetParAK8);
       }else{
-	ResJetParAK8 = new JetCorrectorParameters(DataL2L3); 
+	ResJetParAK8 = new JetCorrectorParameters(DataL2L3);
 	L3JetParAK8  = new JetCorrectorParameters(DataL3);
 	L2JetParAK8  = new JetCorrectorParameters(DataL2);
 	vParAK8.push_back(*L2JetParAK8);
 	vParAK8.push_back(*L3JetParAK8);
 	vParAK8.push_back(*ResJetParAK8);
       }
-      
+
       jecak8 = new FactorizedJetCorrector(vParAK8);
       jecUnc = new JetCorrectionUncertainty(mPset.getParameter<std::string>("UncertaintyAK8"));
 
@@ -181,7 +181,7 @@ int JetSubCalc::BeginJob()
 int JetSubCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * selector)
 {
     // ----- Get AK4 jet objects from the selector -----
-    // This is updated -- original version used all AK4 jets without selection 
+    // This is updated -- original version used all AK4 jets without selection
     std::vector<pat::Jet>                       const & theJets = selector->GetSelectedCorrJets();
     std::vector<std::pair<TLorentzVector,bool>> const & theCorrBtagJets = selector->GetCorrJetsWithBTags();
 
@@ -192,7 +192,7 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * s
     float subjetCSV;
     int CSVL, CSVM, CSVT;
     double theJetHT;
-    
+
     // Available variables
     std::vector<double> theJetPt;
     std::vector<double> theJetEta;
@@ -218,21 +218,21 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * s
     // Decay length value and significance
     std::vector<double> theJetVtx3DVal;
     std::vector<double> theJetVtx3DSig;
-    
+
     // Discriminator for the MVA PileUp id.
     // NOTE: Training used is for ak5PFJetsCHS in CMSSW 5.3.X and Run 1 pileup
     std::vector<double> theJetPileupJetId;
-    
+
     //Identity
     std::vector<int> theJetIndex;
     std::vector<int> theJetnDaughters;
-    
+
     //Daughter four std::vector and index
     std::vector<double> theJetDaughterPt;
     std::vector<double> theJetDaughterEta;
     std::vector<double> theJetDaughterPhi;
     std::vector<double> theJetDaughterEnergy;
-    
+
     std::vector<int> theJetDaughterMotherIndex;
     std::vector<int> theJetCSVLSubJets;
     std::vector<int> theJetCSVMSubJets;
@@ -245,7 +245,7 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * s
     std::vector<int> theJetBTag_bSFdn;
     std::vector<int> theJetBTag_lSFup;
     std::vector<int> theJetBTag_lSFdn;
-    
+
     double theVtxMass, theVtxNtracks, theVtx3DVal, theVtx3DSig, thePileupJetId;
 
     for (std::vector<pat::Jet>::const_iterator ijet = theJets.begin(); ijet != theJets.end(); ijet++) {
@@ -255,22 +255,22 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * s
 
       theVtxNtracks  = -std::numeric_limits<double>::max();
       theVtxNtracks  = (double)ijet->userFloat("vtxNtracks");
-				
+
       if (theVtxNtracks > 0) {
 	theVtxMass     = -std::numeric_limits<double>::max();
 	theVtx3DVal    = -std::numeric_limits<double>::max();
 	theVtx3DSig    = -std::numeric_limits<double>::max();
-	
+
 	theVtxMass     = (double)ijet->userFloat("vtxMass");
 	theVtx3DVal    = (double)ijet->userFloat("vtx3DVal");
 	theVtx3DSig    = (double)ijet->userFloat("vtx3DSig");
-        
+
 	theJetVtxNtracks.push_back(theVtxNtracks);
 	theJetVtxMass.push_back(theVtxMass);
 	theJetVtx3DVal.push_back(theVtx3DVal);
 	theJetVtx3DSig.push_back(theVtx3DSig);
       }
-      
+
       thePileupJetId = -std::numeric_limits<double>::max();
       thePileupJetId = (double)ijet->userFloat("pileupJetId:fullDiscriminant");
       theJetPileupJetId.push_back(thePileupJetId);
@@ -279,7 +279,7 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * s
       theJetEta    . push_back(ijet->eta());
       theJetPhi    . push_back(ijet->phi());
       theJetEnergy . push_back(ijet->energy());
-      
+
       theJetCSV.push_back(ijet->bDiscriminator( bDiscriminant ));
       theJetBTag.push_back(selector->isJetTagged(*ijet, event, true, 0));
       theJetBTag_bSFup.push_back(selector->isJetTagged(*ijet, event, true, 1));
@@ -292,31 +292,31 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * s
       theJetCEmEnergy.push_back(ijet->chargedEmEnergy());
       theJetNEmEnergy.push_back(ijet->neutralEmEnergy());
       theJetCEmEFrac.push_back(ijet->chargedEmEnergyFraction());
-      theJetNEmEFrac.push_back(ijet->neutralEmEnergyFraction());	    
+      theJetNEmEFrac.push_back(ijet->neutralEmEnergyFraction());
 
       theJetCHadEnergy.push_back(ijet->chargedHadronEnergy());
       theJetNHadEnergy.push_back(ijet->neutralHadronEnergy());
       theJetCHadEFrac.push_back(ijet->chargedHadronEnergyFraction());
-      theJetNHadEFrac.push_back(ijet->neutralHadronEnergyFraction());      
+      theJetNHadEFrac.push_back(ijet->neutralHadronEnergyFraction());
       theJetMuonEFrac.push_back(ijet->muonEnergyFraction());
 
       theJetIndex.push_back(index);
       theJetnDaughters.push_back((int)ijet->numberOfDaughters());
-      
+
       //HT
-      theJetHT += ijet->pt(); 
+      theJetHT += ijet->pt();
 
     }
-    
+
     double leading_pt = -999.;
-    for (std::vector<pat::Jet>::const_iterator ijet = theJets.begin(); ijet != theJets.end(); ijet++) { 
+    for (std::vector<pat::Jet>::const_iterator ijet = theJets.begin(); ijet != theJets.end(); ijet++) {
 
       if(killHF && fabs(ijet->eta()) > 2.4) continue;
       if (ijet->pt() > leading_pt){leading_pt = ijet->pt();}
     }
 
     double second_leading_pt =-999.;
-    for (std::vector<pat::Jet>::const_iterator ijet = theJets.begin(); ijet != theJets.end(); ijet++) { 
+    for (std::vector<pat::Jet>::const_iterator ijet = theJets.begin(); ijet != theJets.end(); ijet++) {
 
       if(killHF && fabs(ijet->eta()) > 2.4) continue;
       if(ijet->pt() > second_leading_pt && ijet->pt() < leading_pt){
@@ -337,17 +337,17 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * s
     SetValue("theJetBTag_lSFup",   theJetBTag_lSFup);
     SetValue("theJetBTag_lSFdn",   theJetBTag_lSFdn);
 
-    SetValue("theJetCEmEnergy", theJetCEmEnergy); 
-    SetValue("theJetNEmEnergy", theJetNEmEnergy); 
-    SetValue("theJetCEmEFrac",  theJetCEmEFrac);  
-    SetValue("theJetNEmEFrac",  theJetNEmEFrac);  
+    SetValue("theJetCEmEnergy", theJetCEmEnergy);
+    SetValue("theJetNEmEnergy", theJetNEmEnergy);
+    SetValue("theJetCEmEFrac",  theJetCEmEFrac);
+    SetValue("theJetNEmEFrac",  theJetNEmEFrac);
     SetValue("theJetCHadEnergy",theJetCHadEnergy);
     SetValue("theJetNHadEnergy",theJetNHadEnergy);
-    SetValue("theJetCHadEFrac", theJetCHadEFrac); 
-    SetValue("theJetNHadEFrac", theJetNHadEFrac); 
+    SetValue("theJetCHadEFrac", theJetCHadEFrac);
+    SetValue("theJetNHadEFrac", theJetNHadEFrac);
     SetValue("theJetMuonEFrac", theJetMuonEFrac);
 
-    SetValue("theJetHT", theJetHT);    
+    SetValue("theJetHT", theJetHT);
     SetValue("theJetLeadPt", leading_pt);
     SetValue("theJetSubLeadPt", second_leading_pt);
 
@@ -378,13 +378,13 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * s
     std::vector<double> theJetAK8NHadEnergy;
     std::vector<double> theJetAK8CHadEFrac;
     std::vector<double> theJetAK8NHadEFrac;
-    
+
     // Pruned, trimmed and filtered masses available
     std::vector<double> theJetAK8PrunedMass;
     std::vector<double> theJetAK8TrimmedMass;
     std::vector<double> theJetAK8FilteredMass;
     std::vector<double> theJetAK8SoftDropMass;
-    
+
     // n-subjettiness variables tau1, tau2, and tau3 available
     std::vector<double> theJetAK8NjettinessTau1;
     std::vector<double> theJetAK8NjettinessTau2;
@@ -394,7 +394,7 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * s
     std::vector<double> theJetAK8Mass;
     std::vector<int>    theJetAK8Index;
     std::vector<int>    theJetAK8nDaughters;
-    
+
     std::vector<double> theJetAK8SDSubjetPt;
     std::vector<double> theJetAK8SDSubjetEta;
     std::vector<double> theJetAK8SDSubjetPhi;
@@ -410,19 +410,19 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * s
     std::vector<int> theJetAK8SDSubjetNCSVM_lSFdn;
     std::vector<int> theJetAK8SDSubjetNCSVM_bSFup;
     std::vector<int> theJetAK8SDSubjetNCSVM_bSFdn;
-    
+
     double topMass, minMass, jetCharge;
     int nSubJets;
     double thePrunedMass, theTrimmedMass, theFilteredMass, theSoftDropMass;
     double theNjettinessTau1, theNjettinessTau2, theNjettinessTau3;
 
     double SDsubjetPt;
-    double SDsubjetEta; 
-    double SDsubjetPhi;      
-    double SDsubjetMass;      
-    double SDsubjetBdisc;     
-    double SDsubjetBTag;     
-    double SDdeltaRsubjetJet; 
+    double SDsubjetEta;
+    double SDsubjetPhi;
+    double SDsubjetMass;
+    double SDsubjetBdisc;
+    double SDsubjetBTag;
+    double SDdeltaRsubjetJet;
 
     int nSDSubJets;
     int nSDSubsCSVL;
@@ -440,18 +440,18 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * s
       pat::Jet rawJet = ijet->correctedJet(0);
       bool looseJetID = false;
       if(abs(rawJet.eta()) <= 3.0){
-	looseJetID = (rawJet.neutralHadronEnergyFraction() < 0.99 && 
-		      rawJet.neutralEmEnergyFraction() < 0.99 && 
-		      (rawJet.chargedMultiplicity()+rawJet.neutralMultiplicity()) > 0) && 
-	  ((abs(rawJet.eta()) <= 2.4 && 
-	    rawJet.chargedHadronEnergyFraction() > 0 && 
-	    rawJet.chargedEmEnergyFraction() < 0.99 && 
-	    rawJet.chargedMultiplicity() > 0) || 
+	looseJetID = (rawJet.neutralHadronEnergyFraction() < 0.99 &&
+		      rawJet.neutralEmEnergyFraction() < 0.99 &&
+		      (rawJet.chargedMultiplicity()+rawJet.neutralMultiplicity()) > 0) &&
+	  ((abs(rawJet.eta()) <= 2.4 &&
+	    rawJet.chargedHadronEnergyFraction() > 0 &&
+	    rawJet.chargedEmEnergyFraction() < 0.99 &&
+	    rawJet.chargedMultiplicity() > 0) ||
 	   abs(rawJet.eta()) > 2.4);
       }else{
 	looseJetID = rawJet.neutralEmEnergyFraction() < 0.9 && rawJet.neutralMultiplicity() > 10;
       }
-      if(!looseJetID) continue;	
+      if(!looseJetID) continue;
 
       pat::Jet corrak8;
       if(doNewJEC){
@@ -492,25 +492,25 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * s
 	  // uncertainty in BaseEventSelector takes the corrected pT
 	  jecUnc->setJetEta(corrak8.eta());
 	  jecUnc->setJetPt(corrak8.pt());
-	  
-	  if (JECup) { 
+
+	  if (JECup) {
 	    try{unc = jecUnc->getUncertainty(true);}
 	    catch(...){ // catch all exceptions. Jet Uncertainty tool throws when binning out of range
 	      std::cout << mLegend << "WARNING! Exception thrown by JetCorrectionUncertainty!" << std::endl;
 	      std::cout << mLegend << "WARNING! Jet/MET will remain uncorrected." << std::endl;
 	      unc = 0.0;
 	    }
-	    unc = 1 + unc; 
+	    unc = 1 + unc;
 	  }
-	  else { 
+	  else {
 	    try{unc = jecUnc->getUncertainty(false);}
 	    catch(...){
 	      std::cout << mLegend << "WARNING! Exception thrown by JetCorrectionUncertainty!" << std::endl;
 	      std::cout << mLegend << "WARNING! Jet/MET will remain uncorrected." << std::endl;
 	      unc = 0.0;
 	    }
-	    unc = 1 - unc; 
-	  }	  
+	    unc = 1 - unc;
+	  }
         }
 
 	if(corr*unc == 1.0) cout << "L2+L3 correction is 1.0" << endl;
@@ -519,7 +519,7 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * s
 	theTrimmedMass  = corr*unc*(double)l2l3jet.userFloat("ak8PFJetsCHSTrimmedMass");
 	theFilteredMass = corr*unc*(double)l2l3jet.userFloat("ak8PFJetsCHSFilteredMass");
 	theSoftDropMass = corr*unc*(double)l2l3jet.userFloat("ak8PFJetsCHSSoftDropMass");
-	
+
       }else{
 	thePrunedMass   = (double)corrak8.userFloat("ak8PFJetsCHSPrunedMass");
 	theTrimmedMass  = (double)corrak8.userFloat("ak8PFJetsCHSTrimmedMass");
@@ -543,24 +543,24 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * s
       if(corrak8.pt() > 200 && theNjettinessTau21 < 0.55 && thePrunedMass > 65 && thePrunedMass < 105){
 	PruningTau21Tagged = true;
       }
-      
+
       theJetAK8CSV.push_back(corrak8.bDiscriminator( bDiscriminant ));
 
       theJetAK8CEmEnergy.push_back(corrak8.chargedEmEnergy());
       theJetAK8NEmEnergy.push_back(corrak8.neutralEmEnergy());
       theJetAK8CEmEFrac.push_back(corrak8.chargedEmEnergyFraction());
-      theJetAK8NEmEFrac.push_back(corrak8.neutralEmEnergyFraction());	    
+      theJetAK8NEmEFrac.push_back(corrak8.neutralEmEnergyFraction());
 
       theJetAK8CHadEnergy.push_back(corrak8.chargedHadronEnergy());
       theJetAK8NHadEnergy.push_back(corrak8.neutralHadronEnergy());
       theJetAK8CHadEFrac.push_back(corrak8.chargedHadronEnergyFraction());
       theJetAK8NHadEFrac.push_back(corrak8.neutralHadronEnergyFraction());
-      
+
       theJetAK8PrunedMass  .push_back(thePrunedMass);
       theJetAK8TrimmedMass .push_back(theTrimmedMass);
       theJetAK8FilteredMass.push_back(theFilteredMass);
       theJetAK8SoftDropMass.push_back(theSoftDropMass);
-      
+
       theJetAK8NjettinessTau1.push_back(theNjettinessTau1);
       theJetAK8NjettinessTau2.push_back(theNjettinessTau2);
       theJetAK8NjettinessTau3.push_back(theNjettinessTau3);
@@ -581,9 +581,9 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * s
 
 	con_charge = (int)constituent->charge();
 	con_pt     = (double)constituent->pt();
-	
+
 	sumWeightedCharge = sumWeightedCharge + ( con_charge * pow(con_pt,kappa) );
-	
+
       }
 
       jetCharge  = 1.0/( pow( (corrak8.pt()), kappa) ) * sumWeightedCharge;
@@ -618,12 +618,12 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * s
 	SDsubjetMass      = -std::numeric_limits<double>::max();
 	SDsubjetBdisc     = -std::numeric_limits<double>::max();
 	SDdeltaRsubjetJet = std::numeric_limits<double>::max();
-      
+
 	SDsubjetPt        = corrsubjet.pt();
 	SDsubjetEta       = corrsubjet.eta();
 	SDsubjetPhi       = corrsubjet.phi();
 	SDsubjetMass      = corrsubjet.mass();
-	SDsubjetBdisc     = corrsubjet.bDiscriminator(bDiscriminant); 
+	SDsubjetBdisc     = corrsubjet.bDiscriminator(bDiscriminant);
 	SDsubjetBTag      = selector->isJetTagged(corrsubjet, event);
 	SDdeltaRsubjetJet = deltaR(corrak8.eta(), corrak8.phi(), SDsubjetEta, SDsubjetPhi);
 
@@ -661,20 +661,20 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * s
     SetValue("theJetAK8CSV",    theJetAK8CSV);
     SetValue("theJetAK8JetCharge", theJetAK8JetCharge);
 
-    SetValue("theJetAK8CEmEnergy", theJetAK8CEmEnergy); 
-    SetValue("theJetAK8NEmEnergy", theJetAK8NEmEnergy); 
-    SetValue("theJetAK8CEmEFrac",  theJetAK8CEmEFrac);  
-    SetValue("theJetAK8NEmEFrac",  theJetAK8NEmEFrac);  
+    SetValue("theJetAK8CEmEnergy", theJetAK8CEmEnergy);
+    SetValue("theJetAK8NEmEnergy", theJetAK8NEmEnergy);
+    SetValue("theJetAK8CEmEFrac",  theJetAK8CEmEFrac);
+    SetValue("theJetAK8NEmEFrac",  theJetAK8NEmEFrac);
     SetValue("theJetAK8CHadEnergy",theJetAK8CHadEnergy);
     SetValue("theJetAK8NHadEnergy",theJetAK8NHadEnergy);
-    SetValue("theJetAK8CHadEFrac", theJetAK8CHadEFrac); 
-    SetValue("theJetAK8NHadEFrac", theJetAK8NHadEFrac); 
+    SetValue("theJetAK8CHadEFrac", theJetAK8CHadEFrac);
+    SetValue("theJetAK8NHadEFrac", theJetAK8NHadEFrac);
 
     SetValue("theJetAK8PrunedMass",   theJetAK8PrunedMass);
     SetValue("theJetAK8TrimmedMass",  theJetAK8TrimmedMass);
     SetValue("theJetAK8FilteredMass", theJetAK8FilteredMass);
     SetValue("theJetAK8SoftDropMass", theJetAK8SoftDropMass);
-    
+
     SetValue("theJetAK8NjettinessTau1", theJetAK8NjettinessTau1);
     SetValue("theJetAK8NjettinessTau2", theJetAK8NjettinessTau2);
     SetValue("theJetAK8NjettinessTau3", theJetAK8NjettinessTau3);
@@ -683,15 +683,15 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * s
     SetValue("theJetAK8Mass",   theJetAK8Mass);
     SetValue("theJetAK8nDaughters", theJetAK8nDaughters);
 
-    SetValue("theJetAK8SDSubjetPt",   theJetAK8SDSubjetPt);   
-    SetValue("theJetAK8SDSubjetEta",  theJetAK8SDSubjetEta);  
-    SetValue("theJetAK8SDSubjetPhi",  theJetAK8SDSubjetPhi);  
-    SetValue("theJetAK8SDSubjetMass", theJetAK8SDSubjetMass); 
-    SetValue("theJetAK8SDSubjetCSV",  theJetAK8SDSubjetCSV);  
-    SetValue("theJetAK8SDSubjetBTag",  theJetAK8SDSubjetBTag);  
-    SetValue("theJetAK8SDSubjetDR",   theJetAK8SDSubjetDR);   
+    SetValue("theJetAK8SDSubjetPt",   theJetAK8SDSubjetPt);
+    SetValue("theJetAK8SDSubjetEta",  theJetAK8SDSubjetEta);
+    SetValue("theJetAK8SDSubjetPhi",  theJetAK8SDSubjetPhi);
+    SetValue("theJetAK8SDSubjetMass", theJetAK8SDSubjetMass);
+    SetValue("theJetAK8SDSubjetCSV",  theJetAK8SDSubjetCSV);
+    SetValue("theJetAK8SDSubjetBTag",  theJetAK8SDSubjetBTag);
+    SetValue("theJetAK8SDSubjetDR",   theJetAK8SDSubjetDR);
     SetValue("theJetAK8SDSubjetIndex",theJetAK8SDSubjetIndex);
-    SetValue("theJetAK8SDSubjetSize", theJetAK8SDSubjetSize); 
+    SetValue("theJetAK8SDSubjetSize", theJetAK8SDSubjetSize);
     SetValue("theJetAK8SDSubjetNCSVL",theJetAK8SDSubjetNCSVL);
     SetValue("theJetAK8SDSubjetNCSVMSF",theJetAK8SDSubjetNCSVMSF);
     SetValue("theJetAK8SDSubjetNCSVM_bSFup",theJetAK8SDSubjetNCSVM_bSFup);
@@ -719,26 +719,26 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * s
     std::vector<double> HadronicVHtD2Eta;
     std::vector<double> HadronicVHtD2Phi;
     std::vector<double> HadronicVHtD2E;
-  
+
     // Get the generated particle collection
     edm::Handle<reco::GenParticleCollection> genParticles;
     if(isMc && event.getByLabel(genParticles_it, genParticles)){
-      
+
       for(size_t i = 0; i < genParticles->size(); i++){
 	const reco::GenParticle &p = (*genParticles).at(i);
 	int id = p.pdgId();
 
 	bool hasRadiation = false;
 	bool hasLepton = false;
-	  
+
 	if(abs(id) == 23 || abs(id) == 24 || abs(id) == 25 || abs(id) == 6){
-	    
+
 	  size_t nDs = p.numberOfDaughters();
 	  for(size_t j = 0; j < nDs; j++){
 	    int dauId = (p.daughter(j))->pdgId();
 	    const reco::Candidate *d = p.daughter(j);
 	    if(d->pdgId() != dauId) std::cout << "making daughter GenParticle didn't work" << std::endl;
-	    
+
 	    if(abs(dauId) == abs(id)) hasRadiation = true;
 	    else if(abs(dauId) == 24){  // check t->Wb->leptons and H->WW->leptons
 	      while(d->numberOfDaughters() == 1) d = d->daughter(0);
@@ -750,21 +750,21 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * s
 	      if(abs(d->daughter(0)->pdgId()) > 10 && abs(d->daughter(0)->pdgId()) < 17) hasLepton = true;
 	      if(abs(d->daughter(1)->pdgId()) > 10 && abs(d->daughter(1)->pdgId()) < 17) hasLepton = true;
 	    }
-	    else if(abs(dauId) > 10 && abs(dauId) < 17) hasLepton = true;	    
-	    
+	    else if(abs(dauId) > 10 && abs(dauId) < 17) hasLepton = true;
+
 	  }
-	  
-	  if(hasRadiation) continue;	  
-	  if(hasLepton) continue;	  
+
+	  if(hasRadiation) continue;
+	  if(hasLepton) continue;
 	  if(p.pt() < 175) continue;
-	  
+
 	  if(abs(id) == 24){
 	    double dRWb = 1000;
 	    double dRWW = 1000;
-	    
+
 	    const reco::Candidate *mother = p.mother();
 	    while(abs(mother->pdgId()) == 24) mother = mother->mother();
-	    
+
 	    if(abs(mother->pdgId()) == 6){
 	      double dr = reco::deltaR(p.p4(),mother->daughter(1)->p4());
 	      if(abs(mother->daughter(1)->pdgId()) == 24) dr = reco::deltaR(p.p4(),mother->daughter(0)->p4());
@@ -777,18 +777,18 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * s
 		double dr = reco::deltaR(p.p4(),mother->daughter(0)->p4());
 	      }
 	      if(dr < dRWW) dRWW = dr;
-	    }		
-	    
+	    }
+
 	    if(dRWW < 0.8) continue; // W from merged H
 	    if(dRWb < 0.8) continue; // W from merged t
 	  }
-	  
+
 	  if(abs(id) == 23){
 	    double dRZZ = 1000;
-	    
+
 	    const reco::Candidate *mother = p.mother();
 	    while(abs(mother->pdgId()) == 23) mother = mother->mother();
-	    
+
 	    if(abs(mother->pdgId()) == 25){
 	      double dr = 1000;
 	      if(p.pdgId()*mother->daughter(0)->pdgId() > 0){
@@ -798,10 +798,10 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * s
 	      }
 	      if(dr < dRZZ) dRZZ = dr;
 	    }
-	    
+
 	    if(dRZZ < 0.8) continue; // Z from merged H
 	  }
-	  
+
 	  if(p.numberOfDaughters() < 2){
 	    std::cout << p.numberOfDaughters() << " daughters from " << p.pdgId() << std::endl;
 	    continue;
@@ -817,9 +817,9 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * s
 	  HadronicVHtD0Eta.push_back( p.daughter(1)->eta());
 	  HadronicVHtD0Phi.push_back( p.daughter(1)->phi());
 	  HadronicVHtD0E.push_back( p.daughter(1)->energy());
-	  
+
 	  if(abs(id) != 6){
-	    HadronicVHtD1Pt.push_back( p.daughter(0)->pt());	    
+	    HadronicVHtD1Pt.push_back( p.daughter(0)->pt());
 	    HadronicVHtD2Pt.push_back( 0);
 	    HadronicVHtD1Eta.push_back( p.daughter(0)->eta());
 	    HadronicVHtD2Eta.push_back( 0);
@@ -866,14 +866,14 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * s
     if(useHTT){
 
       ///////////////////////////////////////////////////////////////////////
-      ///  
+      ///
       ///   NOTE: You must install HTT to load the HTTTopJetTagInfo object!
       ///   In your CMSSW_X_X_X/src/ directory:
       ///   git cms-merge-topic gkasieczka:htt-v2-74X
       ///   scramv1 b -r -j 8
-      ///   
+      ///
       ///////////////////////////////////////////////////////////////////////
-    
+
       std::vector<double> theJetCA15Pt;
       std::vector<double> theJetCA15Eta;
       std::vector<double> theJetCA15Phi;
@@ -883,7 +883,7 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * s
       std::vector<double> theJetCA15NjettinessTau1;
       std::vector<double> theJetCA15NjettinessTau2;
       std::vector<double> theJetCA15NjettinessTau3;
-      
+
       std::vector<double> theJetHTTTopMass;
       std::vector<double> theJetHTTfRec;
       std::vector<double> theJetHTTRopt;
@@ -904,7 +904,7 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * s
       double NjettinessTau1;
       double NjettinessTau2;
       double NjettinessTau3;
-      
+
       edm::Handle<std::vector<pat::Jet> > theCA15Jets;
       event.getByLabel(selectedPatJetsCA15Coll_it, theCA15Jets);
 
@@ -924,35 +924,35 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * s
 	theNjettinessTau1 = (double)ijet->userFloat("NjettinessCA15CHSNoHF:tau1");
 	theNjettinessTau2 = (double)ijet->userFloat("NjettinessCA15CHSNoHF:tau2");
 	theNjettinessTau3 = (double)ijet->userFloat("NjettinessCA15CHSNoHF:tau3");
-      
+
 	theJetCA15NjettinessTau1.push_back(theNjettinessTau1);
 	theJetCA15NjettinessTau2.push_back(theNjettinessTau2);
 	theJetCA15NjettinessTau3.push_back(theNjettinessTau3);
-	
+
 	theSoftDropMass = -std::numeric_limits<double>::max();
 	theSoftDropMass = (double)ijet->userFloat("ca15PFJetsCHSNoHFSoftDropMass");
 	theJetCA15SoftDropMass.push_back(theSoftDropMass);
-	
+
 	TLorentzVector ca15;
 	ca15.SetPtEtaPhiE(ijet->pt(),ijet->eta(),ijet->phi(),ijet->energy());
-	
+
 	double minDR = 1000;
 	reco::HTTTopJetProperties CA15HTTProperties;
 	for (std::vector<reco::HTTTopJetTagInfo>::const_iterator ijet = httTagInfo->begin(); ijet != httTagInfo->end(); ijet++) {
-	  
+
 	  reco::HTTTopJetTagInfo const jetInfo = (*ijet);
 	  reco::HTTTopJetProperties HTTProperties = jetInfo.properties();
-	  
+
 	  TLorentzVector fj;
 	  fj.SetPtEtaPhiM(HTTProperties.fjPt, HTTProperties.fjEta, HTTProperties.fjPhi, HTTProperties.fjMass);
-	  
+
 	  double DR = ca15.DeltaR(fj);
 	  if(DR < minDR){
 	    minDR = DR;
 	    CA15HTTProperties = HTTProperties;
 	  }
 	}
-	
+
  	theHTTTopMass = -99.99;
 	theHTTfRec = -99.99;
 	theHTTRopt = -99.99;
@@ -971,7 +971,7 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * s
 	  theHTTRopt = CA15HTTProperties.Ropt;          // R_opt found in Optimal procedure
 	  theHTTRoptCalc = CA15HTTProperties.RoptCalc;     // R_opt calc for a top based on filtered fat jet pT
 	  theHTTRoptCalcPt = CA15HTTProperties.ptForRoptCalc; // Filtered fat jet pT for R_opt calculation
-	  theNjettinessTau1 = CA15HTTProperties.tau1Filtered; 
+	  theNjettinessTau1 = CA15HTTProperties.tau1Filtered;
 	  theNjettinessTau2 = CA15HTTProperties.tau2Filtered;
 	  theNjettinessTau3 = CA15HTTProperties.tau3Filtered;
 	  NjettinessTau1 = CA15HTTProperties.tau1Unfiltered;
@@ -987,9 +987,9 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * s
 	theJetHTTufNjettinessTau1.push_back(NjettinessTau1);
 	theJetHTTufNjettinessTau2.push_back(NjettinessTau2);
 	theJetHTTufNjettinessTau3.push_back(NjettinessTau3);
-	
+
       }
-      
+
       SetValue("theJetCA15Pt", theJetCA15Pt);
       SetValue("theJetCA15Eta", theJetCA15Eta);
       SetValue("theJetCA15Phi", theJetCA15Phi);
@@ -999,17 +999,17 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * s
       SetValue("theJetCA15NjettinessTau1", theJetCA15NjettinessTau1);
       SetValue("theJetCA15NjettinessTau2", theJetCA15NjettinessTau2);
       SetValue("theJetCA15NjettinessTau3", theJetCA15NjettinessTau3);
-      
+
       SetValue("theJetHTTTopMass", theJetHTTTopMass);
       SetValue("theJetHTTfRec", theJetHTTfRec);
       SetValue("theJetHTTRopt", theJetHTTRopt);
       SetValue("theJetHTTRoptCalc", theJetHTTRoptCalc);
       SetValue("theJetHTTRoptCalcPt", theJetHTTRoptCalcPt);
-      
-      SetValue("theJetHTTNjettinessTau1",theJetHTTNjettinessTau1);    
+
+      SetValue("theJetHTTNjettinessTau1",theJetHTTNjettinessTau1);
       SetValue("theJetHTTNjettinessTau2",theJetHTTNjettinessTau2);
       SetValue("theJetHTTNjettinessTau3",theJetHTTNjettinessTau3);
-      SetValue("theJetHTTufNjettinessTau1",theJetHTTufNjettinessTau1);    
+      SetValue("theJetHTTufNjettinessTau1",theJetHTTufNjettinessTau1);
       SetValue("theJetHTTufNjettinessTau2",theJetHTTufNjettinessTau2);
       SetValue("theJetHTTufNjettinessTau3",theJetHTTufNjettinessTau3);
     }

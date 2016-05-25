@@ -1,0 +1,18 @@
+Traceback (most recent call last):
+  File "das_CLI.py", line 530, in <module>
+    main()
+  File "das_CLI.py", line 421, in main
+    jsondict = get_data(host, query, idx, limit, debug, thr, ckey, cert)
+  File "das_CLI.py", line 286, in get_data
+    fdesc = opener.open(req)
+  File "/cvmfs/cms.cern.ch/crab3/slc6_amd64_gcc493/external/python/2.7.11-comp/lib/python2.7/urllib2.py", line 431, in open
+    response = self._open(req, data)
+  File "/cvmfs/cms.cern.ch/crab3/slc6_amd64_gcc493/external/python/2.7.11-comp/lib/python2.7/urllib2.py", line 449, in _open
+    '_open', req)
+  File "/cvmfs/cms.cern.ch/crab3/slc6_amd64_gcc493/external/python/2.7.11-comp/lib/python2.7/urllib2.py", line 409, in _call_chain
+    result = func(*args)
+  File "das_CLI.py", line 69, in https_open
+    return self.do_open(self.get_connection, req)
+  File "/cvmfs/cms.cern.ch/crab3/slc6_amd64_gcc493/external/python/2.7.11-comp/lib/python2.7/urllib2.py", line 1197, in do_open
+    raise URLError(err)
+urllib2.URLError: <urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed (_ssl.c:591)>

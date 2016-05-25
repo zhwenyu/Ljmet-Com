@@ -1,0 +1,15 @@
+universe = vanilla
+use_x509userproxy = true
+Executable = PREFIX.sh
+Requirements   =  OpSys == "LINUX" && (Arch =="INTEL" || Arch =="x86_64")
+request_memory = 2100
+Should_Transfer_Files = YES
+WhenToTransferOutput = ON_EXIT
+Transfer_Input_Files = PREFIX_JOBID.py, PREFIX.sh
+Output = PREFIX_JOBID.out
+Error  = PREFIX_JOBID.err
+Log    = PREFIX_JOBID.condor
++UseSL5 = False
+Arguments = TAR_DIR TAR_FILE OUTPUT_DIR PREFIX JOBID
+Queue 1
+

@@ -1,0 +1,322 @@
+TprimeTprime_M-1000_TuneCUETP8M1_13TeV-madgraph-pythia8: 
+
+T' pair production
+
+TprimeTprime_M-1100_TuneCUETP8M1_13TeV-madgraph-pythia8: 
+
+T' pair production
+
+TprimeTprime_M-1200_TuneCUETP8M1_13TeV-madgraph-pythia8: 
+
+T' pair production
+
+TprimeTprime_M-1300_TuneCUETP8M1_13TeV-madgraph-pythia8: 
+
+T' pair production
+
+TprimeTprime_M-1400_TuneCUETP8M1_13TeV-madgraph-pythia8: 
+
+T' pair production
+
+TprimeTprime_M-1500_TuneCUETP8M1_13TeV-madgraph-pythia8: 
+
+T' pair production
+
+TprimeTprime_M-1600_TuneCUETP8M1_13TeV-madgraph-pythia8: 
+
+T' pair production
+
+TprimeTprime_M-1700_TuneCUETP8M1_13TeV-madgraph-pythia8: 
+
+T' pair production
+
+TprimeTprime_M-1800_TuneCUETP8M1_13TeV-madgraph-pythia8: 
+
+T' pair production
+
+TprimeTprime_M-700_TuneCUETP8M1_13TeV-madgraph-pythia8: 
+
+T' pair production
+
+TprimeTprime_M-800_TuneCUETP8M1_13TeV-madgraph-pythia8: 
+
+T' pair production
+
+TprimeTprime_M-900_TuneCUETP8M1_13TeV-madgraph-pythia8: 
+
+T' pair production
+
+DYJetsToLL_M-10to50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8: 
+
+
+
+DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8: 
+
+
+
+QCD_HT1000to1500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8: 
+
+Cross-section after matching: 1206 +-  6.5   pb
+Matching efficiency: 5.9 +/- 0.3
+
+QCD_HT100to200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8: 
+
+Cross-section before matching: 2.110e+08 +- 4.245e+05 pb
+
+QCD_HT1500to2000_TuneCUETP8M1_13TeV-madgraphMLM-pythia8: 
+
+Cross-section after matching: 120.4 +- 0.64
+Matching efficiency: 6.7 +/- 0.3
+
+QCD_HT2000toInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8: 
+
+Cross-section after matching: 25.25 +- 0.15 pb
+Matching efficiency: 7.0 +/- 0.4
+
+QCD_HT200to300_TuneCUETP8M1_13TeV-madgraphMLM-pythia8: 
+
+Cross-section after matching: 1717000 +-  7800 pb
+Matching efficiency: 9.8 +- 0.3%
+
+QCD_HT300to500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8: 
+
+Cross-section after matching: 351300 +-  1682 pb
+Matching efficiency: 8.8 +- 0.3%
+
+QCD_HT500to700_TuneCUETP8M1_13TeV-madgraphMLM-pythia8: 
+
+Cross-section after matching: 31630 +-  937 pb
+
+QCD_HT700to1000_TuneCUETP8M1_13TeV-madgraphMLM-pythia8: 
+
+Cross-section after matching: 6802 +-  43 pb
+Matching efficiency: 6.6 +/- 0.3
+
+ST_s-channel_4f_leptonDecays_13TeV-amcatnlo-pythia8_TuneCUETP8M1: 
+
+st_sch_4f_ckm_NLO
+PDF NNPDF30_nlo_nf_4_pdfas
+Datacards:
+https://github.com/cms-sw/genproductions/tree/c41ab29f3d86c9e53df8b0d76c12cd519adbf013/bin/MadGraph5_aMCatNLO/cards/production/13TeV/st_sch_4f_ckm_NLO
+
+ST_t-channel_4f_leptonDecays_13TeV-amcatnlo-pythia8_TuneCUETP8M1: 
+
+st_tch_4f_ckm_NLO
+PDF NNPDF30_nlo_nf_4_pdfas
+Datacards:
+https://github.com/cms-sw/genproductions/tree/c41ab29f3d86c9e53df8b0d76c12cd519adbf013/bin/MadGraph5_aMCatNLO/cards/production/13TeV/st_tch_4f_ckm_NLO
+
+ST_t-channel_4f_scaledown_leptonDecays_13TeV-amcatnlo-pythia8_TuneCUETP8M1: 
+
+st_tch_4f_ckm_NLO
+PDF NNPDF30_nlo_nf_4_pdfas
+Datacards:
+https://github.com/cms-sw/genproductions/tree/c41ab29f3d86c9e53df8b0d76c12cd519adbf013/bin/MadGraph5_aMCatNLO/cards/production/13TeV/st_tch_4f_ckm_NLO
+
+ST_t-channel_4f_scaleup_leptonDecays_13TeV-amcatnlo-pythia8_TuneCUETP8M1: 
+
+st_tch_4f_ckm_NLO
+PDF NNPDF30_nlo_nf_4_pdfas
+Datacards:
+https://github.com/cms-sw/genproductions/tree/c41ab29f3d86c9e53df8b0d76c12cd519adbf013/bin/MadGraph5_aMCatNLO/cards/production/13TeV/st_tch_4f_ckm_NLO
+
+ST_tW_antitop_5f_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M1: 
+
+ST_tW_DR_5f_antitop_13TeV
+PDF NNPDF30_nlo_nf_5_pdfas
+Datacards:
+https://github.com/cms-sw/genproductions/tree/b659a584a0e30ee6a164c786f8081cd9a250eb88/bin/Powheg/production/st_tW_5f_dr_ckm_13TeV
+
+ST_tW_antitop_5f_scaledown_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M1: 
+
+ST_tW_DR_5f_antitop_13TeV_scaledown
+PDF NNPDF30_nlo_nf_5_pdfas
+Datacards:
+https://github.com/cms-sw/genproductions/tree/b659a584a0e30ee6a164c786f8081cd9a250eb88/bin/Powheg/production/st_tW_5f_dr_ckm_13TeV_scaledown
+
+ST_tW_antitop_5f_scaleup_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M1: 
+
+ST_tW_DR_5f_antitop_13TeV_scaleup
+PDF NNPDF30_nlo_nf_5_pdfas
+Datacards:
+https://github.com/cms-sw/genproductions/tree/b659a584a0e30ee6a164c786f8081cd9a250eb88/bin/Powheg/production/st_tW_5f_dr_ckm_13TeV_scaleup
+
+ST_tW_top_5f_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M1: 
+
+ST_tW_DR_5f_top_13TeV
+PDF NNPDF30_nlo_nf_5_pdfas
+Datacards:
+https://github.com/cms-sw/genproductions/tree/b659a584a0e30ee6a164c786f8081cd9a250eb88/bin/Powheg/production/st_tW_5f_dr_ckm_13TeV
+
+ST_tW_top_5f_scaledown_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M1: 
+
+ST_tW_DR_5f_top_13TeV_scaledown
+PDF NNPDF30_nlo_nf_5_pdfas
+Datacards:
+https://github.com/cms-sw/genproductions/tree/b659a584a0e30ee6a164c786f8081cd9a250eb88/bin/Powheg/production/st_tW_5f_dr_ckm_13TeV_scaledown
+
+ST_tW_top_5f_scaleup_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M1: 
+
+ST_tW_DR_5f_top_13TeV_scaleup
+PDF NNPDF30_nlo_nf_5_pdfas
+Datacards:
+https://github.com/cms-sw/genproductions/tree/b659a584a0e30ee6a164c786f8081cd9a250eb88/bin/Powheg/production/st_tW_5f_dr_ckm_13TeV_scaleup
+
+TTWJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-madspin-pythia8: 
+
+TTWJetsToLNu_5f_NLO_FXFX
+Datacards:
+https://github.com/cms-sw/genproductions/tree/1b0edbfe74f00eb22b8c78dafe88e1cc39c496a8/bin/MadGraph5_aMCatNLO/cards/production/13TeV/TTWJets/TTWJetstoLNu_5f_NLO_FXFX
+
+TTWJetsToQQ_TuneCUETP8M1_13TeV-amcatnloFXFX-madspin-pythia8: 
+
+TTWJetsToQQ_5f_NLO_FXFX
+Datacards:
+https://github.com/cms-sw/genproductions/tree/1b0edbfe74f00eb22b8c78dafe88e1cc39c496a8/bin/MadGraph5_aMCatNLO/cards/production/13TeV/TTWJets/TTWJetsToQQ_5f_NLO_FXFX
+
+TTZToQQ_TuneCUETP8M1_13TeV-amcatnlo-pythia8: 
+
+TTZToQQ_5f_NLO
+no additional partons
+Datacards:
+https://github.com/cms-sw/genproductions/tree/f2df23bf13242fd796b3a282593f40044527fc0a/bin/MadGraph5_aMCatNLO/cards/production/13TeV/TTZJets/TTZJetsToQQ_5f_NLO
+
+cross section obtained from 20k events: 0.5297 +- 0.0008 pb
+fraction of negative weights: ~27%
+
+TT_TuneCUETP8M1_13TeV-powheg-pythia8: 
+
+POWHEG V2 with hdamp variation. NNPDF30NLO as central PDF, others like CT10NLO available as pdf systematics weights
+Datacards:
+https://github.com/cms-sw/genproductions/tree/c41ab29f3d86c9e53df8b0d76c12cd519adbf013/bin/Powheg/production/TT_hdamp_NNPDF30_13TeV
+
+TT_TuneCUETP8M1_13TeV-powheg-scaledown-pythia8: 
+
+POWHEG V2 with hdamp variation. NNPDF30NLO as central PDF, others like CT10NLO available as pdf systematics weights. PS Scale Down
+Datacards:
+https://github.com/cms-sw/genproductions/tree/c41ab29f3d86c9e53df8b0d76c12cd519adbf013/bin/Powheg/production/TT_hdamp_NNPDF30_13TeV
+
+TT_TuneCUETP8M1_13TeV-powheg-scaleup-pythia8: 
+
+POWHEG V2 with hdamp variation. NNPDF30NLO as central PDF, others like CT10NLO available as pdf systematics weights.PS Scale Up
+Datacards:
+https://github.com/cms-sw/genproductions/tree/c41ab29f3d86c9e53df8b0d76c12cd519adbf013/bin/Powheg/production/TT_hdamp_NNPDF30_13TeV
+
+WJetsToLNu_HT-100To200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8: 
+
+Cross-section after matching: 1345 +- 1.2 pb
+
+WJetsToLNu_HT-1200To2500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8: 
+
+Cross-section after matching:  1.329 +- 0.0025 pb
+
+WJetsToLNu_HT-200To400_TuneCUETP8M1_13TeV-madgraphMLM-pythia8: 
+
+Cross-section after matching: 359.7 +- 0.20 pb
+
+WJetsToLNu_HT-200To400_TuneCUETP8M1_13TeV-madgraphMLM-pythia8: 
+
+Cross-section after matching: 359.7 +- 0.20 pb
+
+WJetsToLNu_HT-2500ToInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8: 
+
+Cross-section after matching: 0.03216 +- 0.000104 pb
+
+WJetsToLNu_HT-400To600_TuneCUETP8M1_13TeV-madgraphMLM-pythia8: 
+
+Cross-section after matching: 48.91 +- 0.072 pb
+
+WJetsToLNu_HT-600To800_TuneCUETP8M1_13TeV-madgraphMLM-pythia8: 
+
+Cross-section before matching:  12.05 +- 0.0073 pb
+
+WJetsToLNu_HT-800To1200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8: 
+
+Cross-section after matching: 5.501 +- 0.017 pb
+
+WJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8: 
+
+
+
+WWJJToLNuLNu_EWK_QCD_noTop_13TeV-madgraph-pythia8: 
+
+
+
+WWJJToLNuLNu_QCD_noTop_13TeV-madgraph-pythia8: 
+
+
+
+WWTo2L2Nu_13TeV-powheg: 
+
+POWHEG V2, NNPDF30NLO as central PDF, others like CT10NLO available as pdf systematics weights
+Dileptonic decays only
+Datacards:
+https://github.com/cms-sw/genproductions/blob/f7132f542361522467a058f90719d1980699bbd7/bin/Powheg/production/WWTo2L2Nu_NNPDF30_13TeV/WWTo2L2Nu_NNPDF30_13TeV.input
+
+WWToLNuQQ_13TeV-powheg: 
+
+POWHEG V2, NNPDF30NLO as central PDF, others like CT10NLO available as pdf systematics weights
+Semileptonic decays only
+Datacards:
+https://github.com/rebecacern/genproductions/blob/f7132f542361522467a058f90719d1980699bbd7/bin/Powheg/production/WWTo2L2Nu_NNPDF30_13TeV/WWTo2L2Nu_NNPDF30_13TeV.input
+
+WW_TuneCUETP8M1_13TeV-pythia8: 
+
+
+
+WZJets_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8: 
+
+
+
+WZTo3LNu_TuneCUETP8M1_13TeV-powheg-pythia8: 
+
+
+
+WZZ_TuneCUETP8M1_13TeV-amcatnlo-pythia8: 
+
+WZZ_5f_NLO
+no additional partons, inclusive decays
+Datacards:
+https://github.com/cms-sw/genproductions/tree/0fd4f80f6fd7b136cb8a0132d7b9d3e2ee768e47/bin/MadGraph5_aMCatNLO/cards/production/13TeV/WZZJets/WZZJets_5f_NLO
+
+cross section obtained from 20k events: 0.05565 +- 0.00006 pb
+fraction of negative weights ~6.5%
+
+WZ_TuneCUETP8M1_13TeV-pythia8: 
+
+
+
+ZZJJTo4L_13TeV-madgraph-pythia8: 
+
+
+
+ZZTo2L2Nu_13TeV_powheg_pythia8: 
+
+m(ll)>40 GeV for charged leptons (e/mu/tau)
+
+ZZTo4L_13TeV-amcatnloFXFX-pythia8: 
+
+
+
+ZZTo4L_13TeV_powheg_pythia8: 
+
+
+
+ZZ_TuneCUETP8M1_13TeV-pythia8: 
+
+
+
+ZZZ_TuneCUETP8M1_13TeV-amcatnlo-pythia8: 
+
+ZZZ_5f_NLO
+no additional partons, inclusive decays
+Datacards:
+https://github.com/cms-sw/genproductions/tree/16c30711dc4712ea94d5746b7f69c57cb4420e30/bin/MadGraph5_aMCatNLO/cards/production/13TeV/ZZZJets/ZZZJets_5f_NLO
+
+cross section obtained from 20k events: 0.05565 +- 0.00006 pb
+fraction of negative weights ~6.5%
+
+WJetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8: 
+
+cross section after matching : 5.069e+04 +- 3.891e+02 pb
+

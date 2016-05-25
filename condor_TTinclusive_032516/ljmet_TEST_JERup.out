@@ -1,0 +1,133 @@
+[BTagSFCalc]: registering BTagSFCalc
+[CATopoCalc]: registering CATopoCalc
+[CommonCalc]: registering CommonCalc
+[DileptonCalc]: registering DileptonCalc
+[DileptonSelector]: registering DileptonSelector
+[JetSubCalc]: registering JetSubCalc
+[PileUpCalc]: registering PileUpCalc
+[TpTpCalc]: registering TpTpCalc
+[singleLepCalc]: registering singleLepCalc
+[singleLepSelector]: registering singleLepSelector
+[ljmet]: getting parameters from config file
+[ljmet]: the following parameter sets found:
+[ljmet]: hello from ljmet!
+WARNING: AutoLibraryloader::enable() and AutoLibraryLoader.h are deprecated.
+Use FWLiteEnabler::enable() and FWLiteEnabler.h instead
+[ljmet]: CommonCalc
+[ljmet]: JetSubCalc
+[ljmet]: LooseTopElectronSelector
+[ljmet]: LoosepfMuonSelector
+[ljmet]: TopElectronSelector
+[ljmet]: event_selector
+[ljmet]: inputs
+[ljmet]: ljmet
+[ljmet]: outputs
+[ljmet]: pfJetIDSelector
+[ljmet]: pfMuonSelector
+[ljmet]: pvSelector
+[ljmet]: singleLepCalc
+[ljmet]: setting up TFileService
+[ljmet]: Creating output tree
+[ljmet]: booking histograms
+[ljmet]: instantiating the event selector
+b-tag check CSVM pfCombinedInclusiveSecondaryVertexV2BJetTags 0.8
+[singleLepSelector]: Applying new jet energy corrections
+--- Reader                   : Booking "Spring15_V1_EB1" of type "BDT" from /uscms_data/d3/rsyarif/Spring2016/produceLJMetNtuple76x/CMSSW_7_6_4/src/LJMet/Com/weights/EIDmva_EB1_10_oldNonTrigSpring15_ConvVarCwoBoolean_TMVA412_FullStatLowPt_PairNegWeightsGlobal_BDT.weights.xml.
+--- MethodBase               : Reading weight file: /uscms_data/d3/rsyarif/Spring2016/produceLJMetNtuple76x/CMSSW_7_6_4/src/LJMet/Com/weights/EIDmva_EB1_10_oldNonTrigSpring15_ConvVarCwoBoolean_TMVA412_FullStatLowPt_PairNegWeightsGlobal_BDT.weights.xml
+--- BDT                      : Read method "BDT" of type "BDT"
+--- BDT                      : MVA method was trained with TMVA Version: 4.1.2
+--- BDT                      : MVA method was trained with ROOT Version: 5.32/00
+--- DataSetInfo              : Added class "Signal"	 with internal class number 0
+--- DataSetInfo              : Added class "Background"	 with internal class number 1
+--- Reader                   : Booked classifier "BDT" of type: "BDT"
+--- Reader                   : Booking "Spring15_V1_EB2" of type "BDT" from /uscms_data/d3/rsyarif/Spring2016/produceLJMetNtuple76x/CMSSW_7_6_4/src/LJMet/Com/weights/EIDmva_EB2_10_oldNonTrigSpring15_ConvVarCwoBoolean_TMVA412_FullStatLowPt_PairNegWeightsGlobal_BDT.weights.xml.
+--- MethodBase               : Reading weight file: /uscms_data/d3/rsyarif/Spring2016/produceLJMetNtuple76x/CMSSW_7_6_4/src/LJMet/Com/weights/EIDmva_EB2_10_oldNonTrigSpring15_ConvVarCwoBoolean_TMVA412_FullStatLowPt_PairNegWeightsGlobal_BDT.weights.xml
+--- BDT                      : Read method "BDT" of type "BDT"
+--- BDT                      : MVA method was trained with TMVA Version: 4.1.2
+--- BDT                      : MVA method was trained with ROOT Version: 5.32/00
+--- Reader                   : Booked classifier "BDT" of type: "BDT"
+--- Reader                   : Booking "Spring15_V1_EE" of type "BDT" from /uscms_data/d3/rsyarif/Spring2016/produceLJMetNtuple76x/CMSSW_7_6_4/src/LJMet/Com/weights/EIDmva_EE_10_oldNonTrigSpring15_ConvVarCwoBoolean_TMVA412_FullStatLowPt_PairNegWeightsGlobal_BDT.weights.xml.
+--- MethodBase               : Reading weight file: /uscms_data/d3/rsyarif/Spring2016/produceLJMetNtuple76x/CMSSW_7_6_4/src/LJMet/Com/weights/EIDmva_EE_10_oldNonTrigSpring15_ConvVarCwoBoolean_TMVA412_FullStatLowPt_PairNegWeightsGlobal_BDT.weights.xml
+--- BDT                      : Read method "BDT" of type "BDT"
+--- BDT                      : MVA method was trained with TMVA Version: 4.1.2
+--- BDT                      : MVA method was trained with ROOT Version: 5.32/00
+--- DataSetInfo              : Added class "Signal"	 with internal class number 0
+--- DataSetInfo              : Added class "Background"	 with internal class number 1
+--- Reader                   : Booked classifier "BDT" of type: "BDT"
+[singleLepSelector]: jet ID selector configured!
+[singleLepSelector]: pv selector configured!
+[singleLepSelector]: muon selector configured!
+[singleLepSelector]: loose muon selector configured!
+TopElectronSelector: If you want to use version NONE then make sure to provide the selection cuts by yourself 
+[singleLepSelector]: top electron selector configured!
+TopElectronSelector: If you want to use version NONE then make sure to provide the selection cuts by yourself 
+[singleLepSelector]: loose top electron selector configured!
+[singleLepSelector]: config parameters loaded...
+[singleLepSelector]: initializing singleLep selection
+[LjmetFactory]: removing PileUpCalc
+[LjmetFactory]: removing BTagSFCalc
+[LjmetFactory]: removing TprimeCalc
+[LjmetFactory]: removing DileptonCalc
+[LjmetFactory]: removing DileptonEventSelector
+[LjmetFactory]: removing CATopoCalc
+[LjmetFactory]: removing StopCalc
+[LjmetFactory]: removing PdfCalc
+[LjmetFactory]: removing ChargedHiggsCalc
+[LjmetFactory]: removing LjetsTopoCalc
+[LjmetFactory]: removing WprimeCalc
+ JetSubCalc Bdisc = pfCombinedInclusiveSecondaryVertexV2BJetTags
+JetSubCalc: doNewJEC = 1, killHF = 0
+JetSubCalc: using L2+L3 corrected groomed masses
+%MSG-e JetCorrectorParameters: 
+No definitions found!!!
+%MSG
+keepFullMChistory 1
+Writing LHE weights (no override).
+[ljmet]: Creating singleLepSelector/jes_correction
+[ljmet]: Creating singleLepSelector/met_correction
+[ljmet]: Creating singleLepSelector/nBtagSfCorrections
+[ljmet]: Using MC truth info
+[ljmet]: Setting up chain event
+[ljmet]: Begin loop over events
+[ljmet]: 0 events processed. Processing run 1, event 4401
+[LjmetEventContent]: Creating branches in output tree
+[LjmetEventContent]: bool branches created: 12
+[LjmetEventContent]: integer branches created: 16
+[LjmetEventContent]: double branches created: 17
+[LjmetEventContent]: std::vector<bool> branches created: 1
+[LjmetEventContent]: std::vector<int> branches created: 81
+[LjmetEventContent]: std::vector<double> branches created: 181
+[ljmet]: 100 events processed. Processing run 1, event 4501
+[ljmet]: 200 events processed. Processing run 1, event 4801
+[ljmet]: 300 events processed. Processing run 1, event 4901
+[ljmet]: 400 events processed. Processing run 1, event 5001
+[ljmet]: 500 events processed. Processing run 1, event 5101
+[ljmet]: 600 events processed. Processing run 1, event 6001
+[ljmet]: 700 events processed. Processing run 1, event 6101
+[ljmet]: 800 events processed. Processing run 1, event 12201
+[ljmet]: 900 events processed. Processing run 1, event 12301
+[ljmet]: Selection
+     0 :         No selection       1000
+     1 :              Trigger        391
+     2 :       Primary vertex        391
+     3 :          MET filters        384
+     4 :      One jet or more        384
+     5 :     Two jets or more        384
+     6 :   Three jets or more        off
+     7 : Min jet multiplicity        384
+     8 : Max jet multiplicity        384
+     9 :       Leading jet pt        384
+    10 :              Min MET        365
+    11 :              Max MET        365
+    12 :             Min muon        365
+    13 :         Min electron        365
+    14 :           Min lepton        365
+    15 :           Max lepton        365
+    16 :     Min loose lepton         32
+    17 :     Max loose lepton         32
+    18 :   Second lepton veto        off
+    19 :             Tau veto        off
+    20 :       1 btag or more        off
+    21 :       2 btag or more        off
+    22 :       3 btag or more        off
+    23 :             All cuts         32

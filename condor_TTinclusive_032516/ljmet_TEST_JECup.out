@@ -1,0 +1,166 @@
+[BTagSFCalc]: registering BTagSFCalc
+[CATopoCalc]: registering CATopoCalc
+[CommonCalc]: registering CommonCalc
+[DileptonCalc]: registering DileptonCalc
+[DileptonSelector]: registering DileptonSelector
+[JetSubCalc]: registering JetSubCalc
+[PileUpCalc]: registering PileUpCalc
+[TpTpCalc]: registering TpTpCalc
+[singleLepCalc]: registering singleLepCalc
+[singleLepSelector]: registering singleLepSelector
+[ljmet]: getting parameters from config file
+[ljmet]: the following parameter sets found:
+[ljmet]: hello from ljmet!
+WARNING: AutoLibraryloader::enable() and AutoLibraryLoader.h are deprecated.
+Use FWLiteEnabler::enable() and FWLiteEnabler.h instead
+[ljmet]: CommonCalc
+[ljmet]: JetSubCalc
+[ljmet]: LooseTopElectronSelector
+[ljmet]: LoosepfMuonSelector
+[ljmet]: TopElectronSelector
+[ljmet]: event_selector
+[ljmet]: inputs
+[ljmet]: ljmet
+[ljmet]: outputs
+[ljmet]: pfJetIDSelector
+[ljmet]: pfMuonSelector
+[ljmet]: pvSelector
+[ljmet]: singleLepCalc
+[ljmet]: setting up TFileService
+[ljmet]: Creating output tree
+[ljmet]: booking histograms
+[ljmet]: instantiating the event selector
+b-tag check CSVM pfCombinedInclusiveSecondaryVertexV2BJetTags 0.8
+[singleLepSelector]: Applying new jet energy corrections
+--- Reader                   : Booking "Spring15_V1_EB1" of type "BDT" from /uscms_data/d3/rsyarif/Spring2016/produceLJMetNtuple76x/CMSSW_7_6_4/src/LJMet/Com/weights/EIDmva_EB1_10_oldNonTrigSpring15_ConvVarCwoBoolean_TMVA412_FullStatLowPt_PairNegWeightsGlobal_BDT.weights.xml.
+--- MethodBase               : Reading weight file: /uscms_data/d3/rsyarif/Spring2016/produceLJMetNtuple76x/CMSSW_7_6_4/src/LJMet/Com/weights/EIDmva_EB1_10_oldNonTrigSpring15_ConvVarCwoBoolean_TMVA412_FullStatLowPt_PairNegWeightsGlobal_BDT.weights.xml
+--- BDT                      : Read method "BDT" of type "BDT"
+--- BDT                      : MVA method was trained with TMVA Version: 4.1.2
+--- BDT                      : MVA method was trained with ROOT Version: 5.32/00
+--- DataSetInfo              : Added class "Signal"	 with internal class number 0
+--- DataSetInfo              : Added class "Background"	 with internal class number 1
+--- Reader                   : Booked classifier "BDT" of type: "BDT"
+--- Reader                   : Booking "Spring15_V1_EB2" of type "BDT" from /uscms_data/d3/rsyarif/Spring2016/produceLJMetNtuple76x/CMSSW_7_6_4/src/LJMet/Com/weights/EIDmva_EB2_10_oldNonTrigSpring15_ConvVarCwoBoolean_TMVA412_FullStatLowPt_PairNegWeightsGlobal_BDT.weights.xml.
+--- MethodBase               : Reading weight file: /uscms_data/d3/rsyarif/Spring2016/produceLJMetNtuple76x/CMSSW_7_6_4/src/LJMet/Com/weights/EIDmva_EB2_10_oldNonTrigSpring15_ConvVarCwoBoolean_TMVA412_FullStatLowPt_PairNegWeightsGlobal_BDT.weights.xml
+--- BDT                      : Read method "BDT" of type "BDT"
+--- BDT                      : MVA method was trained with TMVA Version: 4.1.2
+--- BDT                      : MVA method was trained with ROOT Version: 5.32/00
+--- Reader                   : Booked classifier "BDT" of type: "BDT"
+--- Reader                   : Booking "Spring15_V1_EE" of type "BDT" from /uscms_data/d3/rsyarif/Spring2016/produceLJMetNtuple76x/CMSSW_7_6_4/src/LJMet/Com/weights/EIDmva_EE_10_oldNonTrigSpring15_ConvVarCwoBoolean_TMVA412_FullStatLowPt_PairNegWeightsGlobal_BDT.weights.xml.
+--- MethodBase               : Reading weight file: /uscms_data/d3/rsyarif/Spring2016/produceLJMetNtuple76x/CMSSW_7_6_4/src/LJMet/Com/weights/EIDmva_EE_10_oldNonTrigSpring15_ConvVarCwoBoolean_TMVA412_FullStatLowPt_PairNegWeightsGlobal_BDT.weights.xml
+--- BDT                      : Read method "BDT" of type "BDT"
+--- BDT                      : MVA method was trained with TMVA Version: 4.1.2
+--- BDT                      : MVA method was trained with ROOT Version: 5.32/00
+--- DataSetInfo              : Added class "Signal"	 with internal class number 0
+--- DataSetInfo              : Added class "Background"	 with internal class number 1
+--- Reader                   : Booked classifier "BDT" of type: "BDT"
+[singleLepSelector]: jet ID selector configured!
+[singleLepSelector]: pv selector configured!
+[singleLepSelector]: muon selector configured!
+[singleLepSelector]: loose muon selector configured!
+TopElectronSelector: If you want to use version NONE then make sure to provide the selection cuts by yourself 
+[singleLepSelector]: top electron selector configured!
+TopElectronSelector: If you want to use version NONE then make sure to provide the selection cuts by yourself 
+[singleLepSelector]: loose top electron selector configured!
+[singleLepSelector]: config parameters loaded...
+[singleLepSelector]: initializing singleLep selection
+[LjmetFactory]: removing PileUpCalc
+[LjmetFactory]: removing BTagSFCalc
+[LjmetFactory]: removing TprimeCalc
+[LjmetFactory]: removing DileptonCalc
+[LjmetFactory]: removing DileptonEventSelector
+[LjmetFactory]: removing CATopoCalc
+[LjmetFactory]: removing StopCalc
+[LjmetFactory]: removing PdfCalc
+[LjmetFactory]: removing ChargedHiggsCalc
+[LjmetFactory]: removing LjetsTopoCalc
+[LjmetFactory]: removing WprimeCalc
+ JetSubCalc Bdisc = pfCombinedInclusiveSecondaryVertexV2BJetTags
+JetSubCalc: doNewJEC = 1, killHF = 0
+JetSubCalc: using L2+L3 corrected groomed masses
+%MSG-e JetCorrectorParameters: 
+No definitions found!!!
+%MSG
+keepFullMChistory 1
+Writing LHE weights (no override).
+[ljmet]: Creating singleLepSelector/jes_correction
+[ljmet]: Creating singleLepSelector/met_correction
+[ljmet]: Creating singleLepSelector/nBtagSfCorrections
+[ljmet]: Using MC truth info
+[ljmet]: Setting up chain event
+[ljmet]: Begin loop over events
+[ljmet]: 0 events processed. Processing run 1, event 4401
+
+ *** Break *** segmentation violation
+
+
+
+===========================================================
+There was a crash.
+This is the entire stack trace of all threads:
+===========================================================
+
+Thread 6 (Thread 0x7f69dae19700 (LWP 3021107)):
+#0  0x00000035572e8f33 in epoll_wait () from /lib64/libc.so.6
+#1  0x00007f69daf963e2 in XrdSys::IOEvents::PollE::Begin(XrdSysSemaphore*, int&, char const**) () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/cms/cmssw/CMSSW_7_6_4/external/slc6_amd64_gcc493/lib/libXrdUtils.so.2
+#2  0x00007f69daf92c2d in XrdSys::IOEvents::BootStrap::Start(void*) () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/cms/cmssw/CMSSW_7_6_4/external/slc6_amd64_gcc493/lib/libXrdUtils.so.2
+#3  0x00007f69daf91447 in XrdSysThread_Xeq () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/cms/cmssw/CMSSW_7_6_4/external/slc6_amd64_gcc493/lib/libXrdUtils.so.2
+#4  0x0000003557e07aa1 in start_thread () from /lib64/libpthread.so.0
+#5  0x00000035572e893d in clone () from /lib64/libc.so.6
+
+Thread 5 (Thread 0x7f69da418700 (LWP 3021108)):
+#0  0x0000003557e0f00d in nanosleep () from /lib64/libpthread.so.0
+#1  0x00007f69daf91bdb in XrdSysTimer::Wait(int) () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/cms/cmssw/CMSSW_7_6_4/external/slc6_amd64_gcc493/lib/libXrdUtils.so.2
+#2  0x00007f69daef0f11 in XrdCl::TaskManager::RunTasks() () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/cms/cmssw/CMSSW_7_6_4/external/slc6_amd64_gcc493/lib/libXrdCl.so.2
+#3  0x00007f69daef1079 in ?? () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/cms/cmssw/CMSSW_7_6_4/external/slc6_amd64_gcc493/lib/libXrdCl.so.2
+#4  0x0000003557e07aa1 in start_thread () from /lib64/libpthread.so.0
+#5  0x00000035572e893d in clone () from /lib64/libc.so.6
+
+Thread 4 (Thread 0x7f69d9a17700 (LWP 3021109)):
+#0  0x00000035572e5199 in syscall () from /lib64/libc.so.6
+#1  0x00007f69daf49c63 in XrdCl::JobManager::RunJobs() () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/cms/cmssw/CMSSW_7_6_4/external/slc6_amd64_gcc493/lib/libXrdCl.so.2
+#2  0x00007f69daf49df9 in ?? () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/cms/cmssw/CMSSW_7_6_4/external/slc6_amd64_gcc493/lib/libXrdCl.so.2
+#3  0x0000003557e07aa1 in start_thread () from /lib64/libpthread.so.0
+#4  0x00000035572e893d in clone () from /lib64/libc.so.6
+
+Thread 3 (Thread 0x7f69d9016700 (LWP 3021110)):
+#0  0x00000035572e5199 in syscall () from /lib64/libc.so.6
+#1  0x00007f69daf49c63 in XrdCl::JobManager::RunJobs() () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/cms/cmssw/CMSSW_7_6_4/external/slc6_amd64_gcc493/lib/libXrdCl.so.2
+#2  0x00007f69daf49df9 in ?? () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/cms/cmssw/CMSSW_7_6_4/external/slc6_amd64_gcc493/lib/libXrdCl.so.2
+#3  0x0000003557e07aa1 in start_thread () from /lib64/libpthread.so.0
+#4  0x00000035572e893d in clone () from /lib64/libc.so.6
+
+Thread 2 (Thread 0x7f69d8615700 (LWP 3021111)):
+#0  0x00000035572e5199 in syscall () from /lib64/libc.so.6
+#1  0x00007f69daf49c63 in XrdCl::JobManager::RunJobs() () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/cms/cmssw/CMSSW_7_6_4/external/slc6_amd64_gcc493/lib/libXrdCl.so.2
+#2  0x00007f69daf49df9 in ?? () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/cms/cmssw/CMSSW_7_6_4/external/slc6_amd64_gcc493/lib/libXrdCl.so.2
+#3  0x0000003557e07aa1 in start_thread () from /lib64/libpthread.so.0
+#4  0x00000035572e893d in clone () from /lib64/libc.so.6
+
+Thread 1 (Thread 0x7f69e4b9d2e0 (LWP 3021081)):
+#0  0x00000035572ac69d in waitpid () from /lib64/libc.so.6
+#1  0x000000355723e609 in do_system () from /lib64/libc.so.6
+#2  0x000000355723e940 in system () from /lib64/libc.so.6
+#3  0x00007f69e603f06a in TUnixSystem::StackTrace() () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/cms/cmssw/CMSSW_7_6_4/external/slc6_amd64_gcc493/lib/libCore.so
+#4  0x00007f69e604103c in TUnixSystem::DispatchSignals(ESignals) () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/cms/cmssw/CMSSW_7_6_4/external/slc6_amd64_gcc493/lib/libCore.so
+#5  <signal handler called>
+#6  0x00007f69eaa1547d in JetCorrectionUncertainty::getUncertainty(bool) () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/cms/cmssw/CMSSW_7_6_4/lib/slc6_amd64_gcc493/libCondFormatsJetMETObjects.so
+#7  0x00007f69ebc1dd74 in JetSubCalc::AnalyzeEvent (this=0x1093bd0, event=..., selector=0x10951e0) at /uscms_data/d3/rsyarif/Spring2016/produceLJMetNtuple76x/CMSSW_7_6_4/src/LJMet/Com/src/JetSubCalc.cc:497
+#8  0x00007f69ebc53e4d in LjmetFactory::RunAllCalculators (this=0x108dfb0, event=..., selector=0x10951e0, ec=...) at /uscms_data/d3/rsyarif/Spring2016/produceLJMetNtuple76x/CMSSW_7_6_4/src/LJMet/Com/src/LjmetFactory.cc:84
+#9  0x0000000000407037 in main ()
+===========================================================
+
+
+The lines below might hint at the cause of the crash.
+If they do not help you then please submit a bug report at
+http://root.cern.ch/bugs. Please post the ENTIRE stack trace
+from above as an attachment in addition to anything else
+that might help us fixing this issue.
+===========================================================
+#6  0x00007f69eaa1547d in JetCorrectionUncertainty::getUncertainty(bool) () from /cvmfs/cms.cern.ch/slc6_amd64_gcc493/cms/cmssw/CMSSW_7_6_4/lib/slc6_amd64_gcc493/libCondFormatsJetMETObjects.so
+#7  0x00007f69ebc1dd74 in JetSubCalc::AnalyzeEvent (this=0x1093bd0, event=..., selector=0x10951e0) at /uscms_data/d3/rsyarif/Spring2016/produceLJMetNtuple76x/CMSSW_7_6_4/src/LJMet/Com/src/JetSubCalc.cc:497
+#8  0x00007f69ebc53e4d in LjmetFactory::RunAllCalculators (this=0x108dfb0, event=..., selector=0x10951e0, ec=...) at /uscms_data/d3/rsyarif/Spring2016/produceLJMetNtuple76x/CMSSW_7_6_4/src/LJMet/Com/src/LjmetFactory.cc:84
+#9  0x0000000000407037 in main ()
+===========================================================
+
+
