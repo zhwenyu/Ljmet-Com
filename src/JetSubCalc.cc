@@ -137,10 +137,8 @@ int JetSubCalc::BeginJob()
     if(mPset.exists("isMc")) isMc = mPset.getParameter<bool>("isMc");
     else isMc = false;
 
-    if(mPset.exists("JECup")) JECup = mPset.getParameter<bool>("JECup");
-    else JECup=false;
-    if(mPset.exists("JECdown")) JECdn = mPset.getParameter<bool>("JECdown");
-    else JECdn = false;
+    JECup = mPset.getParameter<bool>("JECup");
+    JECdn = mPset.getParameter<bool>("JECdown");
 
     if(useL2L3Mass){
       cout << "JetSubCalc: using L2+L3 corrected groomed masses" << endl;
@@ -371,6 +369,8 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * s
     std::vector<double> theJetAK8Energy;
     std::vector<double> theJetAK8CSV;
     std::vector<double> theJetAK8JetCharge;
+    std::vector<double> theJetAK8GenPt;
+    std::vector<double> theJetAK8GenDR;
 
     std::vector<double> theJetAK8CEmEnergy;
     std::vector<double> theJetAK8NEmEnergy;
@@ -469,6 +469,20 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * s
       theJetAK8Phi   .push_back(corrak8.phi());
       theJetAK8Energy.push_back(corrak8.energy());
       theJetAK8Mass  .push_back(corrak8.mass());
+
+      double genDR = -99;
+      double genpt = -99;
+      TLorentzVector ak8jet;
+      ak8jet.SetPtEtaPhiE(corrak8.pt(),corrak8.eta(),corrak8.phi(),corrak8.energy());
+      const reco::GenJet * genJet = corrak8.genJet();
+      if(genJet){
+	TLorentzVector genP4;
+	genP4.SetPtEtaPhiE(genJet->pt(),genJet->eta(),genJet->phi(),genJet->energy());
+	genDR = ak8jet.DeltaR(genP4);	
+	genpt = genJet->pt();
+      }
+      theJetAK8GenPt.push_back(genpt);
+      theJetAK8GenDR.push_back(genDR);
 
       thePrunedMass   = -std::numeric_limits<double>::max();
       theTrimmedMass  = -std::numeric_limits<double>::max();
@@ -662,6 +676,8 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * s
     SetValue("theJetAK8Energy", theJetAK8Energy);
     SetValue("theJetAK8CSV",    theJetAK8CSV);
     SetValue("theJetAK8JetCharge", theJetAK8JetCharge);
+    SetValue("theJetAK8GenPt",  theJetAK8GenPt);
+    SetValue("theJetAK8GenDR",  theJetAK8GenDR);
 
     SetValue("theJetAK8CEmEnergy", theJetAK8CEmEnergy); 
     SetValue("theJetAK8NEmEnergy", theJetAK8NEmEnergy); 
@@ -774,9 +790,9 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * s
 	    }else if(abs(mother->pdgId()) == 25){
 	      double dr = 1000;
 	      if(p.pdgId()*mother->daughter(0)->pdgId() > 0){
-		double dr = reco::deltaR(p.p4(),mother->daughter(1)->p4());
+		dr = reco::deltaR(p.p4(),mother->daughter(1)->p4());
 	      }else{
-		double dr = reco::deltaR(p.p4(),mother->daughter(0)->p4());
+		dr = reco::deltaR(p.p4(),mother->daughter(0)->p4());
 	      }
 	      if(dr < dRWW) dRWW = dr;
 	    }		
@@ -794,9 +810,9 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * s
 	    if(abs(mother->pdgId()) == 25){
 	      double dr = 1000;
 	      if(p.pdgId()*mother->daughter(0)->pdgId() > 0){
-		double dr = reco::deltaR(p.p4(),mother->daughter(1)->p4());
+		dr = reco::deltaR(p.p4(),mother->daughter(1)->p4());
 	      }else{
-		double dr = reco::deltaR(p.p4(),mother->daughter(0)->p4());
+		dr = reco::deltaR(p.p4(),mother->daughter(0)->p4());
 	      }
 	      if(dr < dRZZ) dRZZ = dr;
 	    }
@@ -815,24 +831,32 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * s
 	  HadronicVHtEta.push_back( p.eta() );
 	  HadronicVHtPhi.push_back( p.phi() );
 	  HadronicVHtEnergy.push_back( p.energy() );
-	  HadronicVHtD0Pt.push_back( p.daughter(1)->pt());
-	  HadronicVHtD0Eta.push_back( p.daughter(1)->eta());
-	  HadronicVHtD0Phi.push_back( p.daughter(1)->phi());
-	  HadronicVHtD0E.push_back( p.daughter(1)->energy());
 	  
 	  if(abs(id) != 6){
-	    HadronicVHtD1Pt.push_back( p.daughter(0)->pt());	    
-	    HadronicVHtD2Pt.push_back( 0);
-	    HadronicVHtD1Eta.push_back( p.daughter(0)->eta());
-	    HadronicVHtD2Eta.push_back( 0);
-	    HadronicVHtD1Phi.push_back( p.daughter(0)->phi());
-	    HadronicVHtD2Phi.push_back( 0);
-	    HadronicVHtD1E.push_back( p.daughter(0)->energy());
-	    HadronicVHtD2E.push_back( 0);
+	    HadronicVHtD0Pt.push_back( p.daughter(0)->pt());
+	    HadronicVHtD0Eta.push_back( p.daughter(0)->eta());
+	    HadronicVHtD0Phi.push_back( p.daughter(0)->phi());
+	    HadronicVHtD0E.push_back( p.daughter(0)->energy());
+	    HadronicVHtD1Pt.push_back( p.daughter(1)->pt());	    
+	    HadronicVHtD1Eta.push_back( p.daughter(1)->eta());
+	    HadronicVHtD1Phi.push_back( p.daughter(1)->phi());
+	    HadronicVHtD1E.push_back( p.daughter(1)->energy());
+	    HadronicVHtD2Pt.push_back(-99.9);
+	    HadronicVHtD2Eta.push_back(-99.9);
+	    HadronicVHtD2Phi.push_back(-99.9);
+	    HadronicVHtD2E.push_back(-99.9);
 	  }else{
 	    const reco::Candidate *W = p.daughter(0);
-	    if(fabs(W->pdgId()) != 24) W = p.daughter(1);
+	    const reco::Candidate *b = p.daughter(1);
+	    if(fabs(W->pdgId()) != 24){
+	      W = p.daughter(1);
+	      b = p.daughter(0);
+	    }
 	    while(W->numberOfDaughters() == 1) W = W->daughter(0);
+	    HadronicVHtD0Pt.push_back( b->pt());
+	    HadronicVHtD0Eta.push_back( b->eta());
+	    HadronicVHtD0Phi.push_back( b->phi());
+	    HadronicVHtD0E.push_back( b->energy());
 	    HadronicVHtD1Pt.push_back( W->daughter(0)->pt());
 	    HadronicVHtD2Pt.push_back( W->daughter(1)->pt());
 	    HadronicVHtD1Eta.push_back( W->daughter(0)->eta());
