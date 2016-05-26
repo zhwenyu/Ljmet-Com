@@ -22,6 +22,10 @@ cd CMSSWVERSION/src/
 setenv SCRAM_ARCH slc6_amd64_gcc472
 eval `scram runtime -csh`
 cmsenv
+#get jmar fix
+xrdcp root://cmseos.fnal.gov//store/user/clint/cmssw_74X_JMAR.tar cmssw_74X_JMAR.tar
+tar -xvf cmssw_74X_JMAR.tar
+scram b
 #get setup ljmet area
 mkdir -p LJMet/Com
 cd LJMet/Com
