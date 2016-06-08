@@ -923,6 +923,10 @@ TLorentzVector BaseEventSelector::correctMet(const pat::MET & met, edm::EventBas
             correctedMET_py += lv.Py();
         }
     }
+    else {
+        correctedMET_px = met.px();
+        correctedMET_py = met.py();
+    }
     
     correctedMET_p4.SetPxPyPzE(correctedMET_px, correctedMET_py, 0, sqrt(correctedMET_px*correctedMET_px+correctedMET_py*correctedMET_py));
     
@@ -948,6 +952,10 @@ TLorentzVector BaseEventSelector::correctMet(const pat::MET & met, edm::EventBas
             correctedMET_px += lv.Px();
             correctedMET_py += lv.Py();
         }
+    }
+    else {
+        correctedMET_px = met.px();
+        correctedMET_py = met.py();
     }
     
     correctedMET_p4.SetPxPyPzE(correctedMET_px, correctedMET_py, 0, sqrt(correctedMET_px*correctedMET_px+correctedMET_py*correctedMET_py));
