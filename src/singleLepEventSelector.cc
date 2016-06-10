@@ -570,6 +570,7 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
 	    if (patTrigNames.triggerName(i) == "Flag_CSCTightHaloFilter") csctighthalopass = PatTriggerResults->accept(patTrigNames.triggerIndex(patTrigNames.triggerName(i)));
 	    if (patTrigNames.triggerName(i) == "Flag_EcalDeadCellTriggerPrimitiveFilter") ecaldeadcellpass = PatTriggerResults->accept(patTrigNames.triggerIndex(patTrigNames.triggerName(i)));
 	    if (patTrigNames.triggerName(i) == "Flag_eeBadScFilter") eebadscpass = PatTriggerResults->accept(patTrigNames.triggerIndex(patTrigNames.triggerName(i)));
+	    if (patTrigNames.triggerName(i) == "Flag_goodVertices") eebadscpass = PatTriggerResults->accept(patTrigNames.triggerIndex(patTrigNames.triggerName(i)));// this shouldn't actually be necessary since we do this manually, but I add it just for completeness
 	  }
 	  
 	  if(hbhenoisepass && hbhenoiseisopass && csctighthalopass && ecaldeadcellpass && eebadscpass){
