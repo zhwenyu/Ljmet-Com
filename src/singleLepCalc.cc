@@ -416,9 +416,7 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
             muRelIso . push_back(relIso);
             muMiniIso . push_back(miniIso);
             muMiniIsoDB . push_back(miniIsoDB);
-
             muRelIso . push_back(relIso);
-            muMiniIso . push_back(miniIso);
 
             muChIso . push_back(chIso);
             muNhIso . push_back(nhIso);
