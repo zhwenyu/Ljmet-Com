@@ -1,0 +1,11 @@
+WZ
+ZZ
+VH
+TTW
+TTZ
+TTH
+ZZZ
+WWZ
+WZZ
+WpWp
+TTTT
