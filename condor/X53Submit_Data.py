@@ -17,7 +17,7 @@ rel_base = os.environ['CMSSW_BASE']
 cmssw = 'CMSSW_7_4_15_patch1'
 logdir = 'May25'
 #outdir = '/eos/uscms/store/user/lpctlbsm/clint/Fall15/25ns/'+logdir+'/'
-outdir = '/eos/uscms/store/user/clint/Fall15/25ns/'+logdir+'/'
+outdir = '/eos/uscms/store/user/clint/Spring15/25ns/'+logdir+'/'
 
 ### What is the name of your FWLite Analyzer
 FWLiteAnalyzer = 'ljmet'
@@ -31,7 +31,7 @@ DOQCDMC = 'False'
 DOTTBARSYS = 'False'
 
 ### JSON file to use
-MYJSON = "'../data/json/Cert_13TeV_16Dec2015ReReco_Collisions15_25ns_JSON_v2.txt'"
+MYJSON = "'../data/json/Cert_246908-260627_13TeV_PromptReco_Collisions15_25ns_JSON_v2.txt'"
 
 ### Systematics flags
 BTAGUNCERTUP = 'False'
