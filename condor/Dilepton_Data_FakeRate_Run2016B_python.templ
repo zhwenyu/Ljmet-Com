@@ -72,11 +72,23 @@ process.event_selector = cms.PSet(
     dump_trigger             = cms.bool(True),
 
     #Can use same trigger paths for data and MC since MC is always one of the data versions
-    trigger_path_ee          = cms.vstring('HLT_Ele17_CaloIdL_TrackIdL_IsoVL_v1','HLT_Ele17_CaloIdL_TrackIdL_IsoVL_v2','HLT_Ele17_CaloIdL_TrackIdL_IsoVL_v3'),
+    trigger_path_ee          = cms.vstring(
+    'HLT_Ele17_CaloIdL_GsfTrkIdVL_v1',
+    'HLT_Ele17_CaloIdL_GsfTrkIdVL_v2',
+    'HLT_Ele17_CaloIdL_GsfTrkIdVL_v3',
+    'HLT_Ele17_CaloIdL_GsfTrkIdVL_v4',
+    'HLT_Ele17_CaloIdL_TrackIdL_IsoVL_v1',
+    'HLT_Ele17_CaloIdL_TrackIdL_IsoVL_v2',
+    'HLT_Ele17_CaloIdL_TrackIdL_IsoVL_v3',
+    'HLT_Ele17_CaloIdL_TrackIdL_IsoVL_v4',
+    'HLT_Ele17_CaloIdL_TrackIdL_IsoVL_v5'),
     
     trigger_path_em          = cms.vstring(''),
 
-    trigger_path_mm          = cms.vstring('HLT_Mu17_v1','HLT_Mu17_v2','HLT_Mu17_v3'),
+    trigger_path_mm          = cms.vstring(
+    'HLT_Mu17_v1',
+    'HLT_Mu17_v2',
+    'HLT_Mu17_v3'),
 
     pv_cut                   = cms.bool(True),
     hbhe_cut                 = cms.bool(True),
