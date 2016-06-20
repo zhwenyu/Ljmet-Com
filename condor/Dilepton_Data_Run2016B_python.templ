@@ -9,7 +9,7 @@ process.load('LJMet.Com.commonCalc_cfi')
 
 #Dilepton calculator options
 process.load('LJMet.Com.DileptonCalc_cfi')
-
+#process.subProcesses = cms.PSet()
 
 ############################################################
 #
@@ -49,12 +49,12 @@ process.JetSubCalc.useL2L3Mass = cms.bool(True)
 process.JetSubCalc.isMc = process.ljmet.isMc
 process.JetSubCalc.JECup = cms.bool(JECUNCERTUP)
 process.JetSubCalc.JECdown = cms.bool(JECUNCERTDOWN)
-process.JetSubCalc.MCL2JetParAK8 = cms.string('../data/Summer15_25nsV7_MC_L2Relative_AK8PFchs.txt')
-process.JetSubCalc.MCL3JetParAK8 = cms.string('../data/Summer15_25nsV7_MC_L3Absolute_AK8PFchs.txt')
-process.JetSubCalc.DataL2JetParAK8 = cms.string('../data/Summer15_25nsV7_DATA_L2Relative_AK8PFchs.txt')
-process.JetSubCalc.DataL3JetParAK8 = cms.string('../data/Summer15_25nsV7_DATA_L3Absolute_AK8PFchs.txt')
-process.JetSubCalc.DataL2L3JetParAK8 = cms.string('../data/Summer15_25nsV7_DATA_L2L3Residual_AK8PFchs.txt')
-process.JetSubCalc.UncertaintyAK8 = cms.string('../data/Summer15_25nsV7_DATA_Uncertainty_AK8PFchs.txt')
+process.JetSubCalc.MCL2JetParAK8 = cms.string('../data/Spring16_25nsV3_MC_L2Relative_AK8PFchs.txt')
+process.JetSubCalc.MCL3JetParAK8 = cms.string('../data/Spring16_25nsV3_MC_L3Absolute_AK8PFchs.txt')
+process.JetSubCalc.DataL2JetParAK8 = cms.string('../data/Spring16_25nsV3_DATA_L2Relative_AK8PFchs.txt')
+process.JetSubCalc.DataL3JetParAK8 = cms.string('../data/Spring16_25nsV3_DATA_L3Absolute_AK8PFchs.txt')
+process.JetSubCalc.DataL2L3JetParAK8 = cms.string('../data/Spring16_25nsV3_DATA_L2L3Residual_AK8PFchs.txt')
+process.JetSubCalc.UncertaintyAK8 = cms.string('../data/Spring16_25nsV3_DATA_Uncertainty_AK8PFchs.txt')
 
 
 ############################################################
@@ -72,11 +72,47 @@ process.event_selector = cms.PSet(
     dump_trigger             = cms.bool(True),
 
     #Can use same trigger paths for data and MC since MC is always one of the data versions
-    trigger_path_ee          = cms.vstring('HLT_DoubleEle33_CaloIdL_GsfTrkIdVL_v2','HLT_DoubleEle33_CaloIdL_GsfTrkIdVL_v3','HLT_Ele17_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v2','HLT_Ele17_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v3'),
+    trigger_path_ee          = cms.vstring(
+    'HLT_DoubleEle33_CaloIdL_GsfTrkIdVL_v1',
+    'HLT_DoubleEle33_CaloIdL_GsfTrkIdVL_v2',
+    'HLT_DoubleEle33_CaloIdL_GsfTrkIdVL_v3',
+    'HLT_DoubleEle33_CaloIdL_GsfTrkIdVL_v4',
+    'HLT_DoubleEle33_CaloIdL_GsfTrkIdVL_v5',
+    'HLT_DoubleEle33_CaloIdL_GsfTrkIdVL_v6',
+    'HLT_DoubleEle37_Ele27_CaloIdL_GsfTrkIdVL_v1',
+    'HLT_DoubleEle37_Ele27_CaloIdL_GsfTrkIdVL_v2',
+    'HLT_DoubleEle37_Ele27_CaloIdL_GsfTrkIdVL_v3',
+    'HLT_DoubleEle37_Ele27_CaloIdL_GsfTrkIdVL_v4',
+    'HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v1',
+    'HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v2',
+    'HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v3',
+    'HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v4',
+    'HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v5',
+    'HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v6'),
     
-    trigger_path_em          = cms.vstring('HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_v2','HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v2','HLT_Mu8_TrkIsoVVL_Ele17_CaloIdL_TrackIdL_IsoVL_v2','HLT_Mu17_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v2','HLT_Mu30_Ele30_CaloIdL_GsfTrkIdVL_v2','HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_v3','HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v3','HLT_Mu8_TrkIsoVVL_Ele17_CaloIdL_TrackIdL_IsoVL_v3','HLT_Mu17_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v3','HLT_Mu30_Ele30_CaloIdL_GsfTrkIdVL_v3'),
+    trigger_path_em          = cms.vstring(
+    'HLT_Mu37_Ele27_CaloIdL_GsfTrkIdVL_v1',
+    'HLT_Mu37_Ele27_CaloIdL_GsfTrkIdVL_v2',
+    'HLT_Mu27_Ele37_CaloIdL_GsfTrkIdVL_v1',
+    'HLT_Mu27_Ele37_CaloIdL_GsfTrkIdVL_v2',
+    'HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_v1',
+    'HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_v2',
+    'HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_v3',
+    'HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_v4',
+    'HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_v5',
+    'HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_v6',
+    'HLT_Mu23_TrkIsoVVL_Ele8_CaloIdL_TrackIdL_IsoVL_v1',
+    'HLT_Mu23_TrkIsoVVL_Ele8_CaloIdL_TrackIdL_IsoVL_v2',
+    'HLT_Mu23_TrkIsoVVL_Ele8_CaloIdL_TrackIdL_IsoVL_v3',
+    'HLT_Mu23_TrkIsoVVL_Ele8_CaloIdL_TrackIdL_IsoVL_v4',),
 
-    trigger_path_mm          = cms.vstring('HLT_Mu30_TkMu11_v2', 'HLT_Mu40_TkMu11_v2','HLT_Mu27_TkMu8_v2','HLT_Mu30_TkMu11_v3', 'HLT_Mu40_TkMu11_v3','HLT_Mu27_TkMu8_v3'),
+    trigger_path_mm          = cms.vstring(
+    'HLT_Mu30_TkMu11_v1',
+    'HLT_Mu30_TkMu11_v2',
+    'HLT_Mu30_TkMu11_v3',
+    'HLT_Mu40_TkMu11_v1',
+    'HLT_Mu40_TkMu11_v2',
+    'HLT_Mu40_TkMu11_v3',),
 
     pv_cut                   = cms.bool(True),
     hbhe_cut                 = cms.bool(True),
@@ -129,9 +165,9 @@ process.event_selector = cms.PSet(
     JERdown                  = cms.bool(JERUNCERTDOWN),
 
     JEC_txtfile              = cms.string('../data/Spring16_25nsV3_MC_Uncertainty_AK4PFchs.txt'),
-    JERSF_txtfile            = cms.string('../data/Spring16_25nsV3_MC_SF_AK4PFchs.txt'),	
-    JER_txtfile              = cms.string('../data/Spring16_25nsV3_MC_PtResolution_AK4PFchs.txt'),
-    JERAK8_txtfile           = cms.string('../data/Spring16_25nsV3_MC_PtResolution_AK8PFchs.txt'),
+    JERSF_txtfile            = cms.string('../data/Fall15_25nsV2_MC_SF_AK4PFchs.txt'),	
+    JER_txtfile              = cms.string('../data/Fall15_25nsV2_MC_PtResolution_AK4PFchs.txt'),
+    JERAK8_txtfile           = cms.string('../data/Fall15_25nsV2_MC_PtResolution_AK8PFchs.txt'),
 
 
     #new jet energy corrections
