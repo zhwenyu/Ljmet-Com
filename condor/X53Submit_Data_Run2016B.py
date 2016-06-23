@@ -31,7 +31,7 @@ DOQCDMC = 'False'
 DOTTBARSYS = 'False'
 
 ### JSON file to use
-MYJSON = "'../data/json/Cert_271036-274443_13TeV_PromptReco_Collisions16_JSON.txt'"
+MYJSON = "'../data/json/Cert_271036-275125_13TeV_PromptReco_Collisions16_JSON.txt'"
 
 ### Systematics flags
 BTAGUNCERTUP = 'False'
@@ -157,8 +157,8 @@ for i in range(len(prefix)):
         eosfile =   "root://cmseos.fnal.gov/"+dir[i]+"/"+prefix[i]+"_"+str(j)+".py"
         os.system("xrdcp -f %s %s"  % (localfile,eosfile))
         #remove local version
-        os.system('rm %s' % localfile)
-
+        os.system('mv %s python_cfgs/Data/' % localfile)
+    
         localcondor = locdir+'/'+prefix[i]+"_"+str(j)+".condor"
         eoscondor = "root://cmseos.fnal.gov/"+dir[i]+"/"+prefix[i]+"_"+str(j)+".condor"
         condor_file = open(localcondor,"w")

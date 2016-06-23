@@ -14,10 +14,11 @@ import fileinput
 files_per_job = 1
 
 rel_base = os.environ['CMSSW_BASE']
-cmssw = 'CMSSW_7_4_15_patch1'
-logdir = 'May25'
-#outdir = '/eos/uscms/store/user/lpctlbsm/clint/Fall15/25ns/'+logdir+'/'
-outdir = '/eos/uscms/store/user/clint/FakeRate/25ns/'+logdir+'/'
+cmssw = 'CMSSW_8_0_12'
+logdir = 'June18'
+outdir = '/eos/uscms/store/user/lpctlbsm/clint/FakeRate/25ns/'+logdir+'/'
+#outdir = '/store/user/lpctlbsm/clint/FakeRate/25ns/'+logdir+'/'
+#outdir = '/eos/uscms/store/user/clint/FakeRate/25ns/'+logdir+'/'
 
 ### What is the name of your FWLite Analyzer
 FWLiteAnalyzer = 'ljmet'
@@ -31,7 +32,7 @@ DOQCDMC = 'False'
 DOTTBARSYS = 'False'
 
 ### JSON file to use
-MYJSON = "'../data/json/Cert_246908-260627_13TeV_PromptReco_Collisions15_25ns_JSON_v2.txt'"
+MYJSON = "'../data/json/Cert_271036-275125_13TeV_PromptReco_Collisions16_JSON.txt'"
 
 ### Systematics flags
 BTAGUNCERTUP = 'False'
@@ -128,7 +129,7 @@ for i in range(len(prefix)):
 
     while ( nfiles <= count ):    
 
-        py_templ_file = open(rel_base+"/src/LJMet/Com/condor/Dilepton_Data_FakeRate_Run2015D_python.templ")
+        py_templ_file = open(rel_base+"/src/LJMet/Com/condor/Dilepton_Data_FakeRate_Run2016B_python.templ")
         condor_templ_file = open(rel_base+"/src/LJMet/Com/condor/X53condor.templ")
         csh_templ_file    = open(rel_base+"/src/LJMet/Com/condor/X53csh.templ")
 
@@ -155,9 +156,11 @@ for i in range(len(prefix)):
 
         #copy file to eos
         eosfile =   "root://cmseos.fnal.gov/"+dir[i]+"/"+prefix[i]+"_"+str(j)+".py"
+        #loceosfile = dir[i]+"/"+prefix[i]+"_"+str(j)+".py"
+        #os.system("cp %s %s" %(localfile,loceosfile))
         os.system("xrdcp -f %s %s"  % (localfile,eosfile))
         #remove local version
-        os.system('rm %s' % localfile)
+        os.system('mv %s python_cfgs' % localfile)
 
         localcondor = locdir+'/'+prefix[i]+"_"+str(j)+".condor"
         eoscondor = "root://cmseos.fnal.gov/"+dir[i]+"/"+prefix[i]+"_"+str(j)+".condor"

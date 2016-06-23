@@ -14,10 +14,10 @@ import fileinput
 files_per_job = 1
 
 rel_base = os.environ['CMSSW_BASE']
-cmssw = 'CMSSW_7_4_15_patch1'
-logdir = 'May25'
-#outdir = '/eos/uscms/store/user/lpctlbsm/clint/Spring15/25ns/'+logdir+'/'
-outdir = '/eos/uscms/store/user/clint/Spring15/25ns/'+logdir+'/'
+cmssw = 'CMSSW_8_0_12'
+logdir = 'June18'
+outdir = '/eos/uscms/store/user/lpctlbsm/clint/Spring16/25ns/'+logdir+'/'
+#outdir = '/eos/uscms/store/user/clint/Spring15/25ns/'+logdir+'/'
 
 ### What is the name of your FWLite Analyzer
 FWLiteAnalyzer = 'ljmet'
@@ -128,7 +128,7 @@ for i in range(len(prefix)):
 
     while ( nfiles <= count ):    
 
-        py_templ_file = open(rel_base+"/src/LJMet/Com/condor/Dilepton_Spring15MC_25ns_python.templ")
+        py_templ_file = open(rel_base+"/src/LJMet/Com/condor/Dilepton_Spring16MC_25ns_python.templ")
         condor_templ_file = open(rel_base+"/src/LJMet/Com/condor/X53condor.templ")
         csh_templ_file    = open(rel_base+"/src/LJMet/Com/condor/X53csh.templ")
 
@@ -157,7 +157,7 @@ for i in range(len(prefix)):
         eosfile =   "root://cmseos.fnal.gov/"+dir[i]+"/"+prefix[i]+"_"+str(j)+".py"
         os.system("xrdcp -f %s %s"  % (localfile,eosfile))
         #remove local version
-        os.system('rm %s' % localfile)
+        os.system('rm %s python_cfgs/MC/' % localfile)
 
         localcondor = locdir+'/'+prefix[i]+"_"+str(j)+".condor"
         eoscondor = "root://cmseos.fnal.gov/"+dir[i]+"/"+prefix[i]+"_"+str(j)+".condor"
@@ -198,7 +198,7 @@ for i in range(len(prefix)):
 
         os.system('chmod u+x '+locdir+'/'+prefix[i]+'_'+str(j)+'.csh')
         print 'condor file is: '+locdir+'/'+prefix[i]+'_'+str(j)+'.condor;'
-        os.system(' condor_submit %s' % localcondor)
+        #os.system(' condor_submit %s' % localcondor)
         #os.system('cd '+dir[i]+'; condor_submit '+prefix[i]+'_'+str(j)+'.condor; cd -')
         j = j + 1
         nfiles = nfiles + files_per_job
