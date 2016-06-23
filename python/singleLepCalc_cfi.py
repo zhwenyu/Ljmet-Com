@@ -18,13 +18,11 @@ singleLepCalc = cms.PSet(
                          keepPDGIDForce  = cms.vuint32(6,6),
                          keepStatusForce = cms.vuint32(62,22),
                          rhoSrc            = cms.InputTag("fixedGridRhoFastjetAll"),
-                         doElSCMETCorr = cms.bool(True),
+                         doElSCMETCorr = cms.bool(False),
                          electronCollection = cms.InputTag("slimmedElectrons"),
-                         doMuInMETCorr = cms.bool(True),
-                         muonCollection = cms.InputTag("slimmedMuons"),
                          UseElMVA = cms.bool(True),
                          OverrideLHEWeights = cms.bool(False),
                          basePDFname = cms.string("cteq6"),
                          newPDFname = cms.string("PDF4LHC15_nlo_mc_pdfas"),
-                         saveLooseLeps = cms.bool(True)
+                         saveLooseLeps = cms.bool(False)
                          )
