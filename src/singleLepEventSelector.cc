@@ -242,11 +242,15 @@ void singleLepEventSelector::BeginJob( std::map<std::string, edm::ParameterSet c
         mbPar["muon_selector"]             = par[_key].getParameter<bool>         ("muon_selector");
         mbPar["muon_selector_medium"]      = par[_key].getParameter<bool>         ("muon_selector_medium");
         mdPar["muon_reliso"]               = par[_key].getParameter<double>       ("muon_reliso");
+        mdPar["muon_dxy"]                  = par[_key].getParameter<double>       ("muon_dxy");
+        mdPar["muon_dz"]                   = par[_key].getParameter<double>       ("muon_dz");
         mdPar["muon_minpt"]                = par[_key].getParameter<double>       ("muon_minpt");
         mdPar["muon_maxeta"]               = par[_key].getParameter<double>       ("muon_maxeta");
         mbPar["loose_muon_selector"]       = par[_key].getParameter<bool>         ("loose_muon_selector");
         mbPar["loose_muon_selector_tight"] = par[_key].getParameter<bool>         ("loose_muon_selector_tight");
         mdPar["loose_muon_reliso"]         = par[_key].getParameter<double>       ("loose_muon_reliso");
+        mdPar["loose_muon_dxy"]            = par[_key].getParameter<double>       ("loose_muon_dxy");
+        mdPar["loose_muon_dz"]             = par[_key].getParameter<double>       ("loose_muon_dz");
         mdPar["loose_muon_minpt"]          = par[_key].getParameter<double>       ("loose_muon_minpt");
         mdPar["loose_muon_maxeta"]         = par[_key].getParameter<double>       ("loose_muon_maxeta");
         miPar["min_muon"]                  = par[_key].getParameter<int>          ("min_muon");
@@ -560,19 +564,82 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
 	  
 	  bool hbhenoisepass = false;
 	  bool hbhenoiseisopass = false;
-	  bool csctighthalopass = false;
+	  bool globaltighthalopass = false;
 	  bool ecaldeadcellpass = false;
 	  bool eebadscpass = false;
+          bool goodvertpass = false;
 	  
 	  for (unsigned int i=0; i<PatTriggerResults->size(); i++){
 	    if (patTrigNames.triggerName(i) == "Flag_HBHENoiseFilter") hbhenoisepass = PatTriggerResults->accept(patTrigNames.triggerIndex(patTrigNames.triggerName(i)));
 	    if (patTrigNames.triggerName(i) == "Flag_HBHENoiseIsoFilter") hbhenoiseisopass = PatTriggerResults->accept(patTrigNames.triggerIndex(patTrigNames.triggerName(i)));
-	    if (patTrigNames.triggerName(i) == "Flag_CSCTightHaloFilter") csctighthalopass = PatTriggerResults->accept(patTrigNames.triggerIndex(patTrigNames.triggerName(i)));
+	    if (patTrigNames.triggerName(i) == "Flag_globalTightHalo2016Filter") globaltighthalopass = PatTriggerResults->accept(patTrigNames.triggerIndex(patTrigNames.triggerName(i)));
 	    if (patTrigNames.triggerName(i) == "Flag_EcalDeadCellTriggerPrimitiveFilter") ecaldeadcellpass = PatTriggerResults->accept(patTrigNames.triggerIndex(patTrigNames.triggerName(i)));
 	    if (patTrigNames.triggerName(i) == "Flag_eeBadScFilter") eebadscpass = PatTriggerResults->accept(patTrigNames.triggerIndex(patTrigNames.triggerName(i)));
+	    if (patTrigNames.triggerName(i) == "Flag_goodVertices") goodvertpass = PatTriggerResults->accept(patTrigNames.triggerIndex(patTrigNames.triggerName(i)));// this shouldn't actually be necessary since we do this manually, but I add it just for completeness
 	  }
+
+          //get muons and packed pfcandidates
+          event.getByLabel( mtPar["muon_collection"], mhMuons );      
+	  edm::Handle<pat::PackedCandidateCollection> packedPFCands;
+          edm::InputTag packedPFCandsLabel_("packedPFCandidates");
+          event.getByLabel(packedPFCandsLabel_, packedPFCands);
+          //___________________________Bad Muon Filter________________________________||
+          double maxDR = 0.001;
+          double minMuonTrackRelErr = 0.5;
+          int suspiciousAlgo=14;
+          double minMuPt = 100;
+          //minDz = 1;                                                                                                                                                                
+          bool badmuflag = false;
+
+          //___________________________Bad Charged Hadron Filter________________________________||
+          double minPtDiffRel = -0.5;
+
+          bool badchadflag = false;
+
+          for (std::vector<pat::Muon>::const_iterator _imu = mhMuons->begin(); _imu != mhMuons->end(); _imu++){
+              bool foundBadTrack = false;
+              if ((*_imu).innerTrack().isNonnull()) {
+                  reco::TrackRef it = (*_imu).innerTrack();
+                  if (it->pt() < minMuPt or it->quality(reco::TrackBase::TrackQuality::highPurity) or it->ptError()/it->pt() < minMuonTrackRelErr) {}
+                  else if (it->originalAlgo()==suspiciousAlgo and it->algo()==suspiciousAlgo) {
+                      foundBadTrack = true;
+                  }
+              }
+              if (foundBadTrack) {
+                  //   std::cout<<"there is suspicious muon"<<std::endl;
+                  for (std::vector<pat::PackedCandidate>::const_iterator cand = packedPFCands->begin(); cand != packedPFCands->end(); cand++){
+                      if ((*cand).pt() >= minMuPt and abs((*cand).pdgId()) == 13) {
+                          if (deltaR( (*_imu).eta(), (*_imu).phi(), (*cand).eta(), (*cand).phi() ) < maxDR) {
+                              badmuflag = true;
+                              break;
+                          }
+                      }
+                  }
+              }
+
+              //----------------
+
+              if ( (*_imu).pt() < minMuPt and (*_imu).innerTrack().isNonnull()) {
+                  reco::TrackRef it = (*_imu).innerTrack();
+                  if (it->quality(reco::TrackBase::TrackQuality::highPurity) or it->ptError()/it->pt() < minMuonTrackRelErr) {}
+                  // All events had a drastically high pt error on the inner muon track (fac. ~10). Require at least 0.5
+                  else {
+                      for (std::vector<pat::PackedCandidate>::const_iterator cand = packedPFCands->begin(); cand != packedPFCands->end(); cand++){
+                          if (abs((*cand).pdgId()) == 211) {
+                              // Require very loose similarity in pt (one-sided).
+                              double dPtRel =  ( (*cand).pt() - it->pt() )/(0.5*((*cand).pt() + it->pt()));
+                              //  Flag the event bad if dR is tiny  
+                              if (deltaR( it->eta(), it->phi(), (*cand).eta(), (*cand).phi() ) < maxDR and dPtRel > minPtDiffRel) {
+                                  badchadflag = true;
+                                  break;
+                              }
+                          }
+                      }
+                  }
+              }
+          }
 	  
-	  if(hbhenoisepass && hbhenoiseisopass && csctighthalopass && ecaldeadcellpass && eebadscpass){
+	  if(hbhenoisepass && hbhenoiseisopass && globaltighthalopass && ecaldeadcellpass && eebadscpass && goodvertpass && !badmuflag && !badchadflag){
 	    passCut(ret, "MET filters");
 	  }
 	  else break;
@@ -608,6 +675,51 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
             for (std::vector<pat::Muon>::const_iterator _imu = mhMuons->begin(); _imu != mhMuons->end(); _imu++){
                 retMuon.set(false);	
                 bool pass = false;
+    
+                /*if ((*_imu).globalTrack().isNonnull() and (*_imu).globalTrack().isAvailable()) {
+                    reco::TrackRef tunePBestTrack = (*_imu).tunePMuonBestTrack();
+                    reco::TrackRef globalTrack = (*_imu).globalTrack();
+                    reco::TrackRef combinedTrack;
+                    if ((*_imu).combinedMuon().isNonnull() and (*_imu).combinedMuon().isAvailable()) combinedTrack = (*_imu).combinedMuon();
+                    reco::TrackRef innerTrack;
+                    if ((*_imu).innerTrack().isNonnull() and (*_imu).innerTrack().isAvailable()) innerTrack = (*_imu).innerTrack();
+                    reco::TrackRef outerTrack;
+                    if ((*_imu).outerTrack().isNonnull() and (*_imu).outerTrack().isAvailable()) outerTrack = (*_imu).outerTrack();
+                    reco::TrackRef pickyTrack;
+                    if ((*_imu).pickyTrack().isNonnull() and (*_imu).pickyTrack().isAvailable()) pickyTrack = (*_imu).pickyTrack();
+        
+                    reco::Muon::MuonTrackType tunePBestTrackType = (*_imu).tunePMuonBestTrackType();
+                    std::cout<<"Best track type is ";
+                    switch (int(tunePBestTrackType)) {
+                        case 1:
+                            std::cout<<"InnerTrack"<<std::endl;
+                            break;
+                        case 2:
+                            std::cout<<"OuterTrack"<<std::endl;
+                            break;
+                        case 3:
+                            std::cout<<"CombinedTrack"<<std::endl;
+                            break;
+                        case 4:
+                            std::cout<<"TPFMS"<<std::endl;
+                            break;
+                        case 5:
+                            std::cout<<"Picky"<<std::endl;
+                            break;
+                        case 6:
+                            std::cout<<"DYT"<<std::endl;
+                            break;
+                        default:
+                            std::cout<<"Unknown("<<tunePBestTrackType<<")"<<std::endl;
+                    }
+                    std::cout<<"PF       : "<<(*_imu).pt()<<std::endl;
+                    std::cout<<"tuneP    : "<<tunePBestTrack->pt()<<" w/ quality "<<tunePBestTrack->qualityMask()<<std::endl;
+                    std::cout<<"global   : "<<globalTrack->pt()<<" w/ quality "<<globalTrack->qualityMask()<<std::endl;
+                    if ((*_imu).combinedMuon().isNonnull() and (*_imu).combinedMuon().isAvailable()) std::cout<<"combined : "<<combinedTrack->pt()<<" w/ quality "<<combinedTrack->qualityMask()<<std::endl;
+                    if ((*_imu).innerTrack().isNonnull() and (*_imu).innerTrack().isAvailable()) std::cout<<"inner    : "<<innerTrack->pt()<<" w/ quality "<<innerTrack->qualityMask()<<std::endl;
+                    if ((*_imu).outerTrack().isNonnull() and (*_imu).outerTrack().isAvailable()) std::cout<<"outer    : "<<outerTrack->pt()<<" w/ quality "<<outerTrack->qualityMask()<<std::endl;
+                    if ((*_imu).pickyTrack().isNonnull() and (*_imu).pickyTrack().isAvailable()) std::cout<<"picky    : "<<pickyTrack->pt()<<" w/ quality "<<pickyTrack->qualityMask()<<std::endl;
+                }*/
 
                 //muon cuts
                 while(1){
@@ -637,6 +749,13 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
 			else if (mbPar["muon_useMiniIso"] && miniIso<mdPar["muon_miniIso"] ) {delete muptr;}
 			else{delete muptr;  break;}
 		    }
+
+                    if (mvSelPVs.size() > 0){
+                        if ( fabs((*_imu).muonBestTrack()->dxy((*mvSelPVs[0]).position())) < mdPar["muon_dxy"] ){ }
+                        else break;
+                        if ( fabs((*_imu).muonBestTrack()->dz((*mvSelPVs[0]).position())) < mdPar["muon_dz"] ){ }
+                        else break;
+                    }
                     
                     if ( _imu->pt()>mdPar["muon_minpt"] ){ }
                     else break;
@@ -691,6 +810,13 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
 			    else if (mbPar["muon_useMiniIso"] && miniIso<mdPar["loose_muon_miniIso"] ) {delete muptr;}
 			    else{ delete muptr;  break;}
     		        }
+
+                        if (mvSelPVs.size() > 0){
+                            if ( fabs((*_imu).muonBestTrack()->dxy((*mvSelPVs[0]).position())) < mdPar["loose_muon_dxy"] ){ }
+                            else break;
+                            if ( fabs((*_imu).muonBestTrack()->dz((*mvSelPVs[0]).position())) < mdPar["loose_muon_dz"] ){ }
+                            else break;
+                        }
                         
                         if ( _imu->pt()>mdPar["loose_muon_minpt"] ){ }
                         else break;

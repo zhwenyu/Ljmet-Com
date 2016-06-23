@@ -174,6 +174,11 @@ process.event_selector = cms.PSet(
     # or use relative isolation
     muon_reliso              = cms.double(0.2),
     loose_muon_reliso        = cms.double(0.4),
+    # specify IP cuts
+    muon_dxy                 = cms.double(0.2),
+    muon_dz                  = cms.double(0.5),
+    loose_muon_dxy           = cms.double(999999.),
+    loose_muon_dz            = cms.double(999999.),
     # choose min/max pt and eta
     muon_minpt               = cms.double(30.0),
     muon_maxeta              = cms.double(2.4),

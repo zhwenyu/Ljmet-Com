@@ -62,6 +62,8 @@ private:
     edm::InputTag             genParticles_it;
     edm::InputTag             packedPFCandsLabel_;
     edm::InputTag             genJets_it;
+    edm::InputTag             elec_it;
+    edm::InputTag             muon_it;
     std::vector<unsigned int> keepPDGID;
     std::vector<unsigned int> keepMomPDGID;
     std::vector<unsigned int> keepPDGIDForce;
@@ -69,6 +71,7 @@ private:
     bool keepFullMChistory;
     bool cleanGenJets;
     bool UseElMVA;
+    bool doElSCMETCorr;
     bool orlhew;
     bool saveLooseLeps;
     std::string basePDFname;
@@ -169,6 +172,11 @@ int singleLepCalc::BeginJob()
 
     if (mPset.exists("UseElMVA")) UseElMVA = mPset.getParameter<bool>("UseElMVA");
     else                          UseElMVA = false;
+
+    if (mPset.exists("doElSCMETCorr")) doElSCMETCorr = mPset.getParameter<bool>("doElSCMETCorr");
+    else                               doElSCMETCorr = false;
+    if (mPset.exists("electronCollection"))      elec_it = mPset.getParameter<edm::InputTag>("electronCollection");
+    else                                         elec_it = edm::InputTag("slimmedElectrons");
 
     if (mPset.exists("OverrideLHEWeights")) orlhew = mPset.getParameter<bool>("OverrideLHEWeights");
     else                                   orlhew = false;
@@ -314,6 +322,10 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
     std::vector <double> muEta;
     std::vector <double> muPhi;
     std::vector <double> muEnergy;
+    //Three InnerTrack std::vector
+    std::vector <double> muInnerPt;
+    std::vector <double> muInnerEta;
+    std::vector <double> muInnerPhi;
     //Quality criteria
     std::vector <double> muChi2;
     std::vector <double> muDxy;
@@ -354,7 +366,7 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
     std::vector<double> muMatchedPhi;
     std::vector<double> muMatchedEnergy;
 
-    for (std::vector<edm::Ptr<pat::Muon> >::const_iterator imu = vSelMuons.begin(); imu != vSelMuons.end(); imu++) 
+    for (std::vector<edm::Ptr<pat::Muon> >::const_iterator imu = vSelMuons.begin(); imu != vSelMuons.end(); imu++) {
         //Protect against muons without tracks (should never happen, but just in case)
         if ((*imu)->globalTrack().isNonnull() and (*imu)->globalTrack().isAvailable() and
             (*imu)->innerTrack().isNonnull()  and (*imu)->innerTrack().isAvailable()){
@@ -371,6 +383,10 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
             muEta    . push_back((*imu)->eta());
             muPhi    . push_back((*imu)->phi());
             muEnergy . push_back((*imu)->energy());
+
+            muInnerPt     . push_back((*imu)->innerTrack()->pt());
+            muInnerEta    . push_back((*imu)->innerTrack()->eta());
+            muInnerPhi    . push_back((*imu)->innerTrack()->phi());
 
             muIsTight.push_back((*imu)->isTightMuon(goodPVs.at(0)));
             muIsMedium.push_back((*imu)->isMediumMuon());
@@ -448,12 +464,15 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
                 }
             }
         }
-     // }
+    }
     SetValue("muCharge", muCharge);
     SetValue("muGlobal", muGlobal);
     SetValue("muPt"     , muPt);
     SetValue("muEta"    , muEta);
     SetValue("muPhi"    , muPhi);
+    SetValue("muInnerPt"     , muInnerPt);
+    SetValue("muInnerEta"    , muInnerEta);
+    SetValue("muInnerPhi"    , muInnerPhi);
     SetValue("muEnergy" , muEnergy);
     SetValue("muIsTight", muIsTight);
     SetValue("muIsMedium", muIsMedium);
@@ -499,7 +518,10 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
     //Four std::vector
     std::vector <double> elPt;
     std::vector <double> elEta;
+    std::vector <double> elPFEta;
     std::vector <double> elPhi;
+    std::vector <double> elSCE;
+    std::vector <double> elPFPhi;
     std::vector <double> elEnergy;
 
     std::vector <double> elEtaVtx;
@@ -578,7 +600,10 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
             //Four std::vector
             elPt     . push_back((*iel)->pt()); //Must check: why ecalDrivenMomentum?
             elEta    . push_back((*iel)->superCluster()->eta());
+            elPFEta  . push_back((*iel)->eta());
             elPhi    . push_back((*iel)->superCluster()->phi());
+            elSCE    . push_back((*iel)->superCluster()->energy());
+            elPFPhi  . push_back((*iel)->phi());
             elEnergy . push_back((*iel)->energy());
 
 	    elEtaVtx.push_back((*iel)->trackMomentumAtVtxWithConstraint().Eta());
@@ -687,7 +712,10 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
     //Four std::vector
     SetValue("elPt"     , elPt);
     SetValue("elEta"    , elEta);
+    SetValue("elPFEta"  , elPFEta);
     SetValue("elPhi"    , elPhi);
+    SetValue("elSCE"    , elSCE);
+    SetValue("elPFPhi"  , elPFPhi);
     SetValue("elEnergy" , elEnergy);
 
     SetValue("elEtaVtx" , elEtaVtx);
@@ -931,11 +959,27 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
             
         TLorentzVector corrMET = selector->correctMet(*pMet, event);
 
+        if (doElSCMETCorr) {
+            TLorentzVector tmpPF, tmpSC;
+            edm::Handle< std::vector<pat::Electron> > mhElectrons;
+            event.getByLabel( elec_it, mhElectrons );
+            //std::cout<<"----------------------------"<<std::endl;
+            //std::cout<<"Orig MET: met="<<corrMET.Pt()<<", phi="<<corrMET.Phi()<<std::endl;
+            for (std::vector<pat::Electron>::const_iterator _iel = mhElectrons->begin(); _iel != mhElectrons->end(); _iel++){
+                tmpSC.SetPtEtaPhiE(_iel->superCluster()->energy()/TMath::CosH(_iel->superCluster()->eta()),_iel->superCluster()->eta(),_iel->superCluster()->phi(),_iel->superCluster()->energy());
+                //std::cout<<"SC vec: pt="<<tmpSC.Pt()<<", eta="<<tmpSC.Eta()<<", phi="<<tmpSC.Phi()<<", e="<<tmpSC.Energy()<<std::endl;
+                tmpPF.SetPtEtaPhiE(_iel->pt(),_iel->eta(),_iel->phi(),_iel->energy());
+                //std::cout<<"PF vec: pt="<<tmpPF.Pt()<<", eta="<<tmpPF.Eta()<<", phi="<<tmpPF.Phi()<<", e="<<tmpPF.Energy()<<std::endl;
+                if (tmpSC.Pt()==tmpPF.Pt()) continue;
+                corrMET += tmpPF - tmpSC;
+                //std::cout<<"Corr MET: met="<<corrMET.Pt()<<", phi="<<corrMET.Phi()<<std::endl;
+            }
+        }
+
         if(corrMET.Pt()>0) {
             _corr_met = corrMET.Pt();
             _corr_met_phi = corrMET.Phi();
         }
-
     }
     SetValue("met", _met);
     SetValue("met_phi", _met_phi);
@@ -957,7 +1001,7 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
         _metnohf = metnohf->p4().pt();
         _metnohf_phi = metnohf->p4().phi();
         
-        TLorentzVector corrMETNOHF = selector->correctMet(*metnohf, event);
+        TLorentzVector corrMETNOHF = selector->correctMet(*metnohf, event, false);
         //std::cout<<(selector->GetCleanedCorrMet()).Pt()<<std::endl;
         if(corrMETNOHF.Pt()>0) {
 	  _corr_metnohf = corrMETNOHF.Pt();
