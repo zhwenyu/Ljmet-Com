@@ -14,7 +14,7 @@ import re
 import sys
 
 
-dirpre = 'Apr20/'
+dirpre = 'Jun10/'
 
 files = 0
 rootfiles = 0
@@ -28,6 +28,7 @@ badrootfiles = []
 for s in os.listdir(dirpre):
     #if (not (s.endswith('BTAGUP') or s.startswith('BTAGDOWN'))): continue
     #if (not s.startswith('TTbar')): continue
+    if (not s.startswith('Single')): continue
     #if (not (s.startswith('Wprime') and s.endswith('Right'))): continue
     #if (not (s=='Wprime1500Right' or s=='Wprime2000Right' or s=='Wprime2500Right')): continue
     Dir=dirpre+s
@@ -79,6 +80,18 @@ for s in os.listdir(dirpre):
                         good = False
                                 
                 elif line.find('An exception of category')>=0:
+                    if badfilelist.count(f[:-6])==0:
+                        badfiles = badfiles + 1
+                        badfilelist.append(f[:-6])
+                        good = False
+
+                elif line.find('Server responded with an error')>=0:
+                    if badfilelist.count(f[:-6])==0:
+                        badfiles = badfiles + 1
+                        badfilelist.append(f[:-6])
+                        good = False
+
+                elif line.find('Error in <TBranchElement::GetBasket>')>=0:
                     if badfilelist.count(f[:-6])==0:
                         badfiles = badfiles + 1
                         badfilelist.append(f[:-6])
