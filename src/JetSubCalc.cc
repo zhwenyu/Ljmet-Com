@@ -137,8 +137,11 @@ int JetSubCalc::BeginJob()
     if(mPset.exists("isMc")) isMc = mPset.getParameter<bool>("isMc");
     else isMc = false;
 
-    JECup = mPset.getParameter<bool>("JECup");
-    JECdn = mPset.getParameter<bool>("JECdown");
+    if(mPset.exists("JECup")) JECup = mPset.getParameter<bool>("JECup");
+    else JECup = false;
+
+    if(mPset.exists("JECdown")) JECdn = mPset.getParameter<bool>("JECdown");
+    else JECdn = false;
 
     if(useL2L3Mass){
       cout << "JetSubCalc: using L2+L3 corrected groomed masses" << endl;
@@ -415,7 +418,8 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * s
     
     double topMass, minMass, jetCharge;
     int nSubJets;
-    double thePrunedMass, theTrimmedMass, theFilteredMass, theSoftDropMass;
+    double thePrunedMass,theSoftDropMass;
+    double  theTrimmedMass, theFilteredMass;// - not currently in 80x miniAOD set to dummy
     double theNjettinessTau1, theNjettinessTau2, theNjettinessTau3;
 
     double SDsubjetPt;
@@ -532,14 +536,18 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * s
 	if(corr*unc == 1.0) cout << "L2+L3 correction is 1.0" << endl;
 
 	thePrunedMass   = corr*unc*(double)l2l3jet.userFloat("ak8PFJetsCHSPrunedMass");
-	theTrimmedMass  = corr*unc*(double)l2l3jet.userFloat("ak8PFJetsCHSTrimmedMass");
-	theFilteredMass = corr*unc*(double)l2l3jet.userFloat("ak8PFJetsCHSFilteredMass");
+	//theTrimmedMass  = corr*unc*(double)l2l3jet.userFloat("ak8PFJetsCHSTrimmedMass");
+	theTrimmedMass  = -999;
+	//theFilteredMass = corr*unc*(double)l2l3jet.userFloat("ak8PFJetsCHSFilteredMass");
+	theFilteredMass = -999;
 	theSoftDropMass = corr*unc*(double)l2l3jet.userFloat("ak8PFJetsCHSSoftDropMass");
 	
       }else{
 	thePrunedMass   = (double)corrak8.userFloat("ak8PFJetsCHSPrunedMass");
-	theTrimmedMass  = (double)corrak8.userFloat("ak8PFJetsCHSTrimmedMass");
-	theFilteredMass = (double)corrak8.userFloat("ak8PFJetsCHSFilteredMass");
+	//theTrimmedMass  = (double)corrak8.userFloat("ak8PFJetsCHSTrimmedMass");
+	theTrimmedMass  = -999;
+	//theFilteredMass = (double)corrak8.userFloat("ak8PFJetsCHSFilteredMass");
+	theFilteredMass = -999;
 	theSoftDropMass = (double)corrak8.userFloat("ak8PFJetsCHSSoftDropMass");
       }
 
