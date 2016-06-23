@@ -72,7 +72,6 @@ private:
     bool cleanGenJets;
     bool UseElMVA;
     bool doElSCMETCorr;
-    bool doMuInMETCorr;
     bool orlhew;
     bool saveLooseLeps;
     std::string basePDFname;
@@ -178,11 +177,6 @@ int singleLepCalc::BeginJob()
     else                               doElSCMETCorr = false;
     if (mPset.exists("electronCollection"))      elec_it = mPset.getParameter<edm::InputTag>("electronCollection");
     else                                         elec_it = edm::InputTag("slimmedElectrons");
-
-    if (mPset.exists("doMuInMETCorr")) doMuInMETCorr = mPset.getParameter<bool>("doMuInMETCorr");
-    else                               doMuInMETCorr = false;
-    if (mPset.exists("muonCollection"))      muon_it = mPset.getParameter<edm::InputTag>("muonCollection");
-    else                                         muon_it = edm::InputTag("slimmedMuons");
 
     if (mPset.exists("OverrideLHEWeights")) orlhew = mPset.getParameter<bool>("OverrideLHEWeights");
     else                                   orlhew = false;
@@ -984,24 +978,6 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
             }
         }
 
-        if (doMuInMETCorr) {
-            TLorentzVector tmpPF, tmpIN;
-            edm::Handle< std::vector<pat::Muon> > mhMuons;
-            event.getByLabel( muon_it, mhMuons );
-            //std::cout<<"----------------------------"<<std::endl;
-            //std::cout<<"Orig MET: met="<<corrMET.Pt()<<", phi="<<corrMET.Phi()<<std::endl;
-            for (std::vector<pat::Muon>::const_iterator _imu = mhMuons->begin(); _imu != mhMuons->end(); _imu++){
-                if (not _imu->innerTrack().isNonnull() or not _imu->innerTrack().isAvailable()) continue;
-                tmpIN.SetPtEtaPhiE(_imu->innerTrack()->pt(),_imu->innerTrack()->eta(),_imu->innerTrack()->phi(),_imu->innerTrack()->pt()*TMath::CosH(_imu->innerTrack()->eta()));
-                //std::cout<<"Inner vec: pt="<<tmpIN.Pt()<<", eta="<<tmpIN.Eta()<<", phi="<<tmpIN.Phi()<<", e="<<tmpIN.Energy()<<std::endl;
-                tmpPF.SetPtEtaPhiE(_imu->pt(),_imu->eta(),_imu->phi(),_imu->energy());
-                //std::cout<<"   PF vec: pt="<<tmpPF.Pt()<<", eta="<<tmpPF.Eta()<<", phi="<<tmpPF.Phi()<<", e="<<tmpPF.Energy()<<std::endl;
-                if (tmpIN.Pt()==tmpPF.Pt()) continue;
-                corrMET += tmpPF - tmpIN;
-                //std::cout<<"Corr MET: met="<<corrMET.Pt()<<", phi="<<corrMET.Phi()<<std::endl;
-            }
-        }
-
         if(corrMET.Pt()>0) {
             _corr_met = corrMET.Pt();
             _corr_met_phi = corrMET.Phi();
@@ -1027,7 +1003,7 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
         _metnohf = metnohf->p4().pt();
         _metnohf_phi = metnohf->p4().phi();
         
-        TLorentzVector corrMETNOHF = selector->correctMet(*metnohf, event);
+        TLorentzVector corrMETNOHF = selector->correctMet(*metnohf, event, false);
         //std::cout<<(selector->GetCleanedCorrMet()).Pt()<<std::endl;
         if(corrMETNOHF.Pt()>0) {
 	  _corr_metnohf = corrMETNOHF.Pt();
