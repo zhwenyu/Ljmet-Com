@@ -911,13 +911,14 @@ bool BaseEventSelector::isJetTagged(const pat::Jet & jet, edm::EventBase const &
     return _isTagged;
 }
 
-TLorentzVector BaseEventSelector::correctMet(const pat::MET & met, edm::EventBase const & event)
+TLorentzVector BaseEventSelector::correctMet(const pat::MET & met, edm::EventBase const & event, bool useHF)
 {
     double correctedMET_px = met.uncorPx();
     double correctedMET_py = met.uncorPy();
     if ( mbPar["doNewJEC"] ) {
         for (std::vector<edm::Ptr<pat::Jet> >::const_iterator ijet = mvAllJets.begin();
              ijet != mvAllJets.end(); ++ijet) {
+            if (!useHF && fabs((**ijet).eta())>2.6) continue;
             TLorentzVector lv = correctJetForMet(**ijet, event);
             correctedMET_px += lv.Px();
             correctedMET_py += lv.Py();
@@ -940,7 +941,7 @@ TLorentzVector BaseEventSelector::correctMet(const pat::MET & met, edm::EventBas
     return correctedMET_p4;
 }
 
-TLorentzVector BaseEventSelector::correctMet(const pat::MET & met, edm::EventBase const & event, std::vector<pat::Jet> jets)
+TLorentzVector BaseEventSelector::correctMet(const pat::MET & met, edm::EventBase const & event, std::vector<pat::Jet> jets, bool useHF)
 {
     
     double correctedMET_px = met.uncorPx();
@@ -948,6 +949,7 @@ TLorentzVector BaseEventSelector::correctMet(const pat::MET & met, edm::EventBas
     if ( mbPar["doNewJEC"] ) {
         for (std::vector<pat::Jet>::const_iterator ijet = jets.begin();
              ijet != jets.end(); ++ijet) {
+            if (!useHF && fabs((*ijet).eta())>2.6) continue;
             TLorentzVector lv = correctJetForMet(*ijet, event);
             correctedMET_px += lv.Px();
             correctedMET_py += lv.Py();
@@ -968,14 +970,14 @@ TLorentzVector BaseEventSelector::correctMet(const pat::MET & met, edm::EventBas
     SetHistValue("met_correction", correctedMET_p4.Pt()/_orig_met);
     return correctedMET_p4;
 }
-TLorentzVector BaseEventSelector::correctMet(const pat::MET& met, edm::EventBase const & event, std::vector<edm::Ptr<pat::Jet> > jets){
+TLorentzVector BaseEventSelector::correctMet(const pat::MET& met, edm::EventBase const & event, std::vector<edm::Ptr<pat::Jet> > jets, bool useHF){
 
   std::vector<pat::Jet> patJets;
   for(std::vector<edm::Ptr<pat::Jet> >::const_iterator ijet = jets.begin(); ijet!= jets.end(); ++ijet){
     patJets.push_back(**ijet);
   }
 
-  TLorentzVector correctedMET = BaseEventSelector::correctMet(met, event, patJets); //note that doing this also forces correctedMET_p4 member to be correctly set so it preserves the BaseEventSelector::GetCorrectedMET function, though as usual that function has to be called in order the corrected met to be produced
+  TLorentzVector correctedMET = BaseEventSelector::correctMet(met, event, patJets, useHF); //note that doing this also forces correctedMET_p4 member to be correctly set so it preserves the BaseEventSelector::GetCorrectedMET function, though as usual that function has to be called in order the corrected met to be produced
   return correctedMET;
 
 }
