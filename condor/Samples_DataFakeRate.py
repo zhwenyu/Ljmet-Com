@@ -1,4 +1,4 @@
-Samples_Run2015D/DoubleEG_Run2015D-05Oct2015-v1.txt
-Samples_Run2015D/DoubleMuon_Run2015D-05Oct2015-v1.txt
-Samples_Run2015D/DoubleEG_Run2015D-PromptReco-v4.txt
-Samples_Run2015D/DoubleMuon_Run2015D-PromptReco-v4.txt
+Samples_Run2016B/DoubleEG_Run2016B-PromptReco-v1.txt
+Samples_Run2016B/DoubleMuon_Run2016B-PromptReco-v1.txt
+Samples_Run2016B/DoubleEG_Run2016B-PromptReco-v2.txt
+Samples_Run2016B/DoubleMuon_Run2016B-PromptReco-v2.txt
