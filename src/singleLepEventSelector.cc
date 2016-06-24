@@ -1168,8 +1168,10 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
             while(1){ 
 
 	        // quality cuts
-	        if (fabs(_ijet->correctedJet(0).eta()) < 3.0 && (*jetSel_)( *_ijet, retJet ) ){ } 
-	        else if (fabs(_ijet->correctedJet(0).eta()) > 3.0 && 
+	        if (fabs(_ijet->correctedJet(0).eta()) < 2.7 && (*jetSel_)( *_ijet, retJet ) ){ } 
+	        else if (fabs(_ijet->correctedJet(0).eta()) >= 2.7 && fabs(_ijet->correctedJet(0).eta()) < 3.0 &&
+			 (_ijet->correctedJet(0).neutralEmEnergyFraction() < 0.9 || _ijet->correctedJet(0).neutralMultiplicity() > 2)){ }
+	        else if (fabs(_ijet->correctedJet(0).eta()) >= 3.0 && 
 			 (_ijet->correctedJet(0).neutralEmEnergyFraction() < 0.9 || _ijet->correctedJet(0).neutralMultiplicity() > 10)){ }
 	        else break; // fail 
 	
