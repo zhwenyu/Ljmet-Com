@@ -153,6 +153,12 @@ void DileptonEventSelector::BeginJob( std::map<std::string, edm::ParameterSet co
         mbPar["hbheiso_cut"]              = par[_key].getParameter<bool>         ("hbheiso_cut");
 	mbPar["cscHalo_cut"]              = par[_key].getParameter<bool>         ("cscHalo_cut");
 	mbPar["eesc_cut"]                 = par[_key].getParameter<bool>         ("eesc_cut");
+	mbPar["ecalTP_cut"]               = par[_key].getParameter<bool>         ("ecalTP_cut");
+	mbPar["goodVtx_cut"]              = par[_key].getParameter<bool>         ("goodVtx_cut");
+	mbPar["badMuon_cut"]              = par[_key].getParameter<bool>         ("badMuon_cut");
+	mbPar["badChargedHadron_cut"]     = par[_key].getParameter<bool>       ("badChargedHadron_cut");
+
+
 	mtPar["flag_tag"]                 = par[_key].getParameter<edm::InputTag>("flag_tag");
         mbPar["jet_cuts"]                 = par[_key].getParameter<bool>         ("jet_cuts");
         mdPar["jet_minpt"]                = par[_key].getParameter<double>       ("jet_minpt");
@@ -210,6 +216,10 @@ void DileptonEventSelector::BeginJob( std::map<std::string, edm::ParameterSet co
     push_back("HBHE Iso noise filter");
     push_back("CSC Tight Halo filter");
     push_back("EE Bad SC filter");
+    push_back("Ecal Dead TP");
+    push_back("Good Vtx");
+    push_back("Bad Muon");
+    push_back("Bad Charged Hadron");
     push_back("Min muon");
     push_back("Max muon");
     push_back("Min electron");
@@ -233,6 +243,10 @@ void DileptonEventSelector::BeginJob( std::map<std::string, edm::ParameterSet co
     set("HBHE Iso noise filter", mbPar["hbheiso_cut"]); 
     set("CSC Tight Halo filter", mbPar["cscHalo_cut"]);
     set("EE Bad SC filter", mbPar["eesc_cut"]); 
+    set("Ecal Dead TP", mbPar["ecalTP_cut"]); 
+    set("Good Vtx", mbPar["goodVtx_cut"]); 
+    set("Bad Muon", mbPar["badMuon_cut"]);
+    set("Bad Charged Hadron", mbPar["badChargedHadron_cut"]);
 
     if (mbPar["muon_cuts"]){
         set("Min muon", miPar["min_muon"]);
@@ -369,7 +383,7 @@ bool DileptonEventSelector::operator()( edm::EventBase const & event, pat::strbi
         //
         //_____ HBHE noise and scraping filter________________________
         //
-        if ( considerCut("HBHE noise and scraping filter") || considerCut("HBHE Iso noise filter") ) {
+	/* if ( considerCut("HBHE noise and scraping filter") || considerCut("HBHE Iso noise filter") ) {
             
 	  //set cut value considered
 	  bool run1Cut=false;
@@ -449,38 +463,132 @@ bool DileptonEventSelector::operator()( edm::EventBase const & event, pat::strbi
           }
 
 
-        } // end of hbhe cuts
+	  } // end of hbhe cuts*/
 
-	//_________CSC Halo Filter and EE Bad SuperCluster Filter_________
+	//_________MET Filters available in miniAOD_________
 
-        if ( considerCut("CSC Tight Halo filter") || considerCut("EE Bad SC filter") ) {
+        if ( considerCut("CSC Tight Halo filter") || considerCut("EE Bad SC filter") || considerCut("HBHE noise and scraping filter") || considerCut("HBHE Iso noise filter") || considerCut("Ecal Dead TP") || considerCut("Good Vtx")) {
 	  edm::Handle<edm::TriggerResults > PatTriggerResults;
 	  event.getByLabel( mtPar["flag_tag"], PatTriggerResults );
 	  const edm::TriggerNames patTrigNames = event.triggerNames(*PatTriggerResults);
-	  if ( considerCut("CSC Tight Halo filter") ) {
-	        
-	    bool cscpass = false;
-    
-	    for (unsigned int i=0; i<PatTriggerResults->size(); i++){
-	      if (patTrigNames.triggerName(i) == "Flag_CSCTightHaloFilter") cscpass = PatTriggerResults->accept(patTrigNames.triggerIndex(patTrigNames.triggerName(i)));
-	    }
-    
-	    if (cscpass) passCut(ret, "CSC Tight Halo filter"); // CSC cut
+
+	  
+	  bool hbhenoisepass = false;
+	  bool hbhenoiseisopass = false;
+	  bool globaltighthalopass = false;
+	  bool ecaldeadcellpass = false;
+	  bool eebadscpass = false;
+          bool goodvertpass = false;
+	    
+	  for (unsigned int i=0; i<PatTriggerResults->size(); i++){
+	    if (patTrigNames.triggerName(i) == "Flag_HBHENoiseFilter") hbhenoisepass = PatTriggerResults->accept(patTrigNames.triggerIndex(patTrigNames.triggerName(i)));
+	    if (patTrigNames.triggerName(i) == "Flag_HBHENoiseIsoFilter") hbhenoiseisopass = PatTriggerResults->accept(patTrigNames.triggerIndex(patTrigNames.triggerName(i)));
+	    if (patTrigNames.triggerName(i) == "Flag_globalTightHalo2016Filter") globaltighthalopass = PatTriggerResults->accept(patTrigNames.triggerIndex(patTrigNames.triggerName(i)));
+	    if (patTrigNames.triggerName(i) == "Flag_EcalDeadCellTriggerPrimitiveFilter") ecaldeadcellpass = PatTriggerResults->accept(patTrigNames.triggerIndex(patTrigNames.triggerName(i)));
+	    if (patTrigNames.triggerName(i) == "Flag_eeBadScFilter") eebadscpass = PatTriggerResults->accept(patTrigNames.triggerIndex(patTrigNames.triggerName(i)));
+	    if (patTrigNames.triggerName(i) == "Flag_goodVertices") goodvertpass = PatTriggerResults->accept(patTrigNames.triggerIndex(patTrigNames.triggerName(i)));// this shouldn't actually be necessary since we do this manually, but I add it just for completeness
+	  }
+	  if ( considerCut("CSC Tight Halo filter") ) {    
+	    if (globaltighthalopass) passCut(ret, "CSC Tight Halo filter"); // CSC cut
 	    else break;
 	  } // end of CSC cuts
     
-	  if ( considerCut("EE Bad SC filter") ) {
-	        
-	    bool eescpass = false;
-    
-	    for (unsigned int i=0; i<PatTriggerResults->size(); i++){
-	      if (patTrigNames.triggerName(i) == "Flag_eeBadScFilter") eescpass = PatTriggerResults->accept(patTrigNames.triggerIndex(patTrigNames.triggerName(i)));
-	    }
-    
-	    if (eescpass) passCut(ret, "EE Bad SC filter"); // EE Bad SC cut
+	  if ( considerCut("EE Bad SC filter") ) {	        	     
+	    if (eebadscpass) passCut(ret, "EE Bad SC filter"); // EE Bad SC cut
 	    else break;
 	  } // end of EE Bad SC cuts
+
+
+	  if( considerCut("HBHE noise and scraping filter") ) {
+	    if(hbhenoisepass) passCut(ret,"HBHE noise and scraping filter");
+	    else break;	   
+	  }
+	  
+	  if( considerCut("HBHE Iso noise filter")){
+	    if(hbhenoiseisopass) passCut(ret,"HBHE Iso noise filter");
+	    else break;
+	  }
+
+	  if(considerCut("Ecal Dead TP")){
+	    if(ecaldeadcellpass) passCut(ret,"Ecal Dead TP");
+	    else break;	  
+	  }
+	  if(considerCut("Good Vtx")){
+	    if(goodvertpass) passCut(ret,"Good Vtx");
+	    else break;
+	  }
+
         }
+
+
+	//bad muons and bad charged hadrons
+	//get muons and packed pfcandidates
+	event.getByLabel( mtPar["muon_collection"], mhMuons );      
+	edm::Handle<pat::PackedCandidateCollection> packedPFCands;
+	edm::InputTag packedPFCandsLabel_("packedPFCandidates");
+	event.getByLabel(packedPFCandsLabel_, packedPFCands);
+	//___________________________Bad Muon Filter________________________________||
+	double maxDR = 0.001;
+	double minMuonTrackRelErr = 0.5;
+	int suspiciousAlgo=14;
+	double minMuPt = 100;
+	//minDz = 1;                                                                                                                                                                
+	bool badmuflag = false;
+
+	//___________________________Bad Charged Hadron Filter________________________________||
+	double minPtDiffRel = -0.5;
+
+	bool badchadflag = false;
+
+	for (std::vector<pat::Muon>::const_iterator _imu = mhMuons->begin(); _imu != mhMuons->end(); _imu++){
+	  bool foundBadTrack = false;
+	  if ((*_imu).innerTrack().isNonnull()) {
+	    reco::TrackRef it = (*_imu).innerTrack();
+	    if (it->pt() < minMuPt or it->quality(reco::TrackBase::TrackQuality::highPurity) or it->ptError()/it->pt() < minMuonTrackRelErr) {}
+	    else if (it->originalAlgo()==suspiciousAlgo and it->algo()==suspiciousAlgo) {
+	      foundBadTrack = true;
+	    }
+	  }
+	  if (foundBadTrack) {
+	    //   std::cout<<"there is suspicious muon"<<std::endl;
+	    for (std::vector<pat::PackedCandidate>::const_iterator cand = packedPFCands->begin(); cand != packedPFCands->end(); cand++){
+	      if ((*cand).pt() >= minMuPt and abs((*cand).pdgId()) == 13) {
+		if (deltaR( (*_imu).eta(), (*_imu).phi(), (*cand).eta(), (*cand).phi() ) < maxDR) {
+		  badmuflag = true;
+		  break;
+		}
+	      }
+	    }
+	  }
+
+	  //----------------
+
+	  if ( (*_imu).pt() < minMuPt and (*_imu).innerTrack().isNonnull()) {
+	    reco::TrackRef it = (*_imu).innerTrack();
+	    if (it->quality(reco::TrackBase::TrackQuality::highPurity) or it->ptError()/it->pt() < minMuonTrackRelErr) {}
+	    // All events had a drastically high pt error on the inner muon track (fac. ~10). Require at least 0.5
+	    else {
+	      for (std::vector<pat::PackedCandidate>::const_iterator cand = packedPFCands->begin(); cand != packedPFCands->end(); cand++){
+		if (abs((*cand).pdgId()) == 211) {
+		  // Require very loose similarity in pt (one-sided).
+		  double dPtRel =  ( (*cand).pt() - it->pt() )/(0.5*((*cand).pt() + it->pt()));
+		  //  Flag the event bad if dR is tiny  
+		  if (deltaR( it->eta(), it->phi(), (*cand).eta(), (*cand).phi() ) < maxDR and dPtRel > minPtDiffRel) {
+		    badchadflag = true;
+		    break;
+		  }
+		}
+	      }
+	    }
+	  }
+	}
+
+
+	if(!badmuflag) passCut(ret,"Bad Muon");
+	else break;
+	if(!badchadflag) passCut(ret,"Bad Charged Hadron");
+	else break;
+
 
         //
         //_____ Muon cuts ________________________________
