@@ -141,6 +141,7 @@ void DileptonEventSelector::BeginJob( std::map<std::string, edm::ParameterSet co
     
     _key = "event_selector";
     if ( par.find(_key)!=par.end() ){
+        mbPar["debug"]                    = par[_key].getParameter<bool>         ("debug");
         mbPar["trigger_cut"]              = par[_key].getParameter<bool>         ("trigger_cut");
         mbPar["dump_trigger"]             = par[_key].getParameter<bool>         ("dump_trigger");
         mvsPar["trigger_path_ee"]         = par[_key].getParameter<std::vector<std::string> >  ("trigger_path_ee");
@@ -295,6 +296,16 @@ void DileptonEventSelector::BeginJob( std::map<std::string, edm::ParameterSet co
 bool DileptonEventSelector::operator()( edm::EventBase const & event, pat::strbitset & ret){
     
     pat::strbitset retJet       = jetSel_->getBitTemplate();
+
+    //packed pf candidates and rho source needed miniIso
+    edm::Handle<pat::PackedCandidateCollection> packedPFCands;
+    edm::InputTag packedPFCandsLabel_("packedPFCandidates");
+    event.getByLabel(packedPFCandsLabel_, packedPFCands);
+    //rho isolation from susy recommendation
+    edm::Handle<double> rhoJetsNC;
+    event.getByLabel(edm::InputTag("fixedGridRhoFastjetCentralNeutral","") , rhoJetsNC);
+    double myRhoJetsNC = *rhoJetsNC;
+
     
     while(1){ // standard infinite while loop trick to avoid nested ifs
         
@@ -524,9 +535,6 @@ bool DileptonEventSelector::operator()( edm::EventBase const & event, pat::strbi
 	//bad muons and bad charged hadrons
 	//get muons and packed pfcandidates
 	event.getByLabel( mtPar["muon_collection"], mhMuons );      
-	edm::Handle<pat::PackedCandidateCollection> packedPFCands;
-	edm::InputTag packedPFCandsLabel_("packedPFCandidates");
-	event.getByLabel(packedPFCandsLabel_, packedPFCands);
 	//___________________________Bad Muon Filter________________________________||
 	double maxDR = 0.001;
 	double minMuonTrackRelErr = 0.5;
@@ -656,6 +664,8 @@ bool DileptonEventSelector::operator()( edm::EventBase const & event, pat::strbi
 	event.getByLabel(mtPar["pv_collection"], pvHandle);
 	goodPVs = *(pvHandle.product());
 
+
+
         if ( mbPar["electron_cuts"] ) {
 
 	  //get rho src
@@ -670,14 +680,6 @@ bool DileptonEventSelector::operator()( edm::EventBase const & event, pat::strbi
           
 	  mvSelElectrons.clear();
 
-	  //packed pf candidates and rho source needed miniIso
-	  edm::Handle<pat::PackedCandidateCollection> packedPFCands;
-	  edm::InputTag packedPFCandsLabel_("packedPFCandidates");
-	  event.getByLabel(packedPFCandsLabel_, packedPFCands);
-	  //rho isolation from susy recommendation
-	  edm::Handle<double> rhoJetsNC;
-	  event.getByLabel(edm::InputTag("fixedGridRhoFastjetCentralNeutral","") , rhoJetsNC);
-	  double myRhoJetsNC = *rhoJetsNC;
 
           
 	  for ( std::vector<pat::Electron>::const_iterator _iel = mhElectrons->begin(); _iel != mhElectrons->end(); _iel++){
@@ -696,7 +698,7 @@ bool DileptonEventSelector::operator()( edm::EventBase const & event, pat::strbi
 	      
 
 	      if(_iel->pt() < 10) passLoose=false;
-	      else if(miniIso < 0.4) passLoose=false;
+	      else if(miniIso > 0.4) passLoose=false;
 	      else{
 		if(fabs(_iel->ecalDrivenMomentum().eta()) <0.8){
 		  if(mvaVal>0.913286) passLoose = true;
@@ -861,8 +863,12 @@ bool DileptonEventSelector::operator()( edm::EventBase const & event, pat::strbi
 		double gIso   = pfIsolationR04.sumPhotonEt;
 		double puIso  = pfIsolationR04.sumPUPt;
 		double relIso = (chIso + std::max(0.,nhIso + gIso - 0.5*puIso)) / mvSelMuons[ilep]->pt();
-		if(relIso > 0.4) looseMuon=false;
-		if(!(mvSelMuons[ilep]->isPFMuon())) looseMuon=false;
+		//get miniIso
+		pat::Muon* muptr = new pat::Muon(mvSelMuons[ilep]);
+		float miniIso = getPFMiniIsolation_EffectiveArea(packedPFCands, dynamic_cast<const reco::Candidate* > (muptr), 0.05, 0.2, 10., false, false,myRhoJetsNC);
+
+		if(miniIso > 0.4) looseMuon=false;
+		else if(!(mvSelMuons[ilep]->isPFMuon())) looseMuon=false;
 		else if(!( mvSelMuons[ilep]->isGlobalMuon() || mvSelMuons[ilep]->isTrackerMuon())) looseMuon=false;
 		else looseMuon=true;
 		if(!looseMuon) continue;
