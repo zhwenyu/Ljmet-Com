@@ -22,6 +22,10 @@
 #include "DataFormats/HLTReco/interface/TriggerEvent.h"
 #include "DataFormats/PatCandidates/interface/TriggerObjectStandAlone.h"
 #include "DataFormats/PatCandidates/interface/PackedTriggerPrescales.h"
+#include "DataFormats/PatCandidates/interface/Jet.h"
+#include "DataFormats/PatCandidates/interface/MET.h"
+#include "DataFormats/PatCandidates/interface/Muon.h"
+#include "DataFormats/PatCandidates/interface/Electron.h"
 #include "DataFormats/EgammaCandidates/interface/GsfElectron.h"
 #include "HLTrigger/HLTcore/interface/HLTConfigProvider.h"
 #include "SimDataFormats/GeneratorProducts/interface/GenEventInfoProduct.h"
@@ -60,6 +64,13 @@ private:
     edm::InputTag             triggerBits_;
     std::vector<unsigned int> keepPDGID;
     std::vector<unsigned int> keepMomPDGID;
+    //get electrons for mva vid
+    edm::InputTag electronsMiniAODLabel_;
+    edm::InputTag eleLooseIdMapLabel_;
+    edm::InputTag eleTightIdMapLabel_;
+    // MVA values and categories (optional)                                                                                                                                                                      
+    edm::InputTag mvaValuesMapLabel_;
+
     bool keepFullMChistory;
     bool doTriggerStudy_; 
     double rhoIso;
@@ -145,7 +156,13 @@ int DileptonCalc::BeginJob()
         std::exit(-1);
     }
     
-   
+
+    //get mva vid setup
+    electronsMiniAODLabel_= mPset.getParameter<edm::InputTag>("electronsMiniAOD");
+    eleLooseIdMapLabel_ = mPset.getParameter<edm::InputTag>("eleMVALooseIDMap");
+    eleTightIdMapLabel_ = mPset.getParameter<edm::InputTag>("eleMVATightIDMap");
+    mvaValuesMapLabel_ = mPset.getParameter<edm::InputTag>("mvaValuesMap");
+    
     return 0;
 }
 
@@ -362,6 +379,11 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
     std::vector <int>    elVtxFitConv;
     std::vector<double>  elMVA;
 
+    //mva VID
+    std::vector<double>  elMVAValVID;
+    std::vector<double>  elMVATightVID;
+    std::vector<double>  elMVALooseVID;
+    
     //added CMSDAS variables
     std::vector <double> diElMass;
     std::vector <int> elCharge1;
@@ -424,6 +446,21 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
     //_____Electrons______
     //
     
+
+
+    /*    edm::Handle<edm::View<pat::Electron>> electrons;
+    event.getByLabel(electronsMiniAODLabel_,electrons);
+
+    edm::Handle<edm::ValueMap<bool> > tight_id_decisions;
+    event.getByLabel(eleTightIdMapLabel_,tight_id_decisions);
+    edm::Handle<edm::ValueMap<bool> > loose_id_decisions;
+    event.getByLabel(eleLooseIdMapLabel_,loose_id_decisions);
+
+    // Get MVA values and categories (optional)                                                                                                                                                                  
+    edm::Handle<edm::ValueMap<float> > mvaValues;
+    event.getByLabel(mvaValuesMapLabel_,mvaValues);
+    */
+
     //keep track of which electron we are looking at
     int ElIndex = 0;
     for (std::vector<edm::Ptr<pat::Electron> >::const_iterator iel = vSelElectrons.begin(); iel != vSelElectrons.end(); iel++){
@@ -435,6 +472,27 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
 	elEta    . push_back((*iel)->ecalDrivenMomentum().eta());
 	elPhi    . push_back((*iel)->ecalDrivenMomentum().phi());
 	elEnergy . push_back((*iel)->ecalDrivenMomentum().energy());
+
+
+	/*
+	// Loop over view electrons to get mva decisions -- looping over the same collection so can start at ElIndex without fear of missing out and to save time
+	for (size_t i = ElIndex; i < electrons->size(); ++i){
+	  const auto el = electrons->ptrAt(i);
+	  //make sure we are looking at the right electron
+	  bool isPassTight=false;
+	  bool isPassLoose=false;
+	  float mvaVal=-9.99;
+	  if(el->pt()==(*iel)->pt() && el->phi()==(*iel)->phi() && el->eta()==(*iel)->eta()){
+	    isPassTight  = (*tight_id_decisions)[el];
+	    isPassLoose  = (*loose_id_decisions)[el];
+	    mvaVal = (*mvaValues)[el];
+	    
+	  }
+
+	  elMVATightVID.push_back(isPassTight);
+	  elMVALooseVID.push_back(isPassLoose);
+	  elMVAValVID.push_back(mvaVal);
+	  }*/
         
 	//if there are two electrons calculate invariant mass from two highest pt objects
 	if(vSelElectrons.size()==2){
@@ -671,6 +729,9 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
     SetValue("elMHits", elMHits);
     SetValue("elVtxFitConv", elVtxFitConv);
     SetValue("elMVA",elMVA);
+    SetValue("elMVAValVID",elMVAValVID);
+    SetValue("elMVATightVID",elMVATightVID);
+    SetValue("elMVALooseVID",elMVALooseVID);
 
     //Extra info about isolation
     SetValue("elChIso" , elChIso);
