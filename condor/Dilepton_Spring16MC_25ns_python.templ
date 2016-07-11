@@ -64,6 +64,7 @@ process.event_selector = cms.PSet(
     selection = cms.string('DileptonSelector'),
     isMc              = cms.bool(True),
     keepFullMChistory = cms.bool(True),
+    debug             = cms.bool(False),
     # cuts
     #HLT
     trigger_cut              = cms.bool(False),
@@ -77,12 +78,16 @@ process.event_selector = cms.PSet(
     trigger_path_mm          = cms.vstring('HLT_Mu17_Mu8_v1', 'HLT_Mu17_TkMu8_v1', 'HLT_Mu30_TkMu11_v1', 'HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_v1', 'HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_v1'),    
 
     pv_cut                   = cms.bool(True),
-    hbhe_cut                 = cms.bool(False),
+    hbhe_cut                 = cms.bool(True),
     hbhe_cut_value           = cms.string("Run2Loose"),
-    hbheiso_cut              = cms.bool(False),
-    eesc_cut                 = cms.bool(False),
+    hbheiso_cut              = cms.bool(True),
+    eesc_cut                 = cms.bool(True),
+    ecalTP_cut               = cms.bool(True),
+    goodVtx_cut              = cms.bool(True),
+    badMuon_cut              = cms.bool(True),
+    badChargedHadron_cut     = cms.bool(True),    			     
     flag_tag                 = cms.InputTag('FLAGTAG'),
-    cscHalo_cut              = cms.bool(False),
+    cscHalo_cut              = cms.bool(True),
     jet_cuts                 = cms.bool(False),
     jet_minpt                = cms.double(30.0),
     jet_maxeta               = cms.double(2.4),
