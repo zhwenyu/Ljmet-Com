@@ -15,7 +15,7 @@ files_per_job = 1
 
 rel_base = os.environ['CMSSW_BASE']
 cmssw = 'CMSSW_8_0_12'
-logdir = 'June18'
+logdir = 'July2'
 outdir = '/eos/uscms/store/user/lpctlbsm/clint/Spring16/25ns/'+logdir+'/'
 #outdir = '/eos/uscms/store/user/clint/Spring15/25ns/'+logdir+'/'
 
@@ -198,7 +198,7 @@ for i in range(len(prefix)):
 
         os.system('chmod u+x '+locdir+'/'+prefix[i]+'_'+str(j)+'.csh')
         print 'condor file is: '+locdir+'/'+prefix[i]+'_'+str(j)+'.condor;'
-        #os.system(' condor_submit %s' % localcondor)
+        os.system(' condor_submit %s' % localcondor)
         #os.system('cd '+dir[i]+'; condor_submit '+prefix[i]+'_'+str(j)+'.condor; cd -')
         j = j + 1
         nfiles = nfiles + files_per_job
