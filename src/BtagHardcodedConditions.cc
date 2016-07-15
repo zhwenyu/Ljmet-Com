@@ -112,32 +112,52 @@ double BtagHardcodedConditions::GetBtagEfficiency(double pt, double eta,
   // See distribution in /uscms_data/d3/jmanagan/MCBeff/TTJetsBEff/Beff.png
   // Uses hadronFlavour() rather than partonFlavour() as recommended in BTV physics plenary CMS Week 10/2015
   if(tagger == "CSVM"){
-    if(pt < 20) return 0.228679;
-    else if(pt < 40) return 0.472444;
-    else if(pt < 60) return 0.572408;
-    else if(pt < 80) return 0.608838;
-    else if(pt < 100) return 0.629398;
-    else if(pt < 120) return 0.634980;
-    else if(pt < 140) return 0.645666;
-    else if(pt < 2150) return 0.706965 - 0.000328*pt;
-    else return 0.001; // applySF divides by efficiency if SF > 1, keep eff non-zero. 
+    if(pt < 50) return 0.598502;
+    else if(pt < 70) return 0.650253;
+    else if(pt < 100) return 0.675872;
+    else if(pt < 140) return 0.684356;
+    else if(pt < 200) return 0.681335;
+    else if(pt < 300) return 0.647372;
+    else if(pt < 400) return 0.607565;
+    else if(pt < 500) return 0.563892;
+    else if(pt < 600) return 0.536284;
+    else if(pt < 700) return 0.526137;
+    else if(pt < 800) return 0.511053;
+    else if(pt < 900) return 0.490886;
+    else if(pt < 1000) return 0.482464;
+    else if(pt < 1100) return 0.461109;
+    else if(pt < 1200) return 0.447184;
+    else if(pt < 1400) return 0.452516;
+    else if(pt < 1600) return 0.455189;
+    else if(pt < 1800) return 0.399306;
+    else return 0.367347;
   }
   //flat efficiencies from AN-12-187
   //if( tagger == "CSVM")
   //    return 0.685;
   else if( tagger == "CSVL") {
-    if(pt < 40) return 0.759895;
-    else if(pt < 50) return 0.805282;
-    else if(pt < 60) return 0.818699;
-    else if(pt < 70) return 0.835386;
-    else if(pt < 100) return 0.841644;
-    else if(pt < 140) return 0.850732;
-    else if(pt < 200) return 0.854322;
-    else if(pt < 300) return 0.863231;
-    else if(pt < 670) return 0.855325;
-    else if(pt < 1000) return 0.830108;
-    else return 0.801869;
+    if(pt < 50) return 0.745651;
+    else if(pt < 70) return 0.789113;
+    else if(pt < 100) return 0.814259;
+    else if(pt < 140) return 0.829746;
+    else if(pt < 200) return 0.845828;
+    else if(pt < 300) return 0.845156;
+    else if(pt < 400) return 0.827952;
+    else if(pt < 500) return 0.818915;
+    else if(pt < 600) return 0.815968;
+    else if(pt < 700) return 0.811282;
+    else if(pt < 800) return 0.810686;
+    else if(pt < 900) return 0.795970;
+    else if(pt < 1000) return 0.787283;
+    else if(pt < 1100) return 0.772956;
+    else if(pt < 1200) return 0.759414;
+    else if(pt < 1400) return 0.762581;
+    else if(pt < 1600) return 0.739387;
+    else if(pt < 1800) return 0.711806;
+    else return 0.714286;
   }
+
+
   
   // tag eff, x - discriminant
   // from https://twiki.cern.ch/twiki/pub/CMS/BtagPOG/eff_b_c-ttbar_payload.txt
@@ -343,31 +363,50 @@ double BtagHardcodedConditions::GetMistagRate(double pt, double eta,
   // See distribution in /uscms_data/d3/jmanagan/MCBeff/TTJetsBEff/Leff.png
   // Uses hadronFlavour() rather than partonFlavour() as recommended in BTV physics plenary CMS Week 10/2015
   if(tagger == "CSVM"){
-    if(pt < 20) return 0.003402;
-    else if(pt < 40) return 0.008067;
-    else if(pt < 60) return 0.006980;
-    else if(pt < 80) return 0.006316;
-    else if(pt < 100) return 0.006713;
-    else if(pt < 115) return 0.006598;
-    else if(pt < 400) return -0.00242504 + 9.15452e-05*pt - 9.63553e-08*pt*pt;
-    else return 0.0134038 + 1.24358e-05*pt;
+    if(pt < 50) return 0.014675;
+    else if(pt < 70) return 0.012310;
+    else if(pt < 100) return 0.012179;
+    else if(pt < 140) return 0.012088;
+    else if(pt < 200) return 0.013761;
+    else if(pt < 300) return 0.015344;
+    else if(pt < 400) return 0.021110;
+    else if(pt < 500) return 0.023148;
+    else if(pt < 600) return 0.023755;
+    else if(pt < 700) return 0.028529;
+    else if(pt < 800) return 0.030575;
+    else if(pt < 900) return 0.030955;
+    else if(pt < 1000) return 0.034016;
+    else if(pt < 1100) return 0.037446;
+    else if(pt < 1200) return 0.034907;
+    else if(pt < 1400) return 0.043372;
+    else if(pt < 1600) return 0.052239;
+    else if(pt < 1800) return 0.049661;
+    else return 0.073034;
   }
   // 0.96 is the Correction from mistag in MC to data
   // values are measured using the 2012 madgraph ttbar sample
   //    if( tagger == "CSVM")
   //        return 0.013702*0.96;
   else if( tagger == "CSVL") {
-    if(pt < 40) return 0.284513;
-    else if(pt < 50) return 0.319344;
-    else if(pt < 60) return 0.341734;
-    else if(pt < 70) return 0.374783;
-    else if(pt < 100) return 0.398119;
-    else if(pt < 140) return 0.4386;
-    else if(pt < 200) return 0.489042;
-    else if(pt < 300) return 0.52967;
-    else if(pt < 670) return 0.481119;
-    else if(pt < 1000) return 0.392153;
-    else return 0.398851;
+    if(pt < 50) return 0.112903;
+    else if(pt < 70) return 0.090803;
+    else if(pt < 100) return 0.089437;
+    else if(pt < 140) return 0.092771;
+    else if(pt < 200) return 0.114113;
+    else if(pt < 300) return 0.137236;
+    else if(pt < 400) return 0.157950;
+    else if(pt < 500) return 0.174296;
+    else if(pt < 600) return 0.185142;
+    else if(pt < 700) return 0.201428;
+    else if(pt < 800) return 0.212874;
+    else if(pt < 900) return 0.218508;
+    else if(pt < 1000) return 0.221455;
+    else if(pt < 1100) return 0.222522;
+    else if(pt < 1200) return 0.232301;
+    else if(pt < 1400) return 0.243863;
+    else if(pt < 1600) return 0.244610;
+    else if(pt < 1800) return 0.246050;
+    else return 0.314607;
   }
 
     // mistag, x-pT
