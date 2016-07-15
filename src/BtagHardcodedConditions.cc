@@ -111,32 +111,52 @@ double BtagHardcodedConditions::GetBtagEfficiency(double pt, double eta,
   // See distribution in /uscms_data/d3/jmanagan/MCBeff/TTJetsBEff/Beff.png
   // Uses hadronFlavour() rather than partonFlavour() as recommended in BTV physics plenary CMS Week 10/2015
   if(tagger == "CSVM"){
-    if(pt < 20) return 0.228679;
-    else if(pt < 40) return 0.472444;
-    else if(pt < 60) return 0.572408;
-    else if(pt < 80) return 0.608838;
-    else if(pt < 100) return 0.629398;
-    else if(pt < 120) return 0.634980;
-    else if(pt < 140) return 0.645666;
-    else if(pt < 2150) return 0.706965 - 0.000328*pt;
-    else return 0.001; // applySF divides by efficiency if SF > 1, keep eff non-zero. 
+    if(pt < 50) return 0.598502;
+    else if(pt < 70) return 0.650253;
+    else if(pt < 100) return 0.675872;
+    else if(pt < 140) return 0.684356;
+    else if(pt < 200) return 0.681335;
+    else if(pt < 300) return 0.647372;
+    else if(pt < 400) return 0.607565;
+    else if(pt < 500) return 0.563892;
+    else if(pt < 600) return 0.536284;
+    else if(pt < 700) return 0.526137;
+    else if(pt < 800) return 0.511053;
+    else if(pt < 900) return 0.490886;
+    else if(pt < 1000) return 0.482464;
+    else if(pt < 1100) return 0.461109;
+    else if(pt < 1200) return 0.447184;
+    else if(pt < 1400) return 0.452516;
+    else if(pt < 1600) return 0.455189;
+    else if(pt < 1800) return 0.399306;
+    else return 0.367347;
   }
   //flat efficiencies from AN-12-187
   //if( tagger == "CSVM")
   //    return 0.685;
   else if( tagger == "CSVL") {
-    if(pt < 40) return 0.563365;
-    else if(pt < 50) return 0.634109;
-    else if(pt < 60) return 0.671486;
-    else if(pt < 70) return 0.699899;
-    else if(pt < 100) return 0.712678;
-    else if(pt < 140) return 0.734276;
-    else if(pt < 200) return 0.754234;
-    else if(pt < 300) return 0.772274;
-    else if(pt < 670) return 0.760237;
-    else if(pt < 1000) return 0.711905;
-    else return 0.669356;
+    if(pt < 50) return 0.745651;
+    else if(pt < 70) return 0.789113;
+    else if(pt < 100) return 0.814259;
+    else if(pt < 140) return 0.829746;
+    else if(pt < 200) return 0.845828;
+    else if(pt < 300) return 0.845156;
+    else if(pt < 400) return 0.827952;
+    else if(pt < 500) return 0.818915;
+    else if(pt < 600) return 0.815968;
+    else if(pt < 700) return 0.811282;
+    else if(pt < 800) return 0.810686;
+    else if(pt < 900) return 0.795970;
+    else if(pt < 1000) return 0.787283;
+    else if(pt < 1100) return 0.772956;
+    else if(pt < 1200) return 0.759414;
+    else if(pt < 1400) return 0.762581;
+    else if(pt < 1600) return 0.739387;
+    else if(pt < 1800) return 0.711806;
+    else return 0.714286;
   }
+
+
   
   // tag eff, x - discriminant
   // from https://twiki.cern.ch/twiki/pub/CMS/BtagPOG/eff_b_c-ttbar_payload.txt
@@ -168,11 +188,27 @@ double BtagHardcodedConditions::GetBtagScaleFactor(double pt, double eta,
     return GetBtagScaleFactor2011(pt, eta, tagger);
   } else if (year==2015) {
     return GetBtagScaleFactor2015(pt,eta,tagger);
+  } else if (year==2016) {
+    return GetBtagScaleFactor2016(pt,eta,tagger);
   }
   else{
     return 0;
   }
     
+}
+
+// 2016 scale factors from csv file in https://twiki.cern.ch/twiki/bin/viewauth/CMS/BtagRecommendation80X
+double BtagHardcodedConditions::GetBtagScaleFactor2016(double pt, double eta,
+						       std::string tagger){
+  //UPDATED ONLY FOR CSVL
+  if(pt > 670) pt = 670;
+  else if(pt < 30) pt = 30;
+
+    double SFb=0;
+    if( tagger=="CSVL")  SFb = 0.747498*((1.+(0.473236*pt))/(1.+(0.375778*pt))) ;
+    else if( tagger=="CSVM")  SFb = 0.934588*((1.+(0.00678184*pt))/(1.+(0.00627144*pt)));
+    else if( tagger=="CSVT")  SFb = 0.886376*((1.+(0.00250226*pt))/(1.+(0.00193725*pt)));
+    return SFb;
 }
 
 // 2015 scale factors from csv file in https://twiki.cern.ch/twiki/bin/viewauth/CMS/BtagRecommendation76X
@@ -273,6 +309,20 @@ double BtagHardcodedConditions::GetBtagSFUncertainty2015(double pt, double eta,
     return err;
 }
 
+double BtagHardcodedConditions::GetBtagSFUncertainty2016(double pt, double eta,
+                                                         std::string tagger)
+{
+    int bin = findBin(pt, ptRange16);
+    float err = -1;
+    
+    if( tagger=="CSVL") err =  SFb_CSVL_error16[bin];
+    else if( tagger=="CSVM") err =  SFb_CSVM_error16[bin];
+    else if( tagger=="CSVT") err =  SFb_CSVT_error16[bin];
+    
+    if ((pt>670) || (pt<30)) err*=2.0;
+    return err;
+}
+
 double BtagHardcodedConditions::GetBtagSFUncertUp(double pt, double eta,
                                                   std::string tagger, int year)
 {
@@ -282,6 +332,8 @@ double BtagHardcodedConditions::GetBtagSFUncertUp(double pt, double eta,
         return GetBtagSFUncertainty2011(pt, eta, tagger);
     } else if (year==2015) {
         return GetBtagSFUncertainty2015(pt, eta, tagger);
+    } else if (year==2016) {
+        return GetBtagSFUncertainty2016(pt, eta, tagger);
     } else {
         return 0;
     }
@@ -296,6 +348,8 @@ double BtagHardcodedConditions::GetBtagSFUncertDown(double pt, double eta,
         return GetBtagSFUncertainty2011(pt, eta, tagger);
     } else if (year==2015) {
         return GetBtagSFUncertainty2015(pt, eta, tagger);
+    } else if (year==2016) {
+        return GetBtagSFUncertainty2016(pt, eta, tagger);
     } else {
         return 0;
     }
@@ -308,31 +362,50 @@ double BtagHardcodedConditions::GetMistagRate(double pt, double eta,
   // See distribution in /uscms_data/d3/jmanagan/MCBeff/TTJetsBEff/Leff.png
   // Uses hadronFlavour() rather than partonFlavour() as recommended in BTV physics plenary CMS Week 10/2015
   if(tagger == "CSVM"){
-    if(pt < 20) return 0.003402;
-    else if(pt < 40) return 0.008067;
-    else if(pt < 60) return 0.006980;
-    else if(pt < 80) return 0.006316;
-    else if(pt < 100) return 0.006713;
-    else if(pt < 115) return 0.006598;
-    else if(pt < 400) return -0.00242504 + 9.15452e-05*pt - 9.63553e-08*pt*pt;
-    else return 0.0134038 + 1.24358e-05*pt;
+    if(pt < 50) return 0.014675;
+    else if(pt < 70) return 0.012310;
+    else if(pt < 100) return 0.012179;
+    else if(pt < 140) return 0.012088;
+    else if(pt < 200) return 0.013761;
+    else if(pt < 300) return 0.015344;
+    else if(pt < 400) return 0.021110;
+    else if(pt < 500) return 0.023148;
+    else if(pt < 600) return 0.023755;
+    else if(pt < 700) return 0.028529;
+    else if(pt < 800) return 0.030575;
+    else if(pt < 900) return 0.030955;
+    else if(pt < 1000) return 0.034016;
+    else if(pt < 1100) return 0.037446;
+    else if(pt < 1200) return 0.034907;
+    else if(pt < 1400) return 0.043372;
+    else if(pt < 1600) return 0.052239;
+    else if(pt < 1800) return 0.049661;
+    else return 0.073034;
   }
   // 0.96 is the Correction from mistag in MC to data
   // values are measured using the 2012 madgraph ttbar sample
   //    if( tagger == "CSVM")
   //        return 0.013702*0.96;
   else if( tagger == "CSVL") {
-    if(pt < 40) return 0.0844045;
-    else if(pt < 50) return 0.0972303;
-    else if(pt < 60) return 0.0939869;
-    else if(pt < 70) return 0.0935781;
-    else if(pt < 100) return 0.0902793;
-    else if(pt < 140) return 0.0935462;
-    else if(pt < 200) return 0.0970933;
-    else if(pt < 300) return 0.121798;
-    else if(pt < 670) return 0.145031;
-    else if(pt < 1000) return 0.174574;
-    else return 0.191074;
+    if(pt < 50) return 0.112903;
+    else if(pt < 70) return 0.090803;
+    else if(pt < 100) return 0.089437;
+    else if(pt < 140) return 0.092771;
+    else if(pt < 200) return 0.114113;
+    else if(pt < 300) return 0.137236;
+    else if(pt < 400) return 0.157950;
+    else if(pt < 500) return 0.174296;
+    else if(pt < 600) return 0.185142;
+    else if(pt < 700) return 0.201428;
+    else if(pt < 800) return 0.212874;
+    else if(pt < 900) return 0.218508;
+    else if(pt < 1000) return 0.221455;
+    else if(pt < 1100) return 0.222522;
+    else if(pt < 1200) return 0.232301;
+    else if(pt < 1400) return 0.243863;
+    else if(pt < 1600) return 0.244610;
+    else if(pt < 1800) return 0.246050;
+    else return 0.314607;
   }
 
     // mistag, x-pT
@@ -439,6 +512,9 @@ double BtagHardcodedConditions::GetMistagScaleFactor(double pt, double eta,
     // 2015 scale factors from csv file in https://twiki.cern.ch/twiki/bin/viewauth/CMS/BtagRecommendation76X
     if(tagger == "CSVT") return 0.992339;
     else return GetMistagSF2015(pt,eta,tagger,"mean");
+  } else if (year==2016) {
+    if(tagger == "CSVT") return 0.992339;
+    else return GetMistagSF2016(pt,eta,tagger,"mean");
   } else {
     return 0;
   }
@@ -455,6 +531,9 @@ double BtagHardcodedConditions::GetMistagSFUncertDown(double pt, double eta,
   } else if (year==2015) {
     if(tagger == "CSVT") return (pt>1000 ? 2.0 : 1.0) * (0.992339-0.810103);
     else return (pt>1000 ? 2.0 : 1.0) * (GetMistagSF2015(pt,eta,tagger,"mean") - GetMistagSF2015(pt,eta,tagger,"min"));
+  } else if (year==2016) {
+    if(tagger == "CSVT") return (pt>1000 ? 2.0 : 1.0) * (0.992339-0.810103);
+    else return (pt>1000 ? 2.0 : 1.0) * (GetMistagSF2016(pt,eta,tagger,"mean") - GetMistagSF2016(pt,eta,tagger,"min"));
   } else {
     return 0;
   }
@@ -471,9 +550,47 @@ double BtagHardcodedConditions::GetMistagSFUncertUp(double pt, double eta,
   } else if (year==2015) {
     if(tagger == "CSVT") return (pt>1000 ? 2.0 : 1.0) * (1.17457-0.992339);
     else return (pt>1000 ? 2.0 : 1.0) * (GetMistagSF2015(pt,eta,tagger,"max") - GetMistagSF2015(pt,eta,tagger,"mean"));
+  } else if (year==2016) {
+    if(tagger == "CSVT") return (pt>1000 ? 2.0 : 1.0) * (1.17457-0.992339);
+    else return (pt>1000 ? 2.0 : 1.0) * (GetMistagSF2016(pt,eta,tagger,"max") - GetMistagSF2016(pt,eta,tagger,"mean"));
   } else {
     return 0;
   }
+}
+
+double BtagHardcodedConditions::GetMistagSF2016(double pt, double eta,
+                                                std::string tagger, std::string meanminmax)
+{
+  //UPDATED ONLY FOR CSVL
+  double _absEta = abs(eta);
+  double sf = -1;
+  if( tagger=="CSVL" ){
+    if(_absEta<2.4) {
+      if( meanminmax == "mean" ) sf = ((1.00317+(0.000204778*pt))+(7.49098e-07*(pt*pt)))+(-9.52146e-10*(pt*(pt*pt))) ;
+      else if( meanminmax == "min" ) sf = ((0.897474+(0.000130807*pt))+(8.17188e-07*(pt*pt)))+(-9.52657e-10*(pt*(pt*pt))) ;
+      else if( meanminmax == "max" ) sf = ((1.10884+(0.000279575*pt))+(6.77543e-07*(pt*pt)))+(-9.4973e-10*(pt*(pt*pt))) ;
+    }
+  }
+  else if( tagger=="CSVM" ){
+    if(_absEta<0.8) {
+      if( meanminmax == "mean" ) sf = ((0.994351+(0.000250077*pt))+(9.24801e-07*(pt*pt)))+(-8.73293e-10*(pt*(pt*pt))) ;
+      else if( meanminmax == "min" ) sf = ((0.949401+(-0.000356232*pt))+(2.24887e-06*(pt*pt)))+(-1.66011e-09*(pt*(pt*pt))) ;
+      else if( meanminmax == "max" ) sf = ((1.03928+(0.000857422*pt))+(-4.02756e-07*(pt*pt)))+(-8.45836e-11*(pt*(pt*pt))) ;
+    }
+    else if(_absEta<1.6) {
+      if( meanminmax == "mean" ) sf = ((1.00939+(0.000461283*pt))+(-6.30306e-07*(pt*pt)))+(3.53075e-10*(pt*(pt*pt))) ;
+      else if( meanminmax == "min" ) sf = ((0.964857+(-2.19898e-05*pt))+(4.74117e-07*(pt*pt)))+(-3.36548e-10*(pt*(pt*pt))) ;
+      else if( meanminmax == "max" ) sf = ((1.05392+(0.000944135*pt))+(-1.73386e-06*(pt*pt)))+(1.04242e-09*(pt*(pt*pt))) ;
+    }
+    else if(_absEta<2.4) {
+      if( meanminmax == "mean" ) sf = ((0.955798+(0.00146058*pt))+(-3.76689e-06*(pt*pt)))+(2.39196e-09*(pt*(pt*pt))) ;
+      else if( meanminmax == "min" ) sf = ((0.910086+(0.00116371*pt))+(-3.02747e-06*(pt*pt)))+(1.86906e-09*(pt*(pt*pt))) ;
+      else if( meanminmax == "max" ) sf = ((1.00151+(0.00175547*pt))+(-4.50251e-06*(pt*pt)))+(2.91473e-09*(pt*(pt*pt))) ;
+    }
+  }
+
+  return sf;
+
 }
 
 double BtagHardcodedConditions::GetMistagSF2015(double pt, double eta,
