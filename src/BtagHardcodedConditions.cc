@@ -63,18 +63,16 @@ BtagHardcodedConditions::BtagHardcodedConditions() {
     float ptminT15[7] = {30, 50, 70, 100, 140, 200, 300};
     for (int i=0;i<7;++i) ptRange15.push_back(ptminT15[i]);
 
-    //UPDATED ONLY FOR CSVL
     // 2016 scale factors from csv file in https://twiki.cern.ch/twiki/bin/viewauth/CMS/BtagRecommendation80X
     float SFb_CSVL_temp16[7]  = {0.0371706709,0.0373251252,0.0374190658,0.0548675209,0.0915529728,0.1215453818,0.1966012716};
-    float SFb_CSVM_temp16[7]  = {0.018076473847031593,0.024799736216664314,0.024073265492916107,0.020040607079863548,0.016540588811039925,0.025977084413170815,0.027120551094412804};
-    float SFb_CSVT_temp16[7]  = {0.019803794100880623,0.026958625763654709,0.024285079911351204,0.028512096032500267,0.029808893799781799,0.026503190398216248,0.042264193296432495};
+    float SFb_CSVM_temp16[7]  = {0.017849041149020195,0.017849041149020195,0.017849041149020195,0.020885121077299118,0.025080939754843712,0.10671335458755493,0.16398745775222778};
+    float SFb_CSVT_temp16[7]  = {0.019925633445382118,0.01855241134762764,0.018982676789164543,0.04345925897359848,0.0586409792304039,0.081843636929988861,0.14152982831001282};
     fillArray(SFb_CSVL_error16, SFb_CSVL_temp16,7);
     fillArray(SFb_CSVM_error16, SFb_CSVM_temp16,7);
     fillArray(SFb_CSVT_error16, SFb_CSVT_temp16,7);
     float ptminT16[7] = {30, 50, 70, 100, 140, 200, 300};
     for (int i=0;i<7;++i) ptRange16.push_back(ptminT16[i]);
 }
-
 
 BtagHardcodedConditions::~BtagHardcodedConditions() {
 }
@@ -201,14 +199,13 @@ double BtagHardcodedConditions::GetBtagScaleFactor(double pt, double eta,
 // 2016 scale factors from csv file in https://twiki.cern.ch/twiki/bin/viewauth/CMS/BtagRecommendation80X
 double BtagHardcodedConditions::GetBtagScaleFactor2016(double pt, double eta,
 						       std::string tagger){
-  //UPDATED ONLY FOR CSVL
   if(pt > 670) pt = 670;
   else if(pt < 30) pt = 30;
 
     double SFb=0;
     if( tagger=="CSVL")  SFb = 0.747498*((1.+(0.473236*pt))/(1.+(0.375778*pt))) ;
-    else if( tagger=="CSVM")  SFb = 0.934588*((1.+(0.00678184*pt))/(1.+(0.00627144*pt)));
-    else if( tagger=="CSVT")  SFb = 0.886376*((1.+(0.00250226*pt))/(1.+(0.00193725*pt)));
+    else if( tagger=="CSVM")  SFb = 0.892452;
+    else if( tagger=="CSVT")  SFb = 0.134503*((1.+(1.78872*pt))/(1.+(0.268324*pt)));
     return SFb;
 }
 
@@ -514,8 +511,7 @@ double BtagHardcodedConditions::GetMistagScaleFactor(double pt, double eta,
     if(tagger == "CSVT") return 0.992339;
     else return GetMistagSF2015(pt,eta,tagger,"mean");
   } else if (year==2016) {
-    if(tagger == "CSVT") return 0.992339;
-    else return GetMistagSF2016(pt,eta,tagger,"mean");
+    return GetMistagSF2016(pt,eta,tagger,"mean");
   } else {
     return 0;
   }
@@ -533,8 +529,7 @@ double BtagHardcodedConditions::GetMistagSFUncertDown(double pt, double eta,
     if(tagger == "CSVT") return (pt>1000 ? 2.0 : 1.0) * (0.992339-0.810103);
     else return (pt>1000 ? 2.0 : 1.0) * (GetMistagSF2015(pt,eta,tagger,"mean") - GetMistagSF2015(pt,eta,tagger,"min"));
   } else if (year==2016) {
-    if(tagger == "CSVT") return (pt>1000 ? 2.0 : 1.0) * (0.992339-0.810103);
-    else return (pt>1000 ? 2.0 : 1.0) * (GetMistagSF2016(pt,eta,tagger,"mean") - GetMistagSF2016(pt,eta,tagger,"min"));
+    return (pt>1000 ? 2.0 : 1.0) * (GetMistagSF2016(pt,eta,tagger,"mean") - GetMistagSF2016(pt,eta,tagger,"min"));
   } else {
     return 0;
   }
@@ -552,8 +547,7 @@ double BtagHardcodedConditions::GetMistagSFUncertUp(double pt, double eta,
     if(tagger == "CSVT") return (pt>1000 ? 2.0 : 1.0) * (1.17457-0.992339);
     else return (pt>1000 ? 2.0 : 1.0) * (GetMistagSF2015(pt,eta,tagger,"max") - GetMistagSF2015(pt,eta,tagger,"mean"));
   } else if (year==2016) {
-    if(tagger == "CSVT") return (pt>1000 ? 2.0 : 1.0) * (1.17457-0.992339);
-    else return (pt>1000 ? 2.0 : 1.0) * (GetMistagSF2016(pt,eta,tagger,"max") - GetMistagSF2016(pt,eta,tagger,"mean"));
+    return (pt>1000 ? 2.0 : 1.0) * (GetMistagSF2016(pt,eta,tagger,"max") - GetMistagSF2016(pt,eta,tagger,"mean"));
   } else {
     return 0;
   }
@@ -562,7 +556,6 @@ double BtagHardcodedConditions::GetMistagSFUncertUp(double pt, double eta,
 double BtagHardcodedConditions::GetMistagSF2016(double pt, double eta,
                                                 std::string tagger, std::string meanminmax)
 {
-  //UPDATED ONLY FOR CSVL
   double _absEta = abs(eta);
   double sf = -1;
   if( tagger=="CSVL" ){
@@ -573,20 +566,17 @@ double BtagHardcodedConditions::GetMistagSF2016(double pt, double eta,
     }
   }
   else if( tagger=="CSVM" ){
-    if(_absEta<0.8) {
-      if( meanminmax == "mean" ) sf = ((0.994351+(0.000250077*pt))+(9.24801e-07*(pt*pt)))+(-8.73293e-10*(pt*(pt*pt))) ;
-      else if( meanminmax == "min" ) sf = ((0.949401+(-0.000356232*pt))+(2.24887e-06*(pt*pt)))+(-1.66011e-09*(pt*(pt*pt))) ;
-      else if( meanminmax == "max" ) sf = ((1.03928+(0.000857422*pt))+(-4.02756e-07*(pt*pt)))+(-8.45836e-11*(pt*(pt*pt))) ;
+    if(_absEta<2.4) {
+      if( meanminmax == "mean" ) sf = 0.924144 + (-0.000861952*pt) + (3.46078e-06*pt*pt) + (-2.4028e-09*pt*(pt*pt));
+      else if( meanminmax == "min" ) sf = 0.821939 + (-0.00091531*pt) + (3.37305e-06*pt*pt) + (-2.30372e-09*pt*(pt*pt));
+      else if( meanminmax == "max" ) sf = 1.02632 + (-0.000806342*pt) + (3.54292e-06*pt*pt) + (-2.50001e-09*pt*(pt*pt));
     }
-    else if(_absEta<1.6) {
-      if( meanminmax == "mean" ) sf = ((1.00939+(0.000461283*pt))+(-6.30306e-07*(pt*pt)))+(3.53075e-10*(pt*(pt*pt))) ;
-      else if( meanminmax == "min" ) sf = ((0.964857+(-2.19898e-05*pt))+(4.74117e-07*(pt*pt)))+(-3.36548e-10*(pt*(pt*pt))) ;
-      else if( meanminmax == "max" ) sf = ((1.05392+(0.000944135*pt))+(-1.73386e-06*(pt*pt)))+(1.04242e-09*(pt*(pt*pt))) ;
-    }
-    else if(_absEta<2.4) {
-      if( meanminmax == "mean" ) sf = ((0.955798+(0.00146058*pt))+(-3.76689e-06*(pt*pt)))+(2.39196e-09*(pt*(pt*pt))) ;
-      else if( meanminmax == "min" ) sf = ((0.910086+(0.00116371*pt))+(-3.02747e-06*(pt*pt)))+(1.86906e-09*(pt*(pt*pt))) ;
-      else if( meanminmax == "max" ) sf = ((1.00151+(0.00175547*pt))+(-4.50251e-06*(pt*pt)))+(2.91473e-09*(pt*(pt*pt))) ;
+  }
+  else if( tagger=="CSVT" ){
+    if(_absEta<2.4) {
+      if( meanminmax == "mean" ) sf = 0.798878;
+      else if( meanminmax == "min" ) sf = 0.642573;
+      else if( meanminmax == "max" ) sf = 0.955183;
     }
   }
 
