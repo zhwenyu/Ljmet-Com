@@ -1040,6 +1040,8 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
     std::vector <int> genStatus;
     std::vector <int> genMotherID;
     std::vector <int> genMotherIndex;
+    double HTfromHEPEUP = 0;
+    int NPartonsfromHEPEUP = 0;
 
    //event weights
    std::vector<double> evtWeightsMC;
@@ -1117,6 +1119,25 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
   	  edm::InputTag theSrc("externalLHEProducer");
   	  if(event.getByLabel(theSrc,EvtHandle)){
   	  
+	    // Save LHE-level HT calculation from quarks:
+	    for ( unsigned int icount = 0 ; icount < (unsigned int)EvtHandle->hepeup().NUP; icount++ ) {
+	      int pdgid = EvtHandle->hepeup().IDUP[icount];
+	      int status = EvtHandle->hepeup().ISTUP[icount];
+	      int mom1id = abs(EvtHandle->hepeup().IDUP[EvtHandle->hepeup().MOTHUP[icount].first-1]);
+	      int mom2id = abs(EvtHandle->hepeup().IDUP[EvtHandle->hepeup().MOTHUP[icount].second-1]);
+	      float px = (EvtHandle->hepeup().PUP[icount])[0];
+	      float py = (EvtHandle->hepeup().PUP[icount])[1];
+	      float pt = sqrt(px*px+py*py);
+	      	      
+	      if(status==1){
+		if(mom1id!=6 && mom2id!=6 && mom1id!=24 && mom2id!=24 && mom1id!=23 && mom2id!=23 && mom1id!=25 && mom2id!=25) {		  
+		  HTfromHEPEUP += pt;
+		  NPartonsfromHEPEUP++;
+		}
+	      }
+	    }
+	    
+
   	    // Storing LHE weights https://twiki.cern.ch/twiki/bin/viewauth/CMS/LHEReaderCMSSW
   	    // for MC@NLO renormalization and factorization scale. 
   	    // ID numbers 1001 - 1009. (muR,muF) = 
@@ -1330,6 +1351,8 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
     SetValue("MCWeight", MCWeight);
     SetValue("LHEweights", LHEweights);
     SetValue("LHEweightids", LHEweightids);
+    SetValue("HTfromHEPUEP", HTfromHEPEUP);
+    SetValue("NPartonsfromHEPUEP", NPartonsfromHEPEUP);
 
     return 0;
 }

@@ -383,8 +383,6 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * s
     
     // Pruned, trimmed and filtered masses available
     std::vector<double> theJetAK8PrunedMass;
-    std::vector<double> theJetAK8TrimmedMass;
-    std::vector<double> theJetAK8FilteredMass;
     std::vector<double> theJetAK8SoftDropMass;
     
     // n-subjettiness variables tau1, tau2, and tau3 available
@@ -415,7 +413,7 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * s
     
     double topMass, minMass, jetCharge;
     int nSubJets;
-    double thePrunedMass, theTrimmedMass, theFilteredMass, theSoftDropMass;
+    double thePrunedMass, theSoftDropMass;
     double theNjettinessTau1, theNjettinessTau2, theNjettinessTau3;
 
     double SDsubjetPt;
@@ -485,8 +483,6 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * s
       theJetAK8GenDR.push_back(genDR);
 
       thePrunedMass   = -std::numeric_limits<double>::max();
-      theTrimmedMass  = -std::numeric_limits<double>::max();
-      theFilteredMass = -std::numeric_limits<double>::max();
       theSoftDropMass = -std::numeric_limits<double>::max();
 
       if(useL2L3Mass){
@@ -532,14 +528,10 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * s
 	if(corr*unc == 1.0) cout << "L2+L3 correction is 1.0" << endl;
 
 	thePrunedMass   = corr*unc*(double)l2l3jet.userFloat("ak8PFJetsCHSPrunedMass");
-	theTrimmedMass  = corr*unc*(double)l2l3jet.userFloat("ak8PFJetsCHSTrimmedMass");
-	theFilteredMass = corr*unc*(double)l2l3jet.userFloat("ak8PFJetsCHSFilteredMass");
 	theSoftDropMass = corr*unc*(double)l2l3jet.userFloat("ak8PFJetsCHSSoftDropMass");
 	
       }else{
 	thePrunedMass   = (double)corrak8.userFloat("ak8PFJetsCHSPrunedMass");
-	theTrimmedMass  = (double)corrak8.userFloat("ak8PFJetsCHSTrimmedMass");
-	theFilteredMass = (double)corrak8.userFloat("ak8PFJetsCHSFilteredMass");
 	theSoftDropMass = (double)corrak8.userFloat("ak8PFJetsCHSSoftDropMass");
       }
 
@@ -573,8 +565,6 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * s
       theJetAK8NHadEFrac.push_back(corrak8.neutralHadronEnergyFraction());
       
       theJetAK8PrunedMass  .push_back(thePrunedMass);
-      theJetAK8TrimmedMass .push_back(theTrimmedMass);
-      theJetAK8FilteredMass.push_back(theFilteredMass);
       theJetAK8SoftDropMass.push_back(theSoftDropMass);
       
       theJetAK8NjettinessTau1.push_back(theNjettinessTau1);
@@ -689,8 +679,6 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * s
     SetValue("theJetAK8NHadEFrac", theJetAK8NHadEFrac); 
 
     SetValue("theJetAK8PrunedMass",   theJetAK8PrunedMass);
-    SetValue("theJetAK8TrimmedMass",  theJetAK8TrimmedMass);
-    SetValue("theJetAK8FilteredMass", theJetAK8FilteredMass);
     SetValue("theJetAK8SoftDropMass", theJetAK8SoftDropMass);
     
     SetValue("theJetAK8NjettinessTau1", theJetAK8NjettinessTau1);
