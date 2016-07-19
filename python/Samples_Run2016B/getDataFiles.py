@@ -4,10 +4,13 @@ import os
 datasets=[
 "/DoubleMuon/Run2016B-PromptReco-v1/MINIAOD",
 "/DoubleMuon/Run2016B-PromptReco-v2/MINIAOD",
+"/DoubleMuon/Run2016C-PromptReco-v2/MINIAOD",
 "/DoubleEG/Run2016B-PromptReco-v1/MINIAOD",
 "/DoubleEG/Run2016B-PromptReco-v2/MINIAOD",
+"/DoubleEG/Run2016C-PromptReco-v2/MINIAOD",
 "/MuonEG/Run2016B-PromptReco-v1/MINIAOD",
 "/MuonEG/Run2016B-PromptReco-v2/MINIAOD",
+"/MuonEG/Run2016C-PromptReco-v2/MINIAOD",
 ]
 
 files = []

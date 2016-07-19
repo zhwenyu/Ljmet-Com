@@ -49,12 +49,12 @@ process.JetSubCalc.useL2L3Mass = cms.bool(True)
 process.JetSubCalc.isMc = process.ljmet.isMc
 process.JetSubCalc.JECup = cms.bool(False)
 process.JetSubCalc.JECdown = cms.bool(False)
-process.JetSubCalc.MCL2JetParAK8 = cms.string('../data/Spring16_25nsV3_MC_L2Relative_AK8PFchs.txt')
-process.JetSubCalc.MCL3JetParAK8 = cms.string('../data/Spring16_25nsV3_MC_L3Absolute_AK8PFchs.txt')
-process.JetSubCalc.DataL2JetParAK8 = cms.string('../data/Spring16_25nsV3_DATA_L2Relative_AK8PFchs.txt')
-process.JetSubCalc.DataL3JetParAK8 = cms.string('../data/Spring16_25nsV3_DATA_L3Absolute_AK8PFchs.txt')
-process.JetSubCalc.DataL2L3JetParAK8 = cms.string('../data/Spring16_25nsV3_DATA_L2L3Residual_AK8PFchs.txt')
-process.JetSubCalc.UncertaintyAK8 = cms.string('../data/Spring16_25nsV3_DATA_Uncertainty_AK8PFchs.txt')
+process.JetSubCalc.MCL2JetParAK8 = cms.string('../data/Spring16_25nsV6_MC_L2Relative_AK8PFchs.txt')
+process.JetSubCalc.MCL3JetParAK8 = cms.string('../data/Spring16_25nsV6_MC_L3Absolute_AK8PFchs.txt')
+process.JetSubCalc.DataL2JetParAK8 = cms.string('../data/Spring16_25nsV6_DATA_L2Relative_AK8PFchs.txt')
+process.JetSubCalc.DataL3JetParAK8 = cms.string('../data/Spring16_25nsV6_DATA_L3Absolute_AK8PFchs.txt')
+process.JetSubCalc.DataL2L3JetParAK8 = cms.string('../data/Spring16_25nsV6_DATA_L2L3Residual_AK8PFchs.txt')
+process.JetSubCalc.UncertaintyAK8 = cms.string('../data/Spring16_25nsV6_DATA_Uncertainty_AK8PFchs.txt')
 
 
 ############################################################
@@ -139,7 +139,7 @@ process.event_selector = cms.PSet(
     met_collection           = cms.InputTag('slimmedMETs'),
 
     #This is for uncertainty calculations
-    JEC_txtfile              = cms.string('../data/Spring16_25nsV3_MC_Uncertainty_AK4PFchs.txt'),
+    JEC_txtfile              = cms.string('../data/Spring16_25nsV6_MC_Uncertainty_AK4PFchs.txt'),
     JERSF_txtfile            = cms.string('../data/Fall15_25nsV2_MC_SF_AK4PFchs.txt'),	
     JER_txtfile              = cms.string('../data/Fall15_25nsV2_MC_PtResolution_AK4PFchs.txt'),
     JERAK8_txtfile           = cms.string('../data/Fall15_25nsV2_MC_PtResolution_AK8PFchs.txt'),
@@ -152,23 +152,23 @@ process.event_selector = cms.PSet(
     doNewJEC                 = cms.bool(True),
     doLepJetCleaning         = cms.bool(True),
 
-    MCL1JetPar               = cms.string("../data/Spring16_25nsV3_MC_L1FastJet_AK4PFchs.txt"),
-    MCL2JetPar               = cms.string("../data/Spring16_25nsV3_MC_L2Relative_AK4PFchs.txt"),
-    MCL3JetPar               = cms.string("../data/Spring16_25nsV3_MC_L3Absolute_AK4PFchs.txt"),
+    MCL1JetPar               = cms.string("../data/Spring16_25nsV6_MC_L1FastJet_AK4PFchs.txt"),
+    MCL2JetPar               = cms.string("../data/Spring16_25nsV6_MC_L2Relative_AK4PFchs.txt"),
+    MCL3JetPar               = cms.string("../data/Spring16_25nsV6_MC_L3Absolute_AK4PFchs.txt"),
 
-    MCL1JetParAK8            = cms.string("../data/Spring16_25nsV3_MC_L1FastJet_AK8PFchs.txt"),
-    MCL2JetParAK8            = cms.string("../data/Spring16_25nsV3_MC_L2Relative_AK8PFchs.txt"),
-    MCL3JetParAK8            = cms.string("../data/Spring16_25nsV3_MC_L3Absolute_AK8PFchs.txt"),
+    MCL1JetParAK8            = cms.string("../data/Spring16_25nsV6_MC_L1FastJet_AK8PFchs.txt"),
+    MCL2JetParAK8            = cms.string("../data/Spring16_25nsV6_MC_L2Relative_AK8PFchs.txt"),
+    MCL3JetParAK8            = cms.string("../data/Spring16_25nsV6_MC_L3Absolute_AK8PFchs.txt"),
 
-    DataL1JetPar               = cms.string("../data/Spring16_25nsV3_DATA_L1FastJet_AK4PFchs.txt"),
-    DataL2JetPar               = cms.string("../data/Spring16_25nsV3_DATA_L2Relative_AK4PFchs.txt"),
-    DataL3JetPar               = cms.string("../data/Spring16_25nsV3_DATA_L3Absolute_AK4PFchs.txt"),
-    DataResJetPar               = cms.string("../data/Spring16_25nsV3_DATA_L3Absolute_AK4PFchs.txt"),
+    DataL1JetPar               = cms.string("../data/Spring16_25nsV6_DATA_L1FastJet_AK4PFchs.txt"),
+    DataL2JetPar               = cms.string("../data/Spring16_25nsV6_DATA_L2Relative_AK4PFchs.txt"),
+    DataL3JetPar               = cms.string("../data/Spring16_25nsV6_DATA_L3Absolute_AK4PFchs.txt"),
+    DataResJetPar               = cms.string("../data/Spring16_25nsV6_DATA_L3Absolute_AK4PFchs.txt"),
 
-    DataL1JetParAK8            = cms.string("../data/Spring16_25nsV3_DATA_L1FastJet_AK8PFchs.txt"),
-    DataL2JetParAK8            = cms.string("../data/Spring16_25nsV3_DATA_L2Relative_AK8PFchs.txt"),
-    DataL3JetParAK8            = cms.string("../data/Spring16_25nsV3_DATA_L3Absolute_AK8PFchs.txt"),
-    DataResJetParAK8               = cms.string("../data/Spring16_25nsV3_DATA_L3Absolute_AK8PFchs.txt"),
+    DataL1JetParAK8            = cms.string("../data/Spring16_25nsV6_DATA_L1FastJet_AK8PFchs.txt"),
+    DataL2JetParAK8            = cms.string("../data/Spring16_25nsV6_DATA_L2Relative_AK8PFchs.txt"),
+    DataL3JetParAK8            = cms.string("../data/Spring16_25nsV6_DATA_L3Absolute_AK8PFchs.txt"),
+    DataResJetParAK8               = cms.string("../data/Spring16_25nsV6_DATA_L3Absolute_AK8PFchs.txt"),
 
     #triggerstudy info
     doTriggerStudy           = cms.bool(True),
