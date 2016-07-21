@@ -64,7 +64,7 @@ BtagHardcodedConditions::BtagHardcodedConditions() {
     for (int i=0;i<7;++i) ptRange15.push_back(ptminT15[i]);
 
     // 2016 scale factors from csv file in https://twiki.cern.ch/twiki/bin/viewauth/CMS/BtagRecommendation80X
-    float SFb_CSVL_temp16[7]  = {0.0371706709,0.0373251252,0.0374190658,0.0548675209,0.0915529728,0.1215453818,0.1966012716};
+    float SFb_CSVL_temp16[7]  = {0.0085541494190692902,0.010088782757520676,0.0096752624958753586,0.013629432767629623,0.013655256479978561,0.019513897597789764,0.044546689838171005};
     float SFb_CSVM_temp16[7]  = {0.017849041149020195,0.017849041149020195,0.017849041149020195,0.020885121077299118,0.025080939754843712,0.10671335458755493,0.16398745775222778};
     float SFb_CSVT_temp16[7]  = {0.019925633445382118,0.01855241134762764,0.018982676789164543,0.04345925897359848,0.0586409792304039,0.081843636929988861,0.14152982831001282};
     fillArray(SFb_CSVL_error16, SFb_CSVL_temp16,7);
@@ -72,6 +72,7 @@ BtagHardcodedConditions::BtagHardcodedConditions() {
     fillArray(SFb_CSVT_error16, SFb_CSVT_temp16,7);
     float ptminT16[7] = {30, 50, 70, 100, 140, 200, 300};
     for (int i=0;i<7;++i) ptRange16.push_back(ptminT16[i]);
+
 }
 
 BtagHardcodedConditions::~BtagHardcodedConditions() {
@@ -203,7 +204,7 @@ double BtagHardcodedConditions::GetBtagScaleFactor2016(double pt, double eta,
   else if(pt < 30) pt = 30;
 
     double SFb=0;
-    if( tagger=="CSVL")  SFb = 0.747498*((1.+(0.473236*pt))/(1.+(0.375778*pt))) ;
+    if( tagger=="CSVL")  SFb = 0.931535+(1.40704e-05*pt);
     else if( tagger=="CSVM")  SFb = 0.892452;
     else if( tagger=="CSVT")  SFb = 0.134503*((1.+(1.78872*pt))/(1.+(0.268324*pt)));
     return SFb;
@@ -560,9 +561,10 @@ double BtagHardcodedConditions::GetMistagSF2016(double pt, double eta,
   double sf = -1;
   if( tagger=="CSVL" ){
     if(_absEta<2.4) {
-      if( meanminmax == "mean" ) sf = ((1.00317+(0.000204778*pt))+(7.49098e-07*(pt*pt)))+(-9.52146e-10*(pt*(pt*pt))) ;
-      else if( meanminmax == "min" ) sf = ((0.897474+(0.000130807*pt))+(8.17188e-07*(pt*pt)))+(-9.52657e-10*(pt*(pt*pt))) ;
-      else if( meanminmax == "max" ) sf = ((1.10884+(0.000279575*pt))+(6.77543e-07*(pt*pt)))+(-9.4973e-10*(pt*(pt*pt))) ;
+      sf = ((1.05636+(0.000920353*pt))+(-7.85916e-07*(pt*pt)))+(1.92221e-11*(pt*(pt*pt))) ;
+      if( meanminmax == "mean" ) {}
+      else if( meanminmax == "min" ) sf *= (1-(0.0539991+(-6.29073e-06*pt)+(-3.39895e-09*(pt*pt))));
+      else if( meanminmax == "max" ) sf *= (1+(0.0539991+(-6.29073e-06*pt)+(-3.39895e-09*(pt*pt))));
     }
   }
   else if( tagger=="CSVM" ){
