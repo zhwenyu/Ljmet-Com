@@ -891,7 +891,8 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
                     if ( fabs(_iel->superCluster()->eta())<mdPar["electron_maxeta"] ){ }
                     else break;
 
-                    if (!((*_iel).isEBEEGap())){ }
+                    //if (!((*_iel).isEBEEGap())){ }
+                    if ( fabs(_iel->superCluster()->eta())<1.4442 || fabs(_iel->superCluster()->eta())>1.566 ){ }
                     else break;
 
                     if ( mbPar["UseElMVA"] ) {
