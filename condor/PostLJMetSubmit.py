@@ -7,7 +7,7 @@ import fileinput
 import commands
 
 rel_base = os.environ['CMSSW_BASE']
-cmssw = 'CMSSW_8_0_12'
+cmssw = 'CMSSW_8_0_14'
 date = 'Jul13'
 locdir = date+'_All'
 basedir = '/store/user/drankin/LJMet'
@@ -41,13 +41,13 @@ samples = [
     'WW',
     'WZ',
     'ZZ',
-    'QCD_Pt_120to170',
-    'QCD_Pt_170to300',
-    'QCD_Pt_300to470',
-    'QCD_Pt_470to600',
-    'QCD_Pt_600to800',
-    'QCD_Pt_800to1000',
-    'QCD_Pt_1000to1400',
+#    'QCD_Pt_120to170',
+#    'QCD_Pt_170to300',
+#    'QCD_Pt_300to470',
+#    'QCD_Pt_470to600',
+#    'QCD_Pt_600to800',
+#    'QCD_Pt_800to1000',
+#    'QCD_Pt_1000to1400',
 ]
 
 rmasses = [
@@ -82,6 +82,8 @@ datalist = [
 'SingleMuon_Run2016B_PromptReco_v2',
 'SingleElectron_Run2016C_PromptReco_v2',
 'SingleMuon_Run2016C_PromptReco_v2',
+'SingleElectron_Run2016D_PromptReco_v2',
+'SingleMuon_Run2016D_PromptReco_v2',
 ]
 
 systlist = [
@@ -89,7 +91,7 @@ systlist = [
 '_JESUP',
 '_JERUP',
 '_JERDOWN',
-'NOM'
+#'NOM'
 ]
 
 #samples = ['Data']
@@ -144,7 +146,7 @@ for i in range(len(samples)):
                             tmpstr = tmpstr+'eosrm '+basedir+'/'+date+'/'+dataname+'/'+dataname+'_'+str(gooddata)+'.root\n'
                         tmpstr = tmpstr+'''hadd -f tmp_'''+str(ida)+'''.root `xrdfs root://cmseos.fnal.gov ls -u '''+basedir+'''/'''+date+'''/'''+dataname+'''/ | grep ".root"`\n'''
                         ida+=1
-                    line=line.replace('HADD', tmpstr+'hadd -f tmp.root '+date+'/tmp_*.root')
+                    line=line.replace('HADD', tmpstr+'hadd -f tmp.root tmp_*.root')
                     line=line.replace('XRDCP', 'xrdcp -f tmp.root root://cmseos.fnal.gov/'+eosdir+'/SingleLep.root')
                 else:
                     line=line.replace('HADD', '''hadd -f '''+samples[i]+'''_tmp.root `xrdfs root://cmseos.fnal.gov ls -u '''+basedir+'''/'''+date+'''/'''+samples[i]+'''/ | grep ".root"`''')
@@ -165,7 +167,7 @@ for i in range(len(samples)):
         print 'condor file is: '+localcondor
         if (os.path.exists('%s.log'  % localcondor)):
             os.system('rm %s.log' % localcondor)
-        #os.system('condor_submit %s' % localcondor)
+        os.system('condor_submit %s' % localcondor)
     
         condor_templ_file.close()
         csh_templ_file.close()
