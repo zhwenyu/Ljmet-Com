@@ -1,7 +1,7 @@
 #!/bin/tcsh -f
 
 #foreach mass ( 1000 1100 1200 1300 1400 1500 1600 1700 1800 1900 2000 2100 2200 2300 2400 2500 2600 2700 2800 2900 3000 )
-#foreach mass ( 1200 1600 2200 3000 )
+#foreach mass ( 3000 )
 #   echo "Dumping /WprimeToTB_TToLep_M-${mass}_RH_TuneCUETP8M1_13TeV-comphep-pythia8/RunIISpring16MiniAODv2-PUSpring16RAWAODSIM_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/MINIAODSIM:"
 #   set vers = 1
 #   if (mass == 4000 || mass == 3500) then
@@ -24,7 +24,7 @@
 #end
 
 
-foreach dataset ( Run2016B-PromptReco-v2 Run2016C-PromptReco-v2 )
+foreach dataset ( Run2016B-PromptReco-v2 Run2016C-PromptReco-v2  Run2016D-PromptReco-v2)
    set tmp = `echo ${dataset} | sed 's/-/_/g'`
    echo "Dumping /SingleLepton/${dataset}/MINIAOD:"
    eval das_client --query=\"file dataset=/SingleElectron/${dataset}/MINIAOD\" --limit=0 > python/Samples_2016/SingleElectron_${tmp}_cff.txt 

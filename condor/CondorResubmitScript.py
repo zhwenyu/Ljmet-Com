@@ -14,7 +14,7 @@ import re
 import sys
 
 
-dirpre = 'Jul05/'
+dirpre = 'Jul13/'
 debug = False
 
 files = 0
@@ -28,8 +28,8 @@ badrootfiles = []
 
 for s in os.listdir(dirpre):
     print s
-    #if (not (s.endswith('BTAGUP') or s.startswith('BTAGDOWN'))): continue
-    if (not s.startswith('Single')): continue
+    if (not s.endswith('UP') and not s.endswith('DOWN')): continue
+    #if (s.startswith('Single')): continue
     #if (not (s.startswith('Wprime') and s.endswith('Right'))): continue
     #if (not (s=='Wprime1500Right' or s=='Wprime2000Right' or s=='Wprime2500Right')): continue
     Dir=dirpre+s
