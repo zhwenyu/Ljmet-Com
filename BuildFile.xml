@@ -31,6 +31,8 @@
 <use name="SimDataFormats/GeneratorProducts"/>
 <use name="SimGeneral/HepPDTRecord"/>
 <use name="lhapdf"/>
+<use name="fastjet"/>
+<use name="fastjet-contrib"/>
 
 <export>
     <lib name="1"/>
