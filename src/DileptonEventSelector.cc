@@ -689,7 +689,8 @@ bool DileptonEventSelector::operator()( edm::EventBase const & event, pat::strbi
 	    while(1){
 	      if (not _iel->gsfTrack().isNonnull() or not _iel->gsfTrack().isAvailable()) break;
 	      //skip if in barrel-endcap gap; doing it here means I never have to worry about it downstream since both electrons for analysis and those for cleaning are made here
-	      if (_iel->isEBEEGap()) break;
+	      if( fabs(_iel->ecalDrivenMomentum().eta())>1.442 && fabs(_iel->ecalDrivenMomentum().eta())<1.556) break;
+	      //if (_iel->isEBEEGap()) break;
 
 	      //mva loose for cleaning
 	      float mvaVal = mvaValue( *_iel,event);
