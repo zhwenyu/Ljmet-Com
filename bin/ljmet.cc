@@ -107,6 +107,7 @@ int main (int argc, char* argv[]) {
         
         if ( name->find("@")==std::string::npos ){
             // skip weird entries starting with @
+            if (*name=="subProcesses") continue; //no idea why this is now necessary, comes from upstream somewhere...
             std::cout << legend << *name << std::endl;
             edm::ParameterSet const _ps = parameters->getParameter<edm::ParameterSet>(*name);
             mPar.insert( std::pair<std::string, edm::ParameterSet const>(*name, _ps) );

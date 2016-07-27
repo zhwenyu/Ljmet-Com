@@ -14,7 +14,8 @@ import re
 import sys
 
 
-dirpre = 'Apr05/'
+dirpre = 'Jul13/'
+debug = False
 
 files = 0
 rootfiles = 0
@@ -26,8 +27,9 @@ badfileerror = []
 badrootfiles = []
 
 for s in os.listdir(dirpre):
-    #if (not (s.endswith('BTAGUP') or s.startswith('BTAGDOWN'))): continue
-    #if (not s.startswith('TTbar')): continue
+    print s
+    if (not s.endswith('UP') and not s.endswith('DOWN')): continue
+    #if (s.startswith('Single')): continue
     #if (not (s.startswith('Wprime') and s.endswith('Right'))): continue
     #if (not (s=='Wprime1500Right' or s=='Wprime2000Right' or s=='Wprime2500Right')): continue
     Dir=dirpre+s
@@ -58,6 +60,7 @@ for s in os.listdir(dirpre):
             for line in file:
                 if line.find('Abort')>=0:
                     if badfilelist.count(f[:-6])==0:
+                        if (debug): print line
                         badfiles = badfiles + 1
                         badfilelist.append(f[:-6])
                         good = False
@@ -74,12 +77,28 @@ for s in os.listdir(dirpre):
             for line in file:
                 if line.find('segmentation')>=0:
                     if badfilelist.count(f[:-6])==0:
+                        if (debug): print line
                         badfiles = badfiles + 1
                         badfilelist.append(f[:-6])
                         good = False
                                 
                 elif line.find('An exception of category')>=0:
                     if badfilelist.count(f[:-6])==0:
+                        if (debug): print line
+                        badfiles = badfiles + 1
+                        badfilelist.append(f[:-6])
+                        good = False
+
+                elif line.find('Server responded with an error')>=0:
+                    if badfilelist.count(f[:-6])==0:
+                        if (debug): print line
+                        badfiles = badfiles + 1
+                        badfilelist.append(f[:-6])
+                        good = False
+
+                elif line.find('Error in <TBranchElement::GetBasket>')>=0:
+                    if badfilelist.count(f[:-6])==0:
+                        if (debug): print line
                         badfiles = badfiles + 1
                         badfilelist.append(f[:-6])
                         good = False
@@ -96,12 +115,14 @@ for s in os.listdir(dirpre):
             for line in file:
                 if line.find('The system macro SYSTEM_PERIODIC_REMOVE expression')>=0:
                     if badfilelist.count(f[:-10])==0:
+                        if (debug): print line
                         badfiles = badfiles + 1
                         badfilelist.append(f[:-10])
                         good = False
                                 
                 elif line.find('Job was aborted by the user')>=0:
                     if badfilelist.count(f[:-10])==0:
+                        if (debug): print line
                         badfiles = badfiles + 1
                         badfilelist.append(f[:-10])
                         good = False

@@ -15,6 +15,7 @@ static bool fexists(const std::string filename, bool fail)
     std::cout << "File does not exist: " << filename << std::endl;
     assert(ifile);
   }
+
   return static_cast<bool>(ifile);
 }
 
