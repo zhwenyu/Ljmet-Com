@@ -12,7 +12,11 @@ DileptonCalc = cms.PSet (
                          keepMomPDGID = cms.vuint32(6, 24, 8000003),
                          cutbasedIDSelectorLoose  = cutbasedIDSelector.clone(),
                          cutbasedIDSelectorMedium = cutbasedIDSelector.clone(),
-                         cutbasedIDSelectorTight  = cutbasedIDSelector.clone()
+                         cutbasedIDSelectorTight  = cutbasedIDSelector.clone(),
+                         electronsMiniAOD    = cms.InputTag("slimmedElectrons"),                                               
+                         eleMVALooseIDMap = cms.InputTag("egmGsfElectronIDs:mvaEleID-Spring15-25ns-nonTrig-V1-wp90"),
+                         eleMVATightIDMap = cms.InputTag("egmGsfElectronIDs:mvaEleID-Spring15-25ns-nonTrig-V1-wp80"),
+                         mvaValuesMap     = cms.InputTag("electronMVAValueMapProducer:ElectronMVAEstimatorRun2Spring15NonTrig25nsV1Values"),
                          
                          )
 DileptonCalc.cutbasedIDSelectorLoose.version = cms.string('LOOSE')
