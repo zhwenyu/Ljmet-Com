@@ -630,15 +630,15 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * s
 	SDsubjetPhi       = corrsubjet.phi();
 	SDsubjetMass      = corrsubjet.mass();
 	SDsubjetBdisc     = corrsubjet.bDiscriminator(bDiscriminant); 
-	SDsubjetBTag      = selector->isJetTagged(corrsubjet, event);
+	SDsubjetBTag      = selector->isJetTagged(corrsubjet, event, true, 0, true);
 	SDdeltaRsubjetJet = deltaR(corrak8.eta(), corrak8.phi(), SDsubjetEta, SDsubjetPhi);
 
 	if(SDsubjetBdisc > 0.460) nSDSubsCSVL++;
 	if(SDsubjetBTag > 0) nSDSubsCSVMSF++;
-	if(selector->isJetTagged(corrsubjet, event, true, 1) > 0) nSDSubsCSVM_bSFup++;
-	if(selector->isJetTagged(corrsubjet, event, true, 2) > 0) nSDSubsCSVM_bSFdn++;
-	if(selector->isJetTagged(corrsubjet, event, true, 3) > 0) nSDSubsCSVM_lSFup++;
-	if(selector->isJetTagged(corrsubjet, event, true, 4) > 0) nSDSubsCSVM_lSFdn++;
+	if(selector->isJetTagged(corrsubjet, event, true, 1, true) > 0) nSDSubsCSVM_bSFup++;
+	if(selector->isJetTagged(corrsubjet, event, true, 2, true) > 0) nSDSubsCSVM_bSFdn++;
+	if(selector->isJetTagged(corrsubjet, event, true, 3, true) > 0) nSDSubsCSVM_lSFup++;
+	if(selector->isJetTagged(corrsubjet, event, true, 4, true) > 0) nSDSubsCSVM_lSFdn++;
 
 	theJetAK8SDSubjetPt.push_back(SDsubjetPt);
 	theJetAK8SDSubjetEta.push_back(SDsubjetEta);
