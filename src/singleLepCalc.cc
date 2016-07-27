@@ -1120,6 +1120,7 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
   	  if(event.getByLabel(theSrc,EvtHandle)){
   	  
 	    // Save LHE-level HT calculation from quarks:
+	    /*
 	    for ( unsigned int icount = 0 ; icount < (unsigned int)EvtHandle->hepeup().NUP; icount++ ) {
 	      int pdgid = EvtHandle->hepeup().IDUP[icount];
 	      int status = EvtHandle->hepeup().ISTUP[icount];
@@ -1136,8 +1137,7 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
 		}
 	      }
 	    }
-	    
-
+	    */
   	    // Storing LHE weights https://twiki.cern.ch/twiki/bin/viewauth/CMS/LHEReaderCMSSW
   	    // for MC@NLO renormalization and factorization scale. 
   	    // ID numbers 1001 - 1009. (muR,muF) = 
@@ -1351,8 +1351,8 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
     SetValue("MCWeight", MCWeight);
     SetValue("LHEweights", LHEweights);
     SetValue("LHEweightids", LHEweightids);
-    SetValue("HTfromHEPUEP", HTfromHEPEUP);
-    SetValue("NPartonsfromHEPUEP", NPartonsfromHEPEUP);
+    //    SetValue("HTfromHEPUEP", HTfromHEPEUP);
+    //    SetValue("NPartonsfromHEPUEP", NPartonsfromHEPEUP);
 
     return 0;
 }
