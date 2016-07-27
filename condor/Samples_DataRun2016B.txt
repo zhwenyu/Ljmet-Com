@@ -4,3 +4,6 @@ Samples_Run2016B/MuonEG_Run2016B-PromptReco-v2.txt
 Samples_Run2016B/DoubleEG_Run2016C-PromptReco-v2.txt
 Samples_Run2016B/DoubleMuon_Run2016C-PromptReco-v2.txt
 Samples_Run2016B/MuonEG_Run2016C-PromptReco-v2.txt
+Samples_Run2016B/DoubleEG_Run2016D-PromptReco-v2.txt
+Samples_Run2016B/DoubleMuon_Run2016D-PromptReco-v2.txt
+Samples_Run2016B/MuonEG_Run2016D-PromptReco-v2.txt
