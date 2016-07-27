@@ -15,9 +15,9 @@ files_per_job = 1
 
 rel_base = os.environ['CMSSW_BASE']
 cmssw = 'CMSSW_8_0_14'
-logdir = 'July12'
+logdir = 'July25'
 #outdir = '/eos/uscms/store/user/lpctlbsm/clint/Fall15/25ns/'+logdir+'/'
-outdir = '/eos/uscms/store/user/lpctlbsm/clint/Run2016B/'+logdir+'/'
+outdir = '/eos/uscms/store/user/clint/Run2016/'+logdir+'/'
 
 ### What is the name of your FWLite Analyzer
 FWLiteAnalyzer = 'ljmet'
@@ -31,7 +31,7 @@ DOQCDMC = 'False'
 DOTTBARSYS = 'False'
 
 ### JSON file to use
-MYJSON = "'../data/json/Cert_271036-275783_13TeV_PromptReco_Collisions16_JSON.txt'"
+MYJSON = "'../data/json/Cert_271036-276811_13TeV_PromptReco_Collisions16_JSON.txt'"
 
 ### Systematics flags
 BTAGUNCERTUP = 'False'
