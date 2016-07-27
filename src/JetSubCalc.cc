@@ -386,8 +386,6 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * s
     
     // Pruned, trimmed and filtered masses available
     std::vector<double> theJetAK8PrunedMass;
-    std::vector<double> theJetAK8TrimmedMass;
-    std::vector<double> theJetAK8FilteredMass;
     std::vector<double> theJetAK8SoftDropMass;
     
     // n-subjettiness variables tau1, tau2, and tau3 available
@@ -419,7 +417,7 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * s
     double topMass, minMass, jetCharge;
     int nSubJets;
     double thePrunedMass,theSoftDropMass;
-    double  theTrimmedMass, theFilteredMass;// - not currently in 80x miniAOD set to dummy
+    //double  theTrimmedMass, theFilteredMass;// - not currently in 80x miniAOD set to dummy
     double theNjettinessTau1, theNjettinessTau2, theNjettinessTau3;
 
     double SDsubjetPt;
@@ -489,8 +487,6 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * s
       theJetAK8GenDR.push_back(genDR);
 
       thePrunedMass   = -std::numeric_limits<double>::max();
-      theTrimmedMass  = -std::numeric_limits<double>::max();
-      theFilteredMass = -std::numeric_limits<double>::max();
       theSoftDropMass = -std::numeric_limits<double>::max();
 
       if(useL2L3Mass){
@@ -536,18 +532,11 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * s
 	if(corr*unc == 1.0) cout << "L2+L3 correction is 1.0" << endl;
 
 	thePrunedMass   = corr*unc*(double)l2l3jet.userFloat("ak8PFJetsCHSPrunedMass");
-	//theTrimmedMass  = corr*unc*(double)l2l3jet.userFloat("ak8PFJetsCHSTrimmedMass");
-	theTrimmedMass  = -999;
-	//theFilteredMass = corr*unc*(double)l2l3jet.userFloat("ak8PFJetsCHSFilteredMass");
-	theFilteredMass = -999;
+
 	theSoftDropMass = corr*unc*(double)l2l3jet.userFloat("ak8PFJetsCHSSoftDropMass");
 	
       }else{
 	thePrunedMass   = (double)corrak8.userFloat("ak8PFJetsCHSPrunedMass");
-	//theTrimmedMass  = (double)corrak8.userFloat("ak8PFJetsCHSTrimmedMass");
-	theTrimmedMass  = -999;
-	//theFilteredMass = (double)corrak8.userFloat("ak8PFJetsCHSFilteredMass");
-	theFilteredMass = -999;
 	theSoftDropMass = (double)corrak8.userFloat("ak8PFJetsCHSSoftDropMass");
       }
 
@@ -581,8 +570,6 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * s
       theJetAK8NHadEFrac.push_back(corrak8.neutralHadronEnergyFraction());
       
       theJetAK8PrunedMass  .push_back(thePrunedMass);
-      theJetAK8TrimmedMass .push_back(theTrimmedMass);
-      theJetAK8FilteredMass.push_back(theFilteredMass);
       theJetAK8SoftDropMass.push_back(theSoftDropMass);
       
       theJetAK8NjettinessTau1.push_back(theNjettinessTau1);
@@ -648,15 +635,15 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * s
 	SDsubjetPhi       = corrsubjet.phi();
 	SDsubjetMass      = corrsubjet.mass();
 	SDsubjetBdisc     = corrsubjet.bDiscriminator(bDiscriminant); 
-	SDsubjetBTag      = selector->isJetTagged(corrsubjet, event);
+	SDsubjetBTag      = selector->isJetTagged(corrsubjet, event, true, 0, true);
 	SDdeltaRsubjetJet = deltaR(corrak8.eta(), corrak8.phi(), SDsubjetEta, SDsubjetPhi);
 
 	if(SDsubjetBdisc > 0.460) nSDSubsCSVL++;
 	if(SDsubjetBTag > 0) nSDSubsCSVMSF++;
-	if(selector->isJetTagged(corrsubjet, event, true, 1) > 0) nSDSubsCSVM_bSFup++;
-	if(selector->isJetTagged(corrsubjet, event, true, 2) > 0) nSDSubsCSVM_bSFdn++;
-	if(selector->isJetTagged(corrsubjet, event, true, 3) > 0) nSDSubsCSVM_lSFup++;
-	if(selector->isJetTagged(corrsubjet, event, true, 4) > 0) nSDSubsCSVM_lSFdn++;
+	if(selector->isJetTagged(corrsubjet, event, true, 1, true) > 0) nSDSubsCSVM_bSFup++;
+	if(selector->isJetTagged(corrsubjet, event, true, 2, true) > 0) nSDSubsCSVM_bSFdn++;
+	if(selector->isJetTagged(corrsubjet, event, true, 3, true) > 0) nSDSubsCSVM_lSFup++;
+	if(selector->isJetTagged(corrsubjet, event, true, 4, true) > 0) nSDSubsCSVM_lSFdn++;
 
 	theJetAK8SDSubjetPt.push_back(SDsubjetPt);
 	theJetAK8SDSubjetEta.push_back(SDsubjetEta);
@@ -697,8 +684,6 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * s
     SetValue("theJetAK8NHadEFrac", theJetAK8NHadEFrac); 
 
     SetValue("theJetAK8PrunedMass",   theJetAK8PrunedMass);
-    SetValue("theJetAK8TrimmedMass",  theJetAK8TrimmedMass);
-    SetValue("theJetAK8FilteredMass", theJetAK8FilteredMass);
     SetValue("theJetAK8SoftDropMass", theJetAK8SoftDropMass);
     
     SetValue("theJetAK8NjettinessTau1", theJetAK8NjettinessTau1);

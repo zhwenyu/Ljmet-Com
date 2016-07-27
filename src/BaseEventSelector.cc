@@ -878,25 +878,28 @@ pat::Jet BaseEventSelector::correctJetReturnPatJet(const pat::Jet & jet, edm::Ev
     return correctedJet;
 }
 
-bool BaseEventSelector::isJetTagged(const pat::Jet & jet, edm::EventBase const & event, bool applySF, int shiftflag)
+bool BaseEventSelector::isJetTagged(const pat::Jet & jet, edm::EventBase const & event, bool applySF, int shiftflag, bool subjetflag)
 {
     bool _isTagged = false;
     
     if ( jet.bDiscriminator( msPar["btagger"] ) > bTagCut ) _isTagged = true;
     
+    string tagger = msPar["btagOP"];
+    if (subjetflag) tagger += "subjet";
+
     if (mbPar["isMc"] && applySF) {
         TLorentzVector lvjet = correctJet(jet, event);
         
-        double _lightSf = mBtagCond.GetMistagScaleFactor(lvjet.Et(), lvjet.Eta(), msPar["btagOP"]);
-        if (shiftflag == 3 || mbPar["MistagUncertUp"] ) _lightSf += mBtagCond.GetMistagSFUncertUp(lvjet.Et(), lvjet.Eta(), msPar["btagOP"]);
-        else if (shiftflag == 4 ||  mbPar["MistagUncertDown"] ) _lightSf -= mBtagCond.GetMistagSFUncertDown(lvjet.Et(), lvjet.Eta(), msPar["btagOP"]);
-        double _lightEff = mBtagCond.GetMistagRate(lvjet.Et(), lvjet.Eta(), msPar["btagOP"]);
+        double _lightSf = mBtagCond.GetMistagScaleFactor(lvjet.Et(), lvjet.Eta(), tagger);
+        if (shiftflag == 3 || mbPar["MistagUncertUp"] ) _lightSf += mBtagCond.GetMistagSFUncertUp(lvjet.Et(), lvjet.Eta(), tagger);
+        else if (shiftflag == 4 ||  mbPar["MistagUncertDown"] ) _lightSf -= mBtagCond.GetMistagSFUncertDown(lvjet.Et(), lvjet.Eta(), tagger);
+        double _lightEff = mBtagCond.GetMistagRate(lvjet.Et(), lvjet.Eta(), tagger);
         
         int _jetFlavor = abs(jet.hadronFlavour());
-        double _btagSf = mBtagCond.GetBtagScaleFactor(lvjet.Et(), lvjet.Eta(), msPar["btagOP"]);
-        if (shiftflag == 1 ||  mbPar["BTagUncertUp"] ) _btagSf += (mBtagCond.GetBtagSFUncertUp(lvjet.Et(), lvjet.Eta(), msPar["btagOP"])*(_jetFlavor==4?2:1));
-        else if (shiftflag == 2 ||  mbPar["BTagUncertDown"] ) _btagSf -= (mBtagCond.GetBtagSFUncertDown(lvjet.Et(), lvjet.Eta(), msPar["btagOP"])*(_jetFlavor==4?2:1));
-        double _btagEff = mBtagCond.GetBtagEfficiency(lvjet.Et(), lvjet.Eta(), msPar["btagOP"]);
+        double _btagSf = mBtagCond.GetBtagScaleFactor(lvjet.Et(), lvjet.Eta(), tagger);
+        if (shiftflag == 1 ||  mbPar["BTagUncertUp"] ) _btagSf += (mBtagCond.GetBtagSFUncertUp(lvjet.Et(), lvjet.Eta(), tagger)*(_jetFlavor==4?2:1));
+        else if (shiftflag == 2 ||  mbPar["BTagUncertDown"] ) _btagSf -= (mBtagCond.GetBtagSFUncertDown(lvjet.Et(), lvjet.Eta(), tagger)*(_jetFlavor==4?2:1));
+        double _btagEff = mBtagCond.GetBtagEfficiency(lvjet.Et(), lvjet.Eta(), tagger);
         
         mBtagSfUtil.SetSeed(abs(static_cast<int>(sin(jet.phi())*1e5)));
         
@@ -912,17 +915,22 @@ bool BaseEventSelector::isJetTagged(const pat::Jet & jet, edm::EventBase const &
     return _isTagged;
 }
 
-TLorentzVector BaseEventSelector::correctMet(const pat::MET & met, edm::EventBase const & event)
+TLorentzVector BaseEventSelector::correctMet(const pat::MET & met, edm::EventBase const & event, bool useHF)
 {
     double correctedMET_px = met.uncorPx();
     double correctedMET_py = met.uncorPy();
     if ( mbPar["doNewJEC"] ) {
         for (std::vector<edm::Ptr<pat::Jet> >::const_iterator ijet = mvAllJets.begin();
              ijet != mvAllJets.end(); ++ijet) {
+            if (!useHF && fabs((**ijet).eta())>2.6) continue;
             TLorentzVector lv = correctJetForMet(**ijet, event);
             correctedMET_px += lv.Px();
             correctedMET_py += lv.Py();
         }
+    }
+    else {
+        correctedMET_px = met.px();
+        correctedMET_py = met.py();
     }
     
     correctedMET_p4.SetPxPyPzE(correctedMET_px, correctedMET_py, 0, sqrt(correctedMET_px*correctedMET_px+correctedMET_py*correctedMET_py));
@@ -937,7 +945,7 @@ TLorentzVector BaseEventSelector::correctMet(const pat::MET & met, edm::EventBas
     return correctedMET_p4;
 }
 
-TLorentzVector BaseEventSelector::correctMet(const pat::MET & met, edm::EventBase const & event, std::vector<pat::Jet> jets)
+TLorentzVector BaseEventSelector::correctMet(const pat::MET & met, edm::EventBase const & event, std::vector<pat::Jet> jets, bool useHF)
 {
     
     double correctedMET_px = met.uncorPx();
@@ -945,10 +953,15 @@ TLorentzVector BaseEventSelector::correctMet(const pat::MET & met, edm::EventBas
     if ( mbPar["doNewJEC"] ) {
         for (std::vector<pat::Jet>::const_iterator ijet = jets.begin();
              ijet != jets.end(); ++ijet) {
+            if (!useHF && fabs((*ijet).eta())>2.6) continue;
             TLorentzVector lv = correctJetForMet(*ijet, event);
             correctedMET_px += lv.Px();
             correctedMET_py += lv.Py();
         }
+    }
+    else {
+        correctedMET_px = met.px();
+        correctedMET_py = met.py();
     }
     
     correctedMET_p4.SetPxPyPzE(correctedMET_px, correctedMET_py, 0, sqrt(correctedMET_px*correctedMET_px+correctedMET_py*correctedMET_py));
@@ -961,14 +974,14 @@ TLorentzVector BaseEventSelector::correctMet(const pat::MET & met, edm::EventBas
     SetHistValue("met_correction", correctedMET_p4.Pt()/_orig_met);
     return correctedMET_p4;
 }
-TLorentzVector BaseEventSelector::correctMet(const pat::MET& met, edm::EventBase const & event, std::vector<edm::Ptr<pat::Jet> > jets){
+TLorentzVector BaseEventSelector::correctMet(const pat::MET& met, edm::EventBase const & event, std::vector<edm::Ptr<pat::Jet> > jets, bool useHF){
 
   std::vector<pat::Jet> patJets;
   for(std::vector<edm::Ptr<pat::Jet> >::const_iterator ijet = jets.begin(); ijet!= jets.end(); ++ijet){
     patJets.push_back(**ijet);
   }
 
-  TLorentzVector correctedMET = BaseEventSelector::correctMet(met, event, patJets); //note that doing this also forces correctedMET_p4 member to be correctly set so it preserves the BaseEventSelector::GetCorrectedMET function, though as usual that function has to be called in order the corrected met to be produced
+  TLorentzVector correctedMET = BaseEventSelector::correctMet(met, event, patJets, useHF); //note that doing this also forces correctedMET_p4 member to be correctly set so it preserves the BaseEventSelector::GetCorrectedMET function, though as usual that function has to be called in order the corrected met to be produced
   return correctedMET;
 
 }
