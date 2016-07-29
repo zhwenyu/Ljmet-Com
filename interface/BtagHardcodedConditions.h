@@ -58,6 +58,7 @@ private:
     double GetMistagSF2012(double pt, double eta, std::string tagger, std::string meanminmax);
     double GetMistagSF2015(double pt, double eta, std::string tagger, std::string meanminmax);
     double GetMistagSF2016(double pt, double eta, std::string tagger, std::string meanminmax);
+
     inline void fillArray(float* a, float* b, int n) {
         for (int i=0;i<n;++i) a[i] = b[i];
     }
