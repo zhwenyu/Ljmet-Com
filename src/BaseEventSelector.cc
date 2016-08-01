@@ -172,15 +172,12 @@ void BaseEventSelector::BeginJob(std::map<std::string, edm::ParameterSet const >
     bTagCut = mdPar["btag_min_discr"];
     std::cout << "b-tag check "<<msPar["btagOP"]<<" "<< msPar["btagger"]<<" "<<mdPar["btag_min_discr"]<<std::endl;
  
-    if ( mbPar["isMc"] && ( mbPar["JECup"] || mbPar["JECdown"]))
+    if ( mbPar["isMc"] )
       jecUnc = new JetCorrectionUncertainty(msPar["JEC_txtfile"]);
 
     resolution = JME::JetResolution(msPar["JER_txtfile"]);
     resolutionAK8 = JME::JetResolution(msPar["JERAK8_txtfile"]);
     resolution_SF = JME::JetResolutionScaleFactor(msPar["JERSF_txtfile"]);    
-    JERsystematic = Variation::NOMINAL;
-    if(mbPar["JERup"]) JERsystematic = Variation::UP;
-    if(mbPar["JERdown"]) JERsystematic = Variation::DOWN;
 
     std::vector<JetCorrectorParameters> vPar;
     std::vector<JetCorrectorParameters> vParAK8;
@@ -358,7 +355,7 @@ void BaseEventSelector::Init( void )
     mpEc->SetHistogram(mName, "nBtagSfCorrections", 100, 0.0, 10.0);
 }
 
-TLorentzVector BaseEventSelector::correctJetForMet(const pat::Jet & jet, edm::EventBase const & event)
+TLorentzVector BaseEventSelector::correctJetForMet(const pat::Jet & jet, edm::EventBase const & event, unsigned int syst)
 {
 
     TLorentzVector jetP4, offJetP4;
@@ -415,6 +412,10 @@ TLorentzVector BaseEventSelector::correctJetForMet(const pat::Jet & jet, edm::Ev
         offJetP4 *= corrVec[0];
         pt = jetP4.Pt();
 
+        Variation JERsystematic = Variation::NOMINAL;
+        if(mbPar["JERup"] || syst==3) JERsystematic = Variation::UP;
+        if(mbPar["JERdown"] || syst==4) JERsystematic = Variation::DOWN;
+
 	JME::JetParameters parameters;
 	parameters.setJetPt(pt);
 	parameters.setJetEta(jetP4.Eta());
@@ -443,11 +444,11 @@ TLorentzVector BaseEventSelector::correctJetForMet(const pat::Jet & jet, edm::Ev
           ptscale = max(0.0, JERrand.Gaus(pt,sqrt(factor*(factor+2))*res)/pt);
         }
 
-        if ( mbPar["JECup"] || mbPar["JECdown"]) {
+        if ( mbPar["JECup"] || mbPar["JECdown"] || syst==1 || syst==2) {
             jecUnc->setJetEta(jetP4.Eta());
             jecUnc->setJetPt(jetP4.Pt()*ptscale);
 
-            if (mbPar["JECup"]) { 
+            if (mbPar["JECup"] || syst==1) { 
 	        try{
                     unc = jecUnc->getUncertainty(true);
 	        }
@@ -472,8 +473,8 @@ TLorentzVector BaseEventSelector::correctJetForMet(const pat::Jet & jet, edm::Ev
                 unc = 1 - unc; 
             }
 
-            if (jetP4.Pt()*ptscale < 10.0 && mbPar["JECup"]) unc = 2.0;
-            if (jetP4.Pt()*ptscale < 10.0 && mbPar["JECdown"]) unc = 0.01;
+            if (jetP4.Pt()*ptscale < 10.0 && (mbPar["JECup"] || syst==1)) unc = 2.0;
+            if (jetP4.Pt()*ptscale < 10.0 && (mbPar["JECdown"] || syst==2)) unc = 0.01;
 
         }
 
@@ -510,7 +511,7 @@ TLorentzVector BaseEventSelector::correctJetForMet(const pat::Jet & jet, edm::Ev
     return offJetP4-jetP4;
 }
 
-TLorentzVector BaseEventSelector::correctJet(const pat::Jet & jet, edm::EventBase const & event, bool doAK8Corr, bool forceCorr)
+TLorentzVector BaseEventSelector::correctJet(const pat::Jet & jet, edm::EventBase const & event, bool doAK8Corr, bool forceCorr, unsigned int syst)
 {
 
   // JES and JES systematics
@@ -573,6 +574,10 @@ TLorentzVector BaseEventSelector::correctJet(const pat::Jet & jet, edm::EventBas
 
         }
 
+        Variation JERsystematic = Variation::NOMINAL;
+        if(mbPar["JERup"] || syst==3) JERsystematic = Variation::UP;
+        if(mbPar["JERdown"] || syst==4) JERsystematic = Variation::DOWN;
+
 	JME::JetParameters parameters;
 	parameters.setJetPt(pt);
 	parameters.setJetEta(correctedJet.eta());
@@ -600,11 +605,11 @@ TLorentzVector BaseEventSelector::correctJet(const pat::Jet & jet, edm::EventBas
           ptscale = max(0.0, JERrand.Gaus(pt,sqrt(factor*(factor+2))*res)/pt);
         }
 
-        if ( mbPar["JECup"] || mbPar["JECdown"]) {
+        if ( mbPar["JECup"] || mbPar["JECdown"] || syst==1 || syst==2) {
             jecUnc->setJetEta(jet.eta());
             jecUnc->setJetPt(pt*ptscale);
 
-            if (mbPar["JECup"]) { 
+            if (mbPar["JECup"] || syst==1) { 
 	        try{
                     unc = jecUnc->getUncertainty(true);
 	        }
@@ -629,8 +634,8 @@ TLorentzVector BaseEventSelector::correctJet(const pat::Jet & jet, edm::EventBas
                 unc = 1 - unc; 
             }
 
-            if (pt*ptscale < 10.0 && mbPar["JECup"]) unc = 2.0;
-            if (pt*ptscale < 10.0 && mbPar["JECdown"]) unc = 0.01;
+            if (pt*ptscale < 10.0 && (mbPar["JECup"] || syst==1)) unc = 2.0;
+            if (pt*ptscale < 10.0 && (mbPar["JECdown"] || syst==2)) unc = 0.01;
 
         }
 
@@ -703,7 +708,7 @@ TLorentzVector BaseEventSelector::correctJet(const pat::Jet & jet, edm::EventBas
     return jetP4;
 }
 
-pat::Jet BaseEventSelector::correctJetReturnPatJet(const pat::Jet & jet, edm::EventBase const & event, bool doAK8Corr, bool forceCorr)
+pat::Jet BaseEventSelector::correctJetReturnPatJet(const pat::Jet & jet, edm::EventBase const & event, bool doAK8Corr, bool forceCorr, unsigned int syst)
 {
 
   // JES and JES systematics
@@ -767,6 +772,10 @@ pat::Jet BaseEventSelector::correctJetReturnPatJet(const pat::Jet & jet, edm::Ev
 
         }
 
+        Variation JERsystematic = Variation::NOMINAL;
+        if(mbPar["JERup"] || syst==3) JERsystematic = Variation::UP;
+        if(mbPar["JERdown"] || syst==4) JERsystematic = Variation::DOWN;
+
 	JME::JetParameters parameters;
 	parameters.setJetPt(pt);
 	parameters.setJetEta(correctedJet.eta());
@@ -794,11 +803,11 @@ pat::Jet BaseEventSelector::correctJetReturnPatJet(const pat::Jet & jet, edm::Ev
           ptscale = max(0.0, JERrand.Gaus(pt,sqrt(factor*(factor+2))*res)/pt);
         }
 
-        if ( mbPar["JECup"] || mbPar["JECdown"]) {
+        if ( mbPar["JECup"] || mbPar["JECdown"] || syst==1 || syst==2) {
             jecUnc->setJetEta(jet.eta());
             jecUnc->setJetPt(pt*ptscale);
 
-            if (mbPar["JECup"]) { 
+            if (mbPar["JECup"] || syst==1) { 
     	        try{
                     unc = jecUnc->getUncertainty(true);
                 }
@@ -823,8 +832,8 @@ pat::Jet BaseEventSelector::correctJetReturnPatJet(const pat::Jet & jet, edm::Ev
                 unc = 1 - unc; 
             }
     
-            if (pt*ptscale < 10.0 && mbPar["JECup"]) unc = 2.0;
-            if (pt*ptscale < 10.0 && mbPar["JECdown"]) unc = 0.01;
+            if (pt*ptscale < 10.0 && (mbPar["JECup"] || syst==1)) unc = 2.0;
+            if (pt*ptscale < 10.0 && (mbPar["JECdown"] || syst==2)) unc = 0.01;
 
         }
 
@@ -915,7 +924,7 @@ bool BaseEventSelector::isJetTagged(const pat::Jet & jet, edm::EventBase const &
     return _isTagged;
 }
 
-TLorentzVector BaseEventSelector::correctMet(const pat::MET & met, edm::EventBase const & event, bool useHF)
+TLorentzVector BaseEventSelector::correctMet(const pat::MET & met, edm::EventBase const & event, unsigned int syst, bool useHF)
 {
     double correctedMET_px = met.uncorPx();
     double correctedMET_py = met.uncorPy();
@@ -923,7 +932,7 @@ TLorentzVector BaseEventSelector::correctMet(const pat::MET & met, edm::EventBas
         for (std::vector<edm::Ptr<pat::Jet> >::const_iterator ijet = mvAllJets.begin();
              ijet != mvAllJets.end(); ++ijet) {
             if (!useHF && fabs((**ijet).eta())>2.6) continue;
-            TLorentzVector lv = correctJetForMet(**ijet, event);
+            TLorentzVector lv = correctJetForMet(**ijet, event, syst);
             correctedMET_px += lv.Px();
             correctedMET_py += lv.Py();
         }
@@ -945,7 +954,7 @@ TLorentzVector BaseEventSelector::correctMet(const pat::MET & met, edm::EventBas
     return correctedMET_p4;
 }
 
-TLorentzVector BaseEventSelector::correctMet(const pat::MET & met, edm::EventBase const & event, std::vector<pat::Jet> jets, bool useHF)
+TLorentzVector BaseEventSelector::correctMet(const pat::MET & met, edm::EventBase const & event, std::vector<pat::Jet> jets, unsigned int syst, bool useHF)
 {
     
     double correctedMET_px = met.uncorPx();
@@ -954,7 +963,7 @@ TLorentzVector BaseEventSelector::correctMet(const pat::MET & met, edm::EventBas
         for (std::vector<pat::Jet>::const_iterator ijet = jets.begin();
              ijet != jets.end(); ++ijet) {
             if (!useHF && fabs((*ijet).eta())>2.6) continue;
-            TLorentzVector lv = correctJetForMet(*ijet, event);
+            TLorentzVector lv = correctJetForMet(*ijet, event, syst);
             correctedMET_px += lv.Px();
             correctedMET_py += lv.Py();
         }
@@ -974,14 +983,14 @@ TLorentzVector BaseEventSelector::correctMet(const pat::MET & met, edm::EventBas
     SetHistValue("met_correction", correctedMET_p4.Pt()/_orig_met);
     return correctedMET_p4;
 }
-TLorentzVector BaseEventSelector::correctMet(const pat::MET& met, edm::EventBase const & event, std::vector<edm::Ptr<pat::Jet> > jets, bool useHF){
+TLorentzVector BaseEventSelector::correctMet(const pat::MET& met, edm::EventBase const & event, std::vector<edm::Ptr<pat::Jet> > jets, unsigned int syst, bool useHF){
 
   std::vector<pat::Jet> patJets;
   for(std::vector<edm::Ptr<pat::Jet> >::const_iterator ijet = jets.begin(); ijet!= jets.end(); ++ijet){
     patJets.push_back(**ijet);
   }
 
-  TLorentzVector correctedMET = BaseEventSelector::correctMet(met, event, patJets, useHF); //note that doing this also forces correctedMET_p4 member to be correctly set so it preserves the BaseEventSelector::GetCorrectedMET function, though as usual that function has to be called in order the corrected met to be produced
+  TLorentzVector correctedMET = BaseEventSelector::correctMet(met, event, patJets, syst, useHF); //note that doing this also forces correctedMET_p4 member to be correctly set so it preserves the BaseEventSelector::GetCorrectedMET function, though as usual that function has to be called in order the corrected met to be produced
   return correctedMET;
 
 }
