@@ -441,7 +441,7 @@ TLorentzVector BaseEventSelector::correctJetForMet(const pat::Jet & jet, edm::Ev
 	}
         if (!smeared && factor>0) {
           JERrand.SetSeed(abs(static_cast<int>(jet.phi()*1e4)));
-          ptscale = max(0.0, JERrand.Gaus(pt,sqrt(factor*(factor+2))*res)/pt);
+          ptscale = max(0.0, JERrand.Gaus(pt,sqrt(factor*(factor+2))*res*pt)/pt);
         }
 
         if ( mbPar["JECup"] || mbPar["JECdown"] || syst==1 || syst==2) {
@@ -602,7 +602,7 @@ TLorentzVector BaseEventSelector::correctJet(const pat::Jet & jet, edm::EventBas
 	}
         if (!smeared && factor>0) {
           JERrand.SetSeed(abs(static_cast<int>(jet.phi()*1e4)));
-          ptscale = max(0.0, JERrand.Gaus(pt,sqrt(factor*(factor+2))*res)/pt);
+          ptscale = max(0.0, JERrand.Gaus(pt,sqrt(factor*(factor+2))*res*pt)/pt);
         }
 
         if ( mbPar["JECup"] || mbPar["JECdown"] || syst==1 || syst==2) {
@@ -800,7 +800,7 @@ pat::Jet BaseEventSelector::correctJetReturnPatJet(const pat::Jet & jet, edm::Ev
 	}
         if (!smeared && factor>0) {
           JERrand.SetSeed(abs(static_cast<int>(jet.phi()*1e4)));
-          ptscale = max(0.0, JERrand.Gaus(pt,sqrt(factor*(factor+2))*res)/pt);
+          ptscale = max(0.0, JERrand.Gaus(pt,sqrt(factor*(factor+2))*res*pt)/pt);
         }
 
         if ( mbPar["JECup"] || mbPar["JECdown"] || syst==1 || syst==2) {
