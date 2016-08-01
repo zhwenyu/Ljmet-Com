@@ -59,17 +59,24 @@ private:
   bool isMc;
   bool JECup;
   bool JECdn;
+  bool JERup;
+  bool JERdn;
   bool useL2L3Mass;
   std::string MCL3;
   std::string MCL2;
+  std::string MCSF;
+  std::string MCPT;
   std::string DataL3;
   std::string DataL2;
   std::string DataL2L3;
+  JME::JetResolution resolutionAK8;
+  JME::JetResolutionScaleFactor resolution_SF;
   FactorizedJetCorrector *jecak8;
   JetCorrectorParameters *L3JetParAK8;
   JetCorrectorParameters *L2JetParAK8;
   JetCorrectorParameters *ResJetParAK8; 
   JetCorrectionUncertainty *jecUnc;
+  TRandom3 JERrand;
 };
 
 static int reg = LjmetFactory::GetInstance()->Register(new JetSubCalc(), "JetSubCalc");
@@ -143,12 +150,22 @@ int JetSubCalc::BeginJob()
     if(mPset.exists("JECdown")) JECdn = mPset.getParameter<bool>("JECdown");
     else JECdn = false;
 
+    if(mPset.exists("JERup")) JERup = mPset.getParameter<bool>("JERup");
+    else JERup = false;
+
+    if(mPset.exists("JERdown")) JERdn = mPset.getParameter<bool>("JERdown");
+    else JERdn = false;
+
     if(useL2L3Mass){
       cout << "JetSubCalc: using L2+L3 corrected groomed masses" << endl;
       if(mPset.exists("MCL2JetParAK8")) MCL2 = mPset.getParameter<std::string>("MCL2JetParAK8");
       else MCL2 = "/uscms_data/d3/jmanagan/CMSSW_7_4_14/src/LJMet/Com/data/Summer15_25nsV5_MC_L1FastJet";
       if(mPset.exists("MCL3JetParAK8")) MCL3 = mPset.getParameter<std::string>("MCL3JetParAK8");
       else MCL3 = "/uscms_data/d3/jmanagan/CMSSW_7_4_14/src/LJMet/Com/data/Summer15_25nsV5_MC_L1FastJet";
+      if(mPset.exists("MCSF")) MCSF = mPset.getParameter<std::string>("MCSF");
+      else MCSF = "/uscms_data/d3/jmanagan/CMSSW_7_4_14/src/LJMet/Com/data/Summer15_25nsV5_MC_L1FastJet";
+      if(mPset.exists("MCPTResAK8")) MCPT = mPset.getParameter<std::string>("MCPTResAK8");
+      else MCPT = "/uscms_data/d3/jmanagan/CMSSW_7_4_14/src/LJMet/Com/data/Summer15_25nsV5_MC_L1FastJet";
 
       if(mPset.exists("DataL2JetParAK8")) DataL2 = mPset.getParameter<std::string>("DataL2JetParAK8");
       else DataL2 = "/uscms_data/d3/jmanagan/CMSSW_7_4_14/src/LJMet/Com/data/Summer15_25nsV5_Data_L1FastJet";
@@ -175,6 +192,9 @@ int JetSubCalc::BeginJob()
       
       jecak8 = new FactorizedJetCorrector(vParAK8);
       jecUnc = new JetCorrectionUncertainty(mPset.getParameter<std::string>("UncertaintyAK8"));
+
+      resolutionAK8 = JME::JetResolution(MCPT);
+      resolution_SF = JME::JetResolutionScaleFactor(MCSF);    
 
     }
 
@@ -386,6 +406,7 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * s
     
     // Pruned, trimmed and filtered masses available
     std::vector<double> theJetAK8PrunedMass;
+    std::vector<double> theJetAK8PrunedMassWtagUncerts;
     std::vector<double> theJetAK8SoftDropMass;
     
     // n-subjettiness variables tau1, tau2, and tau3 available
@@ -489,6 +510,10 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * s
       thePrunedMass   = -std::numeric_limits<double>::max();
       theSoftDropMass = -std::numeric_limits<double>::max();
 
+      double unc = 1.0;
+      double unc_pruned = 1.0;
+      double ptscale_pruned = 1.0;
+      
       if(useL2L3Mass){
 	edm::Handle<double> rhoHandle;
 	edm::InputTag rhoSrc_("fixedGridRhoFastjetAll", "");
@@ -503,36 +528,74 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * s
 	jecak8->setRho(rho);
 	double corr = jecak8->getCorrection();
 
-	double unc = 1.0;
-        if (isMc && (JECup || JECdn)){
-	  // uncertainty in BaseEventSelector takes the corrected pT
-	  jecUnc->setJetEta(corrak8.eta());
-	  jecUnc->setJetPt(corrak8.pt());
-	  
-	  if (JECup) { 
-	    try{unc = jecUnc->getUncertainty(true);}
-	    catch(...){ // catch all exceptions. Jet Uncertainty tool throws when binning out of range
-	      std::cout << mLegend << "WARNING! Exception thrown by JetCorrectionUncertainty!" << std::endl;
-	      std::cout << mLegend << "WARNING! Jet/MET will remain uncorrected." << std::endl;
-	      unc = 0.0;
+	l2l3jet.scaleEnergy(corr);
+
+	// Apply JER uncertainty + W tagging uncertainty addition for pruned mass only
+	if(isMc){
+	  JME::JetParameters parameters;
+	  parameters.setJetPt(l2l3jet.pt());
+	  parameters.setJetEta(l2l3jet.eta());
+	  parameters.setRho(rho);
+	  double res = resolutionAK8.getResolution(parameters);
+	  Variation JERcentral = Variation::NOMINAL;
+	  Variation JERshifted = Variation::UP;
+	  if(JERdn) JERshifted = Variation::DOWN;	  
+	  // JetWTagging TWiki: 76X JMR for pruned mass + nsubjettiness, resolution scale factor = 1
+	  // uncertainty is 10.3% within eta 2.5, JER #oplus 10.3% outside
+	  double factor_pruned = 0.0;
+	  double uncert = fabs(resolution_SF.getScaleFactor(parameters,JERcentral) - resolution_SF.getScaleFactor(parameters,JERshifted));
+	  double uncert_pruned = 0.103;
+	  if(fabs(l2l3jet.eta()) > 2.5) uncert_pruned = sqrt(uncert*uncert + 0.103*0.103);
+	  if(JERup) factor_pruned = factor_pruned + uncert_pruned;
+	  if(JERdn) factor_pruned = factor_pruned - uncert_pruned;
+
+	  const reco::GenJet * genJet = l2l3jet.genJet();
+	  bool smeared = false;
+	  if(genJet){
+	    double deltaPt = fabs(genJet->pt() - l2l3jet.pt());
+	    double deltaR = reco::deltaR(genJet->p4(),l2l3jet.p4());	
+	    if (deltaR < 0.4 && deltaPt <= 3*l2l3jet.pt()*res){
+	      double deltapt_pruned = (l2l3jet.pt() - genJet->pt()) * factor_pruned;
+	      ptscale_pruned = max(0.0, (l2l3jet.pt() + deltapt_pruned) / l2l3jet.pt());
+	      smeared = true;
 	    }
-	    unc = 1 + unc; 
 	  }
-	  else { 
-	    try{unc = jecUnc->getUncertainty(false);}
-	    catch(...){
-	      std::cout << mLegend << "WARNING! Exception thrown by JetCorrectionUncertainty!" << std::endl;
-	      std::cout << mLegend << "WARNING! Jet/MET will remain uncorrected." << std::endl;
-	      unc = 0.0;
+	  if (!smeared && factor_pruned>0) {
+	    JERrand.SetSeed(abs(static_cast<int>(l2l3jet.phi()*1e4)));
+	    ptscale_pruned = max(0.0, JERrand.Gaus(l2l3jet.pt(),sqrt(factor_pruned*(factor_pruned+2))*res*l2l3jet.pt())/l2l3jet.pt());
+	  }
+	
+	  if (JECup || JECdn){
+	    // uncertainty in BaseEventSelector takes the corrected pT
+	    jecUnc->setJetEta(l2l3jet.eta());
+	    jecUnc->setJetPt(l2l3jet.pt());
+	    
+	    if (JECup) { 
+	      try{unc = jecUnc->getUncertainty(true);}
+	      catch(...){ // catch all exceptions. Jet Uncertainty tool throws when binning out of range
+		std::cout << mLegend << "WARNING! Exception thrown by JetCorrectionUncertainty!" << std::endl;
+		std::cout << mLegend << "WARNING! Jet/MET will remain uncorrected." << std::endl;
+		unc = 0.0;
+	      }	    
+	      unc_pruned = 1 + sqrt(unc*unc + 0.02*0.02);
+	      unc = 1 + unc; 
 	    }
-	    unc = 1 - unc; 
-	  }	  
-        }
+	    else { 
+	      try{unc = jecUnc->getUncertainty(false);}
+	      catch(...){
+		std::cout << mLegend << "WARNING! Exception thrown by JetCorrectionUncertainty!" << std::endl;
+		std::cout << mLegend << "WARNING! Jet/MET will remain uncorrected." << std::endl;
+		unc = 0.0;
+	      }
+	      unc_pruned = 1 - sqrt(unc*unc + 0.02*0.02);
+	      unc = 1 - unc; 
+	    }	  
+	  }
+	}
 
 	if(corr*unc == 1.0) cout << "L2+L3 correction is 1.0" << endl;
-
+	
 	thePrunedMass   = corr*unc*(double)l2l3jet.userFloat("ak8PFJetsCHSPrunedMass");
-
 	theSoftDropMass = corr*unc*(double)l2l3jet.userFloat("ak8PFJetsCHSSoftDropMass");
 	
       }else{
@@ -571,6 +634,7 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * s
       
       theJetAK8PrunedMass  .push_back(thePrunedMass);
       theJetAK8SoftDropMass.push_back(theSoftDropMass);
+      theJetAK8PrunedMassWtagUncerts.push_back(thePrunedMass*ptscale_pruned*unc_pruned/unc);
       
       theJetAK8NjettinessTau1.push_back(theNjettinessTau1);
       theJetAK8NjettinessTau2.push_back(theNjettinessTau2);
@@ -684,6 +748,7 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * s
     SetValue("theJetAK8NHadEFrac", theJetAK8NHadEFrac); 
 
     SetValue("theJetAK8PrunedMass",   theJetAK8PrunedMass);
+    SetValue("theJetAK8PrunedMassWtagUncerts",   theJetAK8PrunedMassWtagUncerts);
     SetValue("theJetAK8SoftDropMass", theJetAK8SoftDropMass);
     
     SetValue("theJetAK8NjettinessTau1", theJetAK8NjettinessTau1);
