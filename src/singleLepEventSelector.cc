@@ -311,6 +311,8 @@ void singleLepEventSelector::BeginJob( std::map<std::string, edm::ParameterSet c
         mtPar["met_collection"]           = par[_key].getParameter<edm::InputTag>("met_collection");
 
         mbPar["doNewJEC"]                 = par[_key].getParameter<bool>         ("doNewJEC");
+        if (par[_key].exists("doAllJetSyst")) mbPar["doAllJetSyst"] = par[_key].getParameter<bool> ("doAllJetSyst");
+        else                                  mbPar["doAllJetSyst"] = false;
         mbPar["doLepJetCleaning"]         = par[_key].getParameter<bool>         ("doLepJetCleaning");
         if (par[_key].exists("CleanLooseLeptons")) mbPar["CleanLooseLeptons"] = par[_key].getParameter<bool> ("CleanLooseLeptons");
 	else                                       mbPar["CleanLooseLeptons"] = false;
@@ -1038,6 +1040,10 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
         mvAllJets.clear();
         mvCorrJetsWithBTags.clear();
 	mvSelCorrJets.clear();
+	mvCorrJets_jesup.clear();
+	mvCorrJets_jesdn.clear();
+	mvCorrJets_jerup.clear();
+	mvCorrJets_jerdn.clear();
         mvSelBtagJets.clear();
 
         // try to get earlier produced data (in a calc)
@@ -1054,6 +1060,10 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
 	    bool _cleaned = false;
 
 	    TLorentzVector jetP4;
+	    TLorentzVector jetP4_jesup;
+	    TLorentzVector jetP4_jesdn;
+	    TLorentzVector jetP4_jerup;
+	    TLorentzVector jetP4_jerdn;
 
 	    pat::Jet tmpJet = _ijet->correctedJet(0);
 	    pat::Jet corrJet = *_ijet;
@@ -1093,6 +1103,12 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
 				    tmpJet.setP4( tmpJet.p4() - muDaughters[muI]->p4() );
 				    if (mbPar["debug"]) std::cout << "  Cleaned Jet : pT = " << tmpJet.pt() << " eta = " << tmpJet.eta() << " phi = " << tmpJet.phi() << std::endl;
 				    jetP4 = correctJet(tmpJet, event, false, true);
+                                    if (mbPar["doAllJetSyst"]) {
+		                        jetP4_jesup = correctJet(tmpJet, event,false,true,1);
+		                        jetP4_jesdn = correctJet(tmpJet, event,false,true,2);
+		                        jetP4_jerup = correctJet(tmpJet, event,false,true,3);
+		                        jetP4_jerdn = correctJet(tmpJet, event,false,true,4);
+                                    }
 				    corrJet = correctJetReturnPatJet(tmpJet, event, false, true);
 				    if (mbPar["debug"]) std::cout << "Corrected Jet : pT = " << jetP4.Pt() << " eta = " << jetP4.Eta() << " phi = " << jetP4.Phi() << std::endl;
 			            _cleaned = true;
@@ -1146,6 +1162,12 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
 				    tmpJet.setP4( tmpJet.p4() - elDaughters[elI]->p4() );
 				    if (mbPar["debug"]) std::cout << "  Cleaned Jet : pT = " << tmpJet.pt() << " eta = " << tmpJet.eta() << " phi = " << tmpJet.phi() << std::endl;
 				    jetP4 = correctJet(tmpJet, event, false, true);
+                                    if (mbPar["doAllJetSyst"]) {
+		                        jetP4_jesup = correctJet(tmpJet, event,false,true,1);
+		                        jetP4_jesdn = correctJet(tmpJet, event,false,true,2);
+		                        jetP4_jerup = correctJet(tmpJet, event,false,true,3);
+		                        jetP4_jerdn = correctJet(tmpJet, event,false,true,4);
+                                    }
 				    corrJet = correctJetReturnPatJet(tmpJet, event, false, true);
 				    if (mbPar["debug"]) std::cout << "Corrected Jet : pT = " << jetP4.Pt() << " eta = " << jetP4.Eta() << " phi = " << jetP4.Phi() << std::endl;
 			            _cleaned = true;
@@ -1172,6 +1194,12 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
 	    }
 	    if (!_cleaned) {
                 jetP4 = correctJet(*_ijet, event);
+                if (mbPar["doAllJetSyst"]) {
+	            jetP4_jesup = correctJet(*_ijet, event,false,true,1);
+	            jetP4_jesdn = correctJet(*_ijet, event,false,true,2);
+	            jetP4_jerup = correctJet(*_ijet, event,false,true,3);
+	            jetP4_jerdn = correctJet(*_ijet, event,false,true,4);
+                }
 		corrJet = correctJetReturnPatJet(*_ijet, event);
             }
 
@@ -1212,6 +1240,18 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
                 ++_n_good_jets;
                 mvSelJets.push_back(edm::Ptr<pat::Jet>( mhJets, _n_jets)); 
 		mvSelCorrJets.push_back(corrJet);
+                if (mbPar["doAllJetSyst"]) {
+		    mvCorrJets_jesup.push_back(jetP4_jesup);
+		    mvCorrJets_jesdn.push_back(jetP4_jesdn);
+		    mvCorrJets_jerup.push_back(jetP4_jerup);
+		    mvCorrJets_jerdn.push_back(jetP4_jerdn);
+                }
+                else {
+		    mvCorrJets_jesup.push_back(jetP4);
+		    mvCorrJets_jesdn.push_back(jetP4);
+		    mvCorrJets_jerup.push_back(jetP4);
+		    mvCorrJets_jerdn.push_back(jetP4);
+                }
                 mvCorrJetsWithBTags.push_back(jetwithtag);
 
                 if (jetP4.Pt() > _leading_jet_pt) _leading_jet_pt = jetP4.Pt();                         
