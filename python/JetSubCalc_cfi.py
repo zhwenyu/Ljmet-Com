@@ -1,5 +1,5 @@
 import FWCore.ParameterSet.Config as cms
-
+import os
 # available bDiscrimiant:
 # - combinedInclusiveSecondaryVertexV2BJetTags
 # - combinedMVABJetTags
@@ -10,6 +10,8 @@ import FWCore.ParameterSet.Config as cms
 # - trackCountingHighPurBJetTags
 # - trackCountingHighEffBJetTags
 # - simpleSecondaryVertexHighPurBJetTags
+
+relBase = os.environ['CMSSW_BASE']
 
 JetSubCalc = cms.PSet(
                       slimmedJetColl     = cms.InputTag("slimmedJets"),
@@ -26,12 +28,16 @@ JetSubCalc = cms.PSet(
                       isMc = cms.bool(True),
                       JECup = cms.bool(False),
                       JECdown = cms.bool(False),
-                      MCL2JetParAK8 = cms.string('/uscms_data/d3/jmanagan/CMSSW_7_4_14/src/LJMet/Com/data/Summer15_25nsV2_MC_L2Relative_AK8PFchs.txt'),
-                      MCL3JetParAK8 = cms.string('/uscms_data/d3/jmanagan/CMSSW_7_4_14/src/LJMet/Com/data/Summer15_25nsV2_MC_L3Absolute_AK8PFchs.txt'),
-                      DataL2JetParAK8 = cms.string('/uscms_data/d3/jmanagan/CMSSW_7_4_14/src/LJMet/Com/data/Summer15_25nsV5_DATA_L2Relative_AK8PFchs.txt'),
-                      DataL3JetParAK8 = cms.string('/uscms_data/d3/jmanagan/CMSSW_7_4_14/src/LJMet/Com/data/Summer15_25nsV5_DATA_L3Absolute_AK8PFchs.txt'),
-                      DataResJetParAK8 = cms.string('/uscms_data/d3/jmanagan/CMSSW_7_4_14/src/LJMet/Com/data/Summer15_25nsV5_DATA_L2L3Residual_AK8PFchs.txt'),
-                      UncertaintyAK8 = cms.string('/uscms_data/d3/jmanagan/CMSSW_7_4_14/src/LJMet/Com/data/Summer15_25nsV7_DATA_Uncertainty_AK8PFchs.txt')           
+                      JERup = cms.bool(False),
+                      JERdown = cms.bool(False),
+                      MCL2JetParAK8 = cms.string(relBase+'/src/LJMet/Com/data/Spring16_25nsV6_MC_L2Relative_AK8PFchs.txt'),
+                      MCL3JetParAK8 = cms.string(relBase+'/src/LJMet/Com/data/Spring16_25nsV6_MC_L3Absolute_AK8PFchs.txt'),
+                      MCPTResAK8 = cms.string(relBase+'/src/LJMet/Com/data/Spring16_25nsV6_MC_PtResolution_AK8PFchs.txt'),
+                      MCSF = cms.string(relBase+'/src/LJMet/Com/data/Spring16_25nsV6_MC_SF_AK4PFchs.txt'),
+                      DataL2JetParAK8 = cms.string(relBase+'/src/LJMet/Com/data/Spring16_25nsV6_DATA_L2Relative_AK8PFchs.txt'),
+                      DataL3JetParAK8 = cms.string(relBase+'/src/LJMet/Com/data/Spring16_25nsV6_DATA_L3Absolute_AK8PFchs.txt'),
+                      DataResJetParAK8 = cms.string(relBase+'/src/LJMet/Com/data/Spring16_25nsV6_DATA_L2L3Residual_AK8PFchs.txt'),
+                      UncertaintyAK8 = cms.string(relBase+'/src/LJMet/Com/data/Spring16_25nsV6_DATA_Uncertainty_AK8PFchs.txt')           
                       )
 
 #######################################################################
