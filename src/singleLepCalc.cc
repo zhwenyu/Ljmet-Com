@@ -74,6 +74,7 @@ private:
     bool doElSCMETCorr;
     bool orlhew;
     bool saveLooseLeps;
+    bool doAllJetSyst;
     std::string basePDFname;
     std::string newPDFname;
 
@@ -195,6 +196,9 @@ int singleLepCalc::BeginJob()
     if (mPset.exists("saveLooseLeps")) saveLooseLeps = mPset.getParameter<bool>("saveLooseLeps");
     else                               saveLooseLeps = false;
 
+    if (mPset.exists("doAllJetSyst"))  doAllJetSyst = mPset.getParameter<bool>("doAllJetSyst");
+    else                               doAllJetSyst = false;
+
     return 0;
 }
 
@@ -202,6 +206,10 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
 {     // ----- Get objects from the selector -----
     std::vector<edm::Ptr<pat::Jet> >            const & vSelJets = selector->GetSelectedJets();
     std::vector<pat::Jet>                       const & vSelCorrJets = selector->GetSelectedCorrJets();
+    std::vector<TLorentzVector>                 const & vSelCorrJets_jesup = selector->GetSelectedCorrJets_jesup();
+    std::vector<TLorentzVector>                 const & vSelCorrJets_jesdn = selector->GetSelectedCorrJets_jesdn();
+    std::vector<TLorentzVector>                 const & vSelCorrJets_jerup = selector->GetSelectedCorrJets_jerup();
+    std::vector<TLorentzVector>                 const & vSelCorrJets_jerdn = selector->GetSelectedCorrJets_jerdn();
     std::vector<edm::Ptr<pat::Jet> >            const & vSelBtagJets = selector->GetSelectedBtagJets();
     std::vector<edm::Ptr<pat::Jet> >            const & vAllJets = selector->GetAllJets();
     std::vector<std::pair<TLorentzVector,bool>> const & vCorrBtagJets = selector->GetCorrJetsWithBTags();
@@ -855,9 +863,17 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
 
     //Four std::vector
     std::vector <double> AK8JetPt;
+    std::vector <double> AK8JetPt_jesup;
+    std::vector <double> AK8JetPt_jesdn;
+    std::vector <double> AK8JetPt_jerup;
+    std::vector <double> AK8JetPt_jerdn;
     std::vector <double> AK8JetEta;
     std::vector <double> AK8JetPhi;
     std::vector <double> AK8JetEnergy;
+    std::vector <double> AK8JetEnergy_jesup;
+    std::vector <double> AK8JetEnergy_jesdn;
+    std::vector <double> AK8JetEnergy_jerup;
+    std::vector <double> AK8JetEnergy_jerdn;
 
     std::vector <double> AK8JetCSV;
     //   std::vector <double> AK8JetRCN;       
@@ -882,8 +898,22 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
 	}
 	if(!looseJetID) continue;	
 
-        TLorentzVector lvak8 = selector->correctJet(*ijet, event,true);
+        if (doAllJetSyst) {
+            TLorentzVector lvak8_jesup = selector->correctJet(*ijet, event,true,false,1);
+            TLorentzVector lvak8_jesdn = selector->correctJet(*ijet, event,true,false,2);
+            TLorentzVector lvak8_jerup = selector->correctJet(*ijet, event,true,false,3);
+            TLorentzVector lvak8_jerdn = selector->correctJet(*ijet, event,true,false,4);
+            AK8JetPt_jesup     . push_back(lvak8_jesup.Pt());
+            AK8JetPt_jesdn     . push_back(lvak8_jesdn.Pt());
+            AK8JetPt_jerup     . push_back(lvak8_jerup.Pt());
+            AK8JetPt_jerdn     . push_back(lvak8_jerdn.Pt());
+            AK8JetEnergy_jesup     . push_back(lvak8_jesup.Energy());
+            AK8JetEnergy_jesdn     . push_back(lvak8_jesdn.Energy());
+            AK8JetEnergy_jerup     . push_back(lvak8_jerup.Energy());
+            AK8JetEnergy_jerdn     . push_back(lvak8_jerdn.Energy());
+        }
 
+        TLorentzVector lvak8 = selector->correctJet(*ijet, event,true);
         //Four std::vector
         AK8JetPt     . push_back(lvak8.Pt());
         AK8JetEta    . push_back(lvak8.Eta());
@@ -896,18 +926,34 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
  
     //Four std::vector
     SetValue("AK8JetPt"     , AK8JetPt);
+    SetValue("AK8JetPt_jesup"     , AK8JetPt_jesup);
+    SetValue("AK8JetPt_jesdn"     , AK8JetPt_jesdn);
+    SetValue("AK8JetPt_jerup"     , AK8JetPt_jerup);
+    SetValue("AK8JetPt_jerdn"     , AK8JetPt_jerdn);
     SetValue("AK8JetEta"    , AK8JetEta);
     SetValue("AK8JetPhi"    , AK8JetPhi);
     SetValue("AK8JetEnergy" , AK8JetEnergy);
+    SetValue("AK8JetEnergy_jesup"     , AK8JetEnergy_jesup);
+    SetValue("AK8JetEnergy_jesdn"     , AK8JetEnergy_jesdn);
+    SetValue("AK8JetEnergy_jerup"     , AK8JetEnergy_jerup);
+    SetValue("AK8JetEnergy_jerdn"     , AK8JetEnergy_jerdn);
 
     SetValue("AK8JetCSV"    , AK8JetCSV);
     //   SetValue("AK8JetRCN"    , AK8JetRCN);
     //Get AK4 Jets
     //Four std::vector
     std::vector <double> AK4JetPt;
+    std::vector <double> AK4JetPt_jesup;
+    std::vector <double> AK4JetPt_jesdn;
+    std::vector <double> AK4JetPt_jerup;
+    std::vector <double> AK4JetPt_jerdn;
     std::vector <double> AK4JetEta;
     std::vector <double> AK4JetPhi;
     std::vector <double> AK4JetEnergy;
+    std::vector <double> AK4JetEnergy_jesup;
+    std::vector <double> AK4JetEnergy_jesdn;
+    std::vector <double> AK4JetEnergy_jerup;
+    std::vector <double> AK4JetEnergy_jerdn;
 
     std::vector <int>    AK4JetBTag;
     std::vector <int>    AK4JetBTag_bSFup;
@@ -941,12 +987,58 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
       AK4HT += ii->pt(); 
     }
     
+    double AK4HT_jesup =.0;
+    double AK4HT_jesdn =.0;
+    double AK4HT_jerup =.0;
+    double AK4HT_jerdn =.0;
+    if (doAllJetSyst) {
+        for (std::vector<TLorentzVector>::const_iterator ii_jesup = vSelCorrJets_jesup.begin(); ii_jesup != vSelCorrJets_jesup.end(); ii_jesup++){
+          AK4JetPt_jesup     . push_back(ii_jesup->Pt());
+          AK4JetEnergy_jesup  . push_back(ii_jesup->Energy());
+          //HT
+          AK4HT_jesup += ii_jesup->Pt(); 
+        }
+    
+        for (std::vector<TLorentzVector>::const_iterator ii_jesdn = vSelCorrJets_jesdn.begin(); ii_jesdn != vSelCorrJets_jesdn.end(); ii_jesdn++){
+          AK4JetPt_jesdn     . push_back(ii_jesdn->Pt());
+          AK4JetEnergy_jesdn . push_back(ii_jesdn->Energy());
+          //HT
+          AK4HT_jesdn += ii_jesdn->Pt(); 
+        }
+    
+        for (std::vector<TLorentzVector>::const_iterator ii_jerup = vSelCorrJets_jerup.begin(); ii_jerup != vSelCorrJets_jerup.end(); ii_jerup++){
+          AK4JetPt_jerup     . push_back(ii_jerup->Pt());
+          AK4JetEnergy_jerup . push_back(ii_jerup->Energy());
+          //HT
+          AK4HT_jerup += ii_jerup->Pt(); 
+        }
+    
+        for (std::vector<TLorentzVector>::const_iterator ii_jerdn = vSelCorrJets_jerdn.begin(); ii_jerdn != vSelCorrJets_jerdn.end(); ii_jerdn++){
+          AK4JetPt_jerdn     . push_back(ii_jerdn->Pt());
+          AK4JetEnergy_jerdn . push_back(ii_jerdn->Energy());
+          //HT
+          AK4HT_jerdn += ii_jerdn->Pt(); 
+        }
+    }
+
     //Four std::vector
     SetValue("AK4JetPt"     , AK4JetPt);
+    SetValue("AK4JetPt_jesup"     , AK4JetPt_jesup);
+    SetValue("AK4JetPt_jesdn"     , AK4JetPt_jesdn);
+    SetValue("AK4JetPt_jerup"     , AK4JetPt_jerup);
+    SetValue("AK4JetPt_jerdn"     , AK4JetPt_jerdn);
     SetValue("AK4JetEta"    , AK4JetEta);
     SetValue("AK4JetPhi"    , AK4JetPhi);
     SetValue("AK4JetEnergy" , AK4JetEnergy);
+    SetValue("AK4JetEnergy_jesup"     , AK4JetEnergy_jesup);
+    SetValue("AK4JetEnergy_jesdn"     , AK4JetEnergy_jesdn);
+    SetValue("AK4JetEnergy_jerup"     , AK4JetEnergy_jerup);
+    SetValue("AK4JetEnergy_jerdn"     , AK4JetEnergy_jerdn);
     SetValue("AK4HT"        , AK4HT);
+    SetValue("AK4HT_jesup"     , AK4HT_jesup);
+    SetValue("AK4HT_jesdn"     , AK4HT_jesdn);
+    SetValue("AK4HT_jerup"     , AK4HT_jerup);
+    SetValue("AK4HT_jerdn"     , AK4HT_jerdn);
     SetValue("AK4JetBTag"   , AK4JetBTag);
     SetValue("AK4JetBTag_bSFup"   , AK4JetBTag_bSFup);
     SetValue("AK4JetBTag_bSFdn"   , AK4JetBTag_bSFdn);
@@ -960,41 +1052,62 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
     double _met = -9999.0;
     double _met_phi = -9999.0;
     // Corrected MET
-    double _corr_met = -9999.0;
-    double _corr_met_phi = -9999.0;
+    std::vector<double> _corr_met;
+    std::vector<double> _corr_met_phi;
 
     if(pMet.isNonnull() && pMet.isAvailable()) {
         _met = pMet->p4().pt();
         _met_phi = pMet->p4().phi();
             
-        TLorentzVector corrMET = selector->correctMet(*pMet, event);
+        for (unsigned int corri = 0; corri<5; corri++) {
 
-        if (doElSCMETCorr) {
-            TLorentzVector tmpPF, tmpSC;
-            edm::Handle< std::vector<pat::Electron> > mhElectrons;
-            event.getByLabel( elec_it, mhElectrons );
-            //std::cout<<"----------------------------"<<std::endl;
-            //std::cout<<"Orig MET: met="<<corrMET.Pt()<<", phi="<<corrMET.Phi()<<std::endl;
-            for (std::vector<pat::Electron>::const_iterator _iel = mhElectrons->begin(); _iel != mhElectrons->end(); _iel++){
-                tmpSC.SetPtEtaPhiE(_iel->superCluster()->energy()/TMath::CosH(_iel->superCluster()->eta()),_iel->superCluster()->eta(),_iel->superCluster()->phi(),_iel->superCluster()->energy());
-                //std::cout<<"SC vec: pt="<<tmpSC.Pt()<<", eta="<<tmpSC.Eta()<<", phi="<<tmpSC.Phi()<<", e="<<tmpSC.Energy()<<std::endl;
-                tmpPF.SetPtEtaPhiE(_iel->pt(),_iel->eta(),_iel->phi(),_iel->energy());
-                //std::cout<<"PF vec: pt="<<tmpPF.Pt()<<", eta="<<tmpPF.Eta()<<", phi="<<tmpPF.Phi()<<", e="<<tmpPF.Energy()<<std::endl;
-                if (tmpSC.Pt()==tmpPF.Pt()) continue;
-                corrMET += tmpPF - tmpSC;
-                //std::cout<<"Corr MET: met="<<corrMET.Pt()<<", phi="<<corrMET.Phi()<<std::endl;
+            if (!doAllJetSyst && corri>0) {
+                _corr_met.push_back(-9999.0);
+                _corr_met_phi.push_back(-9999.0);
+                continue;
             }
-        }
 
-        if(corrMET.Pt()>0) {
-            _corr_met = corrMET.Pt();
-            _corr_met_phi = corrMET.Phi();
+            TLorentzVector corrMET = selector->correctMet(*pMet, event, corri);
+    
+            if (doElSCMETCorr) {
+                TLorentzVector tmpPF, tmpSC;
+                edm::Handle< std::vector<pat::Electron> > mhElectrons;
+                event.getByLabel( elec_it, mhElectrons );
+                //std::cout<<"----------------------------"<<std::endl;
+                //std::cout<<"Orig MET: met="<<corrMET.Pt()<<", phi="<<corrMET.Phi()<<std::endl;
+                for (std::vector<pat::Electron>::const_iterator _iel = mhElectrons->begin(); _iel != mhElectrons->end(); _iel++){
+                    tmpSC.SetPtEtaPhiE(_iel->superCluster()->energy()/TMath::CosH(_iel->superCluster()->eta()),_iel->superCluster()->eta(),_iel->superCluster()->phi(),_iel->superCluster()->energy());
+                    //std::cout<<"SC vec: pt="<<tmpSC.Pt()<<", eta="<<tmpSC.Eta()<<", phi="<<tmpSC.Phi()<<", e="<<tmpSC.Energy()<<std::endl;
+                    tmpPF.SetPtEtaPhiE(_iel->pt(),_iel->eta(),_iel->phi(),_iel->energy());
+                    //std::cout<<"PF vec: pt="<<tmpPF.Pt()<<", eta="<<tmpPF.Eta()<<", phi="<<tmpPF.Phi()<<", e="<<tmpPF.Energy()<<std::endl;
+                    if (tmpSC.Pt()==tmpPF.Pt()) continue;
+                    corrMET += tmpPF - tmpSC;
+                    //std::cout<<"Corr MET: met="<<corrMET.Pt()<<", phi="<<corrMET.Phi()<<std::endl;
+                }
+            }
+    
+            if(corrMET.Pt()>0) {
+                _corr_met.push_back(corrMET.Pt());
+                _corr_met_phi.push_back(corrMET.Phi());
+            }
+            else{
+                _corr_met.push_back(-9999.0);
+                _corr_met_phi.push_back(-9999.0);
+            }
         }
     }
     SetValue("met", _met);
     SetValue("met_phi", _met_phi);
-    SetValue("corr_met", _corr_met);
-    SetValue("corr_met_phi", _corr_met_phi);
+    SetValue("corr_met", _corr_met[0]);
+    SetValue("corr_met_phi", _corr_met_phi[0]);
+    SetValue("corr_met_jesup", _corr_met[1]);
+    SetValue("corr_met_jesup_phi", _corr_met_phi[1]);
+    SetValue("corr_met_jesdn", _corr_met[2]);
+    SetValue("corr_met_jesdn_phi", _corr_met_phi[2]);
+    SetValue("corr_met_jerup", _corr_met[3]);
+    SetValue("corr_met_jerup_phi", _corr_met_phi[3]);
+    SetValue("corr_met_jerdn", _corr_met[4]);
+    SetValue("corr_met_jerdn_phi", _corr_met_phi[4]);
 
     double _metnohf = -9999.0;
     double _metnohf_phi = -9999.0;

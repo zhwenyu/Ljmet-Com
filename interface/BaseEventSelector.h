@@ -86,6 +86,10 @@ public:
     std::vector<edm::Ptr<pat::Jet>> const & GetSelectedJets() const { return mvSelJets; }
     std::vector<pat::Jet> const & GetSelectedCleanedJets() const { return mvSelJetsCleaned; }
     std::vector<pat::Jet> const & GetSelectedCorrJets() const { return mvSelCorrJets; }
+    std::vector<TLorentzVector> const & GetSelectedCorrJets_jesup() const { return mvCorrJets_jesup; }
+    std::vector<TLorentzVector> const & GetSelectedCorrJets_jesdn() const { return mvCorrJets_jesdn; }
+    std::vector<TLorentzVector> const & GetSelectedCorrJets_jerup() const { return mvCorrJets_jerup; }
+    std::vector<TLorentzVector> const & GetSelectedCorrJets_jerdn() const { return mvCorrJets_jerdn; }
     std::vector<edm::Ptr<pat::Jet>> const & GetLooseJets() const { return mvSelJets; }
     std::vector<edm::Ptr<pat::Jet>> const & GetSelectedBtagJets() const { return mvSelBtagJets; }
     std::vector<std::pair<TLorentzVector, bool>> const & GetCorrJetsWithBTags() const { return mvCorrJetsWithBTags; }
@@ -120,12 +124,12 @@ public:
     void SetCorrJetsWithBTags(std::vector<std::pair<TLorentzVector, bool>> & jets) { mvCorrJetsWithBTags = jets; }
     
     bool isJetTagged(const pat::Jet &jet, edm::EventBase const & event, bool applySF = true, int shiftflag = 0, bool subjetflag = false);
-    TLorentzVector correctJetForMet(const pat::Jet & jet, edm::EventBase const & event);
-    TLorentzVector correctJet(const pat::Jet & jet, edm::EventBase const & event, bool doAK8Corr = false, bool forceCorr = false);
-    pat::Jet correctJetReturnPatJet(const pat::Jet & jet, edm::EventBase const & event, bool doAK8Corr = false, bool forceCorr = false);
-    TLorentzVector correctMet(const pat::MET & met, edm::EventBase const & event, bool useHF = true);
-    TLorentzVector correctMet(const pat::MET & met, edm::EventBase const & event, std::vector<pat::Jet> jets, bool useHF = true);
-    TLorentzVector correctMet(const pat::MET & met, edm::EventBase const & event, std::vector<edm::Ptr<pat::Jet> > jets, bool useHF = true);
+    TLorentzVector correctJetForMet(const pat::Jet & jet, edm::EventBase const & event, unsigned int syst = 0);
+    TLorentzVector correctJet(const pat::Jet & jet, edm::EventBase const & event, bool doAK8Corr = false, bool forceCorr = false, unsigned int syst = 0);
+    pat::Jet correctJetReturnPatJet(const pat::Jet & jet, edm::EventBase const & event, bool doAK8Corr = false, bool forceCorr = false, unsigned int syst = 0);
+    TLorentzVector correctMet(const pat::MET & met, edm::EventBase const & event, unsigned int syst = 0, bool useHF = true);
+    TLorentzVector correctMet(const pat::MET & met, edm::EventBase const & event, std::vector<pat::Jet> jets, unsigned int syst = 0, bool useHF = true);
+    TLorentzVector correctMet(const pat::MET & met, edm::EventBase const & event, std::vector<edm::Ptr<pat::Jet> > jets, unsigned int syst = 0, bool useHF = true);
     double mvaValue(const pat::Electron & electron, edm::EventBase const & event);
     
 protected:
@@ -133,6 +137,10 @@ protected:
     std::vector<edm::Ptr<pat::Jet>> mvSelJets;
     std::vector<pat::Jet> mvSelJetsCleaned;
     std::vector<pat::Jet> mvSelCorrJets;
+    std::vector<TLorentzVector> mvCorrJets_jesup;
+    std::vector<TLorentzVector> mvCorrJets_jesdn;
+    std::vector<TLorentzVector> mvCorrJets_jerup;
+    std::vector<TLorentzVector> mvCorrJets_jerdn;
     std::vector<edm::Ptr<pat::Jet>> mvLooseJets;
     std::vector<std::pair<TLorentzVector, bool>> mvCorrJetsWithBTags;
     std::vector<edm::Ptr<pat::Jet>> mvSelBtagJets;
@@ -175,7 +183,6 @@ private:
     JME::JetResolution resolution;
     JME::JetResolution resolutionAK8;
     JME::JetResolutionScaleFactor resolution_SF;
-    Variation JERsystematic;
     JetCorrectionUncertainty *jecUnc;
     JetCorrectorParameters *L3JetPar;
     JetCorrectorParameters *L2JetPar;
