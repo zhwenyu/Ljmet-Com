@@ -1079,9 +1079,9 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
 	    if ( mbPar["doLepJetCleaning"] ){
 	      if (mbPar["debug"]) std::cout << "Checking Overlap" << std::endl;
 
-	      std::vector<reco::CandidatePtr> muDaughters;
 	      for(unsigned int imu = 0; imu < cleaningMuons.size(); imu++){
 		if ( deltaR(cleaningMuons[imu]->p4(),_ijet->p4()) < mdPar["LepJetDR"]) { //0.6 ){
+		  std::vector<reco::CandidatePtr> muDaughters;
 		  for ( unsigned int isrc = 0; isrc < cleaningMuons[imu]->numberOfSourceCandidatePtrs(); ++isrc ){
 		    if (cleaningMuons[imu]->sourceCandidatePtr(isrc).isAvailable()) {
 		      muDaughters.push_back( cleaningMuons[imu]->sourceCandidatePtr(isrc) );
@@ -1145,9 +1145,9 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
 		}
 		}*/
             
-	      std::vector<reco::CandidatePtr> elDaughters;
 	      for(unsigned int iel = 0; iel < cleaningElectrons.size(); iel++){
 		if ( deltaR(cleaningElectrons[iel]->p4(),_ijet->p4()) < mdPar["LepJetDR"]){ //0.6 ){
+		  std::vector<reco::CandidatePtr> elDaughters;
 		  for ( unsigned int isrc = 0; isrc < cleaningElectrons[iel]->numberOfSourceCandidatePtrs(); ++isrc ){
 		    if (cleaningElectrons[iel]->sourceCandidatePtr(isrc).isAvailable()) {
 		      elDaughters.push_back( cleaningElectrons[iel]->sourceCandidatePtr(isrc) );
