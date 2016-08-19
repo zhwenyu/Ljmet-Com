@@ -40,3 +40,8 @@ double getPFMiniIsolation_EffectiveArea(edm::Handle<pat::PackedCandidateCollecti
 			  double r_iso_min, double r_iso_max, double kt_scale,
 					bool use_pfweight,  bool charged_only, double rho);
 
+double getPFMiniIsolation_SUSY(edm::Handle<pat::PackedCandidateCollection> pfcands,
+			  const reco::Candidate* ptcl,  
+			  double r_iso_min, double r_iso_max, double kt_scale,
+					bool use_pfweight,  bool charged_only, double rho);
+
