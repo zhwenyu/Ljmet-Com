@@ -1,0 +1,235 @@
+Implemented in step1_80x:
+
+eee:
+        HLT_Ele17_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v
+        HLT_Ele17_Ele12_CaloIdL_TrackIdL_IsoVL_v
+
+        HLT_Ele16_Ele12_Ele8_CaloIdL_TrackIdL_v
+
+eem:
+        HLT_Ele17_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v
+        HLT_Ele17_Ele12_CaloIdL_TrackIdL_IsoVL_v
+
+        HLT_Mu8_TrkIsoVVL_Ele17_CaloIdL_TrackIdL_IsoVL_v
+        HLT_Mu17_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v
+
+        HLT_Mu8_DiEle12_CaloIdL_TrackIdL_v
+
+emm:
+        HLT_DoubleIsoMu17_eta2p1_v
+        HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_v
+        HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_v
+        HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ_v
+        HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_v
+        HLT_Mu17_Mu8_v
+        HLT_Mu17_Mu8_DZ_v
+        HLT_Mu17_Mu8_SameSign_DZ_v
+
+        HLT_Mu8_TrkIsoVVL_Ele17_CaloIdL_TrackIdL_IsoVL_v
+        HLT_Mu17_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v
+
+        HLT_DiMu9_Ele9_CaloIdL_TrackIdL_v
+
+mmm:
+
+        HLT_DoubleIsoMu17_eta2p1_v
+        HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_v
+        HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_v
+        HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ_v
+        HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_v
+        HLT_Mu17_Mu8_v
+        HLT_Mu17_Mu8_DZ_v
+        HLT_Mu17_Mu8_SameSign_DZ_v
+
+        HLT_TripleMu_12_10_5_v
+
+
+Based on categories:
+
+eee:
+        HLT_DoubleEle24_22_eta2p1_WPLoose_Gsf_v
+        HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v
+        HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_v
+        HLT_Ele17_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v
+        HLT_Ele17_Ele12_CaloIdL_TrackIdL_IsoVL_v
+
+        HLT_DoubleEle8_CaloIdM_TrackIdM_Mass8_PFHT300_v
+        HLT_DoubleEle8_CaloIdM_TrackIdM_Mass8_PFHT250_v
+
+        HLT_Ele16_Ele12_Ele8_CaloIdL_TrackIdL_v
+
+eem:
+        HLT_DoubleEle24_22_eta2p1_WPLoose_Gsf_v
+        HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v
+        HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_v
+        HLT_Ele17_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v
+        HLT_Ele17_Ele12_CaloIdL_TrackIdL_IsoVL_v
+
+        HLT_DoubleEle8_CaloIdM_TrackIdM_Mass8_PFHT300_v
+        HLT_DoubleEle8_CaloIdM_TrackIdM_Mass8_PFHT250_v
+
+        HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_v
+        HLT_Mu8_TrkIsoVVL_Ele17_CaloIdL_TrackIdL_IsoVL_v
+        HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v
+        HLT_Mu17_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v
+        HLT_Mu30_Ele30_CaloIdL_GsfTrkIdVL_v
+
+        HLT_Mu8_Ele8_CaloIdM_TrackIdM_Mass8_PFHT300_v
+        HLT_Mu8_Ele8_CaloIdM_TrackIdM_Mass8_PFHT250_v
+
+        HLT_Mu8_DiEle12_CaloIdL_TrackIdL_v
+
+emm:
+        HLT_DoubleIsoMu17_eta2p1_v
+        HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_v
+        HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_v
+        HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ_v
+        HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_v
+        HLT_Mu27_TkMu8_v
+        HLT_Mu30_TkMu11_v
+        HLT_Mu40_TkMu11_v
+        HLT_Mu17_Mu8_v
+        HLT_Mu17_Mu8_DZ_v
+        HLT_Mu17_Mu8_SameSign_DZ_v
+        HLT_Mu20_Mu10_v
+        HLT_Mu20_Mu10_DZ_v
+        HLT_Mu20_Mu10_SameSign_DZ_v
+
+        HLT_DoubleMu8_Mass8_PFHT300_v
+        HLT_DoubleMu8_Mass8_PFHT250_v
+
+        HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_v
+        HLT_Mu8_TrkIsoVVL_Ele17_CaloIdL_TrackIdL_IsoVL_v
+        HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v
+        HLT_Mu17_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v
+        HLT_Mu30_Ele30_CaloIdL_GsfTrkIdVL_v
+
+        HLT_Mu8_Ele8_CaloIdM_TrackIdM_Mass8_PFHT300_v
+        HLT_Mu8_Ele8_CaloIdM_TrackIdM_Mass8_PFHT250_v
+
+        HLT_DiMu9_Ele9_CaloIdL_TrackIdL_v
+
+mmm:
+
+        HLT_DoubleIsoMu17_eta2p1_v
+        HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_v
+        HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_v
+        HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ_v
+        HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_v
+        HLT_Mu27_TkMu8_v
+        HLT_Mu30_TkMu11_v
+        HLT_Mu40_TkMu11_v
+        HLT_Mu17_Mu8_v
+        HLT_Mu17_Mu8_DZ_v
+        HLT_Mu17_Mu8_SameSign_DZ_v
+        HLT_Mu20_Mu10_v1
+        HLT_Mu20_Mu10_DZ_v
+        HLT_Mu20_Mu10_SameSign_DZ_v
+
+        HLT_DoubleMu8_Mass8_PFHT300_v
+        HLT_DoubleMu8_Mass8_PFHT250_v
+
+        HLT_TripleMu_12_10_5_v
+
+
+
+
+Available in LJMet:
+
+
+    trigger_path_el = cms.vstring(        
+        'HLT_DoubleEle24_22_eta2p1_WPLoose_Gsf_v1',            'HLT_DoubleEle24_22_eta2p1_WPLoose_Gsf_v2',            'HLT_DoubleEle24_22_eta2p1_WPLoose_Gsf_v3',            'HLT_DoubleEle24_22_eta2p1_WPLoose_Gsf_v4',               
+        'HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v1',        'HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v2',        'HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v3',        'HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v4',        
+        'HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_v1',           'HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_v2',           'HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_v3',           'HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_v4',        
+        'HLT_Ele17_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v1',        'HLT_Ele17_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v2',        'HLT_Ele17_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v3',        'HLT_Ele17_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v4',        
+        'HLT_Ele17_Ele12_CaloIdL_TrackIdL_IsoVL_v1',           'HLT_Ele17_Ele12_CaloIdL_TrackIdL_IsoVL_v2',           'HLT_Ele17_Ele12_CaloIdL_TrackIdL_IsoVL_v3',           'HLT_Ele17_Ele12_CaloIdL_TrackIdL_IsoVL_v4',        
+        'HLT_DoubleEle8_CaloIdM_TrackIdM_Mass8_PFHT300_v1',    'HLT_DoubleEle8_CaloIdM_TrackIdM_Mass8_PFHT300_v2',    'HLT_DoubleEle8_CaloIdM_TrackIdM_Mass8_PFHT300_v3',    'HLT_DoubleEle8_CaloIdM_TrackIdM_Mass8_PFHT300_v4',    
+        'HLT_DoubleEle8_CaloIdM_TrackIdM_Mass8_PFHT250_v1',    'HLT_DoubleEle8_CaloIdM_TrackIdM_Mass8_PFHT250_v2',    'HLT_DoubleEle8_CaloIdM_TrackIdM_Mass8_PFHT250_v3',    'HLT_DoubleEle8_CaloIdM_TrackIdM_Mass8_PFHT250_v4',    
+        'HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_v1',   'HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_v2',   'HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_v3',   'HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_v4',   
+        'HLT_Mu8_TrkIsoVVL_Ele17_CaloIdL_TrackIdL_IsoVL_v1',   'HLT_Mu8_TrkIsoVVL_Ele17_CaloIdL_TrackIdL_IsoVL_v2',   'HLT_Mu8_TrkIsoVVL_Ele17_CaloIdL_TrackIdL_IsoVL_v3',   'HLT_Mu8_TrkIsoVVL_Ele17_CaloIdL_TrackIdL_IsoVL_v4',   
+        'HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v1',  'HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v2',  'HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v3',  'HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v4',  
+        'HLT_Mu17_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v1',  'HLT_Mu17_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v2',  'HLT_Mu17_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v3',  'HLT_Mu17_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v4',  
+        'HLT_Mu30_Ele30_CaloIdL_GsfTrkIdVL_v1',                'HLT_Mu30_Ele30_CaloIdL_GsfTrkIdVL_v2',                'HLT_Mu30_Ele30_CaloIdL_GsfTrkIdVL_v3',                'HLT_Mu30_Ele30_CaloIdL_GsfTrkIdVL_v4',                
+        'HLT_Mu8_Ele8_CaloIdM_TrackIdM_Mass8_PFHT300_v1',      'HLT_Mu8_Ele8_CaloIdM_TrackIdM_Mass8_PFHT300_v2',      'HLT_Mu8_Ele8_CaloIdM_TrackIdM_Mass8_PFHT300_v3',      'HLT_Mu8_Ele8_CaloIdM_TrackIdM_Mass8_PFHT300_v4',      
+        'HLT_Mu8_Ele8_CaloIdM_TrackIdM_Mass8_PFHT250_v1',      'HLT_Mu8_Ele8_CaloIdM_TrackIdM_Mass8_PFHT250_v2',      'HLT_Mu8_Ele8_CaloIdM_TrackIdM_Mass8_PFHT250_v3',      'HLT_Mu8_Ele8_CaloIdM_TrackIdM_Mass8_PFHT250_v4',      
+        'HLT_Ele16_Ele12_Ele8_CaloIdL_TrackIdL_v1',            'HLT_Ele16_Ele12_Ele8_CaloIdL_TrackIdL_v2',            'HLT_Ele16_Ele12_Ele8_CaloIdL_TrackIdL_v3',            'HLT_Ele16_Ele12_Ele8_CaloIdL_TrackIdL_v4',            
+        'HLT_Mu8_DiEle12_CaloIdL_TrackIdL_v1',                 'HLT_Mu8_DiEle12_CaloIdL_TrackIdL_v2',                 'HLT_Mu8_DiEle12_CaloIdL_TrackIdL_v3',                 'HLT_Mu8_DiEle12_CaloIdL_TrackIdL_v4',                 
+        'HLT_DiMu9_Ele9_CaloIdL_TrackIdL_v1',                  'HLT_DiMu9_Ele9_CaloIdL_TrackIdL_v2',                  'HLT_DiMu9_Ele9_CaloIdL_TrackIdL_v3',                  'HLT_DiMu9_Ele9_CaloIdL_TrackIdL_v4',                  
+        ),
+    trigger_path_mu = cms.vstring(
+        'HLT_DoubleIsoMu17_eta2p1_v1',                         'HLT_DoubleIsoMu17_eta2p1_v2',                         'HLT_DoubleIsoMu17_eta2p1_v3',                         'HLT_DoubleIsoMu17_eta2p1_v4',                        
+        'HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_v1',              'HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_v2',              'HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_v3',              'HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_v4',             
+        'HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_v1',                 'HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_v2',                 'HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_v3',                 'HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_v4',             
+        'HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ_v1',            'HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ_v2',            'HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ_v3',            'HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ_v4',           
+        'HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_v1',               'HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_v2',               'HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_v3',               'HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_v4',           
+        'HLT_Mu27_TkMu8_v1',                                   'HLT_Mu27_TkMu8_v2',                                   'HLT_Mu27_TkMu8_v3',                                   'HLT_Mu27_TkMu8_v4',                                 
+        'HLT_Mu30_TkMu11_v1',                                  'HLT_Mu30_TkMu11_v2',                                  'HLT_Mu30_TkMu11_v3',                                  'HLT_Mu30_TkMu11_v4',                                 
+        'HLT_Mu40_TkMu11_v1',                                  'HLT_Mu40_TkMu11_v2',                                  'HLT_Mu40_TkMu11_v3',                                  'HLT_Mu40_TkMu11_v4',                                 
+        'HLT_Mu17_Mu8_v1',                                     'HLT_Mu17_Mu8_v2',                                     'HLT_Mu17_Mu8_v3',                                     'HLT_Mu17_Mu8_v4',                           
+        'HLT_Mu17_Mu8_DZ_v1',                                  'HLT_Mu17_Mu8_DZ_v2',                                  'HLT_Mu17_Mu8_DZ_v3',                                  'HLT_Mu17_Mu8_DZ_v4',                           
+        'HLT_Mu17_Mu8_SameSign_DZ_v1',                         'HLT_Mu17_Mu8_SameSign_DZ_v2',                         'HLT_Mu17_Mu8_SameSign_DZ_v3',                         'HLT_Mu17_Mu8_SameSign_DZ_v4',                           
+        'HLT_Mu20_Mu10_v1',                                    'HLT_Mu20_Mu10_v2',                                    'HLT_Mu20_Mu10_v3',                                    'HLT_Mu20_Mu10_v4',                           
+        'HLT_Mu20_Mu10_DZ_v1',                                 'HLT_Mu20_Mu10_DZ_v2',                                 'HLT_Mu20_Mu10_DZ_v3',                                 'HLT_Mu20_Mu10_DZ_v4',                           
+        'HLT_Mu20_Mu10_SameSign_DZ_v1',                        'HLT_Mu20_Mu10_SameSign_DZ_v2',                        'HLT_Mu20_Mu10_SameSign_DZ_v3',                        'HLT_Mu20_Mu10_SameSign_DZ_v4',                           
+        'HLT_DoubleMu8_Mass8_PFHT300_v1',                      'HLT_DoubleMu8_Mass8_PFHT300_v2',                      'HLT_DoubleMu8_Mass8_PFHT300_v3',                      'HLT_DoubleMu8_Mass8_PFHT300_v4',                     
+        'HLT_DoubleMu8_Mass8_PFHT250_v1',                      'HLT_DoubleMu8_Mass8_PFHT250_v2',                      'HLT_DoubleMu8_Mass8_PFHT250_v3',                      'HLT_DoubleMu8_Mass8_PFHT250_v4',                     
+        'HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_v1',   'HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_v2',   'HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_v3',   'HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_v4',  
+        'HLT_Mu8_TrkIsoVVL_Ele17_CaloIdL_TrackIdL_IsoVL_v1',   'HLT_Mu8_TrkIsoVVL_Ele17_CaloIdL_TrackIdL_IsoVL_v2',   'HLT_Mu8_TrkIsoVVL_Ele17_CaloIdL_TrackIdL_IsoVL_v3',   'HLT_Mu8_TrkIsoVVL_Ele17_CaloIdL_TrackIdL_IsoVL_v4',  
+        'HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v1',  'HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v2',  'HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v3',  'HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v4', 
+        'HLT_Mu17_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v1',  'HLT_Mu17_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v2',  'HLT_Mu17_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v3',  'HLT_Mu17_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v4', 
+        'HLT_Mu30_Ele30_CaloIdL_GsfTrkIdVL_v1',                'HLT_Mu30_Ele30_CaloIdL_GsfTrkIdVL_v2',                'HLT_Mu30_Ele30_CaloIdL_GsfTrkIdVL_v3',                'HLT_Mu30_Ele30_CaloIdL_GsfTrkIdVL_v4',               
+        'HLT_Mu8_Ele8_CaloIdM_TrackIdM_Mass8_PFHT300_v1',      'HLT_Mu8_Ele8_CaloIdM_TrackIdM_Mass8_PFHT300_v2',      'HLT_Mu8_Ele8_CaloIdM_TrackIdM_Mass8_PFHT300_v3',      'HLT_Mu8_Ele8_CaloIdM_TrackIdM_Mass8_PFHT300_v4',     
+        'HLT_Mu8_Ele8_CaloIdM_TrackIdM_Mass8_PFHT250_v1',      'HLT_Mu8_Ele8_CaloIdM_TrackIdM_Mass8_PFHT250_v2',      'HLT_Mu8_Ele8_CaloIdM_TrackIdM_Mass8_PFHT250_v3',      'HLT_Mu8_Ele8_CaloIdM_TrackIdM_Mass8_PFHT250_v4',     
+        'HLT_Mu8_DiEle12_CaloIdL_TrackIdL_v1',                 'HLT_Mu8_DiEle12_CaloIdL_TrackIdL_v2',                 'HLT_Mu8_DiEle12_CaloIdL_TrackIdL_v3',                 'HLT_Mu8_DiEle12_CaloIdL_TrackIdL_v4',                 
+        'HLT_DiMu9_Ele9_CaloIdL_TrackIdL_v1',                  'HLT_DiMu9_Ele9_CaloIdL_TrackIdL_v2',                  'HLT_DiMu9_Ele9_CaloIdL_TrackIdL_v3',                  'HLT_DiMu9_Ele9_CaloIdL_TrackIdL_v4',                  
+        'HLT_TripleMu_12_10_5_v1',                             'HLT_TripleMu_12_10_5_v2',                             'HLT_TripleMu_12_10_5_v3',                             'HLT_TripleMu_12_10_5_v4',                             
+        ),
+
+
+    mctrigger_path_el = cms.vstring(        
+        'HLT_DoubleEle24_22_eta2p1_WPLoose_Gsf_v1',            'HLT_DoubleEle24_22_eta2p1_WPLoose_Gsf_v2',            'HLT_DoubleEle24_22_eta2p1_WPLoose_Gsf_v3',            'HLT_DoubleEle24_22_eta2p1_WPLoose_Gsf_v4',               
+        'HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v1',        'HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v2',        'HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v3',        'HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v4',        
+        'HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_v1',           'HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_v2',           'HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_v3',           'HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_v4',        
+        'HLT_Ele17_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v1',        'HLT_Ele17_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v2',        'HLT_Ele17_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v3',        'HLT_Ele17_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v4',        
+        'HLT_Ele17_Ele12_CaloIdL_TrackIdL_IsoVL_v1',           'HLT_Ele17_Ele12_CaloIdL_TrackIdL_IsoVL_v2',           'HLT_Ele17_Ele12_CaloIdL_TrackIdL_IsoVL_v3',           'HLT_Ele17_Ele12_CaloIdL_TrackIdL_IsoVL_v4',        
+        'HLT_DoubleEle8_CaloIdM_TrackIdM_Mass8_PFHT300_v1',    'HLT_DoubleEle8_CaloIdM_TrackIdM_Mass8_PFHT300_v2',    'HLT_DoubleEle8_CaloIdM_TrackIdM_Mass8_PFHT300_v3',    'HLT_DoubleEle8_CaloIdM_TrackIdM_Mass8_PFHT300_v4',    
+        'HLT_DoubleEle8_CaloIdM_TrackIdM_Mass8_PFHT250_v1',    'HLT_DoubleEle8_CaloIdM_TrackIdM_Mass8_PFHT250_v2',    'HLT_DoubleEle8_CaloIdM_TrackIdM_Mass8_PFHT250_v3',    'HLT_DoubleEle8_CaloIdM_TrackIdM_Mass8_PFHT250_v4',    
+        'HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_v1',   'HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_v2',   'HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_v3',   'HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_v4',   
+        'HLT_Mu8_TrkIsoVVL_Ele17_CaloIdL_TrackIdL_IsoVL_v1',   'HLT_Mu8_TrkIsoVVL_Ele17_CaloIdL_TrackIdL_IsoVL_v2',   'HLT_Mu8_TrkIsoVVL_Ele17_CaloIdL_TrackIdL_IsoVL_v3',   'HLT_Mu8_TrkIsoVVL_Ele17_CaloIdL_TrackIdL_IsoVL_v4',   
+        'HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v1',  'HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v2',  'HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v3',  'HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v4',  
+        'HLT_Mu17_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v1',  'HLT_Mu17_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v2',  'HLT_Mu17_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v3',  'HLT_Mu17_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v4',  
+        'HLT_Mu30_Ele30_CaloIdL_GsfTrkIdVL_v1',                'HLT_Mu30_Ele30_CaloIdL_GsfTrkIdVL_v2',                'HLT_Mu30_Ele30_CaloIdL_GsfTrkIdVL_v3',                'HLT_Mu30_Ele30_CaloIdL_GsfTrkIdVL_v4',                
+        'HLT_Mu8_Ele8_CaloIdM_TrackIdM_Mass8_PFHT300_v1',      'HLT_Mu8_Ele8_CaloIdM_TrackIdM_Mass8_PFHT300_v2',      'HLT_Mu8_Ele8_CaloIdM_TrackIdM_Mass8_PFHT300_v3',      'HLT_Mu8_Ele8_CaloIdM_TrackIdM_Mass8_PFHT300_v4',      
+        'HLT_Mu8_Ele8_CaloIdM_TrackIdM_Mass8_PFHT250_v1',      'HLT_Mu8_Ele8_CaloIdM_TrackIdM_Mass8_PFHT250_v2',      'HLT_Mu8_Ele8_CaloIdM_TrackIdM_Mass8_PFHT250_v3',      'HLT_Mu8_Ele8_CaloIdM_TrackIdM_Mass8_PFHT250_v4',      
+        'HLT_Ele16_Ele12_Ele8_CaloIdL_TrackIdL_v1',            'HLT_Ele16_Ele12_Ele8_CaloIdL_TrackIdL_v2',            'HLT_Ele16_Ele12_Ele8_CaloIdL_TrackIdL_v3',            'HLT_Ele16_Ele12_Ele8_CaloIdL_TrackIdL_v4',            
+        'HLT_Mu8_DiEle12_CaloIdL_TrackIdL_v1',                 'HLT_Mu8_DiEle12_CaloIdL_TrackIdL_v2',                 'HLT_Mu8_DiEle12_CaloIdL_TrackIdL_v3',                 'HLT_Mu8_DiEle12_CaloIdL_TrackIdL_v4',                 
+        'HLT_DiMu9_Ele9_CaloIdL_TrackIdL_v1',                  'HLT_DiMu9_Ele9_CaloIdL_TrackIdL_v2',                  'HLT_DiMu9_Ele9_CaloIdL_TrackIdL_v3',                  'HLT_DiMu9_Ele9_CaloIdL_TrackIdL_v4',                  
+        ),
+    mctrigger_path_mu = cms.vstring(
+        'HLT_DoubleIsoMu17_eta2p1_v1',                         'HLT_DoubleIsoMu17_eta2p1_v2',                         'HLT_DoubleIsoMu17_eta2p1_v3',                         'HLT_DoubleIsoMu17_eta2p1_v4',                        
+        'HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_v1',              'HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_v2',              'HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_v3',              'HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_v4',             
+        'HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_v1',                 'HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_v2',                 'HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_v3',                 'HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_v4',             
+        'HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ_v1',            'HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ_v2',            'HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ_v3',            'HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ_v4',           
+        'HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_v1',               'HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_v2',               'HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_v3',               'HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_v4',           
+        'HLT_Mu27_TkMu8_v1',                                   'HLT_Mu27_TkMu8_v2',                                   'HLT_Mu27_TkMu8_v3',                                   'HLT_Mu27_TkMu8_v4',                                 
+        'HLT_Mu30_TkMu11_v1',                                  'HLT_Mu30_TkMu11_v2',                                  'HLT_Mu30_TkMu11_v3',                                  'HLT_Mu30_TkMu11_v4',                                 
+        'HLT_Mu40_TkMu11_v1',                                  'HLT_Mu40_TkMu11_v2',                                  'HLT_Mu40_TkMu11_v3',                                  'HLT_Mu40_TkMu11_v4',                                 
+        'HLT_Mu17_Mu8_v1',                                     'HLT_Mu17_Mu8_v2',                                     'HLT_Mu17_Mu8_v3',                                     'HLT_Mu17_Mu8_v4',                           
+        'HLT_Mu17_Mu8_DZ_v1',                                  'HLT_Mu17_Mu8_DZ_v2',                                  'HLT_Mu17_Mu8_DZ_v3',                                  'HLT_Mu17_Mu8_DZ_v4',                           
+        'HLT_Mu17_Mu8_SameSign_DZ_v1',                         'HLT_Mu17_Mu8_SameSign_DZ_v2',                         'HLT_Mu17_Mu8_SameSign_DZ_v3',                         'HLT_Mu17_Mu8_SameSign_DZ_v4',                           
+        'HLT_Mu20_Mu10_v1',                                    'HLT_Mu20_Mu10_v2',                                    'HLT_Mu20_Mu10_v3',                                    'HLT_Mu20_Mu10_v4',                           
+        'HLT_Mu20_Mu10_DZ_v1',                                 'HLT_Mu20_Mu10_DZ_v2',                                 'HLT_Mu20_Mu10_DZ_v3',                                 'HLT_Mu20_Mu10_DZ_v4',                           
+        'HLT_Mu20_Mu10_SameSign_DZ_v1',                        'HLT_Mu20_Mu10_SameSign_DZ_v2',                        'HLT_Mu20_Mu10_SameSign_DZ_v3',                        'HLT_Mu20_Mu10_SameSign_DZ_v4',                           
+        'HLT_DoubleMu8_Mass8_PFHT300_v1',                      'HLT_DoubleMu8_Mass8_PFHT300_v2',                      'HLT_DoubleMu8_Mass8_PFHT300_v3',                      'HLT_DoubleMu8_Mass8_PFHT300_v4',                     
+        'HLT_DoubleMu8_Mass8_PFHT250_v1',                      'HLT_DoubleMu8_Mass8_PFHT250_v2',                      'HLT_DoubleMu8_Mass8_PFHT250_v3',                      'HLT_DoubleMu8_Mass8_PFHT250_v4',                     
+        'HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_v1',   'HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_v2',   'HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_v3',   'HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_v4',  
+        'HLT_Mu8_TrkIsoVVL_Ele17_CaloIdL_TrackIdL_IsoVL_v1',   'HLT_Mu8_TrkIsoVVL_Ele17_CaloIdL_TrackIdL_IsoVL_v2',   'HLT_Mu8_TrkIsoVVL_Ele17_CaloIdL_TrackIdL_IsoVL_v3',   'HLT_Mu8_TrkIsoVVL_Ele17_CaloIdL_TrackIdL_IsoVL_v4',  
+        'HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v1',  'HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v2',  'HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v3',  'HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v4', 
+        'HLT_Mu17_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v1',  'HLT_Mu17_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v2',  'HLT_Mu17_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v3',  'HLT_Mu17_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v4', 
+        'HLT_Mu30_Ele30_CaloIdL_GsfTrkIdVL_v1',                'HLT_Mu30_Ele30_CaloIdL_GsfTrkIdVL_v2',                'HLT_Mu30_Ele30_CaloIdL_GsfTrkIdVL_v3',                'HLT_Mu30_Ele30_CaloIdL_GsfTrkIdVL_v4',               
+        'HLT_Mu8_Ele8_CaloIdM_TrackIdM_Mass8_PFHT300_v1',      'HLT_Mu8_Ele8_CaloIdM_TrackIdM_Mass8_PFHT300_v2',      'HLT_Mu8_Ele8_CaloIdM_TrackIdM_Mass8_PFHT300_v3',      'HLT_Mu8_Ele8_CaloIdM_TrackIdM_Mass8_PFHT300_v4',     
+        'HLT_Mu8_Ele8_CaloIdM_TrackIdM_Mass8_PFHT250_v1',      'HLT_Mu8_Ele8_CaloIdM_TrackIdM_Mass8_PFHT250_v2',      'HLT_Mu8_Ele8_CaloIdM_TrackIdM_Mass8_PFHT250_v3',      'HLT_Mu8_Ele8_CaloIdM_TrackIdM_Mass8_PFHT250_v4',     
+        'HLT_Mu8_DiEle12_CaloIdL_TrackIdL_v1',                 'HLT_Mu8_DiEle12_CaloIdL_TrackIdL_v2',                 'HLT_Mu8_DiEle12_CaloIdL_TrackIdL_v3',                 'HLT_Mu8_DiEle12_CaloIdL_TrackIdL_v4',                 
+        'HLT_DiMu9_Ele9_CaloIdL_TrackIdL_v1',                  'HLT_DiMu9_Ele9_CaloIdL_TrackIdL_v2',                  'HLT_DiMu9_Ele9_CaloIdL_TrackIdL_v3',                  'HLT_DiMu9_Ele9_CaloIdL_TrackIdL_v4',                  
+        'HLT_TripleMu_12_10_5_v1',                             'HLT_TripleMu_12_10_5_v2',                             'HLT_TripleMu_12_10_5_v3',                             'HLT_TripleMu_12_10_5_v4',                             
+        ),
