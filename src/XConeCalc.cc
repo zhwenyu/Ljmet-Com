@@ -52,10 +52,11 @@ private:
   int 	XConeNumJets;
   double XConeBeta;
   bool usePFchs;
+  bool DEBUG;
 	
 };
 
-//static int reg = LjmetFactory::GetInstance()->Register(new XConeCalc(), "XConeCalc");
+static int reg = LjmetFactory::GetInstance()->Register(new XConeCalc(), "XConeCalc");
 
 
 XConeCalc::XConeCalc()
@@ -68,6 +69,7 @@ XConeCalc::~XConeCalc()
 
 int XConeCalc::BeginJob()
 {
+
     if (mPset.exists("packedPFCandColl")){ packedPFCandColl_it = mPset.getParameter<edm::InputTag>("packedPFCandidates");} //added by rizki
     else packedPFCandColl_it = edm::InputTag("packedPFCandidates"); //added by rizki
 
@@ -97,12 +99,19 @@ int XConeCalc::BeginJob()
 
     std::cout << "XConeCalc: usePFchs = " << usePFchs << std::endl;
 
+   // DEUG
+    if(mPset.exists("DEBUG")) DEBUG = mPset.getParameter<bool>("DEBUG");
+    else DEBUG = false; //default
+
+    std::cout << "XConeCalc: DEBUG = " << DEBUG << std::endl;
+
 
     return 0;
 }
 
 int XConeCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * selector)
 {
+
 	//Implementing XCone - start - Rizki
 	
 	std::vector<double> theXConeJetPt;
@@ -115,10 +124,10 @@ int XConeCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * se
    edm::Handle<std::vector<pat::PackedCandidate> > PFparticles;
    event.getByLabel(packedPFCandColl_it, PFparticles);
    
-//    cout << "-------------------------------------------------------------------------------------" << endl;
-//    cout << "Collecting PFparticles as Jet constituents" << endl;
-//    cout << "-------------------------------------------------------------------------------------" << endl;
-//    std::cout << "No. of PFparticles (All) : "<< PFparticles->size() << std::endl;
+   if(DEBUG)cout << "-------------------------------------------------------------------------------------" << endl;
+   if(DEBUG)cout << "Collecting PFparticles as Jet constituents" << endl;
+   if(DEBUG)cout << "-------------------------------------------------------------------------------------" << endl;
+   if(DEBUG)std::cout << "No. of PFparticles (All) : "<< PFparticles->size() << std::endl;
    int N_PF = 0;
    for (std::vector<pat::PackedCandidate>::const_iterator iPF = PFparticles->begin(); iPF != PFparticles->end(); iPF++) {
       int index = (int)(iPF-PFparticles->begin());
@@ -129,11 +138,11 @@ int XConeCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * se
       FJConstituents.push_back( fastjet::PseudoJet( iPF->px(), iPF->py(), iPF->pz(), iPF->energy() ) );
       N_PF++;
     }
-//    std::cout << "No. of PFparticles (as input to XCone): "<< N_PF << std::endl;
-// 
-//    cout << "-------------------------------------------------------------------------------------" << endl;
-//    cout << "Using the XCone Jet Algorithm" << endl;
-//    cout << "-------------------------------------------------------------------------------------" << endl;
+   if(DEBUG)std::cout << "No. of PFparticles (as input to XCone): "<< N_PF << std::endl;
+
+   if(DEBUG)cout << "-------------------------------------------------------------------------------------" << endl;
+   if(DEBUG)cout << "Using the XCone Jet Algorithm" << endl;
+   if(DEBUG)cout << "-------------------------------------------------------------------------------------" << endl;
 
    // define the plugins
    XConePlugin xcone_pluginA_beta1(XConeNumJets, XConeR, XConeBeta);
@@ -147,14 +156,14 @@ int XConeCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * se
    // and find the jets
    vector<PseudoJet> xcone_jetsA_beta1 = xcone_seqA_beta1.inclusive_jets();
 
-//     std::cout << "---- " << XConeNumJets <<" XCone Jets ---- R = "<< XConeR << std::endl;
+    if(DEBUG)std::cout << "---- " << XConeNumJets <<" XCone Jets ---- R = "<< XConeR << std::endl;
     for (std::vector<fastjet::PseudoJet>::const_iterator ijet = xcone_jetsA_beta1.begin(); ijet != xcone_jetsA_beta1.end(); ijet++) {
       int index = (int)(ijet-xcone_jetsA_beta1.begin());
-//       std::cout << "no. : " << index << std::endl;
-//       std::cout << "      " <<  ", Jet constituents      : "<< ijet->constituents().size() << std::endl;
-//       std::cout << "      " <<  ", Jet pt                : "<< ijet->pt() << std::endl;
-//       std::cout << "      " <<  ", Jet eta                : "<< ijet->eta() << std::endl;
-//       std::cout << "      " <<  ", Jet phi                : "<< ijet->phi() << std::endl;
+      if(DEBUG)std::cout << "no. : " << index << std::endl;
+      if(DEBUG)std::cout << "      " <<  ", Jet constituents      : "<< ijet->constituents().size() << std::endl;
+      if(DEBUG)std::cout << "      " <<  ", Jet pt                : "<< ijet->pt() << std::endl;
+      if(DEBUG)std::cout << "      " <<  ", Jet eta                : "<< ijet->eta() << std::endl;
+      if(DEBUG)std::cout << "      " <<  ", Jet phi                : "<< ijet->phi() << std::endl;
       
       theXConeJetPt     . push_back(ijet->pt());
       theXConeJetEta    . push_back(ijet->eta());

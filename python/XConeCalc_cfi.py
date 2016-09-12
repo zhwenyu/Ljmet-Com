@@ -6,4 +6,5 @@ XConeCalc = cms.PSet(
                       XConeNumJets		 = cms.int32(6),
                       XConeBeta			 = cms.double(2.0),
                       usePFchs			 = cms.bool(True),
+                      DEBUG			     = cms.bool(False),
                       )
