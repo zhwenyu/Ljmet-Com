@@ -46,7 +46,7 @@ sampleList=[
 	#Additionally for multilepton:
 	'WZTo3LNu_TuneCUETP8M1_13TeV-powheg-pythia8.txt',
 	'ZZTo4L_13TeV_powheg_pythia8.txt',
-	'WWW_4f_TuneCUETP8M1_13TeV-amcatnlo-pythia8.txt',
+	'WWW_4F_TuneCUETP8M1_13TeV-amcatnlo-pythia8.txt',
 	'WWZ_TuneCUETP8M1_13TeV-amcatnlo-pythia8.txt',
 	'WZZ_TuneCUETP8M1_13TeV-amcatnlo-pythia8.txt',
 	'ZZZ_TuneCUETP8M1_13TeV-amcatnlo-pythia8.txt',       
