@@ -139,26 +139,44 @@ int XConeCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * se
       N_PF++;
     }
    if(DEBUG)std::cout << "No. of PFparticles (as input to XCone): "<< N_PF << std::endl;
+   
+   //Things for NJettiness
+   double delta;
+   if (XConeBeta > 1) delta = 1/(XConeBeta - 1);
+   else delta = std::numeric_limits<int>::max(); // use winner take all
+   
+   double power;
+   power = 1.0/XConeBeta;
+   
+   // NJettiness
+   std::vector<double> tau_njettiness;
+   int Nmax = 20;
+   Njettiness _njettiness(OnePass_GenET_GenKT_Axes(delta, power, XConeR), XConeMeasure(XConeBeta, XConeR));
+   for(int N=0; N<Nmax;N++){
+	   tau_njettiness.push_back( _njettiness.getTau(N,FJConstituents) );
+	   //cout << "njettiness " <<" (N="<< N << ") = " << tau_njettiness.at(N) << endl; 	
+   }
+   SetValue("tau_njettiness",     tau_njettiness);
 
    if(DEBUG)cout << "-------------------------------------------------------------------------------------" << endl;
    if(DEBUG)cout << "Using the XCone Jet Algorithm" << endl;
    if(DEBUG)cout << "-------------------------------------------------------------------------------------" << endl;
 
    // define the plugins
-   XConePlugin xcone_pluginA_beta1(XConeNumJets, XConeR, XConeBeta);
+   XConePlugin xcone_pluginA(XConeNumJets, XConeR, XConeBeta);
 
    // and the jet definitions
-   JetDefinition xcone_jetDefA_beta1(&xcone_pluginA_beta1);
+   JetDefinition xcone_jetDefA(&xcone_pluginA);
 
    // and the cluster sequences
-   ClusterSequence xcone_seqA_beta1(FJConstituents, xcone_jetDefA_beta1);
+   ClusterSequence xcone_seqA(FJConstituents, xcone_jetDefA);
 
    // and find the jets
-   vector<PseudoJet> xcone_jetsA_beta1 = xcone_seqA_beta1.inclusive_jets();
+   vector<PseudoJet> xcone_jetsA = xcone_seqA.inclusive_jets();
 
     if(DEBUG)std::cout << "---- " << XConeNumJets <<" XCone Jets ---- R = "<< XConeR << std::endl;
-    for (std::vector<fastjet::PseudoJet>::const_iterator ijet = xcone_jetsA_beta1.begin(); ijet != xcone_jetsA_beta1.end(); ijet++) {
-      int index = (int)(ijet-xcone_jetsA_beta1.begin());
+    for (std::vector<fastjet::PseudoJet>::const_iterator ijet = xcone_jetsA.begin(); ijet != xcone_jetsA.end(); ijet++) {
+      int index = (int)(ijet-xcone_jetsA.begin());
       if(DEBUG)std::cout << "no. : " << index << std::endl;
       if(DEBUG)std::cout << "      " <<  ", Jet constituents      : "<< ijet->constituents().size() << std::endl;
       if(DEBUG)std::cout << "      " <<  ", Jet pt                : "<< ijet->pt() << std::endl;
