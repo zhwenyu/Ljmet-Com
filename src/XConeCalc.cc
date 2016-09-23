@@ -50,6 +50,8 @@ private:
   edm::InputTag packedPFCandColl_it; //added by rizki
   double XConeR;
   int 	XConeNumJets;
+  bool 	VarNumJets;
+  int XConeNumJets_optimal;
   double XConeBeta;
   bool usePFchs;
   bool DEBUG;
@@ -86,6 +88,13 @@ int XConeCalc::BeginJob()
 
     std::cout << "XConeCalc: XConeNumJets = " << XConeNumJets << std::endl;
 
+   // Turn on optimization based on tauDiv 
+    if(mPset.exists("VarNumJets")) VarNumJets = mPset.getParameter<bool>("VarNumJets");
+    else VarNumJets = true; 
+
+    std::cout << "XConeCalc: VarNumJets = " << VarNumJets << std::endl;
+    if(VarNumJets)std::cout << "XConeCalc: IGNORING XConeNumJets ! " << std::endl;
+
     
    // Define the jet finding plugins for beta = 1.0 , default is 2.0
     if(mPset.exists("XConeBeta")) XConeBeta = mPset.getParameter<double>("XConeBeta");
@@ -99,7 +108,7 @@ int XConeCalc::BeginJob()
 
     std::cout << "XConeCalc: usePFchs = " << usePFchs << std::endl;
 
-   // DEUG
+   // DEBUG
     if(mPset.exists("DEBUG")) DEBUG = mPset.getParameter<bool>("DEBUG");
     else DEBUG = false; //default
 
@@ -148,22 +157,74 @@ int XConeCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * se
    double power;
    power = 1.0/XConeBeta;
    
-   // NJettiness
-   std::vector<double> tau_njettiness;
-   int Nmax = 20;
+   //NJettiness Stuff - start   
+   const int Nmax = 20;
    Njettiness _njettiness(OnePass_GenET_GenKT_Axes(delta, power, XConeR), XConeMeasure(XConeBeta, XConeR));
+
+   //NJettiness nominal
+   std::vector<double> tau_njettiness;
+   double tau[Nmax];
    for(int N=0; N<Nmax;N++){
-	   tau_njettiness.push_back( _njettiness.getTau(N,FJConstituents) );
+	   tau[N] =  _njettiness.getTau(N,FJConstituents);
+	   tau_njettiness.push_back( tau[N] );
 	   //cout << "njettiness " <<" (N="<< N << ") = " << tau_njettiness.at(N) << endl; 	
    }
    SetValue("tau_njettiness",     tau_njettiness);
+
+   // NJettiness Diff
+   std::vector<double> tau_njettiness_diff;
+   double tauDiff[Nmax];
+   for(int N=0; N<Nmax;N++){
+	   if(N==0)tauDiff[N] =  0;
+	   if(N!=0)tauDiff[N] =  tau[N]-tau[N-1];
+	   tau_njettiness_diff.push_back( tauDiff[N] );
+	   //cout << "njettiness_diff " <<" (N="<< N << ") = " << tau_njettiness_diff.at(N) << endl; 	
+   }
+   SetValue("tau_njettiness_diff",     tau_njettiness_diff);
+
+   // NJettiness Div
+   std::vector<double> tau_njettiness_div;
+   double tauDiv[Nmax];
+   for(int N=0; N<Nmax;N++){
+	   if(N==0)tauDiv[N] =  0;
+	   if(N!=0)tauDiv[N] =  tau[N]/tau[N-1];
+	   tau_njettiness_div.push_back( tauDiv[N] );
+	   //cout << "njettiness_div " <<" (N="<< N << ") = " << tau_njettiness_div.at(N) << endl; 	
+   }
+   SetValue("tau_njettiness_div",     tau_njettiness_div);
+
+   //Finding tauDiv Mean
+   Double_t tauDiv_Tot=0;
+   Double_t tauDiv_Mean=0;		  
+   for(int N=1; N<Nmax;N++){ //start at N=1
+	   tauDiv_Tot = tauDiv_Tot+tauDiv[N];
+   }
+   tauDiv_Mean = tauDiv_Tot /(Nmax-1);
+   if(DEBUG)std::cout << "tauDiv_Mean = " << tauDiv_Mean << std::endl;
+   
+   //Finding N_opt
+   int param = 2; //x distance before y below threshold.
+   for(int N=Nmax-1; N>-1;N--){ //count from large N
+	   if((tauDiv[N]<=tauDiv_Mean)){
+		   XConeNumJets_optimal = N + param; //get value just before y is below mean
+		   if(DEBUG)std::cout << "XConeNumJets_optimal = " << XConeNumJets_optimal << std::endl;
+		   break;
+	   }
+   }
+
+   //NJettiness Stuff - end   
 
    if(DEBUG)cout << "-------------------------------------------------------------------------------------" << endl;
    if(DEBUG)cout << "Using the XCone Jet Algorithm" << endl;
    if(DEBUG)cout << "-------------------------------------------------------------------------------------" << endl;
 
    // define the plugins
-   XConePlugin xcone_pluginA(XConeNumJets, XConeR, XConeBeta);
+   
+   int N;
+   if(VarNumJets) N = XConeNumJets_optimal;
+   else N = XConeNumJets;
+   
+   XConePlugin xcone_pluginA(N, XConeR, XConeBeta);
 
    // and the jet definitions
    JetDefinition xcone_jetDefA(&xcone_pluginA);
