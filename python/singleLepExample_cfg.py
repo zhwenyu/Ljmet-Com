@@ -50,8 +50,12 @@ process.JetSubCalc.useL2L3Mass = cms.bool(True)
 process.JetSubCalc.isMc = cms.bool(condorIsMC)
 process.JetSubCalc.JECup = cms.bool(False)
 process.JetSubCalc.JECdown = cms.bool(False)
+process.JetSubCalc.JERup = cms.bool(False)
+process.JetSubCalc.JERdown = cms.bool(False)
 process.JetSubCalc.MCL2JetParAK8 = cms.string(relBase+'/src/LJMet/Com/data/Spring16_25nsV6_MC_L2Relative_AK8PFchs.txt')
 process.JetSubCalc.MCL3JetParAK8 = cms.string(relBase+'/src/LJMet/Com/data/Spring16_25nsV6_MC_L3Absolute_AK8PFchs.txt')
+process.JetSubCalc.MCPTResAK8 = cms.string(relBase+'/src/LJMet/Com/data/Spring16_25nsV6_MC_PtResolution_AK8PFchs.txt')
+process.JetSubCalc.MCSF = cms.string(relBase+'/src/LJMet/Com/data/Spring16_25nsV6_MC_SF_AK4PFchs.txt')
 process.JetSubCalc.DataL2JetParAK8 = cms.string(relBase+'/src/LJMet/Com/data/Spring16_25nsV6_DATA_L2Relative_AK8PFchs.txt')
 process.JetSubCalc.DataL3JetParAK8 = cms.string(relBase+'/src/LJMet/Com/data/Spring16_25nsV6_DATA_L3Absolute_AK8PFchs.txt')
 process.JetSubCalc.DataL2L3JetParAK8 = cms.string(relBase+'/src/LJMet/Com/data/Spring16_25nsV6_DATA_L2L3Residual_AK8PFchs.txt')
@@ -75,7 +79,7 @@ process.event_selector = cms.PSet(
     
     # Trigger cuts
     trigger_cut  = cms.bool(True),
-    dump_trigger = cms.bool(True),
+    dump_trigger = cms.bool(False),
 
     trigger_path_el = cms.vstring(
         'HLT_Ele27_eta2p1_WPLoose_Gsf_v1', 
@@ -110,11 +114,11 @@ process.event_selector = cms.PSet(
     
     # Jet cuts
     jet_cuts                 = cms.bool(True),
-    jet_minpt                = cms.double(30.0),
+    jet_minpt                = cms.double(0.0),
     jet_maxeta               = cms.double(5.0),
     min_jet                  = cms.int32(2),
     max_jet                  = cms.int32(4000),
-    leading_jet_pt           = cms.double(30.0),
+    leading_jet_pt           = cms.double(0.0),
 
     # muon cuts
     muon_cuts                = cms.bool(True),
@@ -238,11 +242,12 @@ process.event_selector = cms.PSet(
 #
 
 process.inputs = cms.PSet (
-    nEvents    = cms.int32(5000),
+    nEvents    = cms.int32(1000),
     skipEvents = cms.int32(0),
     lumisToProcess = CfgTypes.untracked(CfgTypes.VLuminosityBlockRange()),
     fileNames  = cms.vstring(
        'root://eoscms.cern.ch//store/mc/RunIISpring16MiniAODv2/TprimeTprime_M-800_TuneCUETP8M1_13TeV-madgraph-pythia8/MINIAODSIM/PUSpring16RAWAODSIM_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/70000/0424F3F9-B425-E611-B483-02163E0135B1.root',
+       #'testTprimeMiniAOD.root',
         )
     )
 
