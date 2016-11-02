@@ -28,9 +28,9 @@ badrootfiles = []
 
 for s in os.listdir(dirpre):
     print s
-    if (not s.endswith('UP') and not s.endswith('DOWN')): continue
+    #if (not s.endswith('UP') and not s.endswith('DOWN')): continue
     #if (s.startswith('Single')): continue
-    #if (not (s.startswith('Wprime') and s.endswith('Right'))): continue
+    if (not (s.startswith('Wprime')) or ('Right' in s)): continue
     #if (not (s=='Wprime1500Right' or s=='Wprime2000Right' or s=='Wprime2500Right')): continue
     Dir=dirpre+s
     for f in os.listdir(Dir):
