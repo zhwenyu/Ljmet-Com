@@ -356,6 +356,7 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
     std::vector <double> elRelIso;
     std::vector <double> elMiniIsoEA;
     std::vector <double> elMiniIsoDB;
+    std::vector <double> elMiniIsoSUSY;
     std::vector <double> elDxy;
     std::vector <int>    elNotConversion;
     std::vector <int>    elChargeConsistent;
@@ -592,6 +593,7 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
 	//add miniIso
 	elMiniIsoEA.push_back(getPFMiniIsolation_EffectiveArea(packedPFCands, dynamic_cast<const reco::Candidate *>(iel->get()),0.05, 0.2, 10., false, false,myRhoJetsNC));
 	elMiniIsoDB.push_back(getPFMiniIsolation_DeltaBeta(packedPFCands, dynamic_cast<const reco::Candidate *>(iel->get()), 0.05, 0.2, 10., false));
+	elMiniIsoSUSY.push_back(getPFMiniIsolation_SUSY(packedPFCands, dynamic_cast<const reco::Candidate *>(iel->get()),0.05, 0.2, 10., false, false,myRhoJetsNC));
 
 
 	//Trigger Matching - store 4-std::vector and filter information for all trigger objects deltaR matched to electrons
@@ -719,6 +721,7 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
     SetValue("elQuality", elQuality);
     SetValue("elMiniIsoEA",elMiniIsoEA);
     SetValue("elMiniIsoDB",elMiniIsoDB);
+    SetValue("elMiniIsoSUSY",elMiniIsoSUSY);
     //this value not specific to electrons but we set it here
     SetValue("rhoNC",_rhoNC);
 
@@ -787,6 +790,7 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
     std::vector <double> muRelIso;
     std::vector <double> muMiniIsoEA;
     std::vector <double> muMiniIsoDB;
+    std::vector <double> muMiniIsoSUSY;
     
     std::vector <int> muNValMuHits;
     std::vector <int> muNMatchedStations;
@@ -878,6 +882,7 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
             //get miniIso
 	    muMiniIsoEA.push_back(getPFMiniIsolation_EffectiveArea(packedPFCands, dynamic_cast<const reco::Candidate *>(imu->get()),0.05, 0.2, 10., false, false,myRhoJetsNC));
 	    muMiniIsoDB.push_back(getPFMiniIsolation_DeltaBeta(packedPFCands, dynamic_cast<const reco::Candidate *>(imu->get()), 0.05, 0.2, 10., false));            
+	    muMiniIsoSUSY.push_back(getPFMiniIsolation_SUSY(packedPFCands, dynamic_cast<const reco::Candidate *>(imu->get()),0.05, 0.2, 10., false, false,myRhoJetsNC));
 	    float musip3d;
 	    pat::Muon::IpType muIP3d = (pat::Muon::IpType) 1;
             //IP: for some reason this is with respect to the first vertex in the collection
@@ -1024,6 +1029,7 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
     SetValue("muRelIso" , muRelIso);
     SetValue("muMiniIsoEA", muMiniIsoEA);
     SetValue("muMiniIsoDB", muMiniIsoDB);
+    SetValue("muMiniIsoSUSY", muMiniIsoSUSY);
 
     SetValue("muNValMuHits"       , muNValMuHits);
     SetValue("muNMatchedStations" , muNMatchedStations);
