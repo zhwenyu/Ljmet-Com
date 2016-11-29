@@ -131,6 +131,7 @@ public:
     TLorentzVector correctMet(const pat::MET & met, edm::EventBase const & event, std::vector<pat::Jet> jets, unsigned int syst = 0, bool useHF = true);
     TLorentzVector correctMet(const pat::MET & met, edm::EventBase const & event, std::vector<edm::Ptr<pat::Jet> > jets, unsigned int syst = 0, bool useHF = true);
     double mvaValue(const pat::Electron & electron, edm::EventBase const & event);
+    double mvaValue_alt(const pat::Electron & electron, edm::EventBase const & event);
     
 protected:
     std::vector<edm::Ptr<pat::Jet>> mvAllJets;
@@ -198,6 +199,9 @@ private:
     MVAElectronVars allMVAVars;
     TMVA::Reader tmpTMVAReader_EB;
     TMVA::Reader tmpTMVAReader_EE;
+    MVAElectronVars allMVAVars_alt;
+    TMVA::Reader tmpTMVAReader_EB_alt;
+    TMVA::Reader tmpTMVAReader_EE_alt;
     
     TRandom3 JERrand;
     

@@ -157,6 +157,14 @@ void BaseEventSelector::BeginJob(std::map<std::string, edm::ParameterSet const >
                 mvsPar["ElMVAweightFiles"].push_back("../weights/EIDmva_EB2_10_oldNonTrigSpring15_ConvVarCwoBoolean_TMVA412_FullStatLowPt_PairNegWeightsGlobal_BDT.weights.xml");
                 mvsPar["ElMVAweightFiles"].push_back("../weights/EIDmva_EE_10_oldNonTrigSpring15_ConvVarCwoBoolean_TMVA412_FullStatLowPt_PairNegWeightsGlobal_BDT.weights.xml");
             }
+            if ( par[_key].exists("ElMVAweightFiles_alt") )
+                mvsPar["ElMVAweightFiles_alt"] = par[_key].getParameter<std::vector<std::string> >("ElMVAweightFiles");
+            if (mvsPar["ElMVAweightFiles_alt"].size()!=3) {
+                mvsPar["ElMVAweightFiles_alt"].clear();
+                mvsPar["ElMVAweightFiles_alt"].push_back("../weights/electronID_mva_Spring16_GeneralPurpose_V1_EB1_10.weights.xml");
+                mvsPar["ElMVAweightFiles_alt"].push_back("../weights/electronID_mva_Spring16_GeneralPurpose_V1_EB2_10.weights.xml");
+                mvsPar["ElMVAweightFiles_alt"].push_back("../weights/electronID_mva_Spring16_GeneralPurpose_V1_EE_10.weights.xml");
+            }
             // these are for 25ns, and are up-to-date as of Sep 24 2015
             // this needs to be checked periodically, as well as the list of variables for the MVA
             // look here: https://github.com/cms-sw/cmssw/blob/CMSSW_7_4_X/RecoEgamma/ElectronIdentification/plugins/ElectronMVAEstimatorRun2Spring15NonTrig.cc
@@ -330,6 +338,86 @@ void BaseEventSelector::BeginJob(std::map<std::string, edm::ParameterSet const >
         tmpTMVAReader_EB.BookMVA( "Spring15_V1_EB1",  mvsPar["ElMVAweightFiles"].at(0) );
         tmpTMVAReader_EB.BookMVA( "Spring15_V1_EB2",  mvsPar["ElMVAweightFiles"].at(1) );
         tmpTMVAReader_EE.BookMVA(  "Spring15_V1_EE",   mvsPar["ElMVAweightFiles"].at(2) );
+
+        //----alt----
+
+        tmpTMVAReader_EB_alt.SetOptions("!Color:Silent:!Error");
+        tmpTMVAReader_EE_alt.SetOptions("!Color:Silent:!Error");
+
+        // Pure ECAL -> shower shapes
+        tmpTMVAReader_EB_alt.AddVariable("ele_oldsigmaietaieta", &allMVAVars_alt.see);
+        tmpTMVAReader_EB_alt.AddVariable("ele_oldsigmaiphiiphi", &allMVAVars_alt.spp);
+        tmpTMVAReader_EB_alt.AddVariable("ele_oldcircularity",   &allMVAVars_alt.OneMinusE1x5E5x5);
+        tmpTMVAReader_EB_alt.AddVariable("ele_oldr9",            &allMVAVars_alt.R9);
+        tmpTMVAReader_EB_alt.AddVariable("ele_scletawidth",      &allMVAVars_alt.etawidth);
+        tmpTMVAReader_EB_alt.AddVariable("ele_sclphiwidth",      &allMVAVars_alt.phiwidth);
+        tmpTMVAReader_EB_alt.AddVariable("ele_oldhe",               &allMVAVars_alt.HoE);
+        
+        //Pure tracking variables
+        tmpTMVAReader_EB_alt.AddVariable("ele_kfhits",           &allMVAVars_alt.kfhits);
+        tmpTMVAReader_EB_alt.AddVariable("ele_kfchi2",           &allMVAVars_alt.kfchi2);
+        tmpTMVAReader_EB_alt.AddVariable("ele_gsfchi2",        &allMVAVars_alt.gsfchi2);
+      
+        // Energy matching
+        tmpTMVAReader_EB_alt.AddVariable("ele_fbrem",           &allMVAVars_alt.fbrem);
+      
+        tmpTMVAReader_EB_alt.AddVariable("ele_gsfhits",         &allMVAVars_alt.gsfhits);
+        tmpTMVAReader_EB_alt.AddVariable("ele_expected_inner_hits",             &allMVAVars_alt.expectedMissingInnerHits);
+        tmpTMVAReader_EB_alt.AddVariable("ele_conversionVertexFitProbability",  &allMVAVars_alt.convVtxFitProbability);
+      
+        tmpTMVAReader_EB_alt.AddVariable("ele_ep",              &allMVAVars_alt.EoP);
+        tmpTMVAReader_EB_alt.AddVariable("ele_eelepout",        &allMVAVars_alt.eleEoPout);
+        tmpTMVAReader_EB_alt.AddVariable("ele_IoEmIop",         &allMVAVars_alt.IoEmIoP);
+        
+        // Geometrical matchings
+        tmpTMVAReader_EB_alt.AddVariable("ele_deltaetain",      &allMVAVars_alt.deta);
+        tmpTMVAReader_EB_alt.AddVariable("ele_deltaphiin",      &allMVAVars_alt.dphi);
+        tmpTMVAReader_EB_alt.AddVariable("ele_deltaetaseed",    &allMVAVars_alt.detacalo);
+
+        // Spectator variables  
+        tmpTMVAReader_EB_alt.AddVariable("ele_pt",              &allMVAVars_alt.pt);
+        tmpTMVAReader_EB_alt.AddVariable("scl_eta",             &allMVAVars_alt.SCeta);
+      
+        // Pure ECAL -> shower shapes
+        tmpTMVAReader_EE_alt.AddVariable("ele_oldsigmaietaieta", &allMVAVars_alt.see);
+        tmpTMVAReader_EE_alt.AddVariable("ele_oldsigmaiphiiphi", &allMVAVars_alt.spp);
+        tmpTMVAReader_EE_alt.AddVariable("ele_oldcircularity",   &allMVAVars_alt.OneMinusE1x5E5x5);
+        tmpTMVAReader_EE_alt.AddVariable("ele_oldr9",            &allMVAVars_alt.R9);
+        tmpTMVAReader_EE_alt.AddVariable("ele_scletawidth",      &allMVAVars_alt.etawidth);
+        tmpTMVAReader_EE_alt.AddVariable("ele_sclphiwidth",      &allMVAVars_alt.phiwidth);
+        tmpTMVAReader_EE_alt.AddVariable("ele_oldhe",            &allMVAVars_alt.HoE);
+        
+        //Pure tracking variables
+        tmpTMVAReader_EE_alt.AddVariable("ele_kfhits",           &allMVAVars_alt.kfhits);
+        tmpTMVAReader_EE_alt.AddVariable("ele_kfchi2",           &allMVAVars_alt.kfchi2);
+        tmpTMVAReader_EE_alt.AddVariable("ele_gsfchi2",        &allMVAVars_alt.gsfchi2);
+      
+        // Energy matching
+        tmpTMVAReader_EE_alt.AddVariable("ele_fbrem",           &allMVAVars_alt.fbrem);
+      
+        tmpTMVAReader_EE_alt.AddVariable("ele_gsfhits",         &allMVAVars_alt.gsfhits);
+        tmpTMVAReader_EE_alt.AddVariable("ele_expected_inner_hits",             &allMVAVars_alt.expectedMissingInnerHits);
+        tmpTMVAReader_EE_alt.AddVariable("ele_conversionVertexFitProbability",  &allMVAVars_alt.convVtxFitProbability);
+      
+        tmpTMVAReader_EE_alt.AddVariable("ele_ep",              &allMVAVars_alt.EoP);
+        tmpTMVAReader_EE_alt.AddVariable("ele_eelepout",        &allMVAVars_alt.eleEoPout);
+        tmpTMVAReader_EE_alt.AddVariable("ele_IoEmIop",         &allMVAVars_alt.IoEmIoP);
+        
+        // Geometrical matchings
+        tmpTMVAReader_EE_alt.AddVariable("ele_deltaetain",      &allMVAVars_alt.deta);
+        tmpTMVAReader_EE_alt.AddVariable("ele_deltaphiin",      &allMVAVars_alt.dphi);
+        tmpTMVAReader_EE_alt.AddVariable("ele_deltaetaseed",    &allMVAVars_alt.detacalo);
+
+        // Spectator variables  
+        tmpTMVAReader_EE_alt.AddVariable("ele_pt",              &allMVAVars_alt.pt);
+        tmpTMVAReader_EE_alt.AddVariable("scl_eta",             &allMVAVars_alt.SCeta);
+      
+        // Endcap only variables
+        tmpTMVAReader_EE_alt.AddVariable("ele_psEoverEraw",    &allMVAVars_alt.PreShowerOverRaw);
+
+        tmpTMVAReader_EB_alt.BookMVA( "Spring16_V1_EB1",  mvsPar["ElMVAweightFiles_alt"].at(0) );
+        tmpTMVAReader_EB_alt.BookMVA( "Spring16_V1_EB2",  mvsPar["ElMVAweightFiles_alt"].at(1) );
+        tmpTMVAReader_EE_alt.BookMVA(  "Spring16_V1_EE",   mvsPar["ElMVAweightFiles_alt"].at(2) );
     }
  
 }
@@ -1021,7 +1109,7 @@ double BaseEventSelector::mvaValue(const pat::Electron & electron, edm::EventBas
     allMVAVars.R9             = electron.full5x5_r9();
     allMVAVars.etawidth       = electron.superCluster()->etaWidth();
     allMVAVars.phiwidth       = electron.superCluster()->phiWidth();
-    allMVAVars.HoE            = electron.hadronicOverEm();
+    allMVAVars.HoE            = electron.full5x5_hcalOverEcal();
     // Endcap only variables
     allMVAVars.PreShowerOverRaw  = electron.superCluster()->preshowerEnergy() / electron.superCluster()->rawEnergy();
   
@@ -1029,6 +1117,10 @@ double BaseEventSelector::mvaValue(const pat::Electron & electron, edm::EventBas
     // to pat::Electron, it is not accessible from the pointer to reco::GsfElectron.
     // This behavior is reported and is expected to change in the future (post-7.4.5 some time).
     reco::TrackRef myTrackRef = electron.closestCtfTrackRef();
+    const pat::Electron * elePatPtr = dynamic_cast<const pat::Electron *>(&electron);
+    // Check if this is really a pat::Electron, and if yes, get the track ref from this new
+    // pointer instead
+    if( elePatPtr != NULL ) myTrackRef = elePatPtr->closestCtfTrackRef();
     bool validKF = (myTrackRef.isAvailable() && (myTrackRef.isNonnull()) );  
   
     //Pure tracking variables
@@ -1039,7 +1131,7 @@ double BaseEventSelector::mvaValue(const pat::Electron & electron, edm::EventBas
     // Energy matching
     allMVAVars.fbrem           = electron.fbrem();
   
-    allMVAVars.gsfhits         = electron.gsfTrack()->found();
+    allMVAVars.gsfhits         = electron.gsfTrack()->hitPattern().trackerLayersWithMeasurement();
     allMVAVars.expectedMissingInnerHits = electron.gsfTrack()->hitPattern().numberOfHits(reco::HitPattern::MISSING_INNER_HITS);
   
     reco::ConversionRef conv_ref = ConversionTools::matchedConversion(electron, conversions, beamspot.position());
@@ -1053,7 +1145,7 @@ double BaseEventSelector::mvaValue(const pat::Electron & electron, edm::EventBas
   
     allMVAVars.EoP             = electron.eSuperClusterOverP();
     allMVAVars.eleEoPout       = electron.eEleClusterOverPout();
-    allMVAVars.IoEmIoP         = (1.0/electron.ecalEnergy()) - (1.0 / electron.p());
+    allMVAVars.IoEmIoP         = (1.0/electron.ecalEnergy()) - (1.0 / electron.trackMomentumAtVtx().R() );
   
     // Geometrical matchings
     allMVAVars.deta            = electron.deltaEtaSuperClusterTrackAtVtx();
@@ -1100,6 +1192,109 @@ double BaseEventSelector::mvaValue(const pat::Electron & electron, edm::EventBas
     if (fabs(allMVAVars.SCeta)<=0.8) cutValue = tmpTMVAReader_EB.EvaluateMVA( "Spring15_V1_EB1" );
     else if (fabs(allMVAVars.SCeta)<=1.479) cutValue = tmpTMVAReader_EB.EvaluateMVA( "Spring15_V1_EB2" );
     else cutValue = tmpTMVAReader_EE.EvaluateMVA( "Spring15_V1_EE" );
+    //std::cout<<"cutValue = "<<cutValue<<std::endl;
+
+    return cutValue;	
+}
+double BaseEventSelector::mvaValue_alt(const pat::Electron & electron, edm::EventBase const & event)
+{
+       
+    edm::Handle<std::vector<reco::Vertex> > pvtxHandle;
+    event.getByLabel( mtPar["pv_collection"], pvtxHandle);
+    Int_t PVsize = pvtxHandle->size();
+    if ( PVsize > 0 ) {
+    } else {
+        throw cms::Exception("InvalidInput") << " There needs to be at least one primary vertex in the event." << std::endl;
+    }
+    
+    edm::Handle<reco::ConversionCollection> conversions;
+    edm::InputTag convLabel_ ("reducedEgamma:reducedConversions");
+    event.getByLabel(convLabel_, conversions);
+    edm::Handle<reco::BeamSpot> bsHandle;
+    edm::InputTag bsLabel_ ("offlineBeamSpot");
+    event.getByLabel(bsLabel_, bsHandle);
+    const reco::BeamSpot &beamspot = *bsHandle.product();
+
+
+    // Pure ECAL -> shower shapes
+    allMVAVars_alt.see            = electron.full5x5_sigmaIetaIeta();
+    allMVAVars_alt.spp            = electron.full5x5_sigmaIphiIphi();
+    allMVAVars_alt.OneMinusE1x5E5x5 = 1. - electron.full5x5_e1x5() / electron.full5x5_e5x5();
+    allMVAVars_alt.R9             = electron.full5x5_r9();
+    allMVAVars_alt.etawidth       = electron.superCluster()->etaWidth();
+    allMVAVars_alt.phiwidth       = electron.superCluster()->phiWidth();
+    allMVAVars_alt.HoE            = electron.full5x5_hcalOverEcal();
+    // Endcap only variables
+    allMVAVars_alt.PreShowerOverRaw  = electron.superCluster()->preshowerEnergy() / electron.superCluster()->rawEnergy();
+  
+    // To get to CTF track information in pat::Electron, we have to have the pointer
+    // to pat::Electron, it is not accessible from the pointer to reco::GsfElectron.
+    // This behavior is reported and is expected to change in the future (post-7.4.5 some time).
+    reco::TrackRef myTrackRef = electron.closestCtfTrackRef();
+    const pat::Electron * elePatPtr = dynamic_cast<const pat::Electron *>(&electron);
+    // Check if this is really a pat::Electron, and if yes, get the track ref from this new
+    // pointer instead
+    if( elePatPtr != NULL ) myTrackRef = elePatPtr->closestCtfTrackRef();
+    bool validKF = (myTrackRef.isAvailable() && (myTrackRef.isNonnull()) );  
+  
+    //Pure tracking variables
+    allMVAVars_alt.kfhits         = (validKF) ? myTrackRef->hitPattern().trackerLayersWithMeasurement() : -1. ;
+    allMVAVars_alt.kfchi2          = (validKF) ? myTrackRef->normalizedChi2() : 0;
+    allMVAVars_alt.gsfchi2         = electron.gsfTrack()->normalizedChi2();
+  
+    // Energy matching
+    allMVAVars_alt.fbrem           = electron.fbrem();
+  
+    allMVAVars_alt.gsfhits         = electron.gsfTrack()->hitPattern().trackerLayersWithMeasurement();
+    allMVAVars_alt.expectedMissingInnerHits = electron.gsfTrack()->hitPattern().numberOfHits(reco::HitPattern::MISSING_INNER_HITS);
+  
+    reco::ConversionRef conv_ref = ConversionTools::matchedConversion(electron, conversions, beamspot.position());
+    double vertexFitProbability = -1.; 
+    if(!conv_ref.isNull()) {
+      const reco::Vertex &vtx = conv_ref.get()->conversionVertex(); if (vtx.isValid()) {
+        vertexFitProbability = TMath::Prob( vtx.chi2(), vtx.ndof());
+      } 
+    }
+    allMVAVars_alt.convVtxFitProbability    = vertexFitProbability;
+  
+    allMVAVars_alt.EoP             = electron.eSuperClusterOverP();
+    allMVAVars_alt.eleEoPout       = electron.eEleClusterOverPout();
+    allMVAVars_alt.IoEmIoP         = (1.0/electron.ecalEnergy()) - (1.0 / electron.trackMomentumAtVtx().R() );
+  
+    // Geometrical matchings
+    allMVAVars_alt.deta            = electron.deltaEtaSuperClusterTrackAtVtx();
+    allMVAVars_alt.dphi            = electron.deltaPhiSuperClusterTrackAtVtx();
+    allMVAVars_alt.detacalo        = electron.deltaEtaSeedClusterTrackAtCalo();
+
+    // Spectator variables  
+    allMVAVars_alt.pt              = electron.pt();
+    allMVAVars_alt.SCeta           = electron.superCluster()->eta();
+    constexpr float ebeeSplit = 1.479;
+    allMVAVars_alt.isBarrel        = ( fabs(allMVAVars_alt.SCeta) < ebeeSplit );
+    allMVAVars_alt.isEndcap        = ( fabs(allMVAVars_alt.SCeta) >= ebeeSplit );
+
+
+    // Constrain values
+
+    if(allMVAVars_alt.fbrem < -1.) allMVAVars_alt.fbrem = -1.;
+    allMVAVars_alt.deta = fabs(allMVAVars_alt.deta);
+    if(allMVAVars_alt.deta > 0.06) allMVAVars_alt.deta = 0.06;
+    allMVAVars_alt.dphi = fabs(allMVAVars_alt.dphi);
+    if(allMVAVars_alt.dphi > 0.6) allMVAVars_alt.dphi = 0.6;
+    if(allMVAVars_alt.EoP > 20.) allMVAVars_alt.EoP = 20.;
+    if(allMVAVars_alt.eleEoPout > 20.) allMVAVars_alt.eleEoPout = 20.;
+    allMVAVars_alt.detacalo = fabs(allMVAVars_alt.detacalo);
+    if(allMVAVars_alt.detacalo > 0.2) allMVAVars_alt.detacalo = 0.2;
+    if(allMVAVars_alt.OneMinusE1x5E5x5 < -1.) allMVAVars_alt.OneMinusE1x5E5x5 = -1;
+    if(allMVAVars_alt.OneMinusE1x5E5x5 > 2.) allMVAVars_alt.OneMinusE1x5E5x5 = 2.; 
+    if(allMVAVars_alt.R9 > 5) allMVAVars_alt.R9 = 5;
+    if(allMVAVars_alt.gsfchi2 > 200.) allMVAVars_alt.gsfchi2 = 200;
+    if(allMVAVars_alt.kfchi2 > 10.) allMVAVars_alt.kfchi2 = 10.;
+
+    double cutValue;
+    if (fabs(allMVAVars_alt.SCeta)<=0.8) cutValue = tmpTMVAReader_EB_alt.EvaluateMVA( "Spring16_V1_EB1" );
+    else if (fabs(allMVAVars_alt.SCeta)<=1.479) cutValue = tmpTMVAReader_EB_alt.EvaluateMVA( "Spring16_V1_EB2" );
+    else cutValue = tmpTMVAReader_EE_alt.EvaluateMVA( "Spring16_V1_EE" );
     //std::cout<<"cutValue = "<<cutValue<<std::endl;
 
     return cutValue;	

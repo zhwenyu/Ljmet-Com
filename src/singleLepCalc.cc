@@ -566,6 +566,7 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
     std::vector <int>    elVtxFitConv;    
 
     std::vector <double> elMVAValue;
+    std::vector <double> elMVAValue_alt;
  
     //Extra info about isolation
     std::vector <double> elChIso;
@@ -682,7 +683,10 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
             elVtxFitConv.push_back((*iel)->passConversionVeto());
             elNotConversion.push_back((*iel)->passConversionVeto());
 
-            if (UseElMVA) elMVAValue.push_back( selector->mvaValue(iel->operator*(),event) );
+            if (UseElMVA) {
+                elMVAValue.push_back( selector->mvaValue(iel->operator*(),event) );
+                elMVAValue_alt.push_back( selector->mvaValue_alt(iel->operator*(),event) );
+            }
 
             if(isMc && keepFullMChistory){
                 //cout << "start\n";
@@ -760,6 +764,7 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
     SetValue("elVtxFitConv", elVtxFitConv);
 
     SetValue("elMVAValue", elMVAValue);
+    SetValue("elMVAValue_alt", elMVAValue_alt);
 
     //Extra info about isolation
     SetValue("elChIso" , elChIso);
