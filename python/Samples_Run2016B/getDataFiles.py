@@ -1,19 +1,44 @@
 #!/usr/env/python
 import os
 
+'''datasets=[
+"/DoubleMuon/Run2016E-PromptReco-v2/MINIAOD",
+"/DoubleMuon/Run2016F-PromptReco-v1/MINIAOD",
+"/DoubleMuon/Run2016G-PromptReco-v1/MINIAOD",
+"/DoubleEG/Run2016E-PromptReco-v2/MINIAOD",
+"/DoubleEG/Run2016F-PromptReco-v1/MINIAOD",
+"/DoubleEG/Run2016G-PromptReco-v1/MINIAOD",
+"/MuonEG/Run2016E-PromptReco-v2/MINIAOD",
+"/MuonEG/Run2016F-PromptReco-v1/MINIAOD",
+"/MuonEG/Run2016G-PromptReco-v1/MINIAOD",
+]
+'''
+
 datasets=[
-"/DoubleMuon/Run2016B-PromptReco-v1/MINIAOD",
-"/DoubleMuon/Run2016B-PromptReco-v2/MINIAOD",
-"/DoubleMuon/Run2016C-PromptReco-v2/MINIAOD",
-"/DoubleMuon/Run2016D-PromptReco-v2/MINIAOD",
-"/DoubleEG/Run2016B-PromptReco-v1/MINIAOD",
-"/DoubleEG/Run2016B-PromptReco-v2/MINIAOD",
-"/DoubleEG/Run2016C-PromptReco-v2/MINIAOD",
-"/DoubleEG/Run2016D-PromptReco-v2/MINIAOD",
-"/MuonEG/Run2016B-PromptReco-v1/MINIAOD",
-"/MuonEG/Run2016B-PromptReco-v2/MINIAOD",
-"/MuonEG/Run2016C-PromptReco-v2/MINIAOD",
-"/MuonEG/Run2016D-PromptReco-v2/MINIAOD",
+"/DoubleMuon/Run2016B-23Sep2016-v3/MINIAOD",
+"/DoubleMuon/Run2016C-23Sep2016-v1/MINIAOD",
+"/DoubleMuon/Run2016D-23Sep2016-v1/MINIAOD",
+"/DoubleMuon/Run2016E-23Sep2016-v1/MINIAOD",
+"/DoubleMuon/Run2016F-23Sep2016-v1/MINIAOD",
+"/DoubleMuon/Run2016G-23Sep2016-v1/MINIAOD",
+"/DoubleMuon/Run2016H-PromptReco-v2/MINIAOD",
+"/DoubleMuon/Run2016H-PromptReco-v3/MINIAOD",
+"/DoubleEG/Run2016B-23Sep2016-v3/MINIAOD",
+"/DoubleEG/Run2016C-23Sep2016-v1/MINIAOD",
+"/DoubleEG/Run2016D-23Sep2016-v1/MINIAOD",
+"/DoubleEG/Run2016E-23Sep2016-v1/MINIAOD",
+"/DoubleEG/Run2016F-23Sep2016-v1/MINIAOD",
+"/DoubleEG/Run2016G-23Sep2016-v1/MINIAOD",
+"/DoubleEG/Run2016H-PromptReco-v2/MINIAOD",
+"/DoubleEG/Run2016H-PromptReco-v3/MINIAOD",
+"/MuonEG/Run2016B-23Sep2016-v3/MINIAOD",
+"/MuonEG/Run2016C-23Sep2016-v1/MINIAOD",
+"/MuonEG/Run2016D-23Sep2016-v1/MINIAOD",
+"/MuonEG/Run2016E-23Sep2016-v1/MINIAOD",
+"/MuonEG/Run2016F-23Sep2016-v1/MINIAOD",
+"/MuonEG/Run2016G-23Sep2016-v1/MINIAOD",
+"/MuonEG/Run2016H-PromptReco-v2/MINIAOD",
+"/MuonEG/Run2016H-PromptReco-v3/MINIAOD",
 ]
 
 files = []
