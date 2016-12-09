@@ -50,6 +50,8 @@ samples = [
 #    'TTH',
 ]
 
+samples = []
+
 rmasses = [
 '1000',
 '1100',
@@ -72,23 +74,37 @@ rmasses = [
 '2800',
 '2900',
 '3000',
+'3100',
+'3200',
+'3300',
+'3400',
+'3500',
+'3600',
+'3700',
+'3800',
+'3900',
+'4000',
 ]
 
-#for i in rmasses:
-#    samples.extend(['Wprime'+i+'Right'])
+
+for i in rmasses:
+    #samples.extend(['Wprime'+i+'Right'])
+    samples.extend(['Wprime'+i+'Mix'])
+    samples.extend(['Wprime'+i+'Left'])
+
 
 datalist = [
 ]
 
 systlist = [
-#'_JESDOWN',
-#'_JESUP',
-#'_JERUP',
-#'_JERDOWN',
+'_JESDOWN',
+'_JESUP',
+'_JERUP',
+'_JERDOWN',
 'NOM'
 ]
 
-#samples = ['Data']
+#samples = ['Wprime3100Right','Wprime3200Right','Wprime3300Right','Wprime3400Right','Wprime3500Right','Wprime3600Right','Wprime3700Right','Wprime3800Right','Wprime3900Right','Wprime4000Right']
 
 ### Write the files you wish to run over for each job    
 
