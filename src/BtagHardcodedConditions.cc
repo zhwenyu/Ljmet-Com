@@ -210,7 +210,7 @@ double BtagHardcodedConditions::GetBtagScaleFactor2016(double pt, double eta,
 
     double SFb=0;
     if( tagger=="CSVL")  SFb = 0.931535+(1.40704e-05*pt);
-    else if( tagger=="CSVM")  SFb = 0.901114+(132145e-05*pt);
+    else if( tagger=="CSVM")  SFb = 0.901114+(1.32145e-05*pt);
     else if( tagger=="CSVT")  SFb = 0.857294+(3.75846e-05*pt);
     else if(tagger == "CSVLsubjet"){
       if(pt < 140) SFb = 0.935202;

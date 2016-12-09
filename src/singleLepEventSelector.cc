@@ -311,6 +311,8 @@ void singleLepEventSelector::BeginJob( std::map<std::string, edm::ParameterSet c
         mtPar["met_collection"]           = par[_key].getParameter<edm::InputTag>("met_collection");
 
         mbPar["doNewJEC"]                 = par[_key].getParameter<bool>         ("doNewJEC");
+        if (par[_key].exists("doAllJetSyst")) mbPar["doAllJetSyst"] = par[_key].getParameter<bool> ("doAllJetSyst");
+        else                                  mbPar["doAllJetSyst"] = false;
         mbPar["doLepJetCleaning"]         = par[_key].getParameter<bool>         ("doLepJetCleaning");
         if (par[_key].exists("CleanLooseLeptons")) mbPar["CleanLooseLeptons"] = par[_key].getParameter<bool> ("CleanLooseLeptons");
 	else                                       mbPar["CleanLooseLeptons"] = false;
@@ -1038,10 +1040,22 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
         mvAllJets.clear();
         mvCorrJetsWithBTags.clear();
 	mvSelCorrJets.clear();
+	mvCorrJets_jesup.clear();
+	mvCorrJets_jesdn.clear();
+	mvCorrJets_jerup.clear();
+	mvCorrJets_jerdn.clear();
         mvSelBtagJets.clear();
 
         // try to get earlier produced data (in a calc)
         //std::cout << "Must be 2.34: " << GetTestValue() << std::endl;
+
+	std::vector<edm::Ptr<pat::Muon>> cleaningMuons;
+	cleaningMuons = mvSelMuons;
+	if(mbPar["CleanLooseLeptons"]) cleaningMuons = mvLooseMuons;
+	
+	std::vector<edm::Ptr<pat::Electron>> cleaningElectrons;
+	cleaningElectrons = mvSelElectrons;
+	if(mbPar["CleanLooseLeptons"]) cleaningElectrons = mvLooseElectrons;	
 
         for (std::vector<pat::Jet>::const_iterator _ijet = mhJets->begin();
              _ijet != mhJets->end(); ++_ijet){
@@ -1054,124 +1068,141 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
 	    bool _cleaned = false;
 
 	    TLorentzVector jetP4;
+	    TLorentzVector jetP4_jesup;
+	    TLorentzVector jetP4_jesdn;
+	    TLorentzVector jetP4_jerup;
+	    TLorentzVector jetP4_jerdn;
 
 	    pat::Jet tmpJet = _ijet->correctedJet(0);
 	    pat::Jet corrJet = *_ijet;
 
-	    std::vector<edm::Ptr<pat::Muon>> cleaningMuons;
-	    cleaningMuons = mvSelMuons;
-	    if(mbPar["CleanLooseLeptons"]) cleaningMuons = mvLooseMuons;
-
-	    std::vector<edm::Ptr<pat::Electron>> cleaningElectrons;
-	    cleaningElectrons = mvSelElectrons;
-	    if(mbPar["CleanLooseLeptons"]) cleaningElectrons = mvLooseElectrons;
-
 	    if ( mbPar["doLepJetCleaning"] ){
-		if (mbPar["debug"]) std::cout << "Checking Overlap" << std::endl;
-                if (cleaningMuons.size()>0){
-		  if ( deltaR(cleaningMuons[0]->p4(),_ijet->p4()) < mdPar["LepJetDR"]) { //0.6 ){
-                        std::vector<reco::CandidatePtr> muDaughters;
-                        for ( unsigned int isrc = 0; isrc < cleaningMuons[0]->numberOfSourceCandidatePtrs(); ++isrc ){
-                            if (cleaningMuons[0]->sourceCandidatePtr(isrc).isAvailable()) {
-                                muDaughters.push_back( cleaningMuons[0]->sourceCandidatePtr(isrc) );
-                            }
-                        }
-            	        if (mbPar["debug"]) {
-            	            std::cout << "       Lepton : pT = " << cleaningMuons[0]->pt() << " eta = " << cleaningMuons[0]->eta() << " phi = " << cleaningMuons[0]->phi() << std::endl;
-            	            std::cout << "      Raw Jet : pT = " << _ijet->pt() << " eta = " << _ijet->eta() << " phi = " << _ijet->phi() << std::endl;
-			}
-			const std::vector<edm::Ptr<reco::Candidate> > _ijet_consts = _ijet->daughterPtrVector();
-        		for ( std::vector<edm::Ptr<reco::Candidate> >::const_iterator _i_const = _ijet_consts.begin(); _i_const != _ijet_consts.end(); ++_i_const){
-			    /*if ( (*_i_const).key() == cleaningMuons[0]->originalObjectRef().key() ) {
-				tmpJet.setP4( _ijet->p4() - cleaningMuons[0]->p4() );
-				jetP4 = correctJet(tmpJet, event);
-				if (mbPar["debug"]) std::cout << "Corrected Jet : pT = " << jetP4.Pt() << " eta = " << jetP4.Eta() << " phi = " << jetP4.Phi() << std::endl;
-			        _cleaned = true;
-			    }*////old ref mathcing method, appears to be depreciated in CMSSW_7_4_X(?) 
-                            for (unsigned int muI = 0; muI < muDaughters.size(); muI++) {
-			        if ( (*_i_const).key() == muDaughters[muI].key() ) {
-				    tmpJet.setP4( tmpJet.p4() - muDaughters[muI]->p4() );
-				    if (mbPar["debug"]) std::cout << "  Cleaned Jet : pT = " << tmpJet.pt() << " eta = " << tmpJet.eta() << " phi = " << tmpJet.phi() << std::endl;
-				    jetP4 = correctJet(tmpJet, event, false, true);
-				    corrJet = correctJetReturnPatJet(tmpJet, event, false, true);
-				    if (mbPar["debug"]) std::cout << "Corrected Jet : pT = " << jetP4.Pt() << " eta = " << jetP4.Eta() << " phi = " << jetP4.Phi() << std::endl;
-			            _cleaned = true;
-                                    muDaughters.erase( muDaughters.begin()+muI );
-                                    break;
-			        }
-			    }
-			}
-			// zprime method (gives same results as far as i can tell)
-			/*if (_ijet->muonMultiplicity() > 0) {
-			    double muEchk = (_ijet->correctedJet(0).energy()*_ijet->muonEnergyFraction()-cleaningMuons[0]->energy())/cleaningMuons[0]->energy();
-			    if ( !(muEchk < -0.1 || (muEchk > 0.1 && _ijet->muonMultiplicity()==1)) ) {
- 			        tmpJet.setP4( _ijet->correctedJet(0).p4()-cleaningMuons[0]->p4() );
-			        if (tmpJet.pt() > 5 && deltaR(_ijet->correctedJet(0).p4(),tmpJet.p4()) > 1.57) std::cout << "Lepton-Jet cleaning flipped direction, not cleaning!" << std::endl;
-			        else {
- 			            jetP4 = correctJet(tmpJet, event);
-			            if (mbPar["debug"]) std::cout << "Corrected Jet : pT = " << jetP4.Pt() << " eta = " << jetP4.Eta() << " phi = " << jetP4.Phi() << std::endl;
-			            _cleaned = true;
-			        }
-                            }
-                        }*/
-			//old deltaR matching method
-			/*for (unsigned int id = 0, nd = (*_ijet).numberOfDaughters(); id < nd; ++id) {
-            		    const pat::PackedCandidate &_ijet_const = dynamic_cast<const pat::PackedCandidate &>(*(*_ijet).daughter(id));
-			    if ( deltaR(cleaningMuons[0]->p4(),_ijet_const.p4()) < 0.001 ) {
- 				tmpJet.setP4( _ijet->p4()-cleaningMuons[0]->p4() );
- 				jetP4 = correctJet(tmpJet, event);
-				if (mbPar["debug"]) std::cout << "Corrected Jet : pT = " << jetP4.Pt() << " eta = " << jetP4.Eta() << " phi = " << jetP4.Phi() << std::endl;
-			        _cleaned = true;
- 			    }
-                        }*/
+	      if (mbPar["debug"]) std::cout << "Checking Overlap" << std::endl;
+
+	      for(unsigned int imu = 0; imu < cleaningMuons.size(); imu++){
+		if ( deltaR(cleaningMuons[imu]->p4(),_ijet->p4()) < mdPar["LepJetDR"]) { //0.6 ){
+		  std::vector<reco::CandidatePtr> muDaughters;
+		  for ( unsigned int isrc = 0; isrc < cleaningMuons[imu]->numberOfSourceCandidatePtrs(); ++isrc ){
+		    if (cleaningMuons[imu]->sourceCandidatePtr(isrc).isAvailable()) {
+		      muDaughters.push_back( cleaningMuons[imu]->sourceCandidatePtr(isrc) );
 		    }
-            	}
+		  }
+		  if (mbPar["debug"]) {		    
+		    std::cout << "         Muon : pT = " << cleaningMuons[imu]->pt() << " eta = " << cleaningMuons[imu]->eta() << " phi = " << cleaningMuons[imu]->phi() << std::endl;
+		    std::cout << "      Raw Jet : pT = " << _ijet->pt() << " eta = " << _ijet->eta() << " phi = " << _ijet->phi() << std::endl;
+		  }
+
+		  const std::vector<edm::Ptr<reco::Candidate> > _ijet_consts = _ijet->daughterPtrVector();
+		  for ( std::vector<edm::Ptr<reco::Candidate> >::const_iterator _i_const = _ijet_consts.begin(); _i_const != _ijet_consts.end(); ++_i_const){
+		    /*if ( (*_i_const).key() == cleaningMuons[0]->originalObjectRef().key() ) {
+		      tmpJet.setP4( _ijet->p4() - cleaningMuons[0]->p4() );
+		      jetP4 = correctJet(tmpJet, event);
+		      if (mbPar["debug"]) std::cout << "Corrected Jet : pT = " << jetP4.Pt() << " eta = " << jetP4.Eta() << " phi = " << jetP4.Phi() << std::endl;
+		      _cleaned = true;
+		      }*////old ref mathcing method, appears to be depreciated in CMSSW_7_4_X(?) 
+		    for (unsigned int muI = 0; muI < muDaughters.size(); muI++) {
+		      if ( (*_i_const).key() == muDaughters[muI].key() ) {
+			tmpJet.setP4( tmpJet.p4() - muDaughters[muI]->p4() );
+			if (mbPar["debug"]) std::cout << "  Cleaned Jet : pT = " << tmpJet.pt() << " eta = " << tmpJet.eta() << " phi = " << tmpJet.phi() << std::endl;
+			jetP4 = correctJet(tmpJet, event, false, true);
+			if (mbPar["doAllJetSyst"]) {
+			  jetP4_jesup = correctJet(tmpJet, event,false,true,1);
+			  jetP4_jesdn = correctJet(tmpJet, event,false,true,2);
+			  jetP4_jerup = correctJet(tmpJet, event,false,true,3);
+			  jetP4_jerdn = correctJet(tmpJet, event,false,true,4);
+			}
+			corrJet = correctJetReturnPatJet(tmpJet, event, false, true);
+			if (mbPar["debug"]) std::cout << "Corrected Jet : pT = " << jetP4.Pt() << " eta = " << jetP4.Eta() << " phi = " << jetP4.Phi() << std::endl;
+			_cleaned = true;
+			muDaughters.erase( muDaughters.begin()+muI );
+			break;
+		      }
+		    }
+		  }
+		}
+	      }
+	      // zprime method (gives same results as far as i can tell)
+	      /*if (_ijet->muonMultiplicity() > 0) {
+		double muEchk = (_ijet->correctedJet(0).energy()*_ijet->muonEnergyFraction()-cleaningMuons[0]->energy())/cleaningMuons[0]->energy();
+		if ( !(muEchk < -0.1 || (muEchk > 0.1 && _ijet->muonMultiplicity()==1)) ) {
+		tmpJet.setP4( _ijet->correctedJet(0).p4()-cleaningMuons[0]->p4() );
+		if (tmpJet.pt() > 5 && deltaR(_ijet->correctedJet(0).p4(),tmpJet.p4()) > 1.57) std::cout << "Lepton-Jet cleaning flipped direction, not cleaning!" << std::endl;
+		else {
+		jetP4 = correctJet(tmpJet, event);
+		if (mbPar["debug"]) std::cout << "Corrected Jet : pT = " << jetP4.Pt() << " eta = " << jetP4.Eta() << " phi = " << jetP4.Phi() << std::endl;
+		_cleaned = true;
+		}
+		}
+		}*/
+	      //old deltaR matching method
+	      /*for (unsigned int id = 0, nd = (*_ijet).numberOfDaughters(); id < nd; ++id) {
+		const pat::PackedCandidate &_ijet_const = dynamic_cast<const pat::PackedCandidate &>(*(*_ijet).daughter(id));
+		if ( deltaR(cleaningMuons[0]->p4(),_ijet_const.p4()) < 0.001 ) {
+		tmpJet.setP4( _ijet->p4()-cleaningMuons[0]->p4() );
+		jetP4 = correctJet(tmpJet, event);
+		if (mbPar["debug"]) std::cout << "Corrected Jet : pT = " << jetP4.Pt() << " eta = " << jetP4.Eta() << " phi = " << jetP4.Phi() << std::endl;
+		_cleaned = true;
+		}
+		}*/
             
-                if (cleaningElectrons.size()>0){
-		  if ( deltaR(cleaningElectrons[0]->p4(),_ijet->p4()) < mdPar["LepJetDR"]){ //0.6 ){
-                        std::vector<reco::CandidatePtr> elDaughters;
-                        for ( unsigned int isrc = 0; isrc < cleaningElectrons[0]->numberOfSourceCandidatePtrs(); ++isrc ){
-                            if (cleaningElectrons[0]->sourceCandidatePtr(isrc).isAvailable()) {
-                                elDaughters.push_back( cleaningElectrons[0]->sourceCandidatePtr(isrc) );
-                            }
-                        }
-            	        if (mbPar["debug"]) {
-            	            std::cout << "       Lepton : pT = " << cleaningElectrons[0]->pt() << " eta = " << cleaningElectrons[0]->eta() << " phi = " << cleaningElectrons[0]->phi() << std::endl;
-            	            std::cout << "      Raw Jet : pT = " << _ijet->correctedJet(0).pt() << " eta = " << _ijet->correctedJet(0).eta() << " phi = " << _ijet->correctedJet(0).phi() << std::endl;
-			}
-			const std::vector<edm::Ptr<reco::Candidate> > _ijet_consts = _ijet->daughterPtrVector();
-        		for ( std::vector<edm::Ptr<reco::Candidate> >::const_iterator _i_const = _ijet_consts.begin(); _i_const != _ijet_consts.end(); ++_i_const){
-                            for (unsigned int elI = 0; elI < elDaughters.size(); elI++) {
-			        if ( (*_i_const).key() == elDaughters[elI].key() ) {
-				    tmpJet.setP4( tmpJet.p4() - elDaughters[elI]->p4() );
-				    if (mbPar["debug"]) std::cout << "  Cleaned Jet : pT = " << tmpJet.pt() << " eta = " << tmpJet.eta() << " phi = " << tmpJet.phi() << std::endl;
-				    jetP4 = correctJet(tmpJet, event, false, true);
-				    corrJet = correctJetReturnPatJet(tmpJet, event, false, true);
-				    if (mbPar["debug"]) std::cout << "Corrected Jet : pT = " << jetP4.Pt() << " eta = " << jetP4.Eta() << " phi = " << jetP4.Phi() << std::endl;
-			            _cleaned = true;
-                                    elDaughters.erase( elDaughters.begin()+elI );
-                                    break;
-			        }
-			    }
-			}
-			/*if (_ijet->electronMultiplicity() > 0) {
-			    double elEchk = (_ijet->correctedJet(0).energy()*_ijet->chargedEmEnergyFraction()-cleaningElectrons[0]->energy())/cleaningElectrons[0]->energy();
-                            if (mbPar["debug"]) std::cout<<"Non-zero electron multiplicity in jet, jet_chEm_Energy = "<<_ijet->correctedJet(0).energy()*_ijet->chargedEmEnergyFraction()<<std::endl;
-			    if ( !(elEchk < -0.1 || (elEchk > 0.1 && _ijet->electronMultiplicity()==1)) ) {
- 			        //tmpJet.setP4( _ijet->correctedJet(0).p4()-cleaningElectrons[0]->p4() );
-			        if (tmpJet.pt() > 5 && deltaR(_ijet->correctedJet(0).p4(),tmpJet.p4()) > 1.57) std::cout << "Lepton-Jet cleaning flipped direction, not cleaning!" << std::endl;
-			        else {
- 			            //jetP4 = correctJet(tmpJet, event);
-			            if (mbPar["debug"]) std::cout << "Corrected Jet : pT = " << jetP4.Pt() << " eta = " << jetP4.Eta() << " phi = " << jetP4.Phi() << std::endl;
-			            //_cleaned = true;
-			        }
-                            }
-                        }*/
+	      for(unsigned int iel = 0; iel < cleaningElectrons.size(); iel++){
+		if ( deltaR(cleaningElectrons[iel]->p4(),_ijet->p4()) < mdPar["LepJetDR"]){ //0.6 ){
+		  std::vector<reco::CandidatePtr> elDaughters;
+		  for ( unsigned int isrc = 0; isrc < cleaningElectrons[iel]->numberOfSourceCandidatePtrs(); ++isrc ){
+		    if (cleaningElectrons[iel]->sourceCandidatePtr(isrc).isAvailable()) {
+		      elDaughters.push_back( cleaningElectrons[iel]->sourceCandidatePtr(isrc) );
 		    }
-            	}
+		  }
+		  if (mbPar["debug"]) {
+		    std::cout << "     Electron : pT = " << cleaningElectrons[iel]->pt() << " eta = " << cleaningElectrons[iel]->eta() << " phi = " << cleaningElectrons[iel]->phi() << std::endl;
+		    std::cout << "      Raw Jet : pT = " << _ijet->correctedJet(0).pt() << " eta = " << _ijet->correctedJet(0).eta() << " phi = " << _ijet->correctedJet(0).phi() << std::endl;
+		  }
+		  const std::vector<edm::Ptr<reco::Candidate> > _ijet_consts = _ijet->daughterPtrVector();
+		  for ( std::vector<edm::Ptr<reco::Candidate> >::const_iterator _i_const = _ijet_consts.begin(); _i_const != _ijet_consts.end(); ++_i_const){
+		    for (unsigned int elI = 0; elI < elDaughters.size(); elI++) {
+		      if ( (*_i_const).key() == elDaughters[elI].key() ) {
+			tmpJet.setP4( tmpJet.p4() - elDaughters[elI]->p4() );
+			if (mbPar["debug"]) std::cout << "  Cleaned Jet : pT = " << tmpJet.pt() << " eta = " << tmpJet.eta() << " phi = " << tmpJet.phi() << std::endl;
+			jetP4 = correctJet(tmpJet, event, false, true);
+			if (mbPar["doAllJetSyst"]) {
+			  jetP4_jesup = correctJet(tmpJet, event,false,true,1);
+			  jetP4_jesdn = correctJet(tmpJet, event,false,true,2);
+			  jetP4_jerup = correctJet(tmpJet, event,false,true,3);
+			  jetP4_jerdn = correctJet(tmpJet, event,false,true,4);
+			}
+			corrJet = correctJetReturnPatJet(tmpJet, event, false, true);
+			if (mbPar["debug"]) std::cout << "Corrected Jet : pT = " << jetP4.Pt() << " eta = " << jetP4.Eta() << " phi = " << jetP4.Phi() << std::endl;
+			_cleaned = true;
+			elDaughters.erase( elDaughters.begin()+elI );
+			break;
+		      }
+		    }
+		  }
+		}
+	      }
+	      /*if (_ijet->electronMultiplicity() > 0) {
+		  double elEchk = (_ijet->correctedJet(0).energy()*_ijet->chargedEmEnergyFraction()-cleaningElectrons[0]->energy())/cleaningElectrons[0]->energy();
+		  if (mbPar["debug"]) std::cout<<"Non-zero electron multiplicity in jet, jet_chEm_Energy = "<<_ijet->correctedJet(0).energy()*_ijet->chargedEmEnergyFraction()<<std::endl;
+		  if ( !(elEchk < -0.1 || (elEchk > 0.1 && _ijet->electronMultiplicity()==1)) ) {
+		  //tmpJet.setP4( _ijet->correctedJet(0).p4()-cleaningElectrons[0]->p4() );
+		  if (tmpJet.pt() > 5 && deltaR(_ijet->correctedJet(0).p4(),tmpJet.p4()) > 1.57) std::cout << "Lepton-Jet cleaning flipped direction, not cleaning!" << std::endl;
+		  else {
+		  //jetP4 = correctJet(tmpJet, event);
+		  if (mbPar["debug"]) std::cout << "Corrected Jet : pT = " << jetP4.Pt() << " eta = " << jetP4.Eta() << " phi = " << jetP4.Phi() << std::endl;
+		  //_cleaned = true;
+		  }
+		  }
+		  }*/
 	    }
+
 	    if (!_cleaned) {
                 jetP4 = correctJet(*_ijet, event);
+                if (mbPar["doAllJetSyst"]) {
+	            jetP4_jesup = correctJet(*_ijet, event,false,true,1);
+	            jetP4_jesdn = correctJet(*_ijet, event,false,true,2);
+	            jetP4_jerup = correctJet(*_ijet, event,false,true,3);
+	            jetP4_jerdn = correctJet(*_ijet, event,false,true,4);
+                }
 		corrJet = correctJetReturnPatJet(*_ijet, event);
             }
 
@@ -1212,6 +1243,18 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
                 ++_n_good_jets;
                 mvSelJets.push_back(edm::Ptr<pat::Jet>( mhJets, _n_jets)); 
 		mvSelCorrJets.push_back(corrJet);
+                if (mbPar["doAllJetSyst"]) {
+		    mvCorrJets_jesup.push_back(jetP4_jesup);
+		    mvCorrJets_jesdn.push_back(jetP4_jesdn);
+		    mvCorrJets_jerup.push_back(jetP4_jerup);
+		    mvCorrJets_jerdn.push_back(jetP4_jerdn);
+                }
+                else {
+		    mvCorrJets_jesup.push_back(jetP4);
+		    mvCorrJets_jesdn.push_back(jetP4);
+		    mvCorrJets_jerup.push_back(jetP4);
+		    mvCorrJets_jerdn.push_back(jetP4);
+                }
                 mvCorrJetsWithBTags.push_back(jetwithtag);
 
                 if (jetP4.Pt() > _leading_jet_pt) _leading_jet_pt = jetP4.Pt();                         
