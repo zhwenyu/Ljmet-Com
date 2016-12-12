@@ -379,6 +379,7 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
     std::vector <int>    elMHits;
     std::vector <int>    elVtxFitConv;
     std::vector<double>  elMVA;
+    std::vector<double>  elMVA80X;
 
     //mva VID
     //std::vector<double>  elMVAValVID;
@@ -589,6 +590,7 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
 	elVtxFitConv.push_back((*iel)->passConversionVeto());
         //add mva
 	elMVA.push_back( selector->mvaValue( *(iel->get()), event) );
+	elMVA80X.push_back( selector->mvaValue_alt( *(iel->get()), event) );
 
 	//add miniIso
 	elMiniIsoEA.push_back(getPFMiniIsolation_EffectiveArea(packedPFCands, dynamic_cast<const reco::Candidate *>(iel->get()),0.05, 0.2, 10., false, false,myRhoJetsNC));
@@ -737,6 +739,7 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
     SetValue("elMHits", elMHits);
     SetValue("elVtxFitConv", elVtxFitConv);
     SetValue("elMVA",elMVA);
+    SetValue("elMVA80X",elMVA80X);
     //SetValue("elMVAValVID",elMVAValVID);
     //SetValue("elMVATightVID",elMVATightVID);
     //SetValue("elMVALooseVID",elMVALooseVID);
