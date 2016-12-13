@@ -15,7 +15,7 @@ files_per_job = 1
 
 rel_base = os.environ['CMSSW_BASE']
 cmssw = 'CMSSW_8_0_22'
-logdir = 'Nov16'
+logdir = 'Dec12'
 #outdir = '/eos/uscms/store/user/lpctlbsm/clint/Fall15/25ns/'+logdir+'/'
 outdir = '/eos/uscms/store/user/clint/Run2016/'+logdir+'/'
 
