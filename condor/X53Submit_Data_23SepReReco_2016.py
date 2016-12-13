@@ -31,7 +31,7 @@ DOQCDMC = 'False'
 DOTTBARSYS = 'False'
 
 ### JSON file to use
-MYJSON = "'../data/json/Cert_271036-284044_13TeV_PromptReco_Collisions16_JSON_NoL1T.txt'"
+MYJSON = "'../data/json/Cert_271036-284044_13TeV_23Sep2016ReReco_Collisions16_JSON.txt'"
 
 ### Systematics flags
 BTAGUNCERTUP = 'False'
