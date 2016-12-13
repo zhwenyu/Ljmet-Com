@@ -19,10 +19,15 @@
 source /cvmfs/cms.cern.ch/cmsset_default.csh
 setenv SCRAM_ARCH slc6_amd64_gcc530
 cmsrel CMSSWVERSION
-cd CMSSWVERSION/src/
+cd CMSSWVERSION/
+xrdcp root://cmseos.fnal.gov//store/user/clint/EGM_ID_80X.tar EGM_ID_80X.tar
+tar -xvf EGM_ID_80X.tar
+cd src
 #setenv SCRAM_ARCH slc6_amd64_gcc530
 eval `scram runtime -csh`
 cmsenv
+#compile egm changes
+scram b
 #get setup ljmet area
 mkdir -p LJMet/Com
 cd LJMet/Com
