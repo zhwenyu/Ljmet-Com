@@ -1146,7 +1146,7 @@ double BaseEventSelector::mvaValue(const pat::Electron & electron, edm::EventBas
     allMVAVars.EoP             = electron.eSuperClusterOverP();
     allMVAVars.eleEoPout       = electron.eEleClusterOverPout();
     allMVAVars.IoEmIoP         = (1.0/electron.ecalEnergy()) - (1.0 / electron.trackMomentumAtVtx().R() );
-  
+    double tempEP = (1.0/electron.ecalEnergy()) - (1.0 / electron.p());
     // Geometrical matchings
     allMVAVars.deta            = electron.deltaEtaSuperClusterTrackAtVtx();
     allMVAVars.dphi            = electron.deltaPhiSuperClusterTrackAtVtx();
@@ -1172,7 +1172,6 @@ double BaseEventSelector::mvaValue(const pat::Electron & electron, edm::EventBas
     allMVAVars.mcCBmatchingCategory = nines;
 
     // Constrain values
-
     if(allMVAVars.fbrem < -1.) allMVAVars.fbrem = -1.;
     allMVAVars.deta = fabs(allMVAVars.deta);
     if(allMVAVars.deta > 0.06) allMVAVars.deta = 0.06;
@@ -1187,6 +1186,7 @@ double BaseEventSelector::mvaValue(const pat::Electron & electron, edm::EventBas
     if(allMVAVars.R9 > 5) allMVAVars.R9 = 5;
     if(allMVAVars.gsfchi2 > 200.) allMVAVars.gsfchi2 = 200;
     if(allMVAVars.kfchi2 > 10.) allMVAVars.kfchi2 = 10.;
+
 
     double cutValue;
     if (fabs(allMVAVars.SCeta)<=0.8) cutValue = tmpTMVAReader_EB.EvaluateMVA( "Spring15_V1_EB1" );
@@ -1260,12 +1260,10 @@ double BaseEventSelector::mvaValue_alt(const pat::Electron & electron, edm::Even
     allMVAVars_alt.EoP             = electron.eSuperClusterOverP();
     allMVAVars_alt.eleEoPout       = electron.eEleClusterOverPout();
     allMVAVars_alt.IoEmIoP         = (1.0/electron.ecalEnergy()) - (1.0 / electron.trackMomentumAtVtx().R() );
-  
     // Geometrical matchings
     allMVAVars_alt.deta            = electron.deltaEtaSuperClusterTrackAtVtx();
     allMVAVars_alt.dphi            = electron.deltaPhiSuperClusterTrackAtVtx();
     allMVAVars_alt.detacalo        = electron.deltaEtaSeedClusterTrackAtCalo();
-
     // Spectator variables  
     allMVAVars_alt.pt              = electron.pt();
     allMVAVars_alt.SCeta           = electron.superCluster()->eta();

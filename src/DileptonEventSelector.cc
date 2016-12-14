@@ -687,6 +687,16 @@ bool DileptonEventSelector::operator()( edm::EventBase const & event, pat::strbi
 	    bool pass = false;
 	    bool passLoose=false;
 	    while(1){
+	      //do kinematic selection first
+	      // electron Et cut
+	      if (_iel->pt()>mdPar["electron_minpt"]){ }
+	      else break;
+              
+	      // electron eta cut
+	      if ( fabs(_iel->eta())<mdPar["electron_maxeta"] ){ }
+	      else break;
+
+
 	      if (not _iel->gsfTrack().isNonnull() or not _iel->gsfTrack().isAvailable()) break;
 	      //skip if in barrel-endcap gap; doing it here means I never have to worry about it downstream since both electrons for analysis and those for cleaning are made here
 	      if( fabs(_iel->ecalDrivenMomentum().eta())>1.442 && fabs(_iel->ecalDrivenMomentum().eta())<1.556) break;
@@ -773,13 +783,6 @@ bool DileptonEventSelector::operator()( edm::EventBase const & event, pat::strbi
 		  else passLoose=true;
 		}
 		*/
-	      // electron Et cut
-	      if (_iel->pt()>mdPar["electron_minpt"]){ }
-	      else break;
-              
-	      // electron eta cut
-	      if ( fabs(_iel->eta())<mdPar["electron_maxeta"] ){ }
-	      else break;
               
 	      pass = true;
 	      break;
