@@ -8,9 +8,10 @@ import commands
 
 rel_base = os.environ['CMSSW_BASE']
 cmssw = 'CMSSW_8_0_22'
-date = 'Nov16'
+date = 'Dec14'
 locdir = date
-basedir = '/store/user/clint/Run2016'
+#basedir = '/store/user/clint/Run2016'
+basedir = '/store/user/clint/Spring16/25ns'
 indir = 'root://cmseos.fnal.gov/'+basedir+'/'+date+'/'
 outdir = 'root://cmseos.fnal.gov/'+basedir+'/'+date+'/'
 eosdir = ''+basedir+'/'+date+'/'
@@ -31,7 +32,7 @@ samples = [
 #    'DoubleEG-Run2016H-PromptReco-v3',
 #    'DoubleMuon-Run2016B-23Sep2016-v3',
 #    'DoubleMuon-Run2016C-23Sep2016-v1',
-    'DoubleMuon-Run2016D-23Sep2016-v1',
+#    'DoubleMuon-Run2016D-23Sep2016-v1',
 #    'DoubleMuon-Run2016E-23Sep2016-v1',
 #    'DoubleMuon-Run2016F-23Sep2016-v1',
 #    'DoubleMuon-Run2016G-23Sep2016-v1',
@@ -45,9 +46,16 @@ samples = [
 #    'MuonEG-Run2016G-23Sep2016-v1',
 #    'MuonEG-Run2016H-PromptReco-v2',
 #    'MuonEG-Run2016H-PromptReco-v3',
-#    'TTW',
-#    'TTZ',
-#    'TTH',
+    'TTW',
+    'TTZ',
+    'TTH',
+    'TTTT',
+    'WZ',
+    'ZZ',
+    'WpWp',
+    'WWZ',
+    'WZZ',
+    'ZZZ',
 ]
 
 samples = []
