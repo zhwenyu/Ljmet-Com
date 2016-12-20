@@ -72,10 +72,27 @@ private:
   JME::JetResolution resolutionAK8;
   JME::JetResolutionScaleFactor resolution_SF;
   FactorizedJetCorrector *jecak8;
-  JetCorrectorParameters *L3JetParAK8;
-  JetCorrectorParameters *L2JetParAK8;
-  JetCorrectorParameters *ResJetParAK8; 
+  JetCorrectorParameters *L3JetParAK8MC;
+  JetCorrectorParameters *L2JetParAK8MC;
+  JetCorrectorParameters *ResJetParAK8MC; 
+  JetCorrectorParameters *L3JetParAK8BCD;
+  JetCorrectorParameters *L2JetParAK8BCD;
+  JetCorrectorParameters *ResJetParAK8BCD; 
+  JetCorrectorParameters *L3JetParAK8E;
+  JetCorrectorParameters *L2JetParAK8E;
+  JetCorrectorParameters *ResJetParAK8E; 
+  JetCorrectorParameters *L3JetParAK8F;
+  JetCorrectorParameters *L2JetParAK8F;
+  JetCorrectorParameters *ResJetParAK8F; 
+  JetCorrectorParameters *L3JetParAK8GH;
+  JetCorrectorParameters *L2JetParAK8GH;
+  JetCorrectorParameters *ResJetParAK8GH; 
   JetCorrectionUncertainty *jecUnc;
+  std::vector<JetCorrectorParameters> vParAK8MC;
+  std::vector<JetCorrectorParameters> vParAK8BCD;
+  std::vector<JetCorrectorParameters> vParAK8E;
+  std::vector<JetCorrectorParameters> vParAK8F;
+  std::vector<JetCorrectorParameters> vParAK8GH;
   TRandom3 JERrand;
 };
 
@@ -174,23 +191,58 @@ int JetSubCalc::BeginJob()
       if(mPset.exists("DataL2L3JetParAK8")) DataL2L3 = mPset.getParameter<std::string>("DataL2L3JetParAK8");
       else DataL2L3 = "/uscms_data/d3/jmanagan/CMSSW_7_4_14/src/LJMet/Com/data/Summer15_25nsV5_Data_L1FastJet";
  
-      std::vector<JetCorrectorParameters> vParAK8;
-      
+      std::string strL2BCD = DataL2;
+      std::string strL2E = strL2BCD; boost::replace_first(strL2E,"BCD","E");
+      std::string strL2F = strL2BCD; boost::replace_first(strL2F,"BCD","F");
+      std::string strL2GH = strL2BCD; boost::replace_first(strL2GH,"BCD","p2");  
+
+      std::string strL3BCD = DataL3;
+      std::string strL3E = strL3BCD; boost::replace_first(strL3E,"BCD","E");
+      std::string strL3F = strL3BCD; boost::replace_first(strL3F,"BCD","F");
+      std::string strL3GH = strL3BCD; boost::replace_first(strL3GH,"BCD","p2");  
+
+      std::string strL2L3BCD = DataL2L3;
+      std::string strL2L3E = strL2L3BCD; boost::replace_first(strL2L3E,"BCD","E");
+      std::string strL2L3F = strL2L3BCD; boost::replace_first(strL2L3F,"BCD","F");
+      std::string strL2L3GH = strL2L3BCD; boost::replace_first(strL2L3GH,"BCD","p2");  
+       
       if(isMc){
-	L3JetParAK8  = new JetCorrectorParameters(MCL3);
-	L2JetParAK8  = new JetCorrectorParameters(MCL2);
-	vParAK8.push_back(*L2JetParAK8);
-	vParAK8.push_back(*L3JetParAK8);
+	L3JetParAK8MC  = new JetCorrectorParameters(MCL3);
+	L2JetParAK8MC  = new JetCorrectorParameters(MCL2);
+	vParAK8MC.push_back(*L2JetParAK8MC);
+	vParAK8MC.push_back(*L3JetParAK8MC);
       }else{
-	ResJetParAK8 = new JetCorrectorParameters(DataL2L3); 
-	L3JetParAK8  = new JetCorrectorParameters(DataL3);
-	L2JetParAK8  = new JetCorrectorParameters(DataL2);
-	vParAK8.push_back(*L2JetParAK8);
-	vParAK8.push_back(*L3JetParAK8);
-	vParAK8.push_back(*ResJetParAK8);
+	ResJetParAK8BCD = new JetCorrectorParameters(DataL2L3); 
+	L3JetParAK8BCD  = new JetCorrectorParameters(DataL3);
+	L2JetParAK8BCD  = new JetCorrectorParameters(DataL2);
+	vParAK8BCD.push_back(*L2JetParAK8BCD);
+	vParAK8BCD.push_back(*L3JetParAK8BCD);
+	vParAK8BCD.push_back(*ResJetParAK8BCD);
+
+	ResJetParAK8E = new JetCorrectorParameters(strL2L3E); 
+	L3JetParAK8E  = new JetCorrectorParameters(strL3E);
+	L2JetParAK8E  = new JetCorrectorParameters(strL2E);
+	vParAK8E.push_back(*L2JetParAK8E);
+	vParAK8E.push_back(*L3JetParAK8E);
+	vParAK8E.push_back(*ResJetParAK8E);
+
+	ResJetParAK8F = new JetCorrectorParameters(strL2L3F); 
+	L3JetParAK8F  = new JetCorrectorParameters(strL3F);
+	L2JetParAK8F  = new JetCorrectorParameters(strL2F);
+	vParAK8F.push_back(*L2JetParAK8F);
+	vParAK8F.push_back(*L3JetParAK8F);
+	vParAK8F.push_back(*ResJetParAK8F);
+
+	ResJetParAK8GH = new JetCorrectorParameters(strL2L3GH); 
+	L3JetParAK8GH  = new JetCorrectorParameters(strL3GH);
+	L2JetParAK8GH  = new JetCorrectorParameters(strL2GH);
+	vParAK8GH.push_back(*L2JetParAK8GH);
+	vParAK8GH.push_back(*L3JetParAK8GH);
+	vParAK8GH.push_back(*ResJetParAK8GH);
       }
       
-      jecak8 = new FactorizedJetCorrector(vParAK8);
+      if(isMc) jecak8 = new FactorizedJetCorrector(vParAK8MC);
+
       jecUnc = new JetCorrectionUncertainty(mPset.getParameter<std::string>("UncertaintyAK8"));
 
       resolutionAK8 = JME::JetResolution(MCPT);
@@ -459,6 +511,15 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * s
     int nSDSubsCSVM_lSFup;
     int nSDSubsCSVM_lSFdn;
     int SDSubJetIndex;
+
+    int iRun   = event.id().run();
+    if(!isMc){
+      delete jecak8;
+      if(iRun <= 276811) jecak8 = new FactorizedJetCorrector(vParAK8BCD);
+      else if(iRun <= 277420) jecak8 = new FactorizedJetCorrector(vParAK8E);
+      else if(iRun <= 278801) jecak8 = new FactorizedJetCorrector(vParAK8F);
+      else jecak8 = new FactorizedJetCorrector(vParAK8GH); 
+    }
 
     for (std::vector<pat::Jet>::const_iterator ijet = theAK8Jets->begin(); ijet != theAK8Jets->end(); ijet++) {
       int index = (int)(ijet-theAK8Jets->begin());

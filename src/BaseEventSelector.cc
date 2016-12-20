@@ -14,6 +14,136 @@ mLegend("")
 {
 }
 
+void BaseEventSelector::JECbyIOV(edm::EventBase const & event) {
+/*
+ *This function takes an event, looks up the correct JEC file, and produces the correct JetCorrector for JEC corrections. 
+ *JEC is run number dependent. 
+ *This first gets the run number for the event 
+ *It then pulls in the corersponding spring16_V10* file
+ *Then uses that. 
+ *
+ * This is called in singleLepEventSelector
+ * */
+
+  int iRun   = event.id().run();
+
+  std::string strBCD = msPar["DataL1JetPar"];
+  std::string strE = strBCD; boost::replace_first(strE,"BCD","E");
+  std::string strF = strBCD; boost::replace_first(strF,"BCD","F");
+  std::string strGH = strBCD; boost::replace_first(strGH,"BCD","p2");  
+  if(iRun <= 276811) msPar["DataL1JetParByIOV"] = strBCD;
+  else if(iRun <= 277420) msPar["DataL1JetParByIOV"] = strE;
+  else if(iRun <= 278801) msPar["DataL1JetParByIOV"] = strF;
+  else msPar["DataL1JetParByIOV"] = strGH;
+
+  strBCD = msPar["DataL2JetPar"];
+  strE = strBCD; boost::replace_first(strE,"BCD","E");
+  strF = strBCD; boost::replace_first(strF,"BCD","F");
+  strGH = strBCD; boost::replace_first(strGH,"BCD","p2");  
+  if(iRun <= 276811) msPar["DataL2JetParByIOV"] = strBCD;
+  else if(iRun <= 277420) msPar["DataL2JetParByIOV"] = strE;
+  else if(iRun <= 278801) msPar["DataL2JetParByIOV"] = strF;
+  else msPar["DataL2JetParByIOV"] = strGH;
+
+  strBCD = msPar["DataL3JetPar"];
+  strE = strBCD; boost::replace_first(strE,"BCD","E");
+  strF = strBCD; boost::replace_first(strF,"BCD","F");
+  strGH = strBCD; boost::replace_first(strGH,"BCD","p2");  
+  if(iRun <= 276811) msPar["DataL3JetParByIOV"] = strBCD;
+  else if(iRun <= 277420) msPar["DataL3JetParByIOV"] = strE;
+  else if(iRun <= 278801) msPar["DataL3JetParByIOV"] = strF;
+  else msPar["DataL3JetParByIOV"] = strGH;
+
+  strBCD = msPar["DataResJetPar"];
+  strE = strBCD; boost::replace_first(strE,"BCD","E");
+  strF = strBCD; boost::replace_first(strF,"BCD","F");
+  strGH = strBCD; boost::replace_first(strGH,"BCD","p2");  
+  if(iRun <= 276811) msPar["DataResJetParByIOV"] = strBCD;
+  else if(iRun <= 277420) msPar["DataResJetParByIOV"] = strE;
+  else if(iRun <= 278801) msPar["DataResJetParByIOV"] = strF;
+  else msPar["DataResJetParByIOV"] = strGH;
+
+  strBCD = msPar["DataL1JetParAK8"];
+  strE = strBCD; boost::replace_first(strE,"BCD","E");
+  strF = strBCD; boost::replace_first(strF,"BCD","F");
+  strGH = strBCD; boost::replace_first(strGH,"BCD","p2");  
+  if(iRun <= 276811) msPar["DataL1JetParByIOVAK8"] = strBCD;
+  else if(iRun <= 277420) msPar["DataL1JetParByIOVAK8"] = strE;
+  else if(iRun <= 278801) msPar["DataL1JetParByIOVAK8"] = strF;
+  else msPar["DataL1JetParByIOVAK8"] = strGH;
+
+  strBCD = msPar["DataL2JetParAK8"];
+  strE = strBCD; boost::replace_first(strE,"BCD","E");
+  strF = strBCD; boost::replace_first(strF,"BCD","F");
+  strGH = strBCD; boost::replace_first(strGH,"BCD","p2");  
+  if(iRun <= 276811) msPar["DataL2JetParByIOVAK8"] = strBCD;
+  else if(iRun <= 277420) msPar["DataL2JetParByIOVAK8"] = strE;
+  else if(iRun <= 278801) msPar["DataL2JetParByIOVAK8"] = strF;
+  else msPar["DataL2JetParByIOVAK8"] = strGH;
+
+  strBCD = msPar["DataL3JetParAK8"];
+  strE = strBCD; boost::replace_first(strE,"BCD","E");
+  strF = strBCD; boost::replace_first(strF,"BCD","F");
+  strGH = strBCD; boost::replace_first(strGH,"BCD","p2");  
+  if(iRun <= 276811) msPar["DataL3JetParByIOVAK8"] = strBCD;
+  else if(iRun <= 277420) msPar["DataL3JetParByIOVAK8"] = strE;
+  else if(iRun <= 278801) msPar["DataL3JetParByIOVAK8"] = strF;
+  else msPar["DataL3JetParByIOVAK8"] = strGH;
+
+  strBCD = msPar["DataResJetParAK8"];
+  strE = strBCD; boost::replace_first(strE,"BCD","E");
+  strF = strBCD; boost::replace_first(strF,"BCD","F");
+  strGH = strBCD; boost::replace_first(strGH,"BCD","p2");  
+  if(iRun <= 276811) msPar["DataResJetParByIOVAK8"] = strBCD;
+  else if(iRun <= 277420) msPar["DataResJetParByIOVAK8"] = strE;
+  else if(iRun <= 278801) msPar["DataResJetParByIOVAK8"] = strF;
+  else msPar["DataResJetParByIOVAK8"] = strGH;
+  
+  if ( !mbPar["isMc"] ) {
+    std::vector<JetCorrectorParameters> vPar;
+    std::vector<JetCorrectorParameters> vParAK8;
+    // Create the JetCorrectorParameter objects, the order does not matter.
+    delete ResJetPar;
+    delete L3JetPar;
+    delete L2JetPar;
+    delete L1JetPar;
+    ResJetPar = new JetCorrectorParameters(msPar["DataResJetParByIOV"]); 
+    L3JetPar  = new JetCorrectorParameters(msPar["DataL3JetParByIOV"]);
+    L2JetPar  = new JetCorrectorParameters(msPar["DataL2JetParByIOV"]);
+    L1JetPar  = new JetCorrectorParameters(msPar["DataL1JetParByIOV"]);
+    
+    delete ResJetParAK8;
+    delete L3JetParAK8;
+    delete L2JetParAK8;
+    delete L1JetParAK8;
+    ResJetParAK8 = new JetCorrectorParameters(msPar["DataResJetParByIOVAK8"]); 
+    L3JetParAK8  = new JetCorrectorParameters(msPar["DataL3JetParByIOVAK8"]);
+    L2JetParAK8  = new JetCorrectorParameters(msPar["DataL2JetParByIOVAK8"]);
+    L1JetParAK8  = new JetCorrectorParameters(msPar["DataL1JetParByIOVAK8"]);
+    
+    // Load the JetCorrectorParameter objects into a std::vector,
+    // IMPORTANT: THE ORDER MATTERS HERE !!!! 
+    vPar.push_back(*L1JetPar);
+    vPar.push_back(*L2JetPar);
+    vPar.push_back(*L3JetPar);
+    vPar.push_back(*ResJetPar);
+    
+    vParAK8.push_back(*L1JetParAK8);
+    vParAK8.push_back(*L2JetParAK8);
+    vParAK8.push_back(*L3JetParAK8);
+    vParAK8.push_back(*ResJetParAK8);
+    
+    //if (mbPar["doNewJEC"]) std::cout << mLegend << "Applying new jet energy corrections" << std::endl;
+    //    else std::cout << mLegend << "NOT applying new jet energy corrections - ARE YOU SURE?" << std::endl;
+    
+    delete JetCorrector;
+    delete JetCorrectorAK8;
+    JetCorrector = new FactorizedJetCorrector(vPar);
+    JetCorrectorAK8 = new FactorizedJetCorrector(vParAK8);
+  }
+}
+
+
 void BaseEventSelector::BeginJob(std::map<std::string, edm::ParameterSet const > par)
 {
     std::string _key = "event_selector";
@@ -136,6 +266,15 @@ void BaseEventSelector::BeginJob(std::map<std::string, edm::ParameterSet const >
             msPar["DataResJetParAK8"] = "../data/FT_53_V10_AN3_L2L3Residual_AK5PFchs.txt";
             _missing_config = true;
         }
+	msPar["DataL1JetParByIOV"] = msPar["DataL1JetPar"];
+	msPar["DataL2JetParByIOV"] = msPar["DataL2JetPar"];
+	msPar["DataL3JetParByIOV"] = msPar["DataL3JetPar"];
+	msPar["DataResJetParByIOV"] = msPar["DataResJetPar"];
+	msPar["DataL1JetParByIOVAK8"] = msPar["DataL1JetParAK8"];
+	msPar["DataL2JetParByIOVAK8"] = msPar["DataL2JetParAK8"];
+	msPar["DataL3JetParByIOVAK8"] = msPar["DataL3JetParAK8"];
+	msPar["DataResJetParByIOVAK8"] = msPar["DataResJetParAK8"];
+
         if (par[_key].exists("doNewJEC")) mbPar["doNewJEC"] = par[_key].getParameter<bool> ("doNewJEC");
         else mbPar["doNewJEC"] = false;
         
@@ -236,8 +375,11 @@ void BaseEventSelector::BeginJob(std::map<std::string, edm::ParameterSet const >
     	vParAK8.push_back(*ResJetParAK8);
 
     }
-    if (mbPar["doNewJEC"]) std::cout << mLegend << "Applying new jet energy corrections" << std::endl;
-    else std::cout << mLegend << "NOT applying new jet energy corrections - ARE YOU SURE?" << std::endl;
+    //if (mbPar["doNewJEC"]) std::cout << mLegend << "Applying new jet energy corrections" << std::endl;
+    //else std::cout << mLegend << "NOT applying new jet energy corrections - ARE YOU SURE?" << std::endl;     
+     
+    delete JetCorrector;
+    delete JetCorrectorAK8;
 
     JetCorrector = new FactorizedJetCorrector(vPar);
     JetCorrectorAK8 = new FactorizedJetCorrector(vParAK8);

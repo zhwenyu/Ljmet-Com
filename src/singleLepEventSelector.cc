@@ -420,6 +420,9 @@ void singleLepEventSelector::BeginJob( std::map<std::string, edm::ParameterSet c
 
 bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strbitset & ret)
 {
+
+  if(!mbPar["isMc"]) BaseEventSelector::JECbyIOV(event);
+
     pat::strbitset retJet            = jetSel_->getBitTemplate();
     pat::strbitset retMuon           = muonSel_->getBitTemplate();
     pat::strbitset retLooseMuon      = looseMuonSel_->getBitTemplate();
