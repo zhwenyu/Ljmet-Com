@@ -75,15 +75,15 @@ public:
       delete JetCorrector;
       delete JetCorrectorAK8;
       
-      delete jetCorrector2016BCD;
-      delete jetCorrector2016EF;
-      delete jetCorrector2016G;
-      delete jetCorrector2016H;
+      delete JetCorrector2016BCD;
+      delete JetCorrector2016EF;
+      delete JetCorrector2016G;
+      delete JetCorrector2016H;
 
-      delete jetCorrectorAK82016BCD;
-      delete jetCorrectorAK82016EF;
-      delete jetCorrectorAK82016G;
-      delete jetCorrectorAK82016H;
+      delete JetCorrectorAK82016BCD;
+      delete JetCorrectorAK82016EF;
+      delete JetCorrectorAK82016G;
+      delete JetCorrectorAK82016H;
 
     }
     virtual void AnalyzeEvent( edm::EventBase const & event, LjmetEventContent & ec ) { }
@@ -136,7 +136,7 @@ public:
     bool isJetTagged(const pat::Jet &jet, edm::EventBase const & event, bool applySF = true, int shiftflag = 0, bool subjetflag = false);
     TLorentzVector correctJetForMet(const pat::Jet & jet, edm::EventBase const & event, unsigned int syst = 0);
     TLorentzVector correctJet(const pat::Jet & jet, edm::EventBase const & event, bool doAK8Corr = false, bool forceCorr = false, unsigned int syst = 0,int run=0, bool doEraDepJEC = false);
-    pat::Jet correctJetReturnPatJet(const pat::Jet & jet, edm::EventBase const & event, bool doAK8Corr = false, bool forceCorr = false, unsigned int syst = 0);
+    pat::Jet correctJetReturnPatJet(const pat::Jet & jet, edm::EventBase const & event, bool doAK8Corr = false, bool forceCorr = false, unsigned int syst = 0,int run=0, bool doEraDepJEC = false);
     TLorentzVector correctMet(const pat::MET & met, edm::EventBase const & event, unsigned int syst = 0, bool useHF = true);
     TLorentzVector correctMet(const pat::MET & met, edm::EventBase const & event, std::vector<pat::Jet> jets, unsigned int syst = 0, bool useHF = true);
     TLorentzVector correctMet(const pat::MET & met, edm::EventBase const & event, std::vector<edm::Ptr<pat::Jet> > jets, unsigned int syst = 0, bool useHF = true);
