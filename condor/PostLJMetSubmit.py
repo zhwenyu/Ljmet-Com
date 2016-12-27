@@ -10,11 +10,10 @@ rel_base = os.environ['CMSSW_BASE']
 cmssw = 'CMSSW_8_0_22'
 date = 'Dec14'
 locdir = date
-#basedir = '/store/user/clint/Run2016'
-basedir = '/store/user/clint/Spring16/25ns'
+basedir = '/store/user/clint/Run2016'
 indir = 'root://cmseos.fnal.gov/'+basedir+'/'+date+'/'
 outdir = 'root://cmseos.fnal.gov/'+basedir+'/'+date+'/'
-eosdir = ''+basedir+'/'+date+'/'
+eosdir = '/store/user/lpctlbsm/clint/Run2016/'+date+'/'
 
 #################################################
 ### Names to give to your output root files
@@ -22,83 +21,36 @@ eosdir = ''+basedir+'/'+date+'/'
 
 samples = [
 #    'Data',
-#    'DoubleEG-Run2016B-23Sep2016-v3',
-#    'DoubleEG-Run2016C-23Sep2016-v1',
-#    'DoubleEG-Run2016D-23Sep2016-v1',
-#    'DoubleEG-Run2016E-23Sep2016-v1',
-#    'DoubleEG-Run2016F-23Sep2016-v1',
-#    'DoubleEG-Run2016G-23Sep2016-v1',
-#    'DoubleEG-Run2016H-PromptReco-v2',
-#    'DoubleEG-Run2016H-PromptReco-v3',
-#    'DoubleMuon-Run2016B-23Sep2016-v3',
-#    'DoubleMuon-Run2016C-23Sep2016-v1',
-#    'DoubleMuon-Run2016D-23Sep2016-v1',
-#    'DoubleMuon-Run2016E-23Sep2016-v1',
-#    'DoubleMuon-Run2016F-23Sep2016-v1',
-#    'DoubleMuon-Run2016G-23Sep2016-v1',
-#    'DoubleMuon-Run2016H-PromptReco-v2',
-#    'DoubleMuon-Run2016H-PromptReco-v3',
-#    'MuonEG-Run2016B-23Sep2016-v3',
-#    'MuonEG-Run2016C-23Sep2016-v1',
-#    'MuonEG-Run2016D-23Sep2016-v1',
-#    'MuonEG-Run2016E-23Sep2016-v1',
-#    'MuonEG-Run2016F-23Sep2016-v1',
-#    'MuonEG-Run2016G-23Sep2016-v1',
-#    'MuonEG-Run2016H-PromptReco-v2',
-#    'MuonEG-Run2016H-PromptReco-v3',
-    'TTW',
-    'TTZ',
-    'TTH',
-    'TTTT',
-    'WZ',
-    'ZZ',
-    'WpWp',
-    'WWZ',
-    'WZZ',
-    'ZZZ',
+    'DoubleEG-Run2016B-23Sep2016-v3',
+    'DoubleEG-Run2016C-23Sep2016-v1',
+    'DoubleEG-Run2016D-23Sep2016-v1',
+    'DoubleEG-Run2016E-23Sep2016-v1',
+    'DoubleEG-Run2016F-23Sep2016-v1',
+    'DoubleEG-Run2016G-23Sep2016-v1',
+    'DoubleEG-Run2016H-PromptReco-v2',
+    'DoubleEG-Run2016H-PromptReco-v3',
+    'DoubleMuon-Run2016B-23Sep2016-v3',
+    'DoubleMuon-Run2016C-23Sep2016-v1',
+    'DoubleMuon-Run2016D-23Sep2016-v1',
+    'DoubleMuon-Run2016E-23Sep2016-v1',
+    'DoubleMuon-Run2016F-23Sep2016-v1',
+    'DoubleMuon-Run2016G-23Sep2016-v1',
+    'DoubleMuon-Run2016H-PromptReco-v2',
+    'DoubleMuon-Run2016H-PromptReco-v3',
+    'MuonEG-Run2016B-23Sep2016-v3',
+    'MuonEG-Run2016C-23Sep2016-v1',
+    'MuonEG-Run2016D-23Sep2016-v1',
+    'MuonEG-Run2016E-23Sep2016-v1',
+    'MuonEG-Run2016F-23Sep2016-v1',
+    'MuonEG-Run2016G-23Sep2016-v1',
+    'MuonEG-Run2016H-PromptReco-v2',
+    'MuonEG-Run2016H-PromptReco-v3',
+#    'TTW',
+#    'TTZ',
+#    'TTH',
 ]
 
-samples = []
-
-rmasses = [
-'1000',
-'1100',
-'1200',
-'1300',
-'1400',
-'1500',
-'1600',
-'1700',
-'1800',
-'1900',
-'2000',
-'2100',
-'2200',
-'2300',
-'2400',
-'2500',
-'2600',
-'2700',
-'2800',
-'2900',
-'3000',
-'3100',
-'3200',
-'3300',
-'3400',
-'3500',
-'3600',
-'3700',
-'3800',
-'3900',
-'4000',
-]
-
-
-for i in rmasses:
-    #samples.extend(['Wprime'+i+'Right'])
-    samples.extend(['Wprime'+i+'Mix'])
-    samples.extend(['Wprime'+i+'Left'])
+#samples = []
 
 
 datalist = [
