@@ -192,6 +192,8 @@ void DileptonEventSelector::BeginJob( std::map<std::string, edm::ParameterSet co
 	mbPar["doLepJetCleaning"]         = par[_key].getParameter<bool>         ("doLepJetCleaning");
         mbPar["doNewJEC"]                 = par[_key].getParameter<bool>         ("doNewJEC");
 	mbPar["isMc"]                     = par[_key].getParameter<bool>         ("isMc");
+        if (par[_key].exists("doEraDepJEC")) mbPar["doEraDepJEC"] = par[_key].getParameter<bool> ("doEraDepJEC");
+        else mbPar["doEraDepJEC"] = false;
 
 	//mva value
 	mbPar["UseElMVA"]                 = par[_key].getParameter<bool>         ("UseElMVA");
@@ -830,7 +832,8 @@ bool DileptonEventSelector::operator()( edm::EventBase const & event, pat::strbi
         mvSelJets.clear();
 	mvSelJetsCleaned.clear();
         mvAllJets.clear();
-        
+	//get run for jet energy collections
+	int run = event.id().run();
         event.getByLabel( mtPar["jet_collection"], mhJets );
         for (std::vector<pat::Jet>::const_iterator _ijet = mhJets->begin();
              _ijet != mhJets->end(); ++_ijet){
@@ -840,7 +843,7 @@ bool DileptonEventSelector::operator()( edm::EventBase const & event, pat::strbi
             if ( (*jetSel_)( *_ijet, retJet ) ){ 
                 mvAllJets.push_back(edm::Ptr<pat::Jet>(mhJets, _n_jets)); 		
 		//cut on corrected jet quantities
-		TLorentzVector corJetP4 = correctJet(*_ijet,event);
+		TLorentzVector corJetP4 = correctJet(*_ijet,event,false,false,0,run,mbPar["doEraJEC"]);
                 if (( corJetP4.Pt()>mdPar["jet_minpt"] ) && ( fabs(corJetP4.Eta())<mdPar["jet_maxeta"] )){ 
                     ++_n_good_uncleaned_jets;
                     mvSelJets.push_back(edm::Ptr<pat::Jet>(mhJets, _n_jets)); 
@@ -962,7 +965,7 @@ bool DileptonEventSelector::operator()( edm::EventBase const & event, pat::strbi
 
 	      //if not cleaned just use first jet (remember if no cleaning then cleanedJet==*_ijet) to get corrected four std::vector and set the cleaned jet to have it
 	      if (!_cleaned) {
-		jetP4 = correctJet(cleanedJet, event);
+		jetP4 = correctJet(cleanedJet, event,false,false,0,run,mbPar["doEraJEC"]);
 		//annoying thing to convert our tlorentzstd::vector to root::math::lorentzstd::vector
 		ROOT::Math::LorentzVector<ROOT::Math::PtEtaPhiM4D<double > > rlv;
 		rlv.SetXYZT(jetP4.X(),jetP4.Y(),jetP4.Z(),jetP4.T());
@@ -970,7 +973,7 @@ bool DileptonEventSelector::operator()( edm::EventBase const & event, pat::strbi
 	      }
 	      else{
 		//get the correct 4std::vector
-		jetP4 = correctJet(tmpJet, event);
+		jetP4 = correctJet(tmpJet, event,false,false,0,run,mbPar["doEraJEC"]);
 		//annoying thing to convert our tlorentzstd::vector to root::math::lorentzstd::vector
 		ROOT::Math::LorentzVector<ROOT::Math::PtEtaPhiM4D<double > > rlv;
 		rlv.SetXYZT(jetP4.X(),jetP4.Y(),jetP4.Z(),jetP4.T());
