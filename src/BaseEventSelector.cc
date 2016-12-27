@@ -138,6 +138,7 @@ void BaseEventSelector::BeginJob(std::map<std::string, edm::ParameterSet const >
         }
         if (par[_key].exists("doNewJEC")) mbPar["doNewJEC"] = par[_key].getParameter<bool> ("doNewJEC");
         else mbPar["doNewJEC"] = false;
+
         
         if (_missing_config) {
             std::cout << mLegend
@@ -599,7 +600,7 @@ TLorentzVector BaseEventSelector::correctJetForMet(const pat::Jet & jet, edm::Ev
     return offJetP4-jetP4;
 }
 
-TLorentzVector BaseEventSelector::correctJet(const pat::Jet & jet, edm::EventBase const & event, bool doAK8Corr, bool forceCorr, unsigned int syst)
+TLorentzVector BaseEventSelector::correctJet(const pat::Jet & jet, edm::EventBase const & event, bool doAK8Corr, bool forceCorr, unsigned int syst,int run, bool doEraDepJEC)
 {
 
   // JES and JES systematics
