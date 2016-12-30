@@ -8,6 +8,7 @@
 #include <limits>   // std::numeric_limits
 #include <vector>
 #include <string>
+#include <boost/algorithm/string.hpp>
 #include "TLorentzVector.h"
 
 #include "LJMet/Com/interface/BaseCalc.h"
@@ -78,21 +79,21 @@ private:
   JetCorrectorParameters *L3JetParAK8BCD;
   JetCorrectorParameters *L2JetParAK8BCD;
   JetCorrectorParameters *ResJetParAK8BCD; 
-  JetCorrectorParameters *L3JetParAK8E;
-  JetCorrectorParameters *L2JetParAK8E;
-  JetCorrectorParameters *ResJetParAK8E; 
-  JetCorrectorParameters *L3JetParAK8F;
-  JetCorrectorParameters *L2JetParAK8F;
-  JetCorrectorParameters *ResJetParAK8F; 
-  JetCorrectorParameters *L3JetParAK8GH;
-  JetCorrectorParameters *L2JetParAK8GH;
-  JetCorrectorParameters *ResJetParAK8GH; 
+  JetCorrectorParameters *L3JetParAK8EF;
+  JetCorrectorParameters *L2JetParAK8EF;
+  JetCorrectorParameters *ResJetParAK8EF; 
+  JetCorrectorParameters *L3JetParAK8G;
+  JetCorrectorParameters *L2JetParAK8G;
+  JetCorrectorParameters *ResJetParAK8G; 
+  JetCorrectorParameters *L3JetParAK8H;
+  JetCorrectorParameters *L2JetParAK8H;
+  JetCorrectorParameters *ResJetParAK8H; 
   JetCorrectionUncertainty *jecUnc;
   std::vector<JetCorrectorParameters> vParAK8MC;
   std::vector<JetCorrectorParameters> vParAK8BCD;
-  std::vector<JetCorrectorParameters> vParAK8E;
-  std::vector<JetCorrectorParameters> vParAK8F;
-  std::vector<JetCorrectorParameters> vParAK8GH;
+  std::vector<JetCorrectorParameters> vParAK8EF;
+  std::vector<JetCorrectorParameters> vParAK8G;
+  std::vector<JetCorrectorParameters> vParAK8H;
   TRandom3 JERrand;
 };
 
@@ -192,19 +193,19 @@ int JetSubCalc::BeginJob()
       else DataL2L3 = "/uscms_data/d3/jmanagan/CMSSW_7_4_14/src/LJMet/Com/data/Summer15_25nsV5_Data_L1FastJet";
  
       std::string strL2BCD = DataL2;
-      std::string strL2E = strL2BCD; boost::replace_first(strL2E,"BCD","E");
-      std::string strL2F = strL2BCD; boost::replace_first(strL2F,"BCD","F");
-      std::string strL2GH = strL2BCD; boost::replace_first(strL2GH,"BCD","p2");  
+      std::string strL2EF = strL2BCD; boost::replace_first(strL2EF,"BCD","EF");
+      std::string strL2G = strL2BCD; boost::replace_first(strL2G,"BCD","G");
+      std::string strL2H = strL2BCD; boost::replace_first(strL2H,"BCD","H");  
 
       std::string strL3BCD = DataL3;
-      std::string strL3E = strL3BCD; boost::replace_first(strL3E,"BCD","E");
-      std::string strL3F = strL3BCD; boost::replace_first(strL3F,"BCD","F");
-      std::string strL3GH = strL3BCD; boost::replace_first(strL3GH,"BCD","p2");  
+      std::string strL3EF = strL3BCD; boost::replace_first(strL3EF,"BCD","EF");
+      std::string strL3G = strL3BCD; boost::replace_first(strL3G,"BCD","G");
+      std::string strL3H = strL3BCD; boost::replace_first(strL3H,"BCD","H");  
 
       std::string strL2L3BCD = DataL2L3;
-      std::string strL2L3E = strL2L3BCD; boost::replace_first(strL2L3E,"BCD","E");
-      std::string strL2L3F = strL2L3BCD; boost::replace_first(strL2L3F,"BCD","F");
-      std::string strL2L3GH = strL2L3BCD; boost::replace_first(strL2L3GH,"BCD","p2");  
+      std::string strL2L3EF = strL2L3BCD; boost::replace_first(strL2L3EF,"BCD","EF");
+      std::string strL2L3G = strL2L3BCD; boost::replace_first(strL2L3G,"BCD","G");
+      std::string strL2L3H = strL2L3BCD; boost::replace_first(strL2L3H,"BCD","H");  
        
       if(isMc){
 	L3JetParAK8MC  = new JetCorrectorParameters(MCL3);
@@ -219,26 +220,26 @@ int JetSubCalc::BeginJob()
 	vParAK8BCD.push_back(*L3JetParAK8BCD);
 	vParAK8BCD.push_back(*ResJetParAK8BCD);
 
-	ResJetParAK8E = new JetCorrectorParameters(strL2L3E); 
-	L3JetParAK8E  = new JetCorrectorParameters(strL3E);
-	L2JetParAK8E  = new JetCorrectorParameters(strL2E);
-	vParAK8E.push_back(*L2JetParAK8E);
-	vParAK8E.push_back(*L3JetParAK8E);
-	vParAK8E.push_back(*ResJetParAK8E);
+	ResJetParAK8EF = new JetCorrectorParameters(strL2L3EF); 
+	L3JetParAK8EF  = new JetCorrectorParameters(strL3EF);
+	L2JetParAK8EF  = new JetCorrectorParameters(strL2EF);
+	vParAK8EF.push_back(*L2JetParAK8EF);
+	vParAK8EF.push_back(*L3JetParAK8EF);
+	vParAK8EF.push_back(*ResJetParAK8EF);
 
-	ResJetParAK8F = new JetCorrectorParameters(strL2L3F); 
-	L3JetParAK8F  = new JetCorrectorParameters(strL3F);
-	L2JetParAK8F  = new JetCorrectorParameters(strL2F);
-	vParAK8F.push_back(*L2JetParAK8F);
-	vParAK8F.push_back(*L3JetParAK8F);
-	vParAK8F.push_back(*ResJetParAK8F);
+	ResJetParAK8G = new JetCorrectorParameters(strL2L3G); 
+	L3JetParAK8G  = new JetCorrectorParameters(strL3G);
+	L2JetParAK8G  = new JetCorrectorParameters(strL2G);
+	vParAK8G.push_back(*L2JetParAK8G);
+	vParAK8G.push_back(*L3JetParAK8G);
+	vParAK8G.push_back(*ResJetParAK8G);
 
-	ResJetParAK8GH = new JetCorrectorParameters(strL2L3GH); 
-	L3JetParAK8GH  = new JetCorrectorParameters(strL3GH);
-	L2JetParAK8GH  = new JetCorrectorParameters(strL2GH);
-	vParAK8GH.push_back(*L2JetParAK8GH);
-	vParAK8GH.push_back(*L3JetParAK8GH);
-	vParAK8GH.push_back(*ResJetParAK8GH);
+	ResJetParAK8H = new JetCorrectorParameters(strL2L3H); 
+	L3JetParAK8H  = new JetCorrectorParameters(strL3H);
+	L2JetParAK8H  = new JetCorrectorParameters(strL2H);
+	vParAK8H.push_back(*L2JetParAK8H);
+	vParAK8H.push_back(*L3JetParAK8H);
+	vParAK8H.push_back(*ResJetParAK8H);
       }
       
       if(isMc) jecak8 = new FactorizedJetCorrector(vParAK8MC);
@@ -516,9 +517,9 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * s
     if(!isMc){
       delete jecak8;
       if(iRun <= 276811) jecak8 = new FactorizedJetCorrector(vParAK8BCD);
-      else if(iRun <= 277420) jecak8 = new FactorizedJetCorrector(vParAK8E);
-      else if(iRun <= 278801) jecak8 = new FactorizedJetCorrector(vParAK8F);
-      else jecak8 = new FactorizedJetCorrector(vParAK8GH); 
+      else if(iRun <= 278801) jecak8 = new FactorizedJetCorrector(vParAK8EF);
+      else if(iRun <= 280385) jecak8 = new FactorizedJetCorrector(vParAK8G);
+      else jecak8 = new FactorizedJetCorrector(vParAK8H); 
     }
 
     for (std::vector<pat::Jet>::const_iterator ijet = theAK8Jets->begin(); ijet != theAK8Jets->end(); ijet++) {
@@ -1171,8 +1172,20 @@ int JetSubCalc::EndJob()
 {
   delete jecUnc;
   delete jecak8;
-  delete L2JetParAK8;
-  delete L3JetParAK8;
-  delete ResJetParAK8;
+  delete L3JetParAK8MC;
+  delete L2JetParAK8MC;
+  delete ResJetParAK8MC; 
+  delete L3JetParAK8BCD;
+  delete L2JetParAK8BCD;
+  delete ResJetParAK8BCD; 
+  delete L3JetParAK8EF;
+  delete L2JetParAK8EF;
+  delete ResJetParAK8EF; 
+  delete L3JetParAK8G;
+  delete L2JetParAK8G;
+  delete ResJetParAK8G; 
+  delete L3JetParAK8H;
+  delete L2JetParAK8H;
+  delete ResJetParAK8H; 
   return 0;
 }

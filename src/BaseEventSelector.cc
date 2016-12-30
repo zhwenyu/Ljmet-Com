@@ -1,5 +1,5 @@
 #include <math.h>
-
+#include <boost/algorithm/string.hpp>
 #include "LJMet/Com/interface/BaseEventSelector.h"
 #include "JetMETCorrections/Objects/interface/JetCorrector.h"
 #include "CondFormats/JetMETObjects/interface/JetCorrectorParameters.h"
@@ -28,76 +28,76 @@ void BaseEventSelector::JECbyIOV(edm::EventBase const & event) {
   int iRun   = event.id().run();
 
   std::string strBCD = msPar["DataL1JetPar"];
-  std::string strE = strBCD; boost::replace_first(strE,"BCD","E");
-  std::string strF = strBCD; boost::replace_first(strF,"BCD","F");
-  std::string strGH = strBCD; boost::replace_first(strGH,"BCD","p2");  
+  std::string strEF = strBCD; boost::replace_first(strEF,"BCD","EF");
+  std::string strG = strBCD; boost::replace_first(strG,"BCD","G");
+  std::string strH = strBCD; boost::replace_first(strH,"BCD","H");  
   if(iRun <= 276811) msPar["DataL1JetParByIOV"] = strBCD;
-  else if(iRun <= 277420) msPar["DataL1JetParByIOV"] = strE;
-  else if(iRun <= 278801) msPar["DataL1JetParByIOV"] = strF;
-  else msPar["DataL1JetParByIOV"] = strGH;
+  else if(iRun <= 278801) msPar["DataL1JetParByIOV"] = strEF;
+  else if(iRun <= 280385) msPar["DataL1JetParByIOV"] = strG;
+  else msPar["DataL1JetParByIOV"] = strH;
 
   strBCD = msPar["DataL2JetPar"];
-  strE = strBCD; boost::replace_first(strE,"BCD","E");
-  strF = strBCD; boost::replace_first(strF,"BCD","F");
-  strGH = strBCD; boost::replace_first(strGH,"BCD","p2");  
+  strEF = strBCD; boost::replace_first(strEF,"BCD","EF");
+  strG = strBCD; boost::replace_first(strG,"BCD","G");
+  strH = strBCD; boost::replace_first(strH,"BCD","H");  
   if(iRun <= 276811) msPar["DataL2JetParByIOV"] = strBCD;
-  else if(iRun <= 277420) msPar["DataL2JetParByIOV"] = strE;
-  else if(iRun <= 278801) msPar["DataL2JetParByIOV"] = strF;
-  else msPar["DataL2JetParByIOV"] = strGH;
+  else if(iRun <= 278801) msPar["DataL2JetParByIOV"] = strEF;
+  else if(iRun <= 280385) msPar["DataL2JetParByIOV"] = strG;
+  else msPar["DataL2JetParByIOV"] = strH;
 
   strBCD = msPar["DataL3JetPar"];
-  strE = strBCD; boost::replace_first(strE,"BCD","E");
-  strF = strBCD; boost::replace_first(strF,"BCD","F");
-  strGH = strBCD; boost::replace_first(strGH,"BCD","p2");  
+  strEF = strBCD; boost::replace_first(strEF,"BCD","EF");
+  strG = strBCD; boost::replace_first(strG,"BCD","G");
+  strH = strBCD; boost::replace_first(strH,"BCD","H");  
   if(iRun <= 276811) msPar["DataL3JetParByIOV"] = strBCD;
-  else if(iRun <= 277420) msPar["DataL3JetParByIOV"] = strE;
-  else if(iRun <= 278801) msPar["DataL3JetParByIOV"] = strF;
-  else msPar["DataL3JetParByIOV"] = strGH;
+  else if(iRun <= 278801) msPar["DataL3JetParByIOV"] = strEF;
+  else if(iRun <= 280385) msPar["DataL3JetParByIOV"] = strG;
+  else msPar["DataL3JetParByIOV"] = strH;
 
   strBCD = msPar["DataResJetPar"];
-  strE = strBCD; boost::replace_first(strE,"BCD","E");
-  strF = strBCD; boost::replace_first(strF,"BCD","F");
-  strGH = strBCD; boost::replace_first(strGH,"BCD","p2");  
+  strEF = strBCD; boost::replace_first(strEF,"BCD","EF");
+  strG = strBCD; boost::replace_first(strG,"BCD","G");
+  strH = strBCD; boost::replace_first(strH,"BCD","H");  
   if(iRun <= 276811) msPar["DataResJetParByIOV"] = strBCD;
-  else if(iRun <= 277420) msPar["DataResJetParByIOV"] = strE;
-  else if(iRun <= 278801) msPar["DataResJetParByIOV"] = strF;
-  else msPar["DataResJetParByIOV"] = strGH;
+  else if(iRun <= 278801) msPar["DataResJetParByIOV"] = strEF;
+  else if(iRun <= 280385) msPar["DataResJetParByIOV"] = strG;
+  else msPar["DataResJetParByIOV"] = strH;
 
   strBCD = msPar["DataL1JetParAK8"];
-  strE = strBCD; boost::replace_first(strE,"BCD","E");
-  strF = strBCD; boost::replace_first(strF,"BCD","F");
-  strGH = strBCD; boost::replace_first(strGH,"BCD","p2");  
+  strEF = strBCD; boost::replace_first(strEF,"BCD","EF");
+  strG = strBCD; boost::replace_first(strG,"BCD","G");
+  strH = strBCD; boost::replace_first(strH,"BCD","H");  
   if(iRun <= 276811) msPar["DataL1JetParByIOVAK8"] = strBCD;
-  else if(iRun <= 277420) msPar["DataL1JetParByIOVAK8"] = strE;
-  else if(iRun <= 278801) msPar["DataL1JetParByIOVAK8"] = strF;
-  else msPar["DataL1JetParByIOVAK8"] = strGH;
+  else if(iRun <= 278801) msPar["DataL1JetParByIOVAK8"] = strEF;
+  else if(iRun <= 280385) msPar["DataL1JetParByIOVAK8"] = strG;
+  else msPar["DataL1JetParByIOVAK8"] = strH;
 
   strBCD = msPar["DataL2JetParAK8"];
-  strE = strBCD; boost::replace_first(strE,"BCD","E");
-  strF = strBCD; boost::replace_first(strF,"BCD","F");
-  strGH = strBCD; boost::replace_first(strGH,"BCD","p2");  
+  strEF = strBCD; boost::replace_first(strEF,"BCD","EF");
+  strG = strBCD; boost::replace_first(strG,"BCD","G");
+  strH = strBCD; boost::replace_first(strH,"BCD","H");  
   if(iRun <= 276811) msPar["DataL2JetParByIOVAK8"] = strBCD;
-  else if(iRun <= 277420) msPar["DataL2JetParByIOVAK8"] = strE;
-  else if(iRun <= 278801) msPar["DataL2JetParByIOVAK8"] = strF;
-  else msPar["DataL2JetParByIOVAK8"] = strGH;
+  else if(iRun <= 278801) msPar["DataL2JetParByIOVAK8"] = strEF;
+  else if(iRun <= 280385) msPar["DataL2JetParByIOVAK8"] = strG;
+  else msPar["DataL2JetParByIOVAK8"] = strH;
 
   strBCD = msPar["DataL3JetParAK8"];
-  strE = strBCD; boost::replace_first(strE,"BCD","E");
-  strF = strBCD; boost::replace_first(strF,"BCD","F");
-  strGH = strBCD; boost::replace_first(strGH,"BCD","p2");  
+  strEF = strBCD; boost::replace_first(strEF,"BCD","EF");
+  strG = strBCD; boost::replace_first(strG,"BCD","G");
+  strH = strBCD; boost::replace_first(strH,"BCD","H");  
   if(iRun <= 276811) msPar["DataL3JetParByIOVAK8"] = strBCD;
-  else if(iRun <= 277420) msPar["DataL3JetParByIOVAK8"] = strE;
-  else if(iRun <= 278801) msPar["DataL3JetParByIOVAK8"] = strF;
-  else msPar["DataL3JetParByIOVAK8"] = strGH;
+  else if(iRun <= 278801) msPar["DataL3JetParByIOVAK8"] = strEF;
+  else if(iRun <= 280385) msPar["DataL3JetParByIOVAK8"] = strG;
+  else msPar["DataL3JetParByIOVAK8"] = strH;
 
   strBCD = msPar["DataResJetParAK8"];
-  strE = strBCD; boost::replace_first(strE,"BCD","E");
-  strF = strBCD; boost::replace_first(strF,"BCD","F");
-  strGH = strBCD; boost::replace_first(strGH,"BCD","p2");  
+  strEF = strBCD; boost::replace_first(strEF,"BCD","EF");
+  strG = strBCD; boost::replace_first(strG,"BCD","G");
+  strH = strBCD; boost::replace_first(strH,"BCD","H");  
   if(iRun <= 276811) msPar["DataResJetParByIOVAK8"] = strBCD;
-  else if(iRun <= 277420) msPar["DataResJetParByIOVAK8"] = strE;
-  else if(iRun <= 278801) msPar["DataResJetParByIOVAK8"] = strF;
-  else msPar["DataResJetParByIOVAK8"] = strGH;
+  else if(iRun <= 278801) msPar["DataResJetParByIOVAK8"] = strEF;
+  else if(iRun <= 280385) msPar["DataResJetParByIOVAK8"] = strG;
+  else msPar["DataResJetParByIOVAK8"] = strH;
   
   if ( !mbPar["isMc"] ) {
     std::vector<JetCorrectorParameters> vPar;
