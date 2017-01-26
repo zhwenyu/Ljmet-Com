@@ -294,7 +294,8 @@ void DileptonEventSelector::BeginJob( std::map<std::string, edm::ParameterSet co
 
 
 bool DileptonEventSelector::operator()( edm::EventBase const & event, pat::strbitset & ret){
-    
+
+    if(!mbPar["isMc"]) BaseEventSelector::JECbyIOV(event);    
     pat::strbitset retJet       = jetSel_->getBitTemplate();
 
     //packed pf candidates and rho source needed miniIso
