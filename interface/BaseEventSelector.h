@@ -152,6 +152,7 @@ public:
     double const & GetTestValue() const { return mTestValue; }
     void SetMc(bool isMc) { mbIsMc = isMc; }
     bool IsMc() { return mbIsMc; }
+    bool GetIsTau() { return mbIsTau; }
     
     // LJMET event content setters
     void Init( void );
@@ -215,6 +216,7 @@ protected:
     std::string mName;
     std::string mLegend;
     bool mbIsMc;
+    bool mbIsTau;
     
 private:
     int mNCorrJets;

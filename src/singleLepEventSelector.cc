@@ -901,21 +901,23 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
                     else break;
 
                     if ( mbPar["UseElMVA"] ) {
-                        bool mvapass = false;
-                        if ( fabs(_iel->superCluster()->eta())<=0.8) mvapass = mvaValue( *_iel, event) > mvdPar["tight_electron_mva_cuts"].at(0);
-                        else if ( fabs(_iel->superCluster()->eta())<=1.479 && fabs(_iel->superCluster()->eta())>0.8) mvapass = mvaValue( *_iel, event) > mvdPar["tight_electron_mva_cuts"].at(1);
-                        else mvapass = mvaValue( *_iel, event) > mvdPar["tight_electron_mva_cuts"].at(2);
-                        if (!mvapass) break;
 
-			if(mbPar["electron_useMiniIso"]){
-			  bool passIso = false;
-			  pat::Electron* elptr = new pat::Electron(*_iel);
-			  float miniIso = getPFMiniIsolation_EffectiveArea(packedPFCands, dynamic_cast<const reco::Candidate* > (elptr), 0.05, 0.2, 10., false, false,myRhoJetsNC);
-
-			  if(miniIso < mdPar["electron_miniIso"]) passIso = true;                      
-			  if(!passIso){delete elptr;  break;}
-			  delete elptr;
-			}
+		      //bool mvapass = true;  // HACK FOR TESTING THE MVA EFFICIENCY
+		      bool mvapass = false;
+		      if ( fabs(_iel->superCluster()->eta())<=0.8) mvapass = mvaValue_alt( *_iel, event) > mvdPar["tight_electron_mva_cuts"].at(0);
+		      else if ( fabs(_iel->superCluster()->eta())<=1.479 && fabs(_iel->superCluster()->eta())>0.8) mvapass = mvaValue_alt( *_iel, event) > mvdPar["tight_electron_mva_cuts"].at(1);
+		      else mvapass = mvaValue_alt( *_iel, event) > mvdPar["tight_electron_mva_cuts"].at(2);
+		      if (!mvapass) break;
+		      
+		      if(mbPar["electron_useMiniIso"]){
+			bool passIso = false;
+			pat::Electron* elptr = new pat::Electron(*_iel);
+			float miniIso = getPFMiniIsolation_EffectiveArea(packedPFCands, dynamic_cast<const reco::Candidate* > (elptr), 0.05, 0.2, 10., false, false,myRhoJetsNC);
+			
+			if(miniIso < mdPar["electron_miniIso"]) passIso = true;                      
+			if(!passIso){delete elptr;  break;}
+			delete elptr;
+		      }
                     }
                     else {
 		      if ( (*electronSel_)( *_iel, event, retElectron ) ){ }
@@ -951,21 +953,22 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
                         else break;
 
                         if ( mbPar["UseElMVA"] ) {
-                            bool mvapass = false;
-                            if ( fabs(_iel->superCluster()->eta())<=0.8) mvapass = mvaValue( *_iel, event) > mvdPar["loose_electron_mva_cuts"].at(0);
-                            else if ( fabs(_iel->superCluster()->eta())<=1.479 && fabs(_iel->superCluster()->eta())>0.8) mvapass = mvaValue( *_iel, event) > mvdPar["loose_electron_mva_cuts"].at(1);
-                            else if ( fabs(_iel->superCluster()->eta())>1.479) mvapass = mvaValue( *_iel, event) > mvdPar["loose_electron_mva_cuts"].at(2);
-                            if (!mvapass) break;
+			  //bool mvapass = true; // HACK FOR TESTING THE MVA EFFICIENCY
+			  bool mvapass = false;
+			  if ( fabs(_iel->superCluster()->eta())<=0.8) mvapass = mvaValue_alt( *_iel, event) > mvdPar["loose_electron_mva_cuts"].at(0);
+			  else if ( fabs(_iel->superCluster()->eta())<=1.479 && fabs(_iel->superCluster()->eta())>0.8) mvapass = mvaValue_alt( *_iel, event) > mvdPar["loose_electron_mva_cuts"].at(1);
+			  else if ( fabs(_iel->superCluster()->eta())>1.479) mvapass = mvaValue_alt( *_iel, event) > mvdPar["loose_electron_mva_cuts"].at(2);
+			  if (!mvapass) break;
+			  
+			  if(mbPar["electron_useMiniIso"]){
+			    bool passIso = false;
+			    pat::Electron* elptr = new pat::Electron(*_iel);
+			    float miniIso = getPFMiniIsolation_EffectiveArea(packedPFCands, dynamic_cast<const reco::Candidate* > (elptr), 0.05, 0.2, 10., false, false,myRhoJetsNC);
 			    
-			    if(mbPar["electron_useMiniIso"]){
-			      bool passIso = false;
-			      pat::Electron* elptr = new pat::Electron(*_iel);
-			      float miniIso = getPFMiniIsolation_EffectiveArea(packedPFCands, dynamic_cast<const reco::Candidate* > (elptr), 0.05, 0.2, 10., false, false,myRhoJetsNC);
-			      
-			      if(miniIso < mdPar["loose_electron_miniIso"]) passIso = true;                      
-			      if(!passIso){delete elptr;  break;}
-			      delete elptr;
-			    }
+			    if(miniIso < mdPar["loose_electron_miniIso"]) passIso = true;                      
+			    if(!passIso){delete elptr;  break;}
+			    delete elptr;
+			  }
                         }
                         else {
                             if ( (*looseElectronSel_)( *_iel, event, retLooseElectron ) ){ }
@@ -994,35 +997,40 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
         // loop over taus
 
         int _n_taus  = 0;
+	mbIsTau = 0;
         if (mbPar["debug"]) std::cout<<"start tau cuts..."<<std::endl;
+	
 
-        if ( mbPar["tau_veto"] ) {
-            //get electrons
-            event.getByLabel( mtPar["tau_collection"], mhTaus );      
+        //if ( mbPar["tau_veto"] ) {
+	//get taus
+	event.getByLabel( mtPar["tau_collection"], mhTaus );      
 
-            for (std::vector<pat::Tau>::const_iterator _itau = mhTaus->begin(); _itau != mhTaus->end(); _itau++){
+	for (std::vector<pat::Tau>::const_iterator _itau = mhTaus->begin(); _itau != mhTaus->end(); _itau++){
 
-	      while(1){
+	  while(1){
 
-		//Tau cuts hardcoded here	
-		if(_itau->tauID("byMediumCombinedIsolationDeltaBetaCorr3Hits")){}
-		else break;
+	    //Tau cuts hardcoded here	
+	    if(_itau->tauID("decayModeFindingNewDMs")){}
+	    else break;
+
+	    if(_itau->tauID("byLooseCombinedIsolationDeltaBetaCorr3Hits")){}
+	    else break;
 		
-		if(_itau->tauID("againstElectronTightMVA5")){}
-		else break;
+	    //if(_itau->tauID("againstElectronTightMVA6")){}
+	    //else break;
 		
-		if(_itau->tauID("againstMuonTight3")){}
-		else break;
+	    //if(_itau->tauID("againstMuonLoose3")){}
+	    //else break;
 		
-		if(_itau->pt() > 20 && fabs(_itau->eta()) < 2.4 ){}
-		else break;
+	    if(_itau->pt() > 20 && fabs(_itau->eta()) < 2.4 ){}
+	    else break;
 		
-		++_n_taus;
-		break;
+	    ++_n_taus;
+	    mbIsTau = 1;
+	    break;
 		
-	      }
-	    }
-	    
+	  }
+	  //	}	  
 	}
         if (mbPar["debug"]) std::cout<<"finish tau cuts..."<<std::endl;
         
@@ -1360,7 +1368,7 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
         if( NoSecondLepton || ignoreCut("Second lepton veto") ) passCut(ret, "Second lepton veto");
         else break;
         
-        if( _n_taus == 0 ) passCut(ret, "Tau veto");
+        if( _n_taus == 0 || !mbPar["tau_veto"]) passCut(ret, "Tau veto");
         else break;
         
         if (mbPar["debug"]) std::cout<<"finish lepton cuts..."<<std::endl;
