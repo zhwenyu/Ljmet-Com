@@ -239,6 +239,7 @@ int TTbarMassCalc::AnalyzeEvent(edm::EventBase const & event,
     int isTTbb = 0;
     int isTTbj = 0;
     int isTTcc = 0;
+    int isTTcj = 0;
     int isTTll = 0;
     int isTTlf = 0;
     int isTT = 0;
@@ -335,10 +336,15 @@ int TTbarMassCalc::AnalyzeEvent(edm::EventBase const & event,
       
       if(extrab >= 2) isTTbb = 1;
       else if(extrab == 1) isTTbj = 1;
-      else if((cjets-WdecayCMatches) >= 2) isTTcc = 1;
-      else if((cjets-WdecayCMatches) == 0 && (ljets-WdecayLMatches) >= 2) isTTll = 1;
-      else if((cjets-WdecayCMatches)+(ljets-WdecayLMatches) >= 1) isTTlf = 1;
-      else isTT = 1;
+      else if(extrab == 0){
+	if((cjets-WdecayCMatches) >= 2) isTTcc = 1;
+	else if((cjets-WdecayCMatches) == 1) isTTcj = 1;
+	else if((cjets-WdecayCMatches) == 0){
+	  if((ljets-WdecayLMatches) >= 2) isTTll = 1;
+	  else if((ljets-WdecayLMatches) == 1) isTTlf = 1;
+	  else isTT = 1;
+	}
+      }
       
       //cout << "isTTbb = " << isTTbb << ", isTTbj = " << isTTbj << endl;
       //cout << "isTTcc = " << isTTcc << ", isTTll = " << isTTll << endl;
@@ -356,6 +362,7 @@ int TTbarMassCalc::AnalyzeEvent(edm::EventBase const & event,
     SetValue("isTTbb",isTTbb);
     SetValue("isTTbj",isTTbj);
     SetValue("isTTcc",isTTcc);
+    SetValue("isTTcj",isTTcj);
     SetValue("isTTll",isTTll);
     SetValue("isTTlf",isTTlf);
     SetValue("isTT",isTT);
