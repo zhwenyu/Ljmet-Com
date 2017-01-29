@@ -134,7 +134,7 @@ process.event_selector = cms.PSet(
     jet_maxeta               = cms.double(2.4),
     min_jet                  = cms.int32(2),
     max_jet                  = cms.int32(4000),
-    leading_jet_pt           = cms.double(50.0),
+    leading_jet_pt           = cms.double(30.0),
 
     # muon cuts
     muon_cuts                = cms.bool(True),
@@ -156,12 +156,12 @@ process.event_selector = cms.PSet(
     electron_cuts            = cms.bool(True),
     min_electron             = cms.int32(0),
     electron_minpt           = cms.double(30.0),
-    electron_maxeta          = cms.double(2.4),
+    electron_maxeta          = cms.double(2.5),
     electron_useMiniIso      = cms.bool(True),
     electron_miniIso         = cms.double(0.1),
     loose_electron_miniIso   = cms.double(0.4),
     loose_electron_minpt     = cms.double(10.0),
-    loose_electron_maxeta    = cms.double(2.4),
+    loose_electron_maxeta    = cms.double(2.5),
     UseElMVA                 = cms.bool(True),
     tight_electron_mva_cuts  = cms.vdouble(0.674,0.744,0.170), # 80X WP80 to recover efficiency of 74X WP80
     loose_electron_mva_cuts  = cms.vdouble(-0.041,0.383,-0.515), # 80X WP90 to recover efficiency of 74X WP90

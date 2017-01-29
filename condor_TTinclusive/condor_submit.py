@@ -16,9 +16,9 @@ files_per_job = 10
 
 if (socket.gethostname().find('fnal')>=0):
     brux=bool(False)
-    sePath='\'root://cmseos.fnal.gov/'         # stored on LPC, most of our samples
+#    sePath='\'root://cmseos.fnal.gov/'         # stored on LPC, most of our samples
 #    sePath='\'root://cmsxrootd.fnal.gov/'      # stored elsewhere
-#    sePath='\'root://eoscms.cern.ch/'      # stored at CERN
+    sePath='\'root://eoscms.cern.ch/'      # stored at CERN
     storePath=''
     setupString='source \/cvmfs\/cms.cern.ch\/cmsset_default.csh'
     outPath='root://cmseos.fnal.gov/'          # output on LPC

@@ -2,18 +2,6 @@ import os,sys,datetime
 
 sampleList=[
 	# Should be at CERN, use eoscms.cern.ch in condor_submit.py
-	#'SingleElectron_PRB.txt',
-	#'SingleMuon_PRB.txt',
-	#'SingleElectron_PRC.txt',
-	#'SingleMuon_PRC.txt',
-	#'SingleElectron_PRD.txt',
-	#'SingleMuon_PRD.txt',
-	#'SingleElectron_PRE.txt',
-	#'SingleMuon_PRE.txt',
-	#'SingleElectron_PRF.txt',
-	#'SingleMuon_PRF.txt',
-	#'SingleElectron_PRG.txt',
-	#'SingleMuon_PRG.txt',
 	#'JetHT_PRH.txt',
 	#'JetHT_RRBCDEFG.txt',
 
@@ -45,4 +33,4 @@ else:
 	os.chdir(thisDir)
 
 for sample in sampleList:
-	os.system('python condor_submit.py --useMC False --sample '+sample.split('.')[0]+' --json Cert_271036-284044_13TeV_23Sep2016ReReco_Collisions16_JSON.txt --fileList '+thisDir+'fileListsSpring16/'+sample+' --submit True --inputTar '+tarfile+' --outDir /eos/uscms/store/user/lpcljm/2016/SOMEDIRNAMEHERE --shift '+shift)
+	os.system('python condor_submit.py --useMC False --sample '+sample.split('.')[0]+' --json Cert_271036-284044_13TeV_23Sep2016ReReco_Collisions16_JSON.txt --fileList '+thisDir+'fileListsSpring16/'+sample+' --submit True --inputTar '+tarfile+' --outDir /eos/uscms/store/user/lpcljm/2016/LJMet80X_1lep_012817 --shift '+shift)

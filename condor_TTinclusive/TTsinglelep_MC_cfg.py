@@ -78,11 +78,26 @@ process.event_selector = cms.PSet(
 
     mctrigger_path_el = cms.vstring(
         'digitisation_step',
+        'HLT_Ele27_eta2p1_WPLoose_Gsf_HT200_v8',   'HLT_Ele27_eta2p1_WPLoose_Gsf_HT200_v9',   'HLT_Ele27_eta2p1_WPLoose_Gsf_HT200_v10',   
+        'HLT_Ele32_eta2p1_WPTight_Gsf_v7',         'HLT_Ele32_eta2p1_WPTight_Gsf_v8',         'HLT_Ele32_eta2p1_WPTight_Gsf_v9',         
+        'HLT_Ele30_WPTight_Gsf_v1',                'HLT_Ele30_WPTight_Gsf_v2',                'HLT_Ele30_WPTight_Gsf_v3',                
+        'HLT_Ele32_WPTight_Gsf_v1',                'HLT_Ele32_WPTight_Gsf_v2',                'HLT_Ele32_WPTight_Gsf_v3',                
+        'HLT_Ele50_CaloIdVT_GsfTrkIdT_PFJet140_v6','HLT_Ele50_CaloIdVT_GsfTrkIdT_PFJet140_v7','HLT_Ele50_CaloIdVT_GsfTrkIdT_PFJet140_v8',
+        'HLT_Ele50_CaloIdVT_GsfTrkIdT_PFJet165_v6','HLT_Ele50_CaloIdVT_GsfTrkIdT_PFJet165_v7','HLT_Ele50_CaloIdVT_GsfTrkIdT_PFJet165_v8',
+        'HLT_Ele15_IsoVVVL_PFHT350_v7',            'HLT_Ele15_IsoVVVL_PFHT350_v8',            'HLT_Ele15_IsoVVVL_PFHT350_v9',            
+        'HLT_Ele15_IsoVVVL_PFHT400_v5',            'HLT_Ele15_IsoVVVL_PFHT400_v6',            'HLT_Ele15_IsoVVVL_PFHT400_v7',            
         ),
     mctrigger_path_mu = cms.vstring(
         'digitisation_step',
+        'HLT_IsoMu24_v3',                     'HLT_IsoMu24_v4',                     'HLT_IsoMu24_v5',                     
+        'HLT_IsoTkMu24_v3',                   'HLT_IsoTkMu24_v4',                   'HLT_IsoTkMu24_v5',                   
+        'HLT_Mu50_v4',                        'HLT_Mu50_v5',                        'HLT_Mu50_v6',                        
+        'HLT_TkMu50_v2',                      'HLT_TkMu50_v3',                      'HLT_TkMu50_v4',                      
+        'HLT_Mu15_IsoVVVL_PFHT350_v6',        'HLT_Mu15_IsoVVVL_PFHT350_v7',        'HLT_Mu15_IsoVVVL_PFHT350_v8',        
+        'HLT_Mu15_IsoVVVL_PFHT400_v4',        'HLT_Mu15_IsoVVVL_PFHT400_v5',        'HLT_Mu15_IsoVVVL_PFHT400_v6',        
+        'HLT_Mu40_eta2p1_PFJet200_PFJet50_v6','HLT_Mu40_eta2p1_PFJet200_PFJet50_v7','HLT_Mu40_eta2p1_PFJet200_PFJet50_v8',
         ),
-    
+
     trigger_path_el = cms.vstring(''),
     trigger_path_mu = cms.vstring(''),   
     
@@ -97,7 +112,7 @@ process.event_selector = cms.PSet(
     jet_maxeta               = cms.double(2.4),
     min_jet                  = cms.int32(2),
     max_jet                  = cms.int32(4000),
-    leading_jet_pt           = cms.double(50.0),
+    leading_jet_pt           = cms.double(30.0),
 
     # muon cuts
     muon_cuts                = cms.bool(True),
@@ -119,12 +134,12 @@ process.event_selector = cms.PSet(
     electron_cuts            = cms.bool(True),
     min_electron             = cms.int32(0),
     electron_minpt           = cms.double(30.0),
-    electron_maxeta          = cms.double(2.4),
+    electron_maxeta          = cms.double(2.5),
     electron_useMiniIso      = cms.bool(True),
     electron_miniIso         = cms.double(0.1),
     loose_electron_miniIso   = cms.double(0.4),
     loose_electron_minpt     = cms.double(10.0),
-    loose_electron_maxeta    = cms.double(2.4),
+    loose_electron_maxeta    = cms.double(2.5),
     UseElMVA                 = cms.bool(True),
     tight_electron_mva_cuts  = cms.vdouble(0.674,0.744,0.170), # 80X WP80 to recover efficiency of 74X WP80
     loose_electron_mva_cuts  = cms.vdouble(-0.041,0.383,-0.515), # 80X WP90 to recover efficiency of 74X WP90
