@@ -173,7 +173,7 @@ process.event_selector = cms.PSet(
     
     # Btagging cuts
     btagOP                   = cms.string('CSVM'),
-    btag_min_discr           = cms.double(0.800),
+    btag_min_discr           = cms.double(0.8484),
     btag_cuts                = cms.bool(False),
     btag_1                   = cms.bool(False),
     btag_2                   = cms.bool(False),
