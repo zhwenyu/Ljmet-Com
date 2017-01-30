@@ -488,7 +488,8 @@ TLorentzVector BaseEventSelector::scaleJet(const pat::Jet& jet, bool up){
       std::cout << mLegend << "WARNING! Jet/MET will remain uncorrected." << std::endl;
       unc = 0.0;
     }
-    unc = 1 + unc; 
+    if(up) unc = 1 + unc; 
+    else unc = 1 - unc; 
 
     //scale pT
     float pt = jetP4.Pt()*unc;
