@@ -471,6 +471,77 @@ void BaseEventSelector::Init( void )
     mpEc->SetHistogram(mName, "nBtagSfCorrections", 100, 0.0, 10.0);
 }
 
+TLorentzVector BaseEventSelector::scaleJet(const pat::Jet& jet, bool up){
+
+    double unc = 1.0;
+    TLorentzVector jetP4;
+    jetP4.SetPtEtaPhiM(jet.pt(), jet.eta(),jet.phi(), jet.mass() );
+    jecUnc->setJetEta(jetP4.Eta());
+    jecUnc->setJetPt(jetP4.Pt());
+    
+    try{
+      unc = jecUnc->getUncertainty(up);
+    }
+    catch(...){ // catch all exceptions. Jet Uncertainty tool throws when binning out of range
+      std::cout << mLegend << "WARNING! Exception thrown by JetCorrectionUncertainty!" << std::endl;
+      std::cout << mLegend << "WARNING! Possibly, trying to correct a jet/MET outside correction range." << std::endl;
+      std::cout << mLegend << "WARNING! Jet/MET will remain uncorrected." << std::endl;
+      unc = 0.0;
+    }
+    unc = 1 + unc; 
+
+    //scale pT
+    float pt = jetP4.Pt()*unc;
+    jetP4.SetPtEtaPhiM(pt,jet.eta(),jet.phi(),jet.mass());
+    return jetP4;
+}
+
+TLorentzVector BaseEventSelector::smearJet(const pat::Jet& jet,  edm::EventBase const & event, bool up, bool doAK8){
+
+  //get rho value - would be better not to call it everytime but we already do this....so bad habits everywhere...at least we are consistent
+  edm::Handle<double> rhoHandle;
+  edm::InputTag rhoSrc_("fixedGridRhoFastjetAll", "");
+  event.getByLabel(rhoSrc_, rhoHandle);
+  double rho = std::max(*(rhoHandle.product()), 0.0);
+  double ptscale = 1.0;
+  Variation JERsystematic = Variation::NOMINAL;
+  if(up) JERsystematic = Variation::UP;
+  else JERsystematic = Variation::DOWN;
+  
+  JME::JetParameters parameters;
+  parameters.setJetPt(jet.pt());
+  parameters.setJetEta(jet.eta());
+  parameters.setRho(rho);
+  double res = 0.0;
+  if(doAK8) res = resolutionAK8.getResolution(parameters);
+  else res = resolution.getResolution(parameters);
+  double factor = resolution_SF.getScaleFactor(parameters,JERsystematic) - 1;
+
+  const reco::GenJet * genJet = jet.genJet();
+  bool smeared = false;
+  if(genJet){
+    double deltaPt = fabs(genJet->pt() - jet.pt());
+    double deltaR = reco::deltaR(genJet->p4(),jet.p4());
+    if (deltaR < ((doAK8) ? 0.4 : 0.2) && deltaPt <= 3*jet.pt()*res){
+      double gen_pt = genJet->pt();
+      double reco_pt = jet.pt();
+      double deltapt = (reco_pt - gen_pt) * factor;
+      ptscale = max(0.0, (reco_pt + deltapt) / reco_pt);
+      smeared = true;
+    }
+  }
+  if (!smeared && factor>0) {
+    JERrand.SetSeed(abs(static_cast<int>(jet.phi()*1e4)));
+    ptscale = max(0.0, JERrand.Gaus(jet.pt(),sqrt(factor*(factor+2))*res*jet.pt())/jet.pt());
+  }
+
+  TLorentzVector jetP4;
+  float pt = jet.pt()*ptscale;
+  jetP4.SetPtEtaPhiM(pt,jet.eta(),jet.phi(),jet.mass());
+  return jetP4;
+
+}
+
 TLorentzVector BaseEventSelector::correctJetForMet(const pat::Jet & jet, edm::EventBase const & event, unsigned int syst)
 {
 

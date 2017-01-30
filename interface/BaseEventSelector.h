@@ -136,6 +136,8 @@ public:
     bool isJetTagged(const pat::Jet &jet, edm::EventBase const & event, bool applySF = true, int shiftflag = 0, bool subjetflag = false);
     TLorentzVector correctJetForMet(const pat::Jet & jet, edm::EventBase const & event, unsigned int syst = 0);
     TLorentzVector correctJet(const pat::Jet & jet, edm::EventBase const & event, bool doAK8Corr = false, bool forceCorr = false, unsigned int syst = 0,int run=0, bool doEraDepJEC = false);
+    TLorentzVector smearJet(const pat::Jet & jet, edm::EventBase const & event, bool up=true,bool doAK8=false);
+    TLorentzVector scaleJet(const pat::Jet & jet, bool up=true);
     pat::Jet correctJetReturnPatJet(const pat::Jet & jet, edm::EventBase const & event, bool doAK8Corr = false, bool forceCorr = false, unsigned int syst = 0,int run=0, bool doEraDepJEC = false);
     TLorentzVector correctMet(const pat::MET & met, edm::EventBase const & event, unsigned int syst = 0, bool useHF = true);
     TLorentzVector correctMet(const pat::MET & met, edm::EventBase const & event, std::vector<pat::Jet> jets, unsigned int syst = 0, bool useHF = true);
