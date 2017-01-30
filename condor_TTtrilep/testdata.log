@@ -1,0 +1,24 @@
+     0 :         No selection       5000
+     1 :              Trigger       3741
+     2 :       Primary vertex       3741
+     3 :          MET filters       3737
+     4 :      One jet or more        off
+     5 :     Two jets or more        off
+     6 :   Three jets or more        off
+     7 : Min jet multiplicity       2734
+     8 : Max jet multiplicity       2734
+     9 :       Leading jet pt       2734
+    10 :              Min MET       1844
+    11 :              Max MET       1844
+    12 :             Min muon       1844
+    13 :         Min electron       1844
+    14 :           Min lepton       1844
+    15 :           Max lepton       1844
+    16 :     Min loose lepton          1
+    17 :     Max loose lepton          1
+    18 :   Second lepton veto        off
+    19 :             Tau veto        off
+    20 :       1 btag or more        off
+    21 :       2 btag or more        off
+    22 :       3 btag or more        off
+    23 :             All cuts          1
