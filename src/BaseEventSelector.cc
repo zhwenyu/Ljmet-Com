@@ -190,25 +190,25 @@ void BaseEventSelector::BeginJob(std::map<std::string, edm::ParameterSet const >
 
     //make runera dependent jec
     std::vector<JetCorrectorParameters> vPar2016BCD; 
-    vPar2016BCD.push_back(JetCorrectorParameters("../data/textFiles/Spring16_23Sep2016BCDV2_DATA/Spring16_23Sep2016BCDV2_DATA_L1FastJet_AK4PFchs.txt"));
-    vPar2016BCD.push_back(JetCorrectorParameters("../data/textFiles/Spring16_23Sep2016BCDV2_DATA/Spring16_23Sep2016BCDV2_DATA_L2Relative_AK4PFchs.txt"));
-    vPar2016BCD.push_back(JetCorrectorParameters("../data/textFiles/Spring16_23Sep2016BCDV2_DATA/Spring16_23Sep2016BCDV2_DATA_L3Absolute_AK4PFchs.txt"));
-    vPar2016BCD.push_back(JetCorrectorParameters("../data/textFiles/Spring16_23Sep2016BCDV2_DATA/Spring16_23Sep2016BCDV2_DATA_L2L3Residual_AK4PFchs.txt"));
+    vPar2016BCD.push_back(JetCorrectorParameters("../data/Summer16_23Sep2016BCDV3_DATA_L1FastJet_AK4PFchs.txt"));
+    vPar2016BCD.push_back(JetCorrectorParameters("../data/Summer16_23Sep2016BCDV3_DATA_L2Relative_AK4PFchs.txt"));
+    vPar2016BCD.push_back(JetCorrectorParameters("../data/Summer16_23Sep2016BCDV3_DATA_L3Absolute_AK4PFchs.txt"));
+    vPar2016BCD.push_back(JetCorrectorParameters("../data/Summer16_23Sep2016BCDV3_DATA_L2L3Residual_AK4PFchs.txt"));
     std::vector<JetCorrectorParameters> vPar2016EF;
-    vPar2016EF.push_back(JetCorrectorParameters("../data/textFiles/Spring16_23Sep2016EFV2_DATA/Spring16_23Sep2016EFV2_DATA_L1FastJet_AK4PFchs.txt"));
-    vPar2016EF.push_back(JetCorrectorParameters("../data/textFiles/Spring16_23Sep2016EFV2_DATA/Spring16_23Sep2016EFV2_DATA_L2Relative_AK4PFchs.txt"));
-    vPar2016EF.push_back(JetCorrectorParameters("../data/textFiles/Spring16_23Sep2016EFV2_DATA/Spring16_23Sep2016EFV2_DATA_L3Absolute_AK4PFchs.txt"));
-    vPar2016EF.push_back(JetCorrectorParameters("../data/textFiles/Spring16_23Sep2016EFV2_DATA/Spring16_23Sep2016EFV2_DATA_L2L3Residual_AK4PFchs.txt"));
+    vPar2016EF.push_back(JetCorrectorParameters("../data/Summer16_23Sep2016EFV3_DATA_L1FastJet_AK4PFchs.txt"));
+    vPar2016EF.push_back(JetCorrectorParameters("../data/Summer16_23Sep2016EFV3_DATA_L2Relative_AK4PFchs.txt"));
+    vPar2016EF.push_back(JetCorrectorParameters("../data/Summer16_23Sep2016EFV3_DATA_L3Absolute_AK4PFchs.txt"));
+    vPar2016EF.push_back(JetCorrectorParameters("../data/Summer16_23Sep2016EFV3_DATA_L2L3Residual_AK4PFchs.txt"));
     std::vector<JetCorrectorParameters> vPar2016G;
-    vPar2016G.push_back(JetCorrectorParameters("../data/textFiles/Spring16_23Sep2016GV2_DATA/Spring16_23Sep2016GV2_DATA_L1FastJet_AK4PFchs.txt"));
-    vPar2016G.push_back(JetCorrectorParameters("../data/textFiles/Spring16_23Sep2016GV2_DATA/Spring16_23Sep2016GV2_DATA_L2Relative_AK4PFchs.txt"));
-    vPar2016G.push_back(JetCorrectorParameters("../data/textFiles/Spring16_23Sep2016GV2_DATA/Spring16_23Sep2016GV2_DATA_L3Absolute_AK4PFchs.txt"));
-    vPar2016G.push_back(JetCorrectorParameters("../data/textFiles/Spring16_23Sep2016GV2_DATA/Spring16_23Sep2016GV2_DATA_L2L3Residual_AK4PFchs.txt"));
+    vPar2016G.push_back(JetCorrectorParameters("../data/Summer16_23Sep2016GV3_DATA_L1FastJet_AK4PFchs.txt"));
+    vPar2016G.push_back(JetCorrectorParameters("../data/Summer16_23Sep2016GV3_DATA_L2Relative_AK4PFchs.txt"));
+    vPar2016G.push_back(JetCorrectorParameters("../data/Summer16_23Sep2016GV3_DATA_L3Absolute_AK4PFchs.txt"));
+    vPar2016G.push_back(JetCorrectorParameters("../data/Summer16_23Sep2016GV3_DATA_L2L3Residual_AK4PFchs.txt"));
     std::vector<JetCorrectorParameters> vPar2016H;
-    vPar2016H.push_back(JetCorrectorParameters("../data/textFiles/Spring16_23Sep2016HV2_DATA/Spring16_23Sep2016HV2_DATA_L1FastJet_AK4PFchs.txt"));
-    vPar2016H.push_back(JetCorrectorParameters("../data/textFiles/Spring16_23Sep2016HV2_DATA/Spring16_23Sep2016HV2_DATA_L2Relative_AK4PFchs.txt"));
-    vPar2016H.push_back(JetCorrectorParameters("../data/textFiles/Spring16_23Sep2016HV2_DATA/Spring16_23Sep2016HV2_DATA_L3Absolute_AK4PFchs.txt"));
-    vPar2016H.push_back(JetCorrectorParameters("../data/textFiles/Spring16_23Sep2016HV2_DATA/Spring16_23Sep2016HV2_DATA_L2L3Residual_AK4PFchs.txt"));
+    vPar2016H.push_back(JetCorrectorParameters("../data/Summer16_23Sep2016HV3_DATA_L1FastJet_AK4PFchs.txt"));
+    vPar2016H.push_back(JetCorrectorParameters("../data/Summer16_23Sep2016HV3_DATA_L2Relative_AK4PFchs.txt"));
+    vPar2016H.push_back(JetCorrectorParameters("../data/Summer16_23Sep2016HV3_DATA_L3Absolute_AK4PFchs.txt"));
+    vPar2016H.push_back(JetCorrectorParameters("../data/Summer16_23Sep2016HV3_DATA_L2L3Residual_AK4PFchs.txt"));
 
     std::vector<JetCorrectorParameters> vPar;
     std::vector<JetCorrectorParameters> vParAK8;
