@@ -1,11 +1,14 @@
-WZ
-ZZ
 TTW
 TTZ
 TTH
 TTTT
+WZ
+ZZ
 WWW
 WWZ
 WZZ
 ZZZ
 WpWp
+#DYJets
+#TTbar
+#WJets
