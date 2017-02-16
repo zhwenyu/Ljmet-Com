@@ -18,6 +18,9 @@
 #include "FWCore/Utilities/interface/Exception.h"
 
 using namespace std;
+enum shift:char{ central, up, down, uncert };
+enum method:char{ mujets, comb };
+
 BtagHardcodedConditions::BtagHardcodedConditions() {
     float SFb_TCHPT_temp11[14] = { 0.0543376, 0.0534339, 0.0266156, 0.0271337, 0.0276364, 0.0308838, 0.0381656, 0.0336979, 0.0336773, 0.0347688, 0.0376865, 0.0556052, 0.0598105, 0.0861122 };
     float SFb_CSVL_temp11[14] = { 0.0188743, 0.0161816, 0.0139824, 0.0152644, 0.0161226, 0.0157396, 0.0161619, 0.0168747, 0.0257175, 0.026424, 0.0264928, 0.0315127, 0.030734, 0.0438259 };
@@ -52,83 +55,153 @@ BtagHardcodedConditions::BtagHardcodedConditions() {
     fillArray(SFb_JPT_error12, SFb_JPT_temp12,16);
     float ptminT12[16] = {20, 30, 40, 50, 60, 70, 80, 100, 120, 160, 210, 260, 320, 400, 500, 600};
     for (int i=0;i<16;++i) ptRange12.push_back(ptminT12[i]);
-    
-}
 
+    // 2015 scale factors from csv file in https://twiki.cern.ch/twiki/bin/viewauth/CMS/BtagRecommendation74X50ns
+    float SFb_CSVL_temp15[7]  = {0.022327613085508347, 0.015330483205616474, 0.024493992328643799, 0.020933238789439201, 0.029219608753919601, 0.039571482688188553, 0.047329759448766708};
+    float SFb_CSVM_temp15[7]  = {0.031647235155105591, 0.021615911275148392, 0.032769639045000076, 0.024189794436097145, 0.043655604124069214, 0.060466367751359940, 0.064764265418052673};
+    float SFb_CSVT_temp15[7]  = {0.031852148473262787, 0.023946098983287811, 0.038635428994894028, 0.031439229846000671, 0.049481656402349472, 0.074025325477123260, 0.074882696777582169};
+    fillArray(SFb_CSVL_error15, SFb_CSVL_temp15,7);
+    fillArray(SFb_CSVM_error15, SFb_CSVM_temp15,7);
+    fillArray(SFb_CSVT_error15, SFb_CSVT_temp15,7);
+    float ptminT15[7] = {30, 50, 70, 100, 140, 200, 300};
+    for (int i=0;i<7;++i) ptRange15.push_back(ptminT15[i]);
+
+    // 2016 scale factors from csv file in https://twiki.cern.ch/twiki/bin/viewauth/CMS/BtagRecommendation80XReReco
+    float SFb_CSVL_temp16[9]  = {0.025239448994398117,0.01235662866383791,0.011164451949298382,0.010772000998258591,0.010771119967103004,0.01066881138831377,0.013474081642925739,0.016922028735280037,0.02176009863615036};
+    float SFb_CSVM_temp16[9]  = {0.039442747831344604,0.012669667601585388,0.011243613436818123,0.010686126537621021,0.010994619689881802,0.011888998560607433,0.015397069044411182,0.020918292924761772,0.031905386596918106};
+    float SFb_CSVT_temp16[9]  = {0.033431731164455414,0.013560791499912739,0.0120538379997015,0.011428359895944595,0.011935552582144737,0.012772096320986748,0.019408319145441055,0.029299838468432426,0.052225127816200256};
+    fillArray(SFb_CSVL_error16, SFb_CSVL_temp16,9);
+    fillArray(SFb_CSVM_error16, SFb_CSVM_temp16,9);
+    fillArray(SFb_CSVT_error16, SFb_CSVT_temp16,9);
+    float ptminT16[9] = {20, 30, 50, 70, 100, 140, 200, 300, 600};
+    for (int i=0;i<9;++i) ptRange16.push_back(ptminT16[i]);
+
+}
 
 BtagHardcodedConditions::~BtagHardcodedConditions() {
 }
 
-std::string BtagHardcodedConditions::getAlgoName(const std::string & op){
+std::string BtagHardcodedConditions::getAlgoName(const std::string & op)
+{
     if( op == "JPL")   	return "jetProbabilityBJetTags";
     else if( op == "JPM")   return "jetProbabilityBJetTags";
     else if( op == "JPT")   return "jetProbabilityBJetTags";
     else if( op == "JP")    return "jetProbabilityBJetTags";
     else if( op == "TCHPT") return "trackCountingHighPurBJetTags";
     else if( op == "TCHP") return "trackCountingHighPurBJetTags";
-    else if( op == "CSVL")  return "combinedInclusiveSecondaryVertexV2BJetTags";
-    else if( op == "CSVM")  return "combinedInclusiveSecondaryVertexV2BJetTags";
-    else if( op == "CSVT")  return "combinedInclusiveSecondaryVertexV2BJetTags";
-    else if( op == "CSV")  return "combinedInclusiveSecondaryVertexV2BJetTags";
+    else if( op == "CSVL")  return "pfCombinedInclusiveSecondaryVertexV2BJetTags";
+    else if( op == "CSVM")  return "pfCombinedInclusiveSecondaryVertexV2BJetTags";
+    else if( op == "CSVT")  return "pfCombinedInclusiveSecondaryVertexV2BJetTags";
+    else if( op == "CSV")  return "pfCombinedInclusiveSecondaryVertexV2BJetTags";
+    else if( op == "CSVLsubjet")  return "pfCombinedInclusiveSecondaryVertexV2BJetTags";
+    else if( op == "CSVMsubjet")  return "pfCombinedInclusiveSecondaryVertexV2BJetTags";
     throw cms::Exception("InvalidInput") << "Unknown tagger/operating point: "<< op << std::endl;
 }
 
-float BtagHardcodedConditions::getDiscriminant(const std::string & op){
+float BtagHardcodedConditions::getDiscriminant(const std::string & op)
+{
     if( op == "JPL")   	return 0.275;
     else if( op == "JPM")   return 0.545;
     else if( op == "JPT")   return 0.79;
     else if( op == "TCHPT") return 3.41;
-    else if( op == "CSVL")  return 0.423;
-    else if( op == "CSVM")  return 0.814;
-    else if( op == "CSVT")  return 0.941;
+    else if( op == "CSVL")  return 0.5426; //0.605; //0.423;
+    else if( op == "CSVM")  return 0.8484; //0.890; //0.814;
+    else if( op == "CSVT")  return 0.9535; //0.970; //0.941;
+    else if( op == "CSVLsubjet")  return 0.5426; //0.605; //0.423;
+    else if( op == "CSVMsubjet")  return 0.8484; //0.890; //0.814;
     throw cms::Exception("InvalidInput") << "Unknown operating point: "<< op << std::endl;
 }
 
 
-double BtagHardcodedConditions::GetBtagEfficiency(double pt, double eta,
-                                                  std::string tagger)
+double BtagHardcodedConditions::GetBtagEfficiency(double pt, double eta, std::string tagger)
 {
-    //flat efficiencies from AN-12-187
-    if( tagger == "CSVM")
-        return 0.685;
-    else if( tagger == "CSVL")
-        return 0.844;
-    
-    
-    // tag eff, x - discriminant
-    // from https://twiki.cern.ch/twiki/pub/CMS/BtagPOG/eff_b_c-ttbar_payload.txt
-    
-    float d = getDiscriminant(tagger);
-    /*if ((tagger=="CSV") || (getAlgoTag(tagger)=="CSV")){
-     return -4.46932526854*d*d*d*d+7.32781975653*d*d*d-3.78459588569*d*d+0.221027515486*d+0.970299300468;
-     } else */
-    
-    if ((tagger=="JP") || (getAlgoTag(tagger)=="JP")){
-        return -1.3411375438*d*d*d*d+1.86566177901*d*d*d-0.59348240368*d*d-0.893938089125*d+1.22839928411;
-    } else if ((tagger=="TCHP") || (getAlgoTag(tagger)=="TCHP")){
-        return 9.83842428415e-06*d*d*d*d +  -0.000556835427293*d*d*d +  0.0123891144567*d*d +  -0.141658673059*d +  0.804455651041;
-    }
-    
-    // unknown tagger, return default
-    return -100.0;
-    
+  // Efficiencies from TT powheg sample for Moriond17.
+  // See distribution in /uscms_data/d3/jmanagan/EffsAndNewWeights/TagEffsM17/BEff.png
+  // Uses hadronFlavour() rather than partonFlavour() as recommended in BTV physics plenary CMS Week 10/2015
+  if(tagger == "CSVM"){
+    if(pt < 30) return 0.331971;
+    else if(pt < 50) return 0.550937;
+    else if(pt < 70) return 0.599929;
+    else if(pt < 100) return 0.624677;
+    else if(pt < 140) return 0.635101;
+    else if(pt < 200) return 0.632463;
+    else if(pt < 300) return 0.598059;
+    else if(pt < 400) return 0.558359;
+    else if(pt < 500) return 0.514297;
+    else if(pt < 600) return 0.494422;
+    else if(pt < 800) return 0.474555;
+    else if(pt < 1000) return 0.451810;
+    else if(pt < 1200) return 0.427328;
+    else return 0.414162;
+  }
+  else if( tagger == "CSVL") {
+    if(pt < 30) return 0.531941;
+    else if(pt < 50) return 0.731394;
+    else if(pt < 70) return 0.777463;
+    else if(pt < 100) return 0.802409;
+    else if(pt < 140) return 0.815819;
+    else if(pt < 200) return 0.823917;
+    else if(pt < 300) return 0.813134;
+    else if(pt < 400) return 0.798508;
+    else if(pt < 500) return 0.789124;
+    else if(pt < 600) return 0.783070;
+    else if(pt < 800) return 0.781245;
+    else if(pt < 1000) return 0.766063;
+    else if(pt < 1200) return 0.762402;
+    else return 0.745491;
+  }
+  
+  // tag eff, x - discriminant
+  // from https://twiki.cern.ch/twiki/pub/CMS/BtagPOG/eff_b_c-ttbar_payload.txt
+  
+  float d = getDiscriminant(tagger);
+  
+  if ((tagger=="JP") || (getAlgoTag(tagger)=="JP")){
+    return -1.3411375438*d*d*d*d+1.86566177901*d*d*d-0.59348240368*d*d-0.893938089125*d+1.22839928411;
+  } else if ((tagger=="TCHP") || (getAlgoTag(tagger)=="TCHP")){
+    return 9.83842428415e-06*d*d*d*d +  -0.000556835427293*d*d*d +  0.0123891144567*d*d +  -0.141658673059*d +  0.804455651041;
+  }
+  
+  // unknown tagger, return default
+  return -100.0;
+  
 }
 
+/*.-----------------------------------------------------------------.
+  /  .-.                                                         .-.  \
+ |  /   \                                                       /   \  |
+ | |\_.  |                                                     |    /| |
+ |\|  | /|               B-JET SCALE FACTOR SECTION            |\  | |/|
+ | `---' |                                                     | `---' |
+ |       |                                                     |       | 
+ |       |-----------------------------------------------------|       |
+ \       |                                                     |       /
+  \     /                                                       \     /
+   `---'                                                         `---'*/
 
+double BtagHardcodedConditions::GetBtagScaleFactor(double pt, double eta, std::string tagger, int year)
+{
+	//The main getter for B-tag Scale Factors
+    if      (year==2016) return GetBtagSF2016_comb(tagger, central, pt, eta);
+    else if (year==2015) return GetBtagScaleFactor2015(pt,eta,tagger);
+    else if (year==2012) return GetBtagScaleFactor2012(pt, eta, tagger);
+    else if (year==2011) return GetBtagScaleFactor2011(pt, eta, tagger);
+    else return 0.;
+}//end GetBtagScaleFactor
 
-double BtagHardcodedConditions::GetBtagScaleFactor(double pt, double eta,
-                                                   std::string tagger, int year){
-    if (year==2012) {
-        return GetBtagScaleFactor2012(pt, eta, tagger);
-    } else if (year==2011) {
-        return GetBtagScaleFactor2011(pt, eta, tagger);
-    } else {
-        return 0;
-    }
-    
+// 2015 scale factors from csv file in https://twiki.cern.ch/twiki/bin/viewauth/CMS/BtagRecommendation76X
+
+double BtagHardcodedConditions::GetBtagScaleFactor2015(double pt, double eta, std::string tagger)
+{
+    double SFb=0;
+    if( tagger=="CSVL")  SFb = 0.908299+(2.70877e-06*(log(pt+370.144)*(log(pt+370.144)*(3-(-(104.614*log(pt+370.144)))))));
+    else if( tagger=="CSVM")  SFb = -(0.0443172)+(0.00496634*(log(pt+1267.85)*(log(pt+1267.85)*(3-(-(0.110428*log(pt+1267.85)))))));
+    else if( tagger=="CSVT")  SFb = -(5.1345)+(0.000820101*(log(pt+11518.1)*(log(pt+11518.1)*(3-(-(8.66128*log(pt+11518.1)))))));
+    return SFb;
 }
-double BtagHardcodedConditions::GetBtagScaleFactor2012(double pt, double eta,
-                                                       std::string tagger){
+
+double BtagHardcodedConditions::GetBtagScaleFactor2012(double pt, double eta, std::string tagger)
+{
     if (pt>800) pt=800;
     else if (pt<20) pt=20;
     
@@ -144,8 +217,8 @@ double BtagHardcodedConditions::GetBtagScaleFactor2012(double pt, double eta,
 }
 
 
-double BtagHardcodedConditions::GetBtagScaleFactor2011(double pt, double eta,
-                                                       std::string tagger){
+double BtagHardcodedConditions::GetBtagScaleFactor2011(double pt, double eta, std::string tagger)
+{
     // This is 2011 muon-in-jet
     if (pt>670) pt=670;
     else if (pt<30) pt=30;
@@ -160,6 +233,403 @@ double BtagHardcodedConditions::GetBtagScaleFactor2011(double pt, double eta,
     else if( tagger=="CSVT")  SFb = 0.901615*((1.+(0.552628*pt))/(1.+(0.547195*pt)));
     return SFb;
 }
+
+/************************************************
+ *                                              *
+ * Main Getter functions for 2016 scale factors *
+ *                                              *
+ ************************************************/
+
+double BtagHardcodedConditions::GetBtagSF2016(std::string tagger, method Method, shift Shift, double pt, double eta)
+{
+	//This is the 2016 bjet scale factor getter, which allows for the choice of using either mujets or comb
+    if(      tagger == "CSVM" )      return GetBtagSF2016Medium(Method, Shift, pt, eta);
+    else if( tagger == "CSVMsubjet") return GetBtagSF2016Medium_subjet( Shift, pt, eta);
+    else if( tagger == "CSVL"  )     return GetBtagSF2016Loose( Method, Shift, pt, eta);
+    else if( tagger == "CSVLsubjet") return GetBtagSF2016Loose_subjet(  Shift, pt, eta);
+    else if( tagger == "CSVT" )      return GetBtagSF2016Tight( Method, Shift, pt, eta);
+    else{
+	throw cms::Exception("InvalidInput") << "Unknown tagger: "<< tagger << std::endl;
+	//cout<<"Error, GetBtagSF2016 received a tagger string it does not know how to interpret."<<endl;
+	return 1.0;
+    }
+}//end main getter.
+
+double BtagHardcodedConditions::GetBtagSF2016_comb(std::string tagger, shift Shift, double pt, double eta)
+{
+	//This is the 2016 bjet scale factor getter for b-jet SF from the "combine" method
+    if(      tagger == "CSVM" )      return GetBtagSF2016Medium_comb(Shift, pt, eta);
+    else if( tagger == "CSVMsubjet") return GetBtagSF2016Medium_subjet( Shift, pt, eta);
+    else if( tagger == "CSVL"  )     return GetBtagSF2016Loose_comb(  Shift, pt, eta);
+    else if( tagger == "CSVLsubjet") return GetBtagSF2016Loose_subjet(  Shift, pt, eta);
+    else if( tagger == "CSVT" )      return GetBtagSF2016Tight_comb(Shift, pt, eta);
+    else{
+	throw cms::Exception("InvalidInput") << "Unknown tagger: "<< tagger << std::endl;
+	//cout<<"Error, GetBtagSF2016 received a tagger string it does not know how to interpret."<<endl;
+	return 1.0;
+    }
+}//end main getter.
+
+double BtagHardcodedConditions::GetLFSF2016(std::string tagger, shift Shift, double pt, double eta)
+{
+    if(      tagger == "CSVM" )      return GetLFSF2016Medium(Shift, pt, eta);
+    else if( tagger == "CSVMsubjet") return GetLFSF2016Medium_subjet( Shift, pt, eta);
+    else if( tagger == "CSVL"  )     return GetLFSF2016Loose( Shift, pt, eta);
+    else if( tagger == "CSVLsubjet") return GetLFSF2016Loose_subjet(  Shift, pt, eta);
+    else if( tagger == "CSVT" )      return GetLFSF2016Tight( Shift, pt, eta);
+    else{
+	throw cms::Exception("InvalidInput") << "Unknown tagger: "<< tagger << std::endl;
+	//cout<<"Error, GetLFSF2016 received a tagger string it does not know how to interpret."<<endl;
+	return 1.0;
+    }
+}//end main getter.
+
+/*************************************
+ *                                   *
+ *  Other Getters for 2016 Bjet SF's *
+ *                                   *
+ ************************************/
+
+double BtagHardcodedConditions::GetBtagSF2016Loose(method Method, shift Shift, double pt, double eta)
+{
+    if(Method==mujets) 
+	return GetBtagSF2016Loose_mujets( Shift, pt, eta);
+    else 
+	return GetBtagSF2016Loose_comb(     Shift, pt, eta);
+}
+
+double BtagHardcodedConditions::GetBtagSF2016Loose_mujets( shift Shift, double pt, double eta)
+{
+	//not used
+    if(fabs(eta) > 2.4 or pt<20.) return 1.0; 
+    //if(fabs(eta) > 2.4 or pt<20. or pt > 1000.) return 1.0; 
+    switch(Shift){
+	case uncert:
+	    if(pt<30) return 0.025442773476243019;
+	    else if(pt<50) return 0.013995612040162086;
+	    else if(pt<70) return 0.01321903895586729;
+	    else if(pt<100) return 0.013857406564056873;
+	    else if(pt<140) return 0.013207088224589825;
+	    else if(pt<200) return 0.011531321331858635;
+	    else if(pt<300) return 0.01834111288189888;
+	    else if(pt<600) return 0.018383314833045006;
+	    else  return 0.022504881024360657;
+	case up:
+	    if(pt<30) return (0.884016*((1.+(0.0331508*pt))/(1.+(0.0285096*pt))))+0.025442773476243019;
+	    else if(pt<50) return (0.884016*((1.+(0.0331508*pt))/(1.+(0.0285096*pt))))+0.013995612040162086;
+	    else if(pt<70) return (0.884016*((1.+(0.0331508*pt))/(1.+(0.0285096*pt))))+0.01321903895586729;
+	    else if(pt<100) return (0.884016*((1.+(0.0331508*pt))/(1.+(0.0285096*pt))))+0.013857406564056873;
+	    else if(pt<140) return (0.884016*((1.+(0.0331508*pt))/(1.+(0.0285096*pt))))+0.013207088224589825;
+	    else if(pt<200) return (0.884016*((1.+(0.0331508*pt))/(1.+(0.0285096*pt))))+0.011531321331858635;
+	    else if(pt<300) return (0.884016*((1.+(0.0331508*pt))/(1.+(0.0285096*pt))))+0.01834111288189888;
+	    else if(pt<600) return (0.884016*((1.+(0.0331508*pt))/(1.+(0.0285096*pt))))+0.018383314833045006;
+	    else  return (0.884016*((1.+(0.0331508*pt))/(1.+(0.0285096*pt))))+0.022504881024360657;
+	case down:
+	    if(pt<30) return (0.884016*((1.+(0.0331508*pt))/(1.+(0.0285096*pt))))-0.025442773476243019;
+	    else if(pt<50) return (0.884016*((1.+(0.0331508*pt))/(1.+(0.0285096*pt))))-0.013995612040162086;
+	    else if(pt<70) return (0.884016*((1.+(0.0331508*pt))/(1.+(0.0285096*pt))))-0.01321903895586729;
+	    else if(pt<100) return (0.884016*((1.+(0.0331508*pt))/(1.+(0.0285096*pt))))-0.013857406564056873;
+	    else if(pt<140) return (0.884016*((1.+(0.0331508*pt))/(1.+(0.0285096*pt))))-0.013207088224589825;
+	    else if(pt<200) return (0.884016*((1.+(0.0331508*pt))/(1.+(0.0285096*pt))))-0.011531321331858635;
+	    else if(pt<300) return (0.884016*((1.+(0.0331508*pt))/(1.+(0.0285096*pt))))-0.01834111288189888;
+	    else if(pt<600) return (0.884016*((1.+(0.0331508*pt))/(1.+(0.0285096*pt))))-0.018383314833045006;
+	    else  return (0.884016*((1.+(0.0331508*pt))/(1.+(0.0285096*pt))))-0.022504881024360657;
+	case central: 
+	default:
+	    return  0.884016*((1.+(0.0331508*pt))/(1.+(0.0285096*pt)));   
+    }//end switch on shift
+}
+
+double BtagHardcodedConditions::GetBtagSF2016Loose_comb(shift Shift, double pt, double eta)
+{
+    if(fabs(eta) > 2.4 or pt<20.) return 1.0; 
+    //if(fabs(eta) > 2.4 or pt<20. or pt > 1000.) return 1.0; 
+    switch(Shift){
+	case uncert:
+	    if(pt<30) return 0.025381835177540779;
+	    else if(pt<50) return 0.012564006261527538;
+	    else if(pt<70) return 0.011564776301383972;
+	    else if(pt<100) return 0.011248723603785038;
+	    else if(pt<140) return 0.010811596177518368;
+	    else if(pt<200) return 0.010882497765123844;
+	    else if(pt<300) return 0.013456921093165874;
+	    else if(pt<600) return 0.017094610258936882;
+	    else  return 0.02186630479991436;
+	case up:
+	    if(pt<30) return (0.887973*((1.+(0.0523821*pt))/(1.+(0.0460876*pt))))+0.025381835177540779;
+	    else if(pt<50) return (0.887973*((1.+(0.0523821*pt))/(1.+(0.0460876*pt))))+0.012564006261527538;
+	    else if(pt<70) return (0.887973*((1.+(0.0523821*pt))/(1.+(0.0460876*pt))))+0.011564776301383972;
+	    else if(pt<100) return (0.887973*((1.+(0.0523821*pt))/(1.+(0.0460876*pt))))+0.011248723603785038;
+	    else if(pt<140) return (0.887973*((1.+(0.0523821*pt))/(1.+(0.0460876*pt))))+0.010811596177518368;
+	    else if(pt<200) return (0.887973*((1.+(0.0523821*pt))/(1.+(0.0460876*pt))))+0.010882497765123844;
+	    else if(pt<300) return (0.887973*((1.+(0.0523821*pt))/(1.+(0.0460876*pt))))+0.013456921093165874;
+	    else if(pt<600) return (0.887973*((1.+(0.0523821*pt))/(1.+(0.0460876*pt))))+0.017094610258936882;
+	    else  return (0.887973*((1.+(0.0523821*pt))/(1.+(0.0460876*pt))))+0.02186630479991436;
+	case down:
+	    if(pt<30) return (0.887973*((1.+(0.0523821*pt))/(1.+(0.0460876*pt))))-0.025381835177540779;
+	    else if(pt<50) return (0.887973*((1.+(0.0523821*pt))/(1.+(0.0460876*pt))))-0.012564006261527538;
+	    else if(pt<70) return (0.887973*((1.+(0.0523821*pt))/(1.+(0.0460876*pt))))-0.011564776301383972;
+	    else if(pt<100) return (0.887973*((1.+(0.0523821*pt))/(1.+(0.0460876*pt))))-0.011248723603785038;
+	    else if(pt<140) return (0.887973*((1.+(0.0523821*pt))/(1.+(0.0460876*pt))))-0.010811596177518368;
+	    else if(pt<200) return (0.887973*((1.+(0.0523821*pt))/(1.+(0.0460876*pt))))-0.010882497765123844;
+	    else if(pt<300) return (0.887973*((1.+(0.0523821*pt))/(1.+(0.0460876*pt))))-0.013456921093165874;
+	    else if(pt<600) return (0.887973*((1.+(0.0523821*pt))/(1.+(0.0460876*pt))))-0.017094610258936882;
+	    else  return (0.887973*((1.+(0.0523821*pt))/(1.+(0.0460876*pt))))-0.02186630479991436;
+	case central:
+	default:
+	    return   0.887973*((1.+(0.0523821*pt))/(1.+(0.0460876*pt)));  
+    }//end switch on shift
+}
+
+double BtagHardcodedConditions::GetBtagSF2016Medium(method Method, shift Shift, double pt, double eta)
+{
+    if(Method==mujets) 
+	return GetBtagSF2016Medium_mujets( Shift, pt, eta);
+    else 
+	return GetBtagSF2016Medium_comb(     Shift, pt, eta);
+}
+
+double BtagHardcodedConditions::GetBtagSF2016Medium_mujets(shift Shift, double pt, double eta)
+{
+	//not used
+    if(fabs(eta) > 2.4 or pt<20.) return 1.0; 
+    //if(fabs(eta) > 2.4 or pt<20. or pt > 1000.) return 1.0; 
+    switch(Shift){
+	case uncert:
+	    if(pt<30) return 0.040554910898208618;
+	    else if(pt<50) return 0.01836167648434639;
+	    else if(pt<70) return 0.016199169680476189;
+	    else if(pt<100) return 0.014634267427027225;
+	    else if(pt<140) return 0.014198922552168369;
+	    else if(pt<200) return 0.016547618433833122;
+	    else if(pt<300) return 0.02140621654689312;
+	    else if(pt<600) return 0.023563217371702194;
+	    else  return 0.034716218709945679;
+	case up:
+	    if(pt<30) return (0.718014*((1.+(0.0685826*pt))/(1.+(0.0475779*pt))))+0.040554910898208618;
+	    else if(pt<50) return (0.718014*((1.+(0.0685826*pt))/(1.+(0.0475779*pt))))+0.01836167648434639;
+	    else if(pt<70) return (0.718014*((1.+(0.0685826*pt))/(1.+(0.0475779*pt))))+0.016199169680476189;
+	    else if(pt<100) return (0.718014*((1.+(0.0685826*pt))/(1.+(0.0475779*pt))))+0.014634267427027225;
+	    else if(pt<140) return (0.718014*((1.+(0.0685826*pt))/(1.+(0.0475779*pt))))+0.014198922552168369;
+	    else if(pt<200) return (0.718014*((1.+(0.0685826*pt))/(1.+(0.0475779*pt))))+0.016547618433833122;
+	    else if(pt<300) return (0.718014*((1.+(0.0685826*pt))/(1.+(0.0475779*pt))))+0.02140621654689312;
+	    else if(pt<600) return (0.718014*((1.+(0.0685826*pt))/(1.+(0.0475779*pt))))+0.023563217371702194;
+	    else  return (0.718014*((1.+(0.0685826*pt))/(1.+(0.0475779*pt))))+0.034716218709945679;
+	case down:
+	    if(pt<30) return (0.718014*((1.+(0.0685826*pt))/(1.+(0.0475779*pt))))-0.040554910898208618;
+	    else if(pt<50) return (0.718014*((1.+(0.0685826*pt))/(1.+(0.0475779*pt))))-0.01836167648434639;
+	    else if(pt<70) return (0.718014*((1.+(0.0685826*pt))/(1.+(0.0475779*pt))))-0.016199169680476189;
+	    else if(pt<100) return (0.718014*((1.+(0.0685826*pt))/(1.+(0.0475779*pt))))-0.014634267427027225;
+	    else if(pt<140) return (0.718014*((1.+(0.0685826*pt))/(1.+(0.0475779*pt))))-0.014198922552168369;
+	    else if(pt<200) return (0.718014*((1.+(0.0685826*pt))/(1.+(0.0475779*pt))))-0.016547618433833122;
+	    else if(pt<300) return (0.718014*((1.+(0.0685826*pt))/(1.+(0.0475779*pt))))-0.02140621654689312;
+	    else if(pt<600) return (0.718014*((1.+(0.0685826*pt))/(1.+(0.0475779*pt))))-0.023563217371702194;
+	    else  return (0.718014*((1.+(0.0685826*pt))/(1.+(0.0475779*pt))))-0.034716218709945679;
+	case central:
+	default:
+	    return    0.718014*((1.+(0.0685826*pt))/(1.+(0.0475779*pt)));
+    }//end switch on shift
+}
+
+double BtagHardcodedConditions::GetBtagSF2016Medium_comb(shift Shift, double pt, double eta)
+{
+    if(fabs(eta) > 2.4 or pt<20.) return 1.0; 
+    //if(fabs(eta) > 2.4 or pt<20. or pt > 1000.) return 1.0; 
+    switch(Shift){
+	case uncert:
+	    if(pt<30) return 0.040213499218225479;
+	    else if(pt<50) return 0.014046305790543556;
+	    else if(pt<70) return 0.012372690252959728;
+	    else if(pt<100) return 0.012274007312953472;
+	    else if(pt<140) return 0.011465910822153091;
+	    else if(pt<200) return 0.012079551815986633;
+	    else if(pt<300) return 0.014995276927947998;
+	    else if(pt<600) return 0.021414462476968765;
+	    else  return 0.032377112656831741;
+	case up:
+	    if(pt<30) return (0.561694*((1.+(0.31439*pt))/(1.+(0.17756*pt))))+0.040213499218225479;
+	    else if(pt<50) return (0.561694*((1.+(0.31439*pt))/(1.+(0.17756*pt))))+0.014046305790543556;
+	    else if(pt<70) return (0.561694*((1.+(0.31439*pt))/(1.+(0.17756*pt))))+0.012372690252959728;
+	    else if(pt<100) return (0.561694*((1.+(0.31439*pt))/(1.+(0.17756*pt))))+0.012274007312953472;
+	    else if(pt<140) return (0.561694*((1.+(0.31439*pt))/(1.+(0.17756*pt))))+0.011465910822153091;
+	    else if(pt<200) return (0.561694*((1.+(0.31439*pt))/(1.+(0.17756*pt))))+0.012079551815986633;
+	    else if(pt<300) return (0.561694*((1.+(0.31439*pt))/(1.+(0.17756*pt))))+0.014995276927947998;
+	    else if(pt<600) return (0.561694*((1.+(0.31439*pt))/(1.+(0.17756*pt))))+0.021414462476968765;
+	    else  return (0.561694*((1.+(0.31439*pt))/(1.+(0.17756*pt))))+0.032377112656831741;
+	case down:
+	    if(pt<30) return (0.561694*((1.+(0.31439*pt))/(1.+(0.17756*pt))))-0.040213499218225479;
+	    else if(pt<50) return (0.561694*((1.+(0.31439*pt))/(1.+(0.17756*pt))))-0.014046305790543556;
+	    else if(pt<70) return (0.561694*((1.+(0.31439*pt))/(1.+(0.17756*pt))))-0.012372690252959728;
+	    else if(pt<100) return (0.561694*((1.+(0.31439*pt))/(1.+(0.17756*pt))))-0.012274007312953472;
+	    else if(pt<140) return (0.561694*((1.+(0.31439*pt))/(1.+(0.17756*pt))))-0.011465910822153091;
+	    else if(pt<200) return (0.561694*((1.+(0.31439*pt))/(1.+(0.17756*pt))))-0.012079551815986633;
+	    else if(pt<300) return (0.561694*((1.+(0.31439*pt))/(1.+(0.17756*pt))))-0.014995276927947998;
+	    else if(pt<600) return (0.561694*((1.+(0.31439*pt))/(1.+(0.17756*pt))))-0.021414462476968765;
+	    else  return (0.561694*((1.+(0.31439*pt))/(1.+(0.17756*pt))))-0.032377112656831741;
+	case central:
+	default:
+	    return    0.561694*((1.+(0.31439*pt))/(1.+(0.17756*pt)));
+    }//end switch on shift
+}
+
+double BtagHardcodedConditions::GetBtagSF2016Tight(method Method, shift Shift, double pt, double eta)
+{
+    if(Method==mujets) 
+	return GetBtagSF2016Tight_mujets( Shift, pt, eta);
+    else 
+	return GetBtagSF2016Tight_comb(     Shift, pt, eta);
+}
+
+double BtagHardcodedConditions::GetBtagSF2016Tight_mujets( shift Shift, double pt, double eta)
+{
+	//not used
+    if(fabs(eta) > 2.4 or pt<20.) return 1.0; 
+//    if(fabs(eta) > 2.4 or pt<20. or pt > 1000.) return 1.0; 
+    switch(Shift){
+	case uncert:
+	    if(pt<30) return 0.034476730972528458;
+	    else if(pt<50) return 0.022783603519201279;
+	    else if(pt<70) return 0.021012712270021439;
+	    else if(pt<100) return 0.017111778259277344;
+	    else if(pt<140) return 0.016918083652853966;
+	    else if(pt<200) return 0.016693713143467903;
+	    else if(pt<300) return 0.02831784263253212;
+	    else if(pt<600) return 0.032944366335868835;
+	    else  return 0.054636202752590179;
+	case up:
+	    if(pt<30) return (0.849497*((1.+(0.01854*pt))/(1.+(0.0153613*pt))))+0.034476730972528458;
+	    else if(pt<50) return (0.849497*((1.+(0.01854*pt))/(1.+(0.0153613*pt))))+0.022783603519201279;
+	    else if(pt<70) return (0.849497*((1.+(0.01854*pt))/(1.+(0.0153613*pt))))+0.021012712270021439;
+	    else if(pt<100) return (0.849497*((1.+(0.01854*pt))/(1.+(0.0153613*pt))))+0.017111778259277344;
+	    else if(pt<140) return (0.849497*((1.+(0.01854*pt))/(1.+(0.0153613*pt))))+0.016918083652853966;
+	    else if(pt<200) return (0.849497*((1.+(0.01854*pt))/(1.+(0.0153613*pt))))+0.016693713143467903;
+	    else if(pt<300) return (0.849497*((1.+(0.01854*pt))/(1.+(0.0153613*pt))))+0.02831784263253212;
+	    else if(pt<600) return (0.849497*((1.+(0.01854*pt))/(1.+(0.0153613*pt))))+0.032944366335868835;
+	    else  return (0.849497*((1.+(0.01854*pt))/(1.+(0.0153613*pt))))+0.054636202752590179;
+	case down:
+	    if(pt<30) return (0.849497*((1.+(0.01854*pt))/(1.+(0.0153613*pt))))-0.034476730972528458;
+	    else if(pt<50) return (0.849497*((1.+(0.01854*pt))/(1.+(0.0153613*pt))))-0.022783603519201279;
+	    else if(pt<70) return (0.849497*((1.+(0.01854*pt))/(1.+(0.0153613*pt))))-0.021012712270021439;
+	    else if(pt<100) return (0.849497*((1.+(0.01854*pt))/(1.+(0.0153613*pt))))-0.017111778259277344;
+	    else if(pt<140) return (0.849497*((1.+(0.01854*pt))/(1.+(0.0153613*pt))))-0.016918083652853966;
+	    else if(pt<200) return (0.849497*((1.+(0.01854*pt))/(1.+(0.0153613*pt))))-0.016693713143467903;
+	    else if(pt<300) return (0.849497*((1.+(0.01854*pt))/(1.+(0.0153613*pt))))-0.02831784263253212;
+	    else if(pt<600) return (0.849497*((1.+(0.01854*pt))/(1.+(0.0153613*pt))))-0.032944366335868835;
+	    else  return (0.849497*((1.+(0.01854*pt))/(1.+(0.0153613*pt))))-0.054636202752590179;
+	case central:
+	default:
+	    return  0.849497*((1.+(0.01854*pt))/(1.+(0.0153613*pt)));
+    }
+}
+
+double BtagHardcodedConditions::GetBtagSF2016Tight_comb( shift Shift, double pt, double eta)
+{
+    if(fabs(eta) > 2.4 or pt<20.) return 1.0; 
+    //if(fabs(eta) > 2.4 or pt<20. or pt > 1000.) return 1.0; 
+    switch(Shift){
+	case uncert:
+	    if(pt<30) return 0.033732704818248749;
+	    else if(pt<50) return 0.01562843844294548;
+	    else if(pt<70) return 0.013530348427593708;
+	    else if(pt<100) return 0.013609844259917736;
+	    else if(pt<140) return 0.013236711733043194;
+	    else if(pt<200) return 0.013806583359837532;
+	    else if(pt<300) return 0.019633084535598755;
+	    else if(pt<600) return 0.030928170308470726;
+	    else  return 0.052857179194688797;
+	case up:
+	    if(pt<30) return (0.817647*((1.+(0.038703*pt))/(1.+(0.0312388*pt))))+0.033732704818248749;
+	    else if(pt<50) return (0.817647*((1.+(0.038703*pt))/(1.+(0.0312388*pt))))+0.01562843844294548;
+	    else if(pt<70) return (0.817647*((1.+(0.038703*pt))/(1.+(0.0312388*pt))))+0.013530348427593708;
+	    else if(pt<100) return (0.817647*((1.+(0.038703*pt))/(1.+(0.0312388*pt))))+0.013609844259917736;
+	    else if(pt<140) return (0.817647*((1.+(0.038703*pt))/(1.+(0.0312388*pt))))+0.013236711733043194;
+	    else if(pt<200) return (0.817647*((1.+(0.038703*pt))/(1.+(0.0312388*pt))))+0.013806583359837532;
+	    else if(pt<300) return (0.817647*((1.+(0.038703*pt))/(1.+(0.0312388*pt))))+0.019633084535598755;
+	    else if(pt<600) return (0.817647*((1.+(0.038703*pt))/(1.+(0.0312388*pt))))+0.030928170308470726;
+	    else  return (0.817647*((1.+(0.038703*pt))/(1.+(0.0312388*pt))))+0.052857179194688797;
+	case down:
+	    if(pt<30) return (0.817647*((1.+(0.038703*pt))/(1.+(0.0312388*pt))))-0.033732704818248749;
+	    else if(pt<50) return (0.817647*((1.+(0.038703*pt))/(1.+(0.0312388*pt))))-0.01562843844294548;
+	    else if(pt<70) return (0.817647*((1.+(0.038703*pt))/(1.+(0.0312388*pt))))-0.013530348427593708;
+	    else if(pt<100) return (0.817647*((1.+(0.038703*pt))/(1.+(0.0312388*pt))))-0.013609844259917736;
+	    else if(pt<140) return (0.817647*((1.+(0.038703*pt))/(1.+(0.0312388*pt))))-0.013236711733043194;
+	    else if(pt<200) return (0.817647*((1.+(0.038703*pt))/(1.+(0.0312388*pt))))-0.013806583359837532;
+	    else if(pt<300) return (0.817647*((1.+(0.038703*pt))/(1.+(0.0312388*pt))))-0.019633084535598755;
+	    else if(pt<600) return (0.817647*((1.+(0.038703*pt))/(1.+(0.0312388*pt))))-0.030928170308470726;
+	    else  return (0.817647*((1.+(0.038703*pt))/(1.+(0.0312388*pt))))-0.052857179194688797;
+	case central:
+	default:
+	    return   0.817647*((1.+(0.038703*pt))/(1.+(0.0312388*pt)));
+    }//end switch on shift
+}
+
+double BtagHardcodedConditions::GetBtagSF2016Medium_subjet(shift Shift, double pt, double eta)
+{
+    if(fabs(eta) > 2.4 or pt<30. or pt > 450.) return 1.0; 
+    switch(Shift){
+	case uncert:
+	    if(pt<120) return 0.03395;
+	    else if(pt<180) return 0.01788;
+	    else if(pt<240) return 0.02364;
+	    else  return 0.03332;
+	case up:
+	    if(pt<120) return 1.01236;
+	    else if(pt<180) return 1.02287;
+	    else if(pt<240) return 1.0347;
+	    else  return 1.05521;
+	case down:
+	    if(pt<120) return 0.94446;
+	    else if(pt<180) return 0.98711;
+	    else if(pt<240) return 0.98742;
+	    else  return 0.98857;
+	case central: 
+	default:
+	    if(pt<120) return 0.97841;
+	    else if(pt<180) return 1.00499;
+	    else if(pt<240) return 1.01106;
+	    else  return 1.02189;
+    }//end switch on shift
+}
+
+double BtagHardcodedConditions::GetBtagSF2016Loose_subjet(shift Shift, double pt, double eta)
+{
+    if(fabs(eta) > 2.4 or pt<30. or pt > 450.) return 1.0; 
+    switch(Shift){
+	case uncert: 
+	    if(pt<120) return 0.01071;
+	    else if(pt<180) return 0.01083;
+	    else if(pt<240) return 0.01191;
+	    else  return 0.01939;
+	case up:
+	    if(pt<120) return 1.0091;
+	    else if(pt<180) return 1.01303;
+	    else if(pt<240) return 1.01659;
+	    else  return 1.03703;
+	case down:
+	    if(pt<120) return 0.98769;
+	    else if(pt<180) return 0.99137;
+	    else if(pt<240) return 0.99277;
+	    else  return 0.99825;
+	case central: 
+	default:
+	    if(pt<120) return 0.99839;
+	    else if(pt<180) return 1.0022;
+	    else if(pt<240) return 1.00468;
+	    else  return 1.01764;
+    }//end switch on shift
+}
+
+/*.-----------------------------------------------------------------.
+  /  .-.                                                         .-.  \
+ |  /   \                                                       /   \  |
+ | |\_.  |                                                     |    /| |
+ |\|  | /|      B-JET SCALE FACTOR UNCERTAINTY SECTION         |\  | |/|
+ | `---' |                                                     | `---' |
+ |       |                                                     |       | 
+ |       |-----------------------------------------------------|       |
+ \       |                                                     |       /
+  \     /                                                       \     /
+   `---'                                                         `---'*/
 
 double BtagHardcodedConditions::GetBtagSFUncertainty2011(double pt, double eta,
                                                          std::string tagger)
@@ -180,8 +650,7 @@ double BtagHardcodedConditions::GetBtagSFUncertainty2011(double pt, double eta,
     return err;
 }
 
-double BtagHardcodedConditions::GetBtagSFUncertainty2012(double pt, double eta,
-                                                         std::string tagger)
+double BtagHardcodedConditions::GetBtagSFUncertainty2012(double pt, double eta, std::string tagger)
 {
     int bin = findBin(pt, ptRange12);
     float err = -1;
@@ -198,175 +667,279 @@ double BtagHardcodedConditions::GetBtagSFUncertainty2012(double pt, double eta,
     return err;
 }
 
-double BtagHardcodedConditions::GetBtagSFUncertUp(double pt, double eta,
-                                                  std::string tagger, int year)
+// 2015 scale factors from csv file in https://twiki.cern.ch/twiki/bin/viewauth/CMS/BtagRecommendation74X50ns
+double BtagHardcodedConditions::GetBtagSFUncertainty2015(double pt, double eta, std::string tagger)
 {
-    if (year==2012) {
-        return GetBtagSFUncertainty2012(pt, eta, tagger);
-    } else if (year==2011) {
-        return GetBtagSFUncertainty2011(pt, eta, tagger);
-    } else {
-        return 0;
-    }
+    int bin = findBin(pt, ptRange15);
+    float err = -1;
+    
+    if( tagger=="CSVL") err =  SFb_CSVL_error15[bin];
+    else if( tagger=="CSVM") err =  SFb_CSVM_error15[bin];
+    else if( tagger=="CSVT") err =  SFb_CSVT_error15[bin];
+    
+    if ((pt>670) || (pt<30)) err*=2.0;
+    return err;
 }
 
-double BtagHardcodedConditions::GetBtagSFUncertDown(double pt, double eta,
-                                                    std::string tagger, int year)
+/*.-----------------------------------------------------------------.
+  /  .-.                                                         .-.  \
+ |  /   \                                                       /   \  |
+ | |\_.  |                                                     |    /| |
+ |\|  | /|      B-JET SCALE FACTOR UP/DOWNS SECTION            |\  | |/|
+ | `---' |                                                     | `---' |
+ |       |                                                     |       | 
+ |       |-----------------------------------------------------|       |
+ \       |                                                     |       /
+  \     /                                                       \     /
+   `---'                                                         `---'*/
+
+double BtagHardcodedConditions::GetBtagSFUncertUp(double pt, double eta, std::string tagger, int year)
 {
-    if (year==2012) {
-        return GetBtagSFUncertainty2012(pt, eta, tagger);
-    } else if (year==2011) {
-        return GetBtagSFUncertainty2011(pt, eta, tagger);
-    } else {
-        return 0;
-    }
-}
+
+	if(year == 2016) return GetBtagSF2016_comb(tagger, up, pt, eta); 
+	else if(year == 2015) return GetBtagSFUncertainty2015(pt, eta, tagger);
+	else if(year == 2012) return GetBtagSFUncertainty2012(pt, eta, tagger);
+	else if(year == 2011) return GetBtagSFUncertainty2011(pt, eta, tagger);
+	else return 0.;
+}//end GetBtagSFUncertUp
+
+double BtagHardcodedConditions::GetBtagSFUncertDown(double pt, double eta, std::string tagger, int year)
+{
+    if(year == 2016) return GetBtagSF2016_comb(tagger, down, pt, eta); 
+    else if(year == 2015) return GetBtagSFUncertainty2015(pt, eta, tagger);
+    else if(year == 2012) return GetBtagSFUncertainty2012(pt, eta, tagger);
+    else if(year == 2011) return GetBtagSFUncertainty2011(pt, eta, tagger);
+    else return 0.;
+}//end GetBtagSFUncertDown
 
 
-double BtagHardcodedConditions::GetMistagRate(double pt, double eta,
-                                              std::string tagger){
-    // 0.96 is the Correction from mistag in MC to data
-    // values are measured using the 2012 madgraph ttbar sample
-    if( tagger == "CSVM")
-        return 0.013702*0.96;
-    else if( tagger == "CSVL")
-        return 0.143422*0.96;
-    
-    
+/*.-----------------------------------------------------------------.
+  /  .-.                                                         .-.  \
+ |  /   \                                                       /   \  |
+ | |\_.  |                                                     |    /| |
+ |\|  | /|                                                     |\  | |/|
+ | `---' |           Mistag Rate                               | `---' |
+ |       |                                                     |       | 
+ |       |-----------------------------------------------------|       |
+ \       |                                                     |       /
+  \     /                                                       \     /
+   `---'                                                         `---'*/
+
+double BtagHardcodedConditions::GetMistagRate(double pt, double eta, std::string tagger)
+{
+  // Mistag rates from TT powheg sample for Moriond17.
+  // See distribution in /uscms_data/d3/jmanagan/EffsAndNewWeights/TagEffsM17/BEff.png
+  // Uses hadronFlavour() rather than partonFlavour() as recommended in BTV physics plenary CMS Week 10/2015
+  if(tagger == "CSVM"){
+    if(pt < 30)        return 0.003385;
+    else if(pt < 50)   return 0.009673;
+    else if(pt < 70)   return 0.008316;
+    else if(pt < 100)  return 0.008524;
+    else if(pt < 140)  return 0.009092;
+    else if(pt < 200)  return 0.011431;
+    else if(pt < 300)  return 0.013666;
+    else if(pt < 400)  return 0.020405;
+    else if(pt < 500)  return 0.023609;
+    else if(pt < 600)  return 0.025348;
+    else if(pt < 800)  return 0.028858;
+    else if(pt < 1000) return 0.030427;
+    else if(pt < 1200) return 0.034091;
+    else return 0.047619;
+  }
+  else if( tagger == "CSVL") {
+    if(pt < 30)        return 0.068717;
+    else if(pt < 50)   return 0.095095;
+    else if(pt < 70)   return 0.083338;
+    else if(pt < 100)  return 0.085001;
+    else if(pt < 140)  return 0.086867;
+    else if(pt < 200)  return 0.101223;
+    else if(pt < 300)  return 0.114555;
+    else if(pt < 400)  return 0.139321;
+    else if(pt < 500)  return 0.155025;
+    else if(pt < 600)  return 0.167581;
+    else if(pt < 800)  return 0.189058;
+    else if(pt < 1000) return 0.203596;
+    else if(pt < 1200) return 0.206650;
+    else return 0.243775;
+  }
+
     // mistag, x-pT
     // from https://twiki.cern.ch/twiki/pub/CMS/BtagPOG/MistagFuncs.C
     
     if (pt>670) pt=670;
     else if (pt<20) pt=20;
     double _absEta = abs(eta);
-    /*
-     if( tagger == "CSVL" && _absEta>=0.0 && _absEta<0.5)
-     return 242534*(((1+(0.0182863*pt))+(4.50105e-05*(pt*pt)))/(1+(108569*pt)));
-     if( tagger == "CSVL" && _absEta>=0.5 && _absEta<1.0)
-     return 129.938*(((1+(0.0197657*pt))+(4.73472e-05*(pt*pt)))/(1+(55.2415*pt)));
-     if( tagger == "CSVL" && _absEta>=1.0 && _absEta<1.5)
-     return 592.214*(((1+(0.00671207*pt))+(6.46109e-05*(pt*pt)))/(1+(134.318*pt)));
-     if( tagger == "CSVL" && _absEta>=1.5 && _absEta<2.4)
-     return 93329*(((1+(0.0219705*pt))+(3.76566e-05*(pt*pt)))/(1+(18245.1*pt)));
-     if( tagger == "CSVM" && _absEta>=0.0 && _absEta<0.8)
-     return (0.00967751+(2.54564e-05*pt))+(-6.92256e-10*(pt*pt));
-     if( tagger == "CSVM" && _absEta>=0.8 && _absEta<1.6)
-     return (0.00974141+(5.09503e-05*pt))+(2.0641e-08*(pt*pt));
-     if( tagger == "CSVM" && _absEta>=1.6 && _absEta<2.4)
-     return (0.013595+(0.000104538*pt))+(-1.36087e-08*(pt*pt));
-     
-     */
-    if( tagger == "CSVT" && _absEta>=0.0 && _absEta<2.4)
-        return 0.00315116*(((1+(-0.00769281*pt))+(2.58066e-05*(pt*pt)))+(-2.02149e-08*(pt*(pt*pt))));
-    if( tagger == "JBPL" && _absEta>=0.0 && _absEta<0.5)
-        return (0.0277261+(0.000808207*pt))+(-6.44146e-07*(pt*pt));
-    if( tagger == "JBPL" && _absEta>=0.5 && _absEta<1.0)
-        return (0.0278926+(0.000827697*pt))+(-7.01497e-07*(pt*pt));
-    if( tagger == "JBPL" && _absEta>=1.0 && _absEta<1.5)
-        return (0.0221411+(0.000900444*pt))+(-6.52873e-07*(pt*pt));
-    if( tagger == "JBPL" && _absEta>=1.5 && _absEta<2.4)
-        return (0.0227045+(0.000808122*pt))+(-5.67134e-07*(pt*pt));
-    if( tagger == "JBPM" && _absEta>=0.0 && _absEta<0.8)
-        return (((0.00206106+(0.000105851*pt))+(2.691e-08*(pt*pt)))+(-4.34651e-11*(pt*(pt*pt))))+(-6.73107e-14*(pt*(pt*(pt*pt))));
-    if( tagger == "JBPM" && _absEta>=0.8 && _absEta<1.6)
-        return (((0.00318438+(4.40327e-05*pt))+(3.46922e-07*(pt*pt)))+(-3.93396e-10*(pt*(pt*pt))))+(3.94283e-14*(pt*(pt*(pt*pt))));
-    if( tagger == "JBPM" && _absEta>=1.6 && _absEta<2.4)
-        return (((0.00209833+(4.27753e-05*pt))+(1.96076e-07*(pt*pt)))+(6.19275e-11*(pt*(pt*pt))))+(-2.63318e-13*(pt*(pt*(pt*pt))));
-    if( tagger == "JBPT" && _absEta>=0.0 && _absEta<2.4)
-        return (-3.36681e-05+(1.37292e-05*pt))+(1.78479e-08*(pt*pt));
-    if( tagger == "JPL" && _absEta>=0.0 && _absEta<0.5)
-        return (0.060001+(0.000332202*pt))+(-2.36709e-07*(pt*pt));
-    if( tagger == "JPL" && _absEta>=0.5 && _absEta<1.0)
-        return (0.0597675+(0.000370979*pt))+(-2.94673e-07*(pt*pt));
-    if( tagger == "JPL" && _absEta>=1.0 && _absEta<1.5)
-        return (0.0483728+(0.000528418*pt))+(-3.17825e-07*(pt*pt));
-    if( tagger == "JPL" && _absEta>=1.5 && _absEta<2.4)
-        return (0.0463159+(0.000546644*pt))+(-3.40486e-07*(pt*pt));
-    if( tagger == "JPM" && _absEta>=0.0 && _absEta<0.8)
-        return (0.00727084+(4.48901e-05*pt))+(-4.42894e-09*(pt*pt));
-    if( tagger == "JPM" && _absEta>=0.8 && _absEta<1.6)
-        return (0.00389156+(6.35508e-05*pt))+(1.54183e-08*(pt*pt));
-    if( tagger == "JPM" && _absEta>=1.6 && _absEta<2.4)
-        return (0.0032816+(4.18867e-05*pt))+(7.44912e-08*(pt*pt));
-    if( tagger == "JPT" && _absEta>=0.0 && _absEta<2.4)
-        return (0.000379966+(8.30969e-06*pt))+(1.10364e-08*(pt*pt));
-    if( tagger == "SSVHEM" && _absEta>=0.0 && _absEta<0.8)
-        return (((0.000547883+(0.00023023*pt))+(-7.31792e-07*(pt*pt)))+(1.15659e-09*(pt*(pt*pt))))+(-7.00641e-13*(pt*(pt*(pt*pt))));
-    if( tagger == "SSVHEM" && _absEta>=0.8 && _absEta<1.6)
-        return (((0.000615562+(0.000240254*pt))+(-7.00237e-07*(pt*pt)))+(1.2566e-09*(pt*(pt*pt))))+(-8.59011e-13*(pt*(pt*(pt*pt))));
-    if( tagger == "SSVHEM" && _absEta>=1.6 && _absEta<2.4)
-        return (((0.000372388+(0.000309735*pt))+(-4.35952e-07*(pt*pt)))+(3.63763e-10*(pt*(pt*pt))))+(-2.11993e-13*(pt*(pt*(pt*pt))));
-    if( tagger == "SSVHPT" && _absEta>=0.0 && _absEta<2.4)
-        return (-2.9605e-05+(2.35624e-05*pt))+(-1.77552e-08*(pt*pt));
-    if( tagger == "TCHEL" && _absEta>=0.0 && _absEta<0.5)
-        return (((-0.0235318+(0.00268868*pt))+(-6.47688e-06*(pt*pt)))+(7.92087e-09*(pt*(pt*pt))))+(-4.06519e-12*(pt*(pt*(pt*pt))));
-    if( tagger == "TCHEL" && _absEta>=0.5 && _absEta<1.0)
-        return (((-0.0257274+(0.00289337*pt))+(-7.48879e-06*(pt*pt)))+(9.84928e-09*(pt*(pt*pt))))+(-5.40844e-12*(pt*(pt*(pt*pt))));
-    if( tagger == "TCHEL" && _absEta>=1.0 && _absEta<1.5)
-        return (((-0.0310046+(0.00307803*pt))+(-7.94145e-06*(pt*pt)))+(1.06889e-08*(pt*(pt*pt))))+(-6.08971e-12*(pt*(pt*(pt*pt))));
-    if( tagger == "TCHEL" && _absEta>=1.5 && _absEta<2.4)
-        return (((-0.0274561+(0.00301096*pt))+(-8.89588e-06*(pt*pt)))+(1.40142e-08*(pt*(pt*pt))))+(-8.95723e-12*(pt*(pt*(pt*pt))));
-    if( tagger == "TCHEM" && _absEta>=0.0 && _absEta<0.8)
-        return (0.000919586+(0.00026266*pt))+(-1.75723e-07*(pt*pt));
-    if( tagger == "TCHEM" && _absEta>=0.8 && _absEta<1.6)
-        return (-0.00364137+(0.000350371*pt))+(-1.89967e-07*(pt*pt));
-    if( tagger == "TCHEM" && _absEta>=1.6 && _absEta<2.4)
-        return (-0.00483904+(0.000367751*pt))+(-1.36152e-07*(pt*pt));
-    if( tagger == "TCHPM" && _absEta>=0.0 && _absEta<0.8)
-        return (((-0.00464673+(0.000247485*pt))+(9.13236e-07*(pt*pt)))+(-2.49994e-09*(pt*(pt*pt))))+(1.65678e-12*(pt*(pt*(pt*pt))));
-    if( tagger == "TCHPM" && _absEta>=0.8 && _absEta<1.6)
-        return (((-0.0060878+(0.000297422*pt))+(1.13369e-06*(pt*pt)))+(-2.84945e-09*(pt*(pt*pt))))+(1.64721e-12*(pt*(pt*(pt*pt))));
-    if( tagger == "TCHPM" && _absEta>=1.6 && _absEta<2.4)
-        return (((-0.00836219+(0.000391889*pt))+(2.78156e-07*(pt*pt)))+(-6.14017e-10*(pt*(pt*pt))))+(-1.30592e-13*(pt*(pt*(pt*pt))));
-    if( tagger == "TCHPT" && _absEta>=0.0 && _absEta<2.4)
-        return (-0.00101+(4.70405e-05*pt))+(8.3338e-09*(pt*pt));
+    if( _absEta< 0.0 or _absEta > 2.4) return -100.;
+
+    else if( tagger == "CSVT") return 0.00315116*(((1+(-0.00769281*pt))+(2.58066e-05*(pt*pt)))+(-2.02149e-08*(pt*(pt*pt))));
+    else if( tagger == "JBPL"){
+	if(_absEta<0.5) return (0.0277261+(0.000808207*pt))+(-6.44146e-07*(pt*pt));
+	else if(_absEta<1.0) return (0.0278926+(0.000827697*pt))+(-7.01497e-07*(pt*pt));
+	else if(_absEta<1.5) return (0.0221411+(0.000900444*pt))+(-6.52873e-07*(pt*pt));
+	else return (0.0227045+(0.000808122*pt))+(-5.67134e-07*(pt*pt));
+    }
+    else if( tagger == "JBPM"){
+	if( _absEta<0.8) return (((0.00206106+(0.000105851*pt))+(2.691e-08*(pt*pt)))+(-4.34651e-11*(pt*(pt*pt))))+(-6.73107e-14*(pt*(pt*(pt*pt))));
+	else if( _absEta<1.6) return (((0.00318438+(4.40327e-05*pt))+(3.46922e-07*(pt*pt)))+(-3.93396e-10*(pt*(pt*pt))))+(3.94283e-14*(pt*(pt*(pt*pt))));
+	else return (((0.00209833+(4.27753e-05*pt))+(1.96076e-07*(pt*pt)))+(6.19275e-11*(pt*(pt*pt))))+(-2.63318e-13*(pt*(pt*(pt*pt))));
+    }
+    else if( tagger == "JBPT") return (-3.36681e-05+(1.37292e-05*pt))+(1.78479e-08*(pt*pt));
+    else if( tagger == "JPL" ){
+	if( _absEta<0.5) return (0.060001+(0.000332202*pt))+(-2.36709e-07*(pt*pt));
+	else if( _absEta<1.0) return (0.0597675+(0.000370979*pt))+(-2.94673e-07*(pt*pt));
+	else if( _absEta<1.5) return (0.0483728+(0.000528418*pt))+(-3.17825e-07*(pt*pt));
+	else return (0.0463159+(0.000546644*pt))+(-3.40486e-07*(pt*pt));
+    }
+    else if( tagger == "JPM"){
+	if( _absEta<0.8) return (0.00727084+(4.48901e-05*pt))+(-4.42894e-09*(pt*pt));
+	else if( _absEta<1.6) return (0.00389156+(6.35508e-05*pt))+(1.54183e-08*(pt*pt));
+	else return (0.0032816+(4.18867e-05*pt))+(7.44912e-08*(pt*pt));
+	}
+    else if( tagger == "JPT" ) return (0.000379966+(8.30969e-06*pt))+(1.10364e-08*(pt*pt));
+    else if( tagger == "SSVHEM"){
+	if( _absEta<0.8) return (((0.000547883+(0.00023023*pt))+(-7.31792e-07*(pt*pt)))+(1.15659e-09*(pt*(pt*pt))))+(-7.00641e-13*(pt*(pt*(pt*pt))));
+	else if( _absEta<1.6) return (((0.000615562+(0.000240254*pt))+(-7.00237e-07*(pt*pt)))+(1.2566e-09*(pt*(pt*pt))))+(-8.59011e-13*(pt*(pt*(pt*pt))));
+	else return (((0.000372388+(0.000309735*pt))+(-4.35952e-07*(pt*pt)))+(3.63763e-10*(pt*(pt*pt))))+(-2.11993e-13*(pt*(pt*(pt*pt))));
+    }
+    else if( tagger == "SSVHPT" ) return (-2.9605e-05+(2.35624e-05*pt))+(-1.77552e-08*(pt*pt));
+    else if( tagger == "TCHEL" ){
+	if( _absEta<0.5) return (((-0.0235318+(0.00268868*pt))+(-6.47688e-06*(pt*pt)))+(7.92087e-09*(pt*(pt*pt))))+(-4.06519e-12*(pt*(pt*(pt*pt))));
+	else if( _absEta<1.0) return (((-0.0257274+(0.00289337*pt))+(-7.48879e-06*(pt*pt)))+(9.84928e-09*(pt*(pt*pt))))+(-5.40844e-12*(pt*(pt*(pt*pt))));
+	else if( _absEta<1.5) return (((-0.0310046+(0.00307803*pt))+(-7.94145e-06*(pt*pt)))+(1.06889e-08*(pt*(pt*pt))))+(-6.08971e-12*(pt*(pt*(pt*pt))));
+	else return (((-0.0274561+(0.00301096*pt))+(-8.89588e-06*(pt*pt)))+(1.40142e-08*(pt*(pt*pt))))+(-8.95723e-12*(pt*(pt*(pt*pt))));
+    }
+    else if( tagger == "TCHEM"){
+	if(_absEta<0.8) return (0.000919586+(0.00026266*pt))+(-1.75723e-07*(pt*pt));
+	else if( _absEta<1.6) return (-0.00364137+(0.000350371*pt))+(-1.89967e-07*(pt*pt));
+	else return (-0.00483904+(0.000367751*pt))+(-1.36152e-07*(pt*pt));
+    }
+    else if( tagger == "TCHPM"){
+	if( _absEta<0.8) return (((-0.00464673+(0.000247485*pt))+(9.13236e-07*(pt*pt)))+(-2.49994e-09*(pt*(pt*pt))))+(1.65678e-12*(pt*(pt*(pt*pt))));
+	else if( _absEta<1.6) return (((-0.0060878+(0.000297422*pt))+(1.13369e-06*(pt*pt)))+(-2.84945e-09*(pt*(pt*pt))))+(1.64721e-12*(pt*(pt*(pt*pt))));
+	else if( _absEta<2.4) return (((-0.00836219+(0.000391889*pt))+(2.78156e-07*(pt*pt)))+(-6.14017e-10*(pt*(pt*pt))))+(-1.30592e-13*(pt*(pt*(pt*pt))));
+    }
+    else if( tagger == "TCHPT" ) return (-0.00101+(4.70405e-05*pt))+(8.3338e-09*(pt*pt));
     
     // unknown tagger, return default
     return -100.0;
 }
 
+/*.-----------------------------------------------------------------.
+  /  .-.                                                         .-.  \
+ |  /   \                                                       /   \  |
+ | |\_.  |                                                     |    /| |
+ |\|  | /|      UDSG SCALE FACTOR & UP/DOWNS SECTION           |\  | |/|
+ | `---' |       aka Mistag Rate Scale Factors                 | `---' |
+ |       |                                                     |       | 
+ |       |-----------------------------------------------------|       |
+ \       |                                                     |       /
+  \     /                                                       \     /
+   `---'                                                         `---'*/
 
-double BtagHardcodedConditions::GetMistagScaleFactor(double pt, double eta,
-                                                     std::string tagger, int year){
-    if (year==2012) {
-        return GetMistagSF2012(pt, eta, tagger, "mean");
-    } else if (year==2011) {
-        return GetMistagSF2011(pt, eta, tagger, "mean");
-    } else {
-        return 0;
-    }
-}
-
-double BtagHardcodedConditions::GetMistagSFUncertDown(double pt, double eta,
-                                                      std::string tagger, int year){
-    if (year==2012) {
-        return (pt>800?2.0:1.0) *
-        (GetMistagSF2012(pt, eta, tagger, "mean")- GetMistagSF2012(pt, eta, tagger, "min"));
-    } else if (year==2011) {
-        return (pt>670?2.0:1.0) *
-        (GetMistagSF2011(pt, eta, tagger, "mean")- GetMistagSF2011(pt, eta, tagger, "min"));
-    } else {
-        return 0;
-    }
-}
-
-double BtagHardcodedConditions::GetMistagSFUncertUp(double pt, double eta,
-                                                    std::string tagger, int year){
-    if (year==2012) {
-        return (pt>800?2.0:1.0) *
-        (GetMistagSF2012(pt, eta, tagger, "max")- GetMistagSF2012(pt, eta, tagger, "mean"));
-    } else if (year==2011) {
-        return (pt>670?2.0:1.0) *
-        (GetMistagSF2011(pt, eta, tagger, "max")- GetMistagSF2011(pt, eta, tagger, "mean"));
-    } else {
-        return 0;
-    }
-}
-
-double BtagHardcodedConditions::GetMistagSF2011(double pt, double eta,
-                                                std::string tagger, std::string meanminmax)
+double BtagHardcodedConditions::GetMistagScaleFactor(double pt, double eta, std::string tagger, int year)
 {
-    
+    if(year == 2016) return GetLFSF2016( tagger, central, pt, eta);
+    else if(year == 2015){
+	// 2015 scale factors from csv file in https://twiki.cern.ch/twiki/bin/viewauth/CMS/BtagRecommendation76X
+	if(tagger == "CSVT") return 0.992339;
+	else return GetMistagSF2015(pt,eta,tagger,"mean");
+    }
+    else if(year == 2012) return GetMistagSF2012(pt, eta, tagger, "mean");
+    else if(year == 2011) return GetMistagSF2011(pt, eta, tagger, "mean");
+    else return 0.;
+}//end GetMistagScaleFactor
+
+double BtagHardcodedConditions::GetMistagSFUncertDown(double pt, double eta, std::string tagger, int year)
+{
+
+    if(year == 2016) return (pt>1000 ? 2.0 : 1.0) * GetLFSF2016( tagger, uncert, pt, eta);
+    else if(year==2015){
+	if(tagger == "CSVT") return (pt>1000 ? 2.0 : 1.0) * (0.992339-0.810103);
+	else return (pt>1000 ? 2.0 : 1.0) * (GetMistagSF2015(pt,eta,tagger,"mean") - GetMistagSF2015(pt,eta,tagger,"min"));
+    }
+    else if(year==2012) return (pt>800?2.0:1.0) * (GetMistagSF2012(pt, eta, tagger, "mean")- GetMistagSF2012(pt, eta, tagger, "min"));
+    else if(year==2011) return (pt>670?2.0:1.0) * (GetMistagSF2011(pt, eta, tagger, "mean")- GetMistagSF2011(pt, eta, tagger, "min"));
+    else return 0.;
+}//end GetMistagSFUncertDown
+
+double BtagHardcodedConditions::GetMistagSFUncertUp(double pt, double eta, std::string tagger, int year)
+{
+    if(year == 2016) return (pt>1000 ? 2.0 : 1.0) * GetLFSF2016( tagger, uncert, pt, eta);
+    else if(year==2015){
+	if(tagger == "CSVT") return (pt>1000 ? 2.0 : 1.0) * (1.17457-0.992339);
+	else return (pt>1000 ? 2.0 : 1.0) * (GetMistagSF2015(pt,eta,tagger,"max") - GetMistagSF2015(pt,eta,tagger,"mean"));
+    }
+    else if(year==2012) return (pt>800?2.0:1.0) * (GetMistagSF2012(pt, eta, tagger, "max")- GetMistagSF2012(pt, eta, tagger, "mean"));
+    else if(year==2011) return (pt>670?2.0:1.0) * (GetMistagSF2011(pt, eta, tagger, "max")- GetMistagSF2011(pt, eta, tagger, "mean"));
+    else return 0.;
+}//end GetMistagSFUncertUp
+
+
+double BtagHardcodedConditions::GetMistagSF2015(double pt, double eta, std::string tagger, std::string meanminmax)
+{
+  
+  double _absEta = abs(eta);
+  double sf = -1;
+  if( tagger=="CSVL" ){
+    if(_absEta < 0.3) {
+      if( meanminmax == "mean" ) sf = ((1.13199+(0.00121087*pt))+(-2.1714e-06*(pt*pt)))+(1.06583e-09*(pt*(pt*pt)));
+      else if( meanminmax == "min" ) sf = ((1.09518+(0.000823444*pt))+(-1.1289e-06*(pt*pt)))+(3.82933e-10*(pt*(pt*pt))); 
+      else if( meanminmax == "max" ) sf = ((1.1688+(0.00159691*pt))+(-3.21137e-06*(pt*pt)))+(1.74795e-09*(pt*(pt*pt)));
+    }
+    else if(_absEta<0.6) {
+      if( meanminmax == "mean" ) sf = ((1.09165+(0.000702517*pt))+(-1.02871e-06*(pt*pt)))+(4.30424e-10*(pt*(pt*pt))) ;
+      else if( meanminmax == "min" ) sf = ((1.05683+(0.000364968*pt))+(-1.36739e-07*(pt*pt)))+(-1.49029e-10*(pt*(pt*pt))) ;
+      else if( meanminmax == "max" ) sf = ((1.12646+(0.00103951*pt))+(-1.91997e-06*(pt*pt)))+(1.00985e-09*(pt*(pt*pt))) ;
+    }
+    else if(_absEta<0.9) {
+      if( meanminmax == "mean" ) sf =  ((1.0784+(0.000436514*pt))+(-4.80533e-07*(pt*pt)))+(1.33671e-10*(pt*(pt*pt))) ;
+      else if( meanminmax == "min" ) sf = ((1.04698+(9.25694e-05*pt))+(4.4349e-07*(pt*pt)))+(-4.79468e-10*(pt*(pt*pt))) ;
+      else if( meanminmax == "max" ) sf = ((1.10982+(0.000780264*pt))+(-1.40461e-06*(pt*pt)))+(7.47048e-10*(pt*(pt*pt))) ;
+    }
+    else if(_absEta<1.2) {
+      if( meanminmax == "mean" ) sf = ((1.07503+(0.000526042*pt))+(-6.49158e-07*(pt*pt)))+(1.62348e-10*(pt*(pt*pt))) ;
+      else if( meanminmax == "min" ) sf = ((1.04579+(0.000173093*pt))+(3.18263e-07*(pt*pt)))+(-4.91223e-10*(pt*(pt*pt))) ;
+      else if( meanminmax == "max" ) sf = ((1.10426+(0.000878747*pt))+(-1.61676e-06*(pt*pt)))+(8.16318e-10*(pt*(pt*pt))) ;
+    }
+    else if(_absEta<1.5) {
+      if( meanminmax == "mean" ) sf = ((1.04288+(0.000657559*pt))+(-1.06594e-06*(pt*pt)))+(3.86717e-10*(pt*(pt*pt))) ;
+      else if( meanminmax == "min" ) sf = ((1.01419+(0.000577889*pt))+(-8.55682e-07*(pt*pt)))+(2.468e-10*(pt*(pt*pt))) ;
+      else if( meanminmax == "max" ) sf = ((1.07156+(0.00073673*pt))+(-1.27588e-06*(pt*pt)))+(5.26892e-10*(pt*(pt*pt))) ;
+    }
+    else if(_absEta<1.8) {
+      if( meanminmax == "mean" ) sf = ((1.03033+(0.000622107*pt))+(-1.09864e-06*(pt*pt)))+(4.7558e-10*(pt*(pt*pt))) ;
+      else if( meanminmax == "min" ) sf = ((1.00339+(0.000508366*pt))+(-7.81139e-07*(pt*pt)))+(2.53078e-10*(pt*(pt*pt))) ;
+      else if( meanminmax == "max" ) sf = ((1.05727+(0.00073532*pt))+(-1.4156e-06*(pt*pt)))+(6.98246e-10*(pt*(pt*pt))) ;
+    }
+    else if(_absEta<2.4) {
+      if( meanminmax == "mean" ) sf = ((1.00087+(0.000789414*pt))+(-1.51105e-06*(pt*pt)))+(8.63264e-10*(pt*(pt*pt))) ;
+      else if( meanminmax == "min" ) sf = ((0.976332+(0.000678258*pt))+(-1.19056e-06*(pt*pt)))+(6.19232e-10*(pt*(pt*pt))) ;
+      else if( meanminmax == "max" ) sf = ((1.02541+(0.000899915*pt))+(-1.83065e-06*(pt*pt)))+(1.10768e-09*(pt*(pt*pt))) ;
+    }
+  }
+  else if( tagger=="CSVM" ){
+    if(_absEta<0.8) {
+      if( meanminmax == "mean" ) sf = ((0.994351+(0.000250077*pt))+(9.24801e-07*(pt*pt)))+(-8.73293e-10*(pt*(pt*pt))) ;
+      else if( meanminmax == "min" ) sf = ((0.949401+(-0.000356232*pt))+(2.24887e-06*(pt*pt)))+(-1.66011e-09*(pt*(pt*pt))) ;
+      else if( meanminmax == "max" ) sf = ((1.03928+(0.000857422*pt))+(-4.02756e-07*(pt*pt)))+(-8.45836e-11*(pt*(pt*pt))) ;
+    }
+    else if(_absEta<1.6) {
+      if( meanminmax == "mean" ) sf = ((1.00939+(0.000461283*pt))+(-6.30306e-07*(pt*pt)))+(3.53075e-10*(pt*(pt*pt))) ;
+      else if( meanminmax == "min" ) sf = ((0.964857+(-2.19898e-05*pt))+(4.74117e-07*(pt*pt)))+(-3.36548e-10*(pt*(pt*pt))) ;
+      else if( meanminmax == "max" ) sf = ((1.05392+(0.000944135*pt))+(-1.73386e-06*(pt*pt)))+(1.04242e-09*(pt*(pt*pt))) ;
+    }
+    else if(_absEta<2.4) {
+      if( meanminmax == "mean" ) sf = ((0.955798+(0.00146058*pt))+(-3.76689e-06*(pt*pt)))+(2.39196e-09*(pt*(pt*pt))) ;
+      else if( meanminmax == "min" ) sf = ((0.910086+(0.00116371*pt))+(-3.02747e-06*(pt*pt)))+(1.86906e-09*(pt*(pt*pt))) ;
+      else if( meanminmax == "max" ) sf = ((1.00151+(0.00175547*pt))+(-4.50251e-06*(pt*pt)))+(2.91473e-09*(pt*(pt*pt))) ;
+    }
+  }
+
+  return sf;
+}
+
+double BtagHardcodedConditions::GetMistagSF2011(double pt, double eta, std::string tagger, std::string meanminmax)
+{
     double _absEta = abs(eta);
     double sf = -1;
     if ((pt<670)||(tagger[tagger.length()-1]=='T')) {
@@ -634,8 +1207,7 @@ double BtagHardcodedConditions::GetMistagSF2011(double pt, double eta,
     return sf;
 }
 
-double BtagHardcodedConditions::GetMistagSF2012(double pt, double eta,
-                                                std::string tagger, std::string meanminmax)
+double BtagHardcodedConditions::GetMistagSF2012(double pt, double eta, std::string tagger, std::string meanminmax)
 {
     
     double _absEta = abs(eta);
@@ -774,5 +1346,86 @@ double BtagHardcodedConditions::GetMistagSF2012(double pt, double eta,
     }
     
     return sf;
-}
+}//end GetMistagSF2012
+
+double BtagHardcodedConditions::GetLFSF2016Medium( shift Shift, double pt, double eta)
+{
+    if(fabs(eta) > 2.4 or pt<20.) return 1.;
+    switch(Shift){
+	case uncert:
+	    return  (1.0589+0.000382569*pt+-2.4252e-07*pt*pt+2.20966e-10*pt*pt*pt)*((0.100485+3.95509e-05*pt+-4.90326e-08*pt*pt));
+	case up:
+	    return  (1.0589+0.000382569*pt+-2.4252e-07*pt*pt+2.20966e-10*pt*pt*pt)*(1+(0.100485+3.95509e-05*pt+-4.90326e-08*pt*pt));
+	case down:
+	    return  (1.0589+0.000382569*pt+-2.4252e-07*pt*pt+2.20966e-10*pt*pt*pt)*(1-(0.100485+3.95509e-05*pt+-4.90326e-08*pt*pt));
+	case central:
+	default:
+	    return  1.0589+0.000382569*pt+-2.4252e-07*pt*pt+2.20966e-10*pt*pt*pt;
+    }//end switch Shift
+}//end GetLFSF2016
+
+double BtagHardcodedConditions::GetLFSF2016Medium_subjet( shift Shift, double pt, double eta)
+{
+    if(fabs(eta) > 2.4 or pt<20.) return 1.;
+    switch(Shift){
+	case uncert:
+		return GetLFSF2016Medium_subjet( up, pt, eta) - GetLFSF2016Medium_subjet( central, pt, eta);
+	case up:
+	    return  0.676736+0.00286128*pt+-4.34618e-06*pt*pt+2.44485e-09*pt*pt*pt;
+	case down:
+	    return  0.582177+0.00204348*pt+-2.94226e-06*pt*pt+1.6536e-09*pt*pt*pt;
+	case central: 
+	default:
+	    return  0.629961+0.00245187*pt+-3.64539e-06*pt*pt+2.04999e-09*pt*pt*pt;
+    }//end switch Shift
+}//end GetLFSF2016
+
+double BtagHardcodedConditions::GetLFSF2016Loose( shift Shift, double pt, double eta)
+{
+    if(fabs(eta) > 2.4 or pt<20.) return 1.;
+    switch(Shift){
+	case uncert:
+	    return  (1.13904+-0.000594946*pt+1.97303e-06*pt*pt+-1.38194e-09*pt*pt*pt)*((0.0996438+-8.33354e-05*pt+4.74359e-08*pt*pt));
+	case up:
+	    return  (1.13904+-0.000594946*pt+1.97303e-06*pt*pt+-1.38194e-09*pt*pt*pt)*(1+(0.0996438+-8.33354e-05*pt+4.74359e-08*pt*pt));
+	case down:
+	    return  (1.13904+-0.000594946*pt+1.97303e-06*pt*pt+-1.38194e-09*pt*pt*pt)*(1-(0.0996438+-8.33354e-05*pt+4.74359e-08*pt*pt));
+	case central:
+	default:
+	    return  1.13904+-0.000594946*pt+1.97303e-06*pt*pt+-1.38194e-09*pt*pt*pt;
+    }//end switch Shift
+}//end GetLFSF2016
+
+double BtagHardcodedConditions::GetLFSF2016Loose_subjet( shift Shift, double pt, double eta)
+{
+    if(fabs(eta) > 2.4 or pt<20.) return 1.;
+    switch(Shift){
+	case uncert:
+	    return GetLFSF2016Loose_subjet(up,pt,eta) - GetLFSF2016Loose_subjet(central,pt,eta);
+	case up:
+	    return  1.0358+0.000107516*pt+9.58049e-07*pt*pt+-8.59906e-10*pt*pt*pt;
+	case down:
+	    return  0.873638+0.0005247*pt+-3.15316e-07*pt*pt+4.83633e-11*pt*pt*pt;
+	case central:
+	default:
+	    return  0.954689+0.000316059*pt+3.22024e-07*pt*pt+-4.06201e-10*pt*pt*pt;
+    }//end switch Shift
+}//end GetLFSF2016
+
+double BtagHardcodedConditions::GetLFSF2016Tight( shift Shift, double pt, double eta)
+{
+    if(fabs(eta) > 2.4 or pt<20. ) return 1.;
+    switch(Shift){
+	case uncert:
+	    return  (0.971945+163.215/(pt*pt)+0.000517836*pt)*((0.291298+-0.000222983*pt+1.69699e-07*pt*pt));
+	case up:
+	    return  (0.971945+163.215/(pt*pt)+0.000517836*pt)*(1+(0.291298+-0.000222983*pt+1.69699e-07*pt*pt));
+	case down:
+	    return  (0.971945+163.215/(pt*pt)+0.000517836*pt)*(1-(0.291298+-0.000222983*pt+1.69699e-07*pt*pt));
+	case central:
+	default:
+	    return  0.971945+163.215/(pt*pt)+0.000517836*pt;
+    }//end switch Shift
+}//end GetLFSF2016
+
 
