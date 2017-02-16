@@ -1,18 +1,26 @@
 #!/bin/bash
 
 #tt+X
-hadd /eos/uscms/store/user/clint/Spring16/25ns/Dec14/ljmet_trees/ljmet_TTW.root /eos/uscms/store/user/clint/Spring16/25ns/Dec14/TTW/*.root
-hadd /eos/uscms/store/user/clint/Spring16/25ns/Dec14/ljmet_trees/ljmet_TTZ.root /eos/uscms/store/user/clint/Spring16/25ns/Dec14/TTZ/*.root
-hadd /eos/uscms/store/user/clint/Spring16/25ns/Dec14/ljmet_trees/ljmet_TTH.root /eos/uscms/store/user/clint/Spring16/25ns/Dec14/TTH/*.root
-hadd /eos/uscms/store/user/clint/Spring16/25ns/Dec14/ljmet_trees/ljmet_TTTT.root /eos/uscms/store/user/clint/Spring16/25ns/Dec14/TTTT/*.root
+hadd root://cmseos.fnal.gov//store/user/lpctlbsm/clint/Moriond17/25ns/Feb01/ljmet_trees/ljmet_TTW.root `xrdfs root://cmseos.fnal.gov ls -u /eos/uscms/store/user/lpctlbsm/clint/Moriond17/25ns/Feb01/TTW/ | grep '.root'`
+hadd root://cmseos.fnal.gov//store/user/lpctlbsm/clint/Moriond17/25ns/Feb01/ljmet_trees/ljmet_TTZ.root `xrdfs root://cmseos.fnal.gov ls -u /eos/uscms/store/user/lpctlbsm/clint/Moriond17/25ns/Feb01/TTZ/ | grep '.root'`
+hadd root://cmseos.fnal.gov//store/user/lpctlbsm/clint/Moriond17/25ns/Feb01/ljmet_trees/ljmet_TTH.root `xrdfs root://cmseos.fnal.gov ls -u /eos/uscms/store/user/lpctlbsm/clint/Moriond17/25ns/Feb01/TTH/ | grep '.root'`
+hadd root://cmseos.fnal.gov//store/user/lpctlbsm/clint/Moriond17/25ns/Feb01/ljmet_trees/ljmet_TTTT.root `xrdfs root://cmseos.fnal.gov ls -u /eos/uscms/store/user/lpctlbsm/clint/Moriond17/25ns/Feb01/TTTT/ | grep '.root'`
 #diboson
-hadd -f /eos/uscms/store/user/clint/Spring16/25ns/Dec14/ljmet_trees/ljmet_WZ.root /eos/uscms/store/user/clint/Spring16/25ns/Dec14/WZ/*.root
-hadd -f /eos/uscms/store/user/clint/Spring16/25ns/Dec14/ljmet_trees/ljmet_ZZ.root /eos/uscms/store/user/clint/Spring16/25ns/Dec14/ZZ/*.root
-hadd /eos/uscms/store/user/clint/Spring16/25ns/Dec14/ljmet_trees/ljmet_WpWp.root /eos/uscms/store/user/clint/Spring16/25ns/Dec14/WpWp/*.root
-#hadd /eos/uscms/store/user/clint/Spring16/25ns/Dec14/ljmet_trees/ljmet_VH.root /eos/uscms/store/user/clint/Spring16/25ns/Dec14/VH/*.root
+hadd root://cmseos.fnal.gov//store/user/lpctlbsm/clint/Moriond17/25ns/Feb01/ljmet_trees/ljmet_WZ.root `xrdfs root://cmseos.fnal.gov ls -u /eos/uscms/store/user/lpctlbsm/clint/Moriond17/25ns/Feb01/WZ/ | grep '.root'`
+hadd root://cmseos.fnal.gov//store/user/lpctlbsm/clint/Moriond17/25ns/Feb01/ljmet_trees/ljmet_ZZ.root `xrdfs root://cmseos.fnal.gov ls -u /eos/uscms/store/user/lpctlbsm/clint/Moriond17/25ns/Feb01/ZZ/ | grep '.root'`
+hadd root://cmseos.fnal.gov//store/user/lpctlbsm/clint/Moriond17/25ns/Feb01/ljmet_trees/ljmet_WpWp.root `xrdfs root://cmseos.fnal.gov ls -u /eos/uscms/store/user/lpctlbsm/clint/Moriond17/25ns/Feb01/WpWp/ | grep '.root'`
+##hadd root://cmseos.fnal.gov//store/user/lpctlbsm/clint/Moriond17/25ns/Feb01/ljmet_trees/ljmet_VH.root `xrdfs root://cmseos.fnal.gov ls -u /eos/uscms/store/user/lpctlbsm/clint/Moriond17/25ns/Feb01/VH/ | grep '.root'`
 #triboson
-#hadd /eos/uscms/store/user/clint/Spring16/25ns/Dec14/ljmet_trees/ljmet_WWW.root /eos/uscms/store/user/clint/Spring16/25ns/Dec14/WWW/*.root
-hadd -f /eos/uscms/store/user/clint/Spring16/25ns/Dec14/ljmet_trees/ljmet_WWZ.root /eos/uscms/store/user/clint/Spring16/25ns/Dec14/WWZ/*.root
-hadd /eos/uscms/store/user/clint/Spring16/25ns/Dec14/ljmet_trees/ljmet_WZZ.root /eos/uscms/store/user/clint/Spring16/25ns/Dec14/WZZ/*.root
-hadd /eos/uscms/store/user/clint/Spring16/25ns/Dec14/ljmet_trees/ljmet_ZZZ.root /eos/uscms/store/user/clint/Spring16/25ns/Dec14/ZZZ/*.root
+#hadd root://cmseos.fnal.gov//store/user/lpctlbsm/clint/Moriond17/25ns/Feb01/ljmet_trees/ljmet_WWW.root `xrdfs root://cmseos.fnal.gov ls -u /eos/uscms/store/user/lpctlbsm/clint/Moriond17/25ns/Feb01/WWW/ | grep '.root'`
+hadd root://cmseos.fnal.gov//store/user/lpctlbsm/clint/Moriond17/25ns/Feb01/ljmet_trees/ljmet_WWZ.root `xrdfs root://cmseos.fnal.gov ls -u /eos/uscms/store/user/lpctlbsm/clint/Moriond17/25ns/Feb01/WWZ/ | grep '.root'`
+hadd root://cmseos.fnal.gov//store/user/lpctlbsm/clint/Moriond17/25ns/Feb01/ljmet_trees/ljmet_WZZ.root `xrdfs root://cmseos.fnal.gov ls -u /eos/uscms/store/user/lpctlbsm/clint/Moriond17/25ns/Feb01/WZZ/ | grep '.root'`
+hadd root://cmseos.fnal.gov//store/user/lpctlbsm/clint/Moriond17/25ns/Feb01/ljmet_trees/ljmet_ZZZ.root `xrdfs root://cmseos.fnal.gov ls -u /eos/uscms/store/user/lpctlbsm/clint/Moriond17/25ns/Feb01/ZZZ/ | grep '.root'`
 
+#WJets
+#hadd root://cmseos.fnal.gov//store/user/lpctlbsm/clint/Moriond17/25ns/Feb01/ljmet_trees/ljmet_WJets_SingleLep.root `xrdfs root://cmseos.fnal.gov ls -u /eos/uscms/store/user/lpctlbsm/clint/Moriond17/25ns/Feb01/WJets-SingleLepSelection/ | grep '.root'`
+
+#qcd
+#hadd root://cmseos.fnal.gov//store/user/lpctlbsm/clint/Moriond17/25ns/Feb01/ljmet_trees/ljmet_QCD_Pt15to30_SingleLep.root `xrdfs root://cmseos.fnal.gov ls -u /eos/uscms/store/user/lpctlbsm/clint/Moriond17/25ns/Feb01/QCD-Pt15to30-SingleLepSelection/ | grep '.root'`
+#hadd root://cmseos.fnal.gov//store/user/lpctlbsm/clint/Moriond17/25ns/Feb01/ljmet_trees/ljmet_QCD_Pt30to50_SingleLep.root `xrdfs root://cmseos.fnal.gov ls -u /eos/uscms/store/user/lpctlbsm/clint/Moriond17/25ns/Feb01/QCD-Pt30to50-SingleLepSelection/ | grep '.root'`
+#hadd root://cmseos.fnal.gov//store/user/lpctlbsm/clint/Moriond17/25ns/Feb01/ljmet_trees/ljmet_QCD_Pt50to80_SingleLep.root `xrdfs root://cmseos.fnal.gov ls -u /eos/uscms/store/user/lpctlbsm/clint/Moriond17/25ns/Feb01/QCD-Pt50to80-SingleLepSelection/ | grep '.root'`
+#hadd root://cmseos.fnal.gov//store/user/lpctlbsm/clint/Moriond17/25ns/Feb01/ljmet_trees/ljmet_QCD_Pt80to120_SingleLep.root `xrdfs root://cmseos.fnal.gov ls -u /eos/uscms/store/user/lpctlbsm/clint/Moriond17/25ns/Feb01/QCD-Pt80to120-SingleLepSelection/ | grep '.root'`
