@@ -15,10 +15,9 @@ files_per_job = 1
 
 rel_base = os.environ['CMSSW_BASE']
 cmssw = 'CMSSW_8_0_22'
-logdir = 'Jan09'
-#outdir = '/eos/uscms/store/user/clint/FakeRate/25ns/'+logdir+'/'
-outdir = '/store/user/lpctlbsm/clint/FakeRate/25ns/'+logdir+'/'
-#outdir = '/eos/uscms/store/user/clint/FakeRate/25ns/'+logdir+'/'
+logdir = 'Feb01'
+outdir = '/eos/uscms/store/user/lpctlbsm/clint/Moriond17/25ns/'+logdir+'/'
+#outdir = '/eos/uscms/store/user/clint/Spring15/25ns/'+logdir+'/'
 
 ### What is the name of your FWLite Analyzer
 FWLiteAnalyzer = 'ljmet'
@@ -32,7 +31,7 @@ DOQCDMC = 'False'
 DOTTBARSYS = 'False'
 
 ### JSON file to use
-MYJSON = "'../data/json/Cert_271036-284044_13TeV_23Sep2016ReReco_Collisions16_JSON.txt'"
+MYJSON = "''"
 
 ### Systematics flags
 BTAGUNCERTUP = 'False'
@@ -97,7 +96,7 @@ def get_input(num, list):
 print str(files_per_job)+' files per job...'
 
 #make tarball and move to eos
-#os.system('tar -cvf ljmet.tar ../bin/* ../src/* ../interface/* ../data/* ../python/* ../tools/* ../BuildFile.xml ../setup.sh ../weights/*')
+#os.system('tar -cvf ljmet.tar ../bin/* ../src/* ../interface/* ../data/* ../python/* ../tools/* ../BuildFile.xml ../setup.sh ../weights/* ')
 #os.system('xrdcp -f ljmet.tar root://cmseos.fnal.gov//store/user/clint/ljmet.tar')
 
 for i in range(len(prefix)):
@@ -106,11 +105,11 @@ for i in range(len(prefix)):
     nfiles = 1
 
     #make local directory
-    locdir = 'FakeRate/'+logdir+'/'+prefix[i]
+    locdir = logdir+'/'+prefix[i]
     os.system('mkdir -p  %s' %locdir)
 
         
-    FLAGTAG = 'TriggerResults'
+    FLAGTAG = 'TriggerResults::PAT'
     
     print 'CONDOR work dir: '+dir[i]
     #os.system('rm -rf '+dir[i])
@@ -129,7 +128,7 @@ for i in range(len(prefix)):
 
     while ( nfiles <= count ):    
 
-        py_templ_file = open(rel_base+"/src/LJMet/Com/condor/Dilepton_Data_FakeRate_23SepReReco_python.templ")
+        py_templ_file = open(rel_base+"/src/LJMet/Com/condor/Dilepton_Moriond17MC_25ns_python.templ")
         condor_templ_file = open(rel_base+"/src/LJMet/Com/condor/X53condor.templ")
         csh_templ_file    = open(rel_base+"/src/LJMet/Com/condor/X53csh.templ")
 
@@ -156,11 +155,9 @@ for i in range(len(prefix)):
 
         #copy file to eos
         eosfile =   "root://cmseos.fnal.gov/"+dir[i]+"/"+prefix[i]+"_"+str(j)+".py"
-        #loceosfile = dir[i]+"/"+prefix[i]+"_"+str(j)+".py"
-        #os.system("cp %s %s" %(localfile,loceosfile))
         os.system("xrdcp -f %s %s"  % (localfile,eosfile))
         #remove local version
-        os.system('mv %s python_cfgs' % localfile)
+        os.system('rm %s python_cfgs/MC/' % localfile)
 
         localcondor = locdir+'/'+prefix[i]+"_"+str(j)+".condor"
         eoscondor = "root://cmseos.fnal.gov/"+dir[i]+"/"+prefix[i]+"_"+str(j)+".condor"
