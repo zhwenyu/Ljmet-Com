@@ -1390,18 +1390,19 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
     for (std::vector<pat::Jet>::const_iterator ijet = vSelCleanedJets.begin();
          ijet != vSelCleanedJets.end(); ijet++){
       //no need to correct so just push back quantities from jet directly
-      //get scaled values
-      TLorentzVector jecUP   = selector->scaleJet(*ijet,true);
-      TLorentzVector jecDOWN = selector->scaleJet(*ijet,false);
-      TLorentzVector jerUP   = selector->smearJet(*ijet,event,true);
-      TLorentzVector jerDOWN = selector->smearJet(*ijet,event,false);
-
+      //get scaled values for MC only
+      if(isMc){
+	TLorentzVector jecUP   = selector->scaleJet(*ijet,true);
+	TLorentzVector jecDOWN = selector->scaleJet(*ijet,false);
+	TLorentzVector jerUP   = selector->smearJet(*ijet,event,true);
+	TLorentzVector jerDOWN = selector->smearJet(*ijet,event,false);
+	cleanedAK4JetPtScaleUp.   push_back(jecUP.Pt());
+	cleanedAK4JetPtScaleDown. push_back(jecDOWN.Pt());
+	cleanedAK4JetPtSmearUp.   push_back(jerUP.Pt());
+	cleanedAK4JetPtSmearDown. push_back(jerDOWN.Pt());
+      }
       cleanedAK4JetPt     . push_back((*ijet).pt());
       //scaled values
-      cleanedAK4JetPtScaleUp.   push_back(jecUP.Pt());
-      cleanedAK4JetPtScaleDown. push_back(jecDOWN.Pt());
-      cleanedAK4JetPtSmearUp.   push_back(jerUP.Pt());
-      cleanedAK4JetPtSmearDown. push_back(jerDOWN.Pt());
 
       cleanedAK4JetEta    . push_back((*ijet).eta());
       cleanedAK4JetPhi    . push_back((*ijet).phi());
