@@ -158,6 +158,8 @@ process.event_selector = cms.PSet(
     #new jet energy corrections
     doNewJEC                 = cms.bool(True),
     doLepJetCleaning         = cms.bool(True),
+    #era dependent jecs
+    doEraDepJEC              = cms.bool(True),
 
     MCL1JetPar               = cms.string("../data/Spring16_25nsV6_MC_L1FastJet_AK4PFchs.txt"),
     MCL2JetPar               = cms.string("../data/Spring16_25nsV6_MC_L2Relative_AK4PFchs.txt"),
