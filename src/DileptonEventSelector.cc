@@ -705,7 +705,7 @@ bool DileptonEventSelector::operator()( edm::EventBase const & event, pat::strbi
 	      //if (_iel->isEBEEGap()) break;
 
 	      //mva loose for cleaning
-	      float mvaVal = mvaValue( *_iel,event);
+	      float mvaVal = mvaValue_alt( *_iel,event);
 	      pat::Electron* elptr = new pat::Electron(*_iel);
 	      float miniIso = getPFMiniIsolation_EffectiveArea(packedPFCands, dynamic_cast<const reco::Candidate* > (elptr), 0.05, 0.2, 10., false, false,myRhoJetsNC);
 	      
@@ -714,13 +714,13 @@ bool DileptonEventSelector::operator()( edm::EventBase const & event, pat::strbi
 	      else if(miniIso > 0.4) passLoose=false;
 	      else{
 		if(fabs(_iel->ecalDrivenMomentum().eta()) <0.8){
-		  if(mvaVal>0.913286) passLoose = true;
+		  if(mvaVal>-0.041) passLoose = true;
 		}
 		else if(fabs(_iel->ecalDrivenMomentum().eta()) < 1.479){
-		  if(mvaVal>0.805013) passLoose = true;
+		  if(mvaVal>0.383) passLoose = true;
 		}
 		else if(fabs(_iel->ecalDrivenMomentum().eta())<2.4){
-		  if(mvaVal > 0.358969) passLoose=true;
+		  if(mvaVal > -0.515) passLoose=true;
 		}
 	      }
 	      /* NOT USING CUT BASED LOOSE ANYMORE
