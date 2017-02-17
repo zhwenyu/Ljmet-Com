@@ -1,127 +1,195 @@
 import FWCore.ParameterSet.Config as cms
 import FWCore.PythonUtilities.LumiList as LumiList
 import FWCore.ParameterSet.Types as CfgTypes
+import os
 
 # Define the base process
 process = cms.Process("LJMetCom")
 
-# Save the working area to a variable -- EDIT USER DIRECTORY HERE
-relBase    = str('/uscms/home/jmanagan/work/CMSSW_7_3_0/')
+#Arguments from condor submit script which are used more than once
+condorIsMC = bool(True) ## True for MC
+relBase = os.environ['CMSSW_BASE']
+condorJSON = str('Cert_271036-275125_13TeV_PromptReco_Collisions16_JSON.txt')
 ############################################################
 #
 # FWLite application options
 process.load('LJMet.Com.ljmet_cfi')
-process.ljmet.isMc = cms.bool(True)
+process.ljmet.isMc = cms.bool(condorIsMC)
 
 # Exclude some unnecessary calculators from the process
 process.ljmet.excluded_calculators = cms.vstring(
-	'DileptonCalc',
-	'StopCalc',
-	'PdfCalc',
-	'ChargedHiggsCalc',
-	'TprimeCalc',
-	'LjetsTopoCalc',
-	'WprimeCalc'
-	) 
+    'PileUpCalc',
+    'BTagSFCalc',
+    'TprimeCalc',
+    'CATopoCalc',
+    'DileptonCalc',
+    'DileptonEventSelector',
+    'StopCalc',
+    'PdfCalc',
+    'ChargedHiggsCalc',
+    'LjetsTopoCalc',
+    'WprimeCalc'
+    ) 
 
-# common calculator options
+# common calculator options -- see src/CommonCalc.cc
 process.load('LJMet.Com.commonCalc_cfi')
 
-# Stop calculator options
-process.load('LJMet.Com.stopCalc_cfi')
-
-# singleLep calculator options
+# singleLep calculator options -- see src/singleLepCalc.cc
 process.load('LJMet.Com.singleLepCalc_cfi')
-process.singleLepCalc.isWJets = cms.bool(False)
+process.singleLepCalc.isMc              = cms.bool(condorIsMC)
+process.singleLepCalc.keepFullMChistory = cms.bool(condorIsMC)
+process.singleLepCalc.UseElMVA          = cms.bool(True)
+process.singleLepCalc.saveLooseLeps     = cms.bool(False)
 
-# LjetsTopoCalc options
-process.load('LJMet.Com.ljetsTopoCalcNew_cfi')
-process.LjetsTopoCalcNew.useBestTop = cms.bool(True)
-
-# Stop calculator options
+# Jet substructure calculator options -- see src/JetSubCalc.cc
 process.load('LJMet.Com.JetSubCalc_cfi')
-
+process.JetSubCalc.useHTT = cms.bool(False)
+process.JetSubCalc.killHF = cms.bool(False)
+process.JetSubCalc.doNewJEC = cms.bool(True)
+process.JetSubCalc.useL2L3Mass = cms.bool(True)
+process.JetSubCalc.isMc = cms.bool(condorIsMC)
+process.JetSubCalc.JECup = cms.bool(False)
+process.JetSubCalc.JECdown = cms.bool(False)
+process.JetSubCalc.JERup = cms.bool(False)
+process.JetSubCalc.JERdown = cms.bool(False)
+process.JetSubCalc.MCL2JetParAK8 = cms.string(relBase+'/src/LJMet/Com/data/Spring16_25nsV6_MC_L2Relative_AK8PFchs.txt')
+process.JetSubCalc.MCL3JetParAK8 = cms.string(relBase+'/src/LJMet/Com/data/Spring16_25nsV6_MC_L3Absolute_AK8PFchs.txt')
+process.JetSubCalc.MCPTResAK8 = cms.string(relBase+'/src/LJMet/Com/data/Spring16_25nsV6_MC_PtResolution_AK8PFchs.txt')
+process.JetSubCalc.MCSF = cms.string(relBase+'/src/LJMet/Com/data/Spring16_25nsV6_MC_SF_AK4PFchs.txt')
+process.JetSubCalc.DataL2JetParAK8 = cms.string(relBase+'/src/LJMet/Com/data/Spring16_25nsV6_DATA_L2Relative_AK8PFchs.txt')
+process.JetSubCalc.DataL3JetParAK8 = cms.string(relBase+'/src/LJMet/Com/data/Spring16_25nsV6_DATA_L3Absolute_AK8PFchs.txt')
+process.JetSubCalc.DataL2L3JetParAK8 = cms.string(relBase+'/src/LJMet/Com/data/Spring16_25nsV6_DATA_L2L3Residual_AK8PFchs.txt')
+process.JetSubCalc.UncertaintyAK8 = cms.string(relBase+'/src/LJMet/Com/data/Spring16_25nsV6_DATA_Uncertainty_AK8PFchs.txt')
 
 ############################################################
 #
-# Event selector options
+# Event selector options -- see src/singleLepEventSelector.cc
 #
 process.event_selector = cms.PSet(
-
+    
     selection = cms.string('singleLepSelector'),
-
+    
     # Define cuts -- variable names are strings searched by src/singleLepEventSelector.cc
-
+    
     debug  = cms.bool(False),
-
-    isMc  = cms.bool(True),
-    keepFullMChistory = cms.bool(False),
+    
+    isMc  = cms.bool(condorIsMC),
+    keepFullMChistory = cms.bool(condorIsMC),
     doLaserCalFilt  = cms.bool(False),
-
+    
     # Trigger cuts
     trigger_cut  = cms.bool(True),
     dump_trigger = cms.bool(False),
+
+    trigger_path_el = cms.vstring(
+        'HLT_Ele27_eta2p1_WPLoose_Gsf_v1', 
+	'HLT_Ele27_eta2p1_WPLoose_Gsf_v2', 
+	'HLT_Ele27_eta2p1_WPLoose_Gsf_v3', 
+        'HLT_Ele27_eta2p1_WPLoose_Gsf_v4', 
+	'HLT_Ele27_eta2p1_WPLoose_Gsf_v5', 
+        ),
+    trigger_path_mu = cms.vstring(
+        'HLT_IsoMu20_v1',   
+	'HLT_IsoMu20_v2',   
+	'HLT_IsoMu20_v3',   
+	'HLT_IsoMu20_v4',   
+	'HLT_IsoMu20_v5',   
+	'HLT_IsoMu20_v6',
+        'HLT_IsoTkMu20_v1', 
+	'HLT_IsoTkMu20_v2', 
+	'HLT_IsoTkMu20_v3', 
+	'HLT_IsoTkMu20_v4', 
+	'HLT_IsoTkMu20_v5', 
+	'HLT_IsoTkMu20_v6',
+        ),
+
+    mctrigger_path_el = cms.vstring('digitisation_step'),
+    mctrigger_path_mu = cms.vstring('digitisation_step'),
     
-    mctrigger_path_el = cms.string('HLT_Ele32_eta2p1_WP85_Gsf_v1'),
-    mctrigger_path_mu = cms.string('HLT_IsoMu24_eta2p1_IterTrk02_v1'),
-    trigger_path_el = cms.vstring('HLT_Ele27_WP80_v8','HLT_Ele27_WP80_v9','HLT_Ele27_WP80_v10','HLT_Ele27_WP80_v11'),
-    trigger_path_mu = cms.vstring('HLT_IsoMu24_eta2p1_v11','HLT_IsoMu24_eta2p1_v12','HLT_IsoMu24_eta2p1_v13','HLT_IsoMu24_eta2p1_v14','HLT_IsoMu24_eta2p1_v15'),
-
-    #testing muons 
-    #mctrigger_path_el = cms.string('HLT_Mu40_v12'), 
-    #mctrigger_path_mu = cms.string('HLT_Mu40_v12'), 
-    #trigger_path_el = cms.vstring('HLT_Mu40_v12'), 
-    #trigger_path_mu = cms.vstring('HLT_Mu40_v12'),
-
     # PV cuts
     pv_cut         = cms.bool(True),
-    hbhe_cut       = cms.bool(True),
-
+    metfilters     = cms.bool(True),
+    #flag_tag       = cms.InputTag('TriggerResults::RECO'), # for Data
+    flag_tag       = cms.InputTag('TriggerResults::PAT'), # For MC
+    
     # Jet cuts
     jet_cuts                 = cms.bool(True),
-    jet_minpt                = cms.double(30.0),
-    jet_maxeta               = cms.double(4.7),
-    min_jet                  = cms.int32(1),
+    jet_minpt                = cms.double(0.0),
+    jet_maxeta               = cms.double(5.0),
+    min_jet                  = cms.int32(2),
     max_jet                  = cms.int32(4000),
-    leading_jet_pt           = cms.double(100.0),
+    leading_jet_pt           = cms.double(0.0),
 
     # muon cuts
     muon_cuts                = cms.bool(True),
-    muon_selector            = cms.bool(True),
-    muon_reliso              = cms.double(0.12),
-    muon_minpt               = cms.double(25.0),
-    muon_maxeta              = cms.double(2.1),
+    muon_selector            = cms.bool(False),
+    muon_selector_medium     = cms.bool(False),
+    muon_reliso              = cms.double(0.2),
+    muon_useMiniIso          = cms.bool(True),
+    muon_miniIso             = cms.double(0.2),
+    loose_muon_miniIso       = cms.double(0.4),
+    muon_minpt               = cms.double(30.0),
+    muon_maxeta              = cms.double(2.4),
     min_muon                 = cms.int32(0),
-    loose_muon_selector      = cms.bool(True),
+    # use a code based selector? Right now "false" for all
+    loose_muon_selector      = cms.bool(False),
     loose_muon_selector_tight = cms.bool(False),
-    loose_muon_reliso        = cms.double(0.12),
+    # turn on miniIso and set cuts
+    # or use relative isolation
+    loose_muon_reliso        = cms.double(0.4),
     loose_muon_minpt         = cms.double(10.0),
     loose_muon_maxeta        = cms.double(2.4),
+    # specify IP cuts
+    muon_dxy                 = cms.double(0.2),
+    muon_dz                  = cms.double(0.5),
+    loose_muon_dxy           = cms.double(999999.),
+    loose_muon_dz            = cms.double(999999.),
+    # choose min/max pt and eta
 
     # electron cuts
     electron_cuts            = cms.bool(True),
     electron_minpt           = cms.double(30.0),
-    electron_maxeta          = cms.double(2.5),
-    min_electron             = cms.int32(0),
-    loose_electron_minpt     = cms.double(20.0),
-    loose_electron_maxeta    = cms.double(2.5),
+    electron_maxeta          = cms.double(2.1),
+    electron_miniIso         = cms.double(0.1),
     
-    # more lepton cuts
-    min_lepton               = cms.int32(1),
-    max_lepton               = cms.int32(1),    
-    second_lepton_veto       = cms.bool(True),
-    tau_veto		     = cms.bool(False),
+    electron_CutsPlusMVA     = cms.bool(False),
+    min_electron             = cms.int32(0),
+    loose_electron_minpt     = cms.double(10.0),
+    loose_electron_maxeta    = cms.double(2.1),
+    loose_electron_miniIso   = cms.double(0.4),
+    # turn on MVA identification, or default to cut-based
+    UseElMVA                 = cms.bool(True),
+    UseElMVA_tight           = cms.bool(True),
+    tight_electron_mva_cuts  = cms.vdouble(0.967083,0.929117,0.726311), # ~80% el efficiency WP
+    loose_electron_mva_cuts  = cms.vdouble(0.913286,0.805013,0.358969), # ~90% el efficiency WP
 
+    ElMVAweightFiles = cms.vstring(
+        relBase+'/src/LJMet/Com/weights/EIDmva_EB1_10_oldNonTrigSpring15_ConvVarCwoBoolean_TMVA412_FullStatLowPt_PairNegWeightsGlobal_BDT.weights.xml',
+        relBase+'/src/LJMet/Com/weights/EIDmva_EB2_10_oldNonTrigSpring15_ConvVarCwoBoolean_TMVA412_FullStatLowPt_PairNegWeightsGlobal_BDT.weights.xml',
+        relBase+'/src/LJMet/Com/weights/EIDmva_EE_10_oldNonTrigSpring15_ConvVarCwoBoolean_TMVA412_FullStatLowPt_PairNegWeightsGlobal_BDT.weights.xml',
+        ),
+
+    # more lepton cuts
+    min_lepton               = cms.int32(1),    # checks (N tight mu + N tight el) >= cut
+    max_lepton               = cms.int32(1),    # checks (N tight mu + N tight el) <= cut
+    min_loose_lepton         = cms.int32(0),    # checks (N loose mu + N loose el) >= cut
+    max_loose_lepton         = cms.int32(1000),    # checks (N loose mu + N loose el) <= cur
+    second_lepton_veto       = cms.bool(True),  # checks (N tight lep > 0) AND (N loose lep > 0), vetoes if there are loose leptons.
+    tau_veto		     = cms.bool(False),
+    
     # MET cuts
-    met_cuts                 = cms.bool(False),
+    met_cuts                 = cms.bool(True),
     min_met                  = cms.double(20.0),
+    max_met                  = cms.double(100000.0),
     
     # Btagging cuts
-    btag_cuts                = cms.bool(True),
+    btagOP                   = cms.string('CSVM'),
+    btag_min_discr           = cms.double(0.800),
+    btag_cuts                = cms.bool(False),
     btag_1                   = cms.bool(False),
     btag_2                   = cms.bool(False),
     btag_3                   = cms.bool(False),
-
+    
     # Define the branch names of object collections in the input miniAOD file
     trigger_collection       = cms.InputTag('TriggerResults::HLT'),
     pv_collection            = cms.InputTag('offlineSlimmedPrimaryVertices'),
@@ -130,26 +198,41 @@ process.event_selector = cms.PSet(
     electron_collection      = cms.InputTag('slimmedElectrons'),
     tau_collection	     = cms.InputTag('slimmedTaus'),
     met_collection           = cms.InputTag('slimmedMETs'),
-
-    # Jet corrections are read from txt files which need updating!
-    BTagUncertUp             = cms.bool(False),
-    BTagUncertDown           = cms.bool(False),
+    
+    # Jet corrections are read from txt files
     JECup                    = cms.bool(False),
     JECdown                  = cms.bool(False),
     JERup                    = cms.bool(False),
     JERdown                  = cms.bool(False),
-    JEC_txtfile = cms.string('CMSSW_BASE/src/LJMet/singleLepton/JEC/Summer13_V5_DATA_UncertaintySources_AK5PF.txt'),
-    doNewJEC                 = cms.bool(False),
-    doLepJetCleaning         = cms.bool(False),
+    doNewJEC                 = cms.bool(True),
+    doLepJetCleaning         = cms.bool(True),
+    LepJetDR                 = cms.double(0.4),
+    CleanLooseLeptons        = cms.bool(False),
 
-    MCL1JetPar               = cms.string('CMSSW_BASE/src/LJMet/Com/data/PHYS14_25_V2_L1FastJet_AK4PFchs.txt'),
-    MCL2JetPar               = cms.string('CMSSW_BASE/src/LJMet/Com/data/PHYS14_25_V2_L2Relative_AK4PFchs.txt'),
-    MCL3JetPar               = cms.string('CMSSW_BASE/src/LJMet/Com/data/PHYS14_25_V2_L3Absolute_AK4PFchs.txt'),
+    # Jet corrections are read from txt files which need updating!
+    JEC_txtfile = cms.string(relBase+'/src/LJMet/Com/data/Spring16_25nsV6_DATA_Uncertainty_AK4PFchs.txt'),
+    JERSF_txtfile = cms.string(relBase+'/src/LJMet/Com/data/Spring16_25nsV6_MC_SF_AK4PFchs.txt'),
+    JER_txtfile = cms.string(relBase+'/src/LJMet/Com/data/Spring16_25nsV6_MC_PtResolution_AK4PFchs.txt'),
+    JERAK8_txtfile = cms.string(relBase+'/src/LJMet/Com/data/Spring16_25nsV6_MC_PtResolution_AK8PFchs.txt'),
+   
+    MCL1JetPar               = cms.string(relBase+'/src/LJMet/Com/data/Spring16_25nsV6_MC_L1FastJet_AK4PFchs.txt'),
+    MCL2JetPar               = cms.string(relBase+'/src/LJMet/Com/data/Spring16_25nsV6_MC_L2Relative_AK4PFchs.txt'),
+    MCL3JetPar               = cms.string(relBase+'/src/LJMet/Com/data/Spring16_25nsV6_MC_L3Absolute_AK4PFchs.txt'),
 
-    DataL1JetPar             = cms.string('CMSSW_BASE/src/LJMet/singleLepton/JEC/Summer13_V4_DATA_L1FastJet_AK5PFchs.txt'),
-    DataL2JetPar             = cms.string('CMSSW_BASE/src/LJMet/singleLepton/JEC/Summer13_V4_DATA_L2Relative_AK5PFchs.txt'),
-    DataL3JetPar             = cms.string('CMSSW_BASE/src/LJMet/singleLepton/JEC/Summer13_V4_DATA_L3Absolute_AK5PFchs.txt'),
-    DataResJetPar            = cms.string('CMSSW_BASE/src/LJMet/singleLepton/JEC/Summer13_V4_DATA_L2L3Residual_AK5PFchs.txt')
+    MCL1JetParAK8            = cms.string(relBase+'/src/LJMet/Com/data/Spring16_25nsV6_MC_L1FastJet_AK8PFchs.txt'),
+    MCL2JetParAK8            = cms.string(relBase+'/src/LJMet/Com/data/Spring16_25nsV6_MC_L2Relative_AK8PFchs.txt'),
+    MCL3JetParAK8            = cms.string(relBase+'/src/LJMet/Com/data/Spring16_25nsV6_MC_L3Absolute_AK8PFchs.txt'),
+
+    DataL1JetPar             = cms.string(relBase+'/src/LJMet/Com/data/Spring16_25nsV6_DATA_L1FastJet_AK4PFchs.txt'),
+    DataL2JetPar             = cms.string(relBase+'/src/LJMet/Com/data/Spring16_25nsV6_DATA_L2Relative_AK4PFchs.txt'),
+    DataL3JetPar             = cms.string(relBase+'/src/LJMet/Com/data/Spring16_25nsV6_DATA_L3Absolute_AK4PFchs.txt'),
+    DataResJetPar            = cms.string(relBase+'/src/LJMet/Com/data/Spring16_25nsV6_DATA_L2L3Residual_AK4PFchs.txt'),
+
+    DataL1JetParAK8          = cms.string(relBase+'/src/LJMet/Com/data/Spring16_25nsV6_DATA_L1FastJet_AK8PFchs.txt'),
+    DataL2JetParAK8          = cms.string(relBase+'/src/LJMet/Com/data/Spring16_25nsV6_DATA_L2Relative_AK8PFchs.txt'),
+    DataL3JetParAK8          = cms.string(relBase+'/src/LJMet/Com/data/Spring16_25nsV6_DATA_L3Absolute_AK8PFchs.txt'),
+    DataResJetParAK8         = cms.string(relBase+'/src/LJMet/Com/data/Spring16_25nsV6_DATA_L2L3Residual_AK8PFchs.txt')
+
     )
 
 
@@ -159,30 +242,31 @@ process.event_selector = cms.PSet(
 #
 
 process.inputs = cms.PSet (
-    nEvents    = cms.int32(100),
+    nEvents    = cms.int32(1000),
     skipEvents = cms.int32(0),
     lumisToProcess = CfgTypes.untracked(CfgTypes.VLuminosityBlockRange()),
-    
-    # files can be read locally or from the grid, in which case you need a proxy to run.
-    fileNames  = cms.vstring('root://cmsxrootd-site.fnal.gov//store/mc/Phys14DR/TTJets_MSDecaysCKM_central_Tune4C_13TeV-madgraph-tauola/MINIAODSIM/PU20bx25_PHYS14_25_V1-v1/00000/00C90EFC-3074-E411-A845-002590DB9262.root')
+    fileNames  = cms.vstring(
+       'root://eoscms.cern.ch//store/mc/RunIISpring16MiniAODv2/TprimeTprime_M-800_TuneCUETP8M1_13TeV-madgraph-pythia8/MINIAODSIM/PUSpring16RAWAODSIM_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/70000/0424F3F9-B425-E611-B483-02163E0135B1.root',
+       #'testTprimeMiniAOD.root',
+        )
     )
+
 
 # JSON
 if (not process.ljmet.isMc==cms.bool(True)):
-    JsonFile = 'CMSSW_BASE/src/LJMet/singleLepton/json/Jan222013ReReco_json.txt'
+    JsonFile = relBase+'/src/LJMet/Com/data/json/'+condorJSON
     myList   = LumiList.LumiList(filename=JsonFile).getCMSSWString().split(',')
     process.inputs.lumisToProcess.extend(myList)
-        
-                
+    
+    
 #######################################################
 #
 # Output
 #
 process.outputs = cms.PSet (
-    outputName = cms.string('ljmet_tree'),
+    outputName = cms.string('testdata'),
     treeName   = cms.string('ljmet'),
-)
-
+    )
 
 #######################################################
 #
@@ -200,17 +284,16 @@ process.load('PhysicsTools.SelectorUtils.pfJetIDSelector_cfi')
 process.pfJetIDSelector.version = cms.string('FIRSTDATA')
 process.pfJetIDSelector.quality = cms.string('LOOSE')
 
-# Tight muon
+# Tight muon -- not used
 process.load('LJMet.Com.pfMuonSelector_cfi') 
-process.pfMuonSelector.maxPfRelIso = cms.double(0.2)
-process.pfMuonSelector.cutsToIgnore = cms.vstring('TrackerMuon','Chi2')
 
-# Loose muon
+# Loose muon -- not used
 process.LoosepfMuonSelector = process.pfMuonSelector.clone()
 
-# Tight electron
+# Tight electron for 25ns --- only used if MVA ID is turned off
 process.load('LJMet.Com.TopElectronSelector_cfi')
-
-# Loose electron -- this overrides the default "TIGHT" setting in TopElectronSelector
+process.TopElectronSelector.version = cms.string('NONE')
+                   	       
+#Loose electron for 25ns --- only used if MVA ID is turned off 
 process.LooseTopElectronSelector = process.TopElectronSelector.clone()
-process.LooseTopElectronSelector.version = cms.string('VETO')
+process.LooseTopElectronSelector.version = cms.string('NONE')

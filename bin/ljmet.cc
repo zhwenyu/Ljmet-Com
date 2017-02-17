@@ -78,8 +78,8 @@ int main (int argc, char* argv[]) {
     
     // log file
     std::string _logName = _outputName+".log";
-    fstream _logfile;
-    _logfile.open(_logName, fstream::out);
+    std::fstream _logfile;
+    _logfile.open(_logName, std::fstream::out);
     
     
     // usage
@@ -107,6 +107,7 @@ int main (int argc, char* argv[]) {
         
         if ( name->find("@")==std::string::npos ){
             // skip weird entries starting with @
+            if (*name=="subProcesses") continue; //no idea why this is now necessary, comes from upstream somewhere...
             std::cout << legend << *name << std::endl;
             edm::ParameterSet const _ps = parameters->getParameter<edm::ParameterSet>(*name);
             mPar.insert( std::pair<std::string, edm::ParameterSet const>(*name, _ps) );

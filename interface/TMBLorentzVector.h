@@ -63,7 +63,7 @@ public:
 
    TMBLorentzVector(const TVector3& vect, Double_t v4, EInitializer init=kXYZE):
       TMBVector3(vect) {
-       /// Initialize a TMBLorentzVector with a 3 vector and energy or mass,
+       /// Initialize a TMBLorentzVector with a 3 std::vector and energy or mass,
        /// depending on the value of init (e.g. it's the mass for init==kPtEtaPhiM)
       switch (init) {
          case kXYZM: case kPEtaPhiM: case kPtEtaPhiM: fM=v4;
@@ -193,17 +193,17 @@ public:
    
 
    TMBLorentzVector   operator +  (const TMBLorentzVector &lv) const {
-      /// 4vector addition
+      /// 4std::vector addition
       return TMBLorentzVector(Vect()+lv.Vect(), E()+lv.E()); }
    TMBLorentzVector & operator += (const TMBLorentzVector &lv) {
-      /// 4vector addition
+      /// 4std::vector addition
       Double_t e=E(); Vect()+=lv.Vect(); SetE(e+lv.E()); return *this; }
 
    TMBLorentzVector   operator -  (const TMBLorentzVector &lv) const {
-      /// 4vector substraction
+      /// 4std::vector substraction
       return TMBLorentzVector(Vect()-lv.Vect(), E()-lv.E()); }
    TMBLorentzVector & operator -= (const TMBLorentzVector &lv) {
-      /// 4vector substraction
+      /// 4std::vector substraction
       Double_t e=E(); Vect()-=lv.Vect(); SetE(e-lv.E()); return *this; }
 
    TMBLorentzVector operator - () const {
@@ -219,11 +219,11 @@ public:
 
    Bool_t operator == (const TMBLorentzVector &lv) const {
       /// Comparison, equality operator. 
-      /// Two lorentz vectors are equal if all their componens are equal.
+      /// Two lorentz std::vectors are equal if all their componens are equal.
       return (fM==lv.fM && Vect()==lv.Vect()); }
    Bool_t operator != (const TMBLorentzVector &lv) const {
       /// Comparison, in-equality operator. 
-      /// Two lorentz vectors are not equal if any of their componens are not equal.
+      /// Two lorentz std::vectors are not equal if any of their componens are not equal.
       return !(operator == (lv)); }
 
    /// Equivalence operator. True if all components are
@@ -265,13 +265,13 @@ public:
       return Dot(lv);}
 
    void SetVectMag(const TVector3 & spatial, Double_t magnitude) {
-      /// set vector and mass
+      /// set std::vector and mass
       Vect()=spatial; SetE(TMath::Sqrt(magnitude * magnitude + spatial * spatial)); }
    void SetVectM(const TVector3 & spatial, Double_t mass) {
-      /// set vector and mass
+      /// set std::vector and mass
       SetVectMag(spatial, mass); }
    void SetVectE(const TVector3 & spatial, Double_t e) {
-      /// set vector and energy
+      /// set std::vector and energy
       Vect()=spatial; SetE(e); }
 
    Double_t Plus() const { 
@@ -299,7 +299,7 @@ public:
       else Warning("BoostVector()","E()==0.!"); return TVector3(); }
 
    void Boost(Double_t x, Double_t y, Double_t z) { 
-      /// Lorentz boost by vector xyz
+      /// Lorentz boost by std::vector xyz
       Boost(TVector3(x,y,z)); }
    void Boost(const TVector3 & b);
 
@@ -325,7 +325,7 @@ public:
 
 private:
    Double32_t fM; ///< mass
-     //ClassDef(TMBLorentzVector,1) // A four vector with (-,-,-,+) metric
+     //ClassDef(TMBLorentzVector,1) // A four std::vector with (-,-,-,+) metric
 };
 
 inline

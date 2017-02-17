@@ -423,7 +423,7 @@ public:
       return _currentAxes;
    }
    
-   // partition inputs by Voronoi (each vector stores indices corresponding to inputJets)
+   // partition inputs by Voronoi (each std::vector stores indices corresponding to inputJets)
    std::vector<std::list<int> > getPartition(const std::vector<fastjet::PseudoJet> & inputJets);
 
    // partition inputs by Voronoi
@@ -498,8 +498,8 @@ Njettiness::Njettiness(AxesMode axes, NsubParameters paraNsub) : _axes(axes), _p
 
 
 // Partition a list of particles according to which N-jettiness axis they are closest to.
-// Return a vector of length _currentAxes.size() (which should be N).
-// Each vector element is a list of ints corresponding to the indices in
+// Return a std::vector of length _currentAxes.size() (which should be N).
+// Each std::vector element is a list of ints corresponding to the indices in
 // particles of the particles belonging to that jet.
 std::vector<std::list<int> > Njettiness::getPartition(const std::vector<fastjet::PseudoJet> & particles) {
    double Rcutoff = _paraNsub.Rcutoff();

@@ -16,8 +16,8 @@ class BTagWeight
 
    BTagWeight(int nTaggers) : taggers(nTaggers) {}
    
-   virtual bool filter(vector<int> tags);
-   float weight(vector<vector<JetInfo> > jets);
+   virtual bool filter(std::vector<int> tags);
+   float weight(std::vector<std::vector<JetInfo> > jets);
  private:
    int taggers;
 
@@ -30,7 +30,7 @@ bool BTagWeight::filter(std::vector<int> t)
 // return (t >= minTags && t <= maxTags);
 }
 
-float BTagWeight::weight(vector<vector<JetInfo> >jets)
+float BTagWeight::weight(std::vector<std::vector<JetInfo> >jets)
 {
  int njets=jets.size();
  std::vector<int> comb(jets.size());

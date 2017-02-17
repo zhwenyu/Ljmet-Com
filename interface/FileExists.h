@@ -8,14 +8,15 @@
    * if fail is set to true, executable will exit
    */
 
-static bool fexists(const string filename, bool fail)
+static bool fexists(const std::string filename, bool fail)
 {
-  ifstream ifile(filename.c_str());
+  std::ifstream ifile(filename.c_str());
   if (fail && !ifile) {
-    std::cout << "File does not exist: " << filename << endl;
+    std::cout << "File does not exist: " << filename << std::endl;
     assert(ifile);
   }
-  return ifile;
+
+  return static_cast<bool>(ifile);
 }
 
 #endif

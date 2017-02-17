@@ -73,6 +73,12 @@ void LjmetEventContent::SetValue(std::string key, int value)
     mIntBranch[key] = value;
 }
 
+void LjmetEventContent::SetValue(std::string key, long long value)
+{
+    mLongIntBranch[key] = value;
+}
+
+
 void LjmetEventContent::SetValue(std::string key, double value)
 {
     mDoubleBranch[key] = value;
@@ -92,6 +98,12 @@ void LjmetEventContent::SetValue(std::string key, std::vector<double> value)
 {
     mVectorDoubleBranch[key] = value;
 }
+
+
+void LjmetEventContent::SetValue(std::string key,std::vector<std::string> value){
+    mVectorStringBranch[key] = value;
+}
+
 
 void LjmetEventContent::SetHistValue(std::string modname, std::string histname, double value)
 {
@@ -171,6 +183,19 @@ int LjmetEventContent::createBranches()
     }
     std::cout << mLegend << "integer branches created: " << mIntBranch.size() << std::endl;
     
+
+    // Long Integer branches
+    for (std::map<std::string, long long>::iterator br = mLongIntBranch.begin(); br != mLongIntBranch.end(); ++br) {
+        name_type = br->first + "/L";
+        mpTree->Branch(br->first.c_str(), &(br->second), name_type.c_str());
+        
+        if (mVerbosity > 0) {
+            std::cout << mLegend << "Branch " << name_type << " created" << std::endl;
+        }
+    }
+    std::cout << mLegend << "integer branches created: " << mLongIntBranch.size() << std::endl;
+    
+
     // Double branches
     for (std::map<std::string, double>::iterator br = mDoubleBranch.begin(); br != mDoubleBranch.end(); ++br) {
         name_type = br->first + "/D";
@@ -190,7 +215,7 @@ int LjmetEventContent::createBranches()
             std::cout << mLegend << "Branch " << br->first << " std::vector<bool> created" << std::endl;
         }
     }
-    std::cout << mLegend << "vector<bool> branches created: " << mVectorBoolBranch.size() << std::endl;
+    std::cout << mLegend << "std::vector<bool> branches created: " << mVectorBoolBranch.size() << std::endl;
     
     // Vector-of-int branches
     for (std::map<std::string, std::vector<int>>::iterator br = mVectorIntBranch.begin(); br != mVectorIntBranch.end(); ++br) {
@@ -200,7 +225,7 @@ int LjmetEventContent::createBranches()
             std::cout << mLegend << "Branch " << br->first << " std::vector<int> created" << std::endl;
         }
     }
-    std::cout << mLegend << "vector<int> branches created: " << mVectorIntBranch.size() << std::endl;
+    std::cout << mLegend << "std::vector<int> branches created: " << mVectorIntBranch.size() << std::endl;
     
     // Vector-of-double branches
     for (std::map<std::string, std::vector<double>>::iterator br = mVectorDoubleBranch.begin(); br != mVectorDoubleBranch.end(); ++br) {
@@ -210,7 +235,24 @@ int LjmetEventContent::createBranches()
             std::cout << mLegend << "Branch " << br->first << " std::vector<double> created" << std::endl;
         }
     }
-    std::cout << mLegend << "vector<double> branches created: " << mVectorDoubleBranch.size() << std::endl;
-    
+
+    std::cout << mLegend << "std::vector<double> branches created: "
+    << mVectorDoubleBranch.size() << std::endl;
+
+    // std::vector std::vector std::string branches
+    for(std::map<std::string,std::vector<std::string> >::iterator br = mVectorStringBranch.begin();
+	br != mVectorStringBranch.end();
+	++br){
+        std::string name_type = br->first+" std::vector<std::string>";
+      //      std::string type = "VVString";
+      mpTree -> Branch(br->first.c_str(),
+		       &(br->second));
+
+    if (mVerbosity>0){
+            std::cout << mLegend << "Branch " << name_type
+            << " created" << std::endl;
+        }
+    }
+
     return 0;
 }

@@ -72,7 +72,7 @@ public: // interface
         
         //    size_t found;
         //    found = eidUsed.find("NONE");
-        //  if ( found != string::npos)
+        //  if ( found != std::string::npos)
         electronIDvalue_ = eidUsed;
         
         push_back("MVA",       mva   );

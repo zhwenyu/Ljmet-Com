@@ -30,9 +30,21 @@
 #include "LJMet/Com/interface/BtagHardcodedConditions.h"
 #include "CondFormats/JetMETObjects/interface/JetCorrectionUncertainty.h"
 #include "CondFormats/JetMETObjects/interface/FactorizedJetCorrector.h"
+#include "JetMETCorrections/Objects/interface/JetCorrector.h"
+#include "CondFormats/JetMETObjects/interface/JetCorrectorParameters.h"
+#include "JetMETCorrections/Modules/interface/JetResolution.h"
+
+#include "RecoEgamma/EgammaTools/interface/ConversionTools.h"
+#include "TMath.h"
+#include "TMVA/Reader.h"
+#include "TMVA/MethodBDT.h"
 
 //#include "TROOT.h"
 //#include "TVector3.h"
+
+struct MVAElectronVars {
+    Float_t see, spp, OneMinusE1x5E5x5, R9, etawidth, phiwidth, HoE, PreShowerOverRaw, kfhits, kfchi2, gsfchi2, fbrem, convVtxFitProbability, EoP, eleEoPout, IoEmIoP, deta, dphi, detacalo, gsfhits, expectedMissingInnerHits, pt, isBarrel, isEndcap, SCeta, eClass, pfRelIso, expectedInnerHits, vtxconv, mcEventWeight, mcCBmatchingCategory;
+};
 
 class BaseEventSelector : public EventSelector {
     //
@@ -46,8 +58,66 @@ public:
     virtual ~BaseEventSelector() { };
     virtual void BeginJob(std::map<std::string, edm::ParameterSet const > par);
     virtual bool operator()( edm::EventBase const & event, pat::strbitset & ret) = 0;
-    virtual void EndJob() { }
+    virtual void EndJob() {
+
+      delete ResJetPar;
+      delete L3JetPar;
+      delete L2JetPar;
+      delete L1JetPar;
+      delete ResJetParAK8;
+      delete L3JetParAK8;
+      delete L2JetParAK8;
+      delete L1JetParAK8;
+
+      delete ResJetPar_BCD;
+      delete L3JetPar_BCD;
+      delete L2JetPar_BCD;
+      delete L1JetPar_BCD;
+      delete ResJetParAK8_BCD;
+      delete L3JetParAK8_BCD;
+      delete L2JetParAK8_BCD;
+      delete L1JetParAK8_BCD;
+      delete ResJetPar_EF;
+      delete L3JetPar_EF;
+      delete L2JetPar_EF;
+      delete L1JetPar_EF;
+      delete ResJetParAK8_EF;
+      delete L3JetParAK8_EF;
+      delete L2JetParAK8_EF;
+      delete L1JetParAK8_EF;
+      delete ResJetPar_G;
+      delete L3JetPar_G;
+      delete L2JetPar_G;
+      delete L1JetPar_G;
+      delete ResJetParAK8_G;
+      delete L3JetParAK8_G;
+      delete L2JetParAK8_G;
+      delete L1JetParAK8_G;
+      delete ResJetPar_H;
+      delete L3JetPar_H;
+      delete L2JetPar_H;
+      delete L1JetPar_H;
+      delete ResJetParAK8_H;
+      delete L3JetParAK8_H;
+      delete L2JetParAK8_H;
+      delete L1JetParAK8_H;
+
+      delete jecUnc;
+
+      delete JetCorrector;
+      delete JetCorrectorAK8;
+      delete JetCorrector_BCD;
+      delete JetCorrectorAK8_BCD;
+      delete JetCorrector_EF;
+      delete JetCorrectorAK8_EF;
+      delete JetCorrector_G;
+      delete JetCorrectorAK8_G;
+      delete JetCorrector_H;
+      delete JetCorrectorAK8_H;
+
+    }
     virtual void AnalyzeEvent( edm::EventBase const & event, LjmetEventContent & ec ) { }
+    virtual void JECbyIOV(edm::EventBase const & event);
     std::string GetName() { return mName; }
     /// Evaluates a signed perp components of v1 relative to v2. The sign is defined by Phi
     double GetPerp(TVector3 & v1, TVector3 & v2);
@@ -55,6 +125,12 @@ public:
     
     std::vector<edm::Ptr<pat::Jet>> const & GetAllJets() const { return mvAllJets; }
     std::vector<edm::Ptr<pat::Jet>> const & GetSelectedJets() const { return mvSelJets; }
+    std::vector<pat::Jet> const & GetSelectedCleanedJets() const { return mvSelJetsCleaned; }
+    std::vector<pat::Jet> const & GetSelectedCorrJets() const { return mvSelCorrJets; }
+    std::vector<TLorentzVector> const & GetSelectedCorrJets_jesup() const { return mvCorrJets_jesup; }
+    std::vector<TLorentzVector> const & GetSelectedCorrJets_jesdn() const { return mvCorrJets_jesdn; }
+    std::vector<TLorentzVector> const & GetSelectedCorrJets_jerup() const { return mvCorrJets_jerup; }
+    std::vector<TLorentzVector> const & GetSelectedCorrJets_jerdn() const { return mvCorrJets_jerdn; }
     std::vector<edm::Ptr<pat::Jet>> const & GetLooseJets() const { return mvSelJets; }
     std::vector<edm::Ptr<pat::Jet>> const & GetSelectedBtagJets() const { return mvSelBtagJets; }
     std::vector<std::pair<TLorentzVector, bool>> const & GetCorrJetsWithBTags() const { return mvCorrJetsWithBTags; }
@@ -68,10 +144,15 @@ public:
     edm::Ptr<reco::PFMET> const & GetType1CorrMet() const { return mpType1CorrMet; }
     TLorentzVector const & GetCorrectedMet() const { return correctedMET_p4; }
     std::vector<unsigned int> const & GetSelectedTriggers() const { return mvSelTriggers; }
+    std::map<std::string, unsigned int> const & GetSelectedTriggersEl() const { return mvSelTriggersEl; }
+    std::map<std::string, unsigned int> const & GetSelectedTriggersMu() const { return mvSelTriggersMu; }
+    std::map<std::string, unsigned int> const & GetSelectedMCTriggersEl() const { return mvSelMCTriggersEl; }
+    std::map<std::string, unsigned int> const & GetSelectedMCTriggersMu() const { return mvSelMCTriggersMu; }
     std::vector<edm::Ptr<reco::Vertex>> const & GetSelectedPVs() const { return mvSelPVs; }
     double const & GetTestValue() const { return mTestValue; }
     void SetMc(bool isMc) { mbIsMc = isMc; }
     bool IsMc() { return mbIsMc; }
+    bool GetIsTau() { return mbIsTau; }
     
     // LJMET event content setters
     void Init( void );
@@ -84,13 +165,25 @@ public:
     void SetCorrectedMet(TLorentzVector & met) { correctedMET_p4 = met; }
     void SetCorrJetsWithBTags(std::vector<std::pair<TLorentzVector, bool>> & jets) { mvCorrJetsWithBTags = jets; }
     
-    bool isJetTagged(const pat::Jet &jet, edm::EventBase const & event, bool applySF = true);
-    TLorentzVector correctJet(const pat::Jet & jet, edm::EventBase const & event, bool doAK8Corr = false);
-    TLorentzVector correctMet(const pat::MET & met, edm::EventBase const & event);
+    bool isJetTagged(const pat::Jet &jet, edm::EventBase const & event, bool applySF = true, int shiftflag = 0, bool subjetflag = false);
+    TLorentzVector correctJetForMet(const pat::Jet & jet, edm::EventBase const & event, unsigned int syst = 0);
+    TLorentzVector correctJet(const pat::Jet & jet, edm::EventBase const & event, bool doAK8Corr = false, bool forceCorr = false, unsigned int syst = 0);
+    pat::Jet correctJetReturnPatJet(const pat::Jet & jet, edm::EventBase const & event, bool doAK8Corr = false, bool forceCorr = false, unsigned int syst = 0);
+    TLorentzVector correctMet(const pat::MET & met, edm::EventBase const & event, unsigned int syst = 0, bool useHF = true);
+    TLorentzVector correctMet(const pat::MET & met, edm::EventBase const & event, std::vector<pat::Jet> jets, unsigned int syst = 0, bool useHF = true);
+    TLorentzVector correctMet(const pat::MET & met, edm::EventBase const & event, std::vector<edm::Ptr<pat::Jet> > jets, unsigned int syst = 0, bool useHF = true);
+    double mvaValue(const pat::Electron & electron, edm::EventBase const & event);
+    double mvaValue_alt(const pat::Electron & electron, edm::EventBase const & event);
     
 protected:
     std::vector<edm::Ptr<pat::Jet>> mvAllJets;
     std::vector<edm::Ptr<pat::Jet>> mvSelJets;
+    std::vector<pat::Jet> mvSelJetsCleaned;
+    std::vector<pat::Jet> mvSelCorrJets;
+    std::vector<TLorentzVector> mvCorrJets_jesup;
+    std::vector<TLorentzVector> mvCorrJets_jesdn;
+    std::vector<TLorentzVector> mvCorrJets_jerup;
+    std::vector<TLorentzVector> mvCorrJets_jerdn;
     std::vector<edm::Ptr<pat::Jet>> mvLooseJets;
     std::vector<std::pair<TLorentzVector, bool>> mvCorrJetsWithBTags;
     std::vector<edm::Ptr<pat::Jet>> mvSelBtagJets;
@@ -104,6 +197,10 @@ protected:
     edm::Ptr<reco::PFMET> mpType1CorrMet;
     TLorentzVector correctedMET_p4;
     std::vector<unsigned int> mvSelTriggers;
+    std::map<std::string, unsigned int> mvSelTriggersEl;
+    std::map<std::string, unsigned int> mvSelTriggersMu;
+    std::map<std::string, unsigned int> mvSelMCTriggersEl;
+    std::map<std::string, unsigned int> mvSelMCTriggersMu;
     std::vector<edm::Ptr<reco::Vertex>> mvSelPVs;
     double mTestValue;
     
@@ -111,13 +208,15 @@ protected:
     std::map<std::string, bool> mbPar;
     std::map<std::string, int> miPar;
     std::map<std::string, double> mdPar;
+    std::map<std::string, std::vector<double>> mvdPar;
     std::map<std::string, std::string> msPar;
     std::map<std::string, edm::InputTag> mtPar;
     std::map<std::string, std::vector<std::string>> mvsPar;
-    
+
     std::string mName;
     std::string mLegend;
     bool mbIsMc;
+    bool mbIsTau;
     
 private:
     int mNCorrJets;
@@ -125,10 +224,69 @@ private:
     double bTagCut;
     BTagSFUtil mBtagSfUtil;
     BtagHardcodedConditions mBtagCond;
+    JME::JetResolution resolution;
+    JME::JetResolution resolutionAK8;
+    JME::JetResolutionScaleFactor resolution_SF;
     JetCorrectionUncertainty *jecUnc;
+    JetCorrectorParameters *L3JetPar;
+    JetCorrectorParameters *L2JetPar;
+    JetCorrectorParameters *L1JetPar;    				   
+    JetCorrectorParameters *L3JetParAK8;
+    JetCorrectorParameters *L2JetParAK8;
+    JetCorrectorParameters *L1JetParAK8;
+    JetCorrectorParameters *L3JetPar_BCD;
+    JetCorrectorParameters *L2JetPar_BCD;
+    JetCorrectorParameters *L1JetPar_BCD;    				   
+    JetCorrectorParameters *L3JetParAK8_BCD;
+    JetCorrectorParameters *L2JetParAK8_BCD;
+    JetCorrectorParameters *L1JetParAK8_BCD;
+    JetCorrectorParameters *L3JetPar_EF;
+    JetCorrectorParameters *L2JetPar_EF;
+    JetCorrectorParameters *L1JetPar_EF;    				   
+    JetCorrectorParameters *L3JetParAK8_EF;
+    JetCorrectorParameters *L2JetParAK8_EF;
+    JetCorrectorParameters *L1JetParAK8_EF;
+    JetCorrectorParameters *L3JetPar_G;
+    JetCorrectorParameters *L2JetPar_G;
+    JetCorrectorParameters *L1JetPar_G;    				   
+    JetCorrectorParameters *L3JetParAK8_G;
+    JetCorrectorParameters *L2JetParAK8_G;
+    JetCorrectorParameters *L1JetParAK8_G;
+    JetCorrectorParameters *L3JetPar_H;
+    JetCorrectorParameters *L2JetPar_H;
+    JetCorrectorParameters *L1JetPar_H;    				   
+    JetCorrectorParameters *L3JetParAK8_H;
+    JetCorrectorParameters *L2JetParAK8_H;
+    JetCorrectorParameters *L1JetParAK8_H;
+    JetCorrectorParameters *ResJetPar; 
+    JetCorrectorParameters *ResJetParAK8; 
     FactorizedJetCorrector *JetCorrector;
     FactorizedJetCorrector *JetCorrectorAK8;
+    JetCorrectorParameters *ResJetPar_BCD; 
+    JetCorrectorParameters *ResJetParAK8_BCD; 
+    FactorizedJetCorrector *JetCorrector_BCD;
+    FactorizedJetCorrector *JetCorrectorAK8_BCD;
+    JetCorrectorParameters *ResJetPar_EF; 
+    JetCorrectorParameters *ResJetParAK8_EF; 
+    FactorizedJetCorrector *JetCorrector_EF;
+    FactorizedJetCorrector *JetCorrectorAK8_EF;
+    JetCorrectorParameters *ResJetPar_G; 
+    JetCorrectorParameters *ResJetParAK8_G; 
+    FactorizedJetCorrector *JetCorrector_G;
+    FactorizedJetCorrector *JetCorrectorAK8_G;
+    JetCorrectorParameters *ResJetPar_H; 
+    JetCorrectorParameters *ResJetParAK8_H; 
+    FactorizedJetCorrector *JetCorrector_H;
+    FactorizedJetCorrector *JetCorrectorAK8_H;
     LjmetEventContent * mpEc;
+    MVAElectronVars allMVAVars;
+    TMVA::Reader tmpTMVAReader_EB;
+    TMVA::Reader tmpTMVAReader_EE;
+    MVAElectronVars allMVAVars_alt;
+    TMVA::Reader tmpTMVAReader_EB_alt;
+    TMVA::Reader tmpTMVAReader_EE_alt;
+    
+    TRandom3 JERrand;
     
     /// Private init method to be called by LjmetFactory when registering the selector
     void init() { mLegend = "[" + mName + "]: "; std::cout << mLegend << "registering " << mName << std::endl; }

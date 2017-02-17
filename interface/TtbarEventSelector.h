@@ -95,10 +95,10 @@ class TtbarEventSelector : public BaseEventSelector {
   boost::shared_ptr<PVSelector>            pvSel_;
 
   edm::Handle<edm::TriggerResults >           mhEdmTriggerResults;
-  edm::Handle<vector<pat::Jet> >              mhJets;
-  edm::Handle<vector<pat::Muon> >             mhMuons;
-  edm::Handle<vector<pat::Electron> >         mhElectrons;
-  edm::Handle<vector<pat::MET> >              mhMet;
+  edm::Handle<std::vector<pat::Jet> >              mhJets;
+  edm::Handle<std::vector<pat::Muon> >             mhMuons;
+  edm::Handle<std::vector<pat::Electron> >         mhElectrons;
+  edm::Handle<std::vector<pat::MET> >              mhMet;
   edm::Handle<double>                         h_rho;
   edm::Handle<std::vector<reco::Vertex> >     h_primVtx;
 
@@ -423,7 +423,7 @@ bool TtbarEventSelector::operator()( edm::EventBase const & event, pat::strbitse
       mvAllJets.clear();
 
       event.getByLabel( mtPar["jet_collection"], mhJets );
-      for (vector<pat::Jet>::const_iterator _ijet = mhJets->begin();
+      for (std::vector<pat::Jet>::const_iterator _ijet = mhJets->begin();
 	   _ijet != mhJets->end(); ++_ijet){
 	
 	retJet.set(false);
@@ -492,7 +492,7 @@ bool TtbarEventSelector::operator()( edm::EventBase const & event, pat::strbitse
       mvSelMuons.clear();
       mvLooseMuons.clear();
 	
-      for ( vector<pat::Muon>::const_iterator _imu = mhMuons->begin();
+      for ( std::vector<pat::Muon>::const_iterator _imu = mhMuons->begin();
 	    _imu != mhMuons->end(); _imu++){
 	
 	retMuon.set(false);
@@ -618,7 +618,7 @@ bool TtbarEventSelector::operator()( edm::EventBase const & event, pat::strbitse
 
       mvSelElectrons.clear();
 
-      for ( vector<pat::Electron>::const_iterator _iel = mhElectrons->begin();
+      for ( std::vector<pat::Electron>::const_iterator _iel = mhElectrons->begin();
 	    _iel != mhElectrons->end(); _iel++){
 
 	retElectron.set(false);

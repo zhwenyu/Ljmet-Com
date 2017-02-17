@@ -13,6 +13,8 @@
 #include "LJMet/Com/interface/LjmetPdfWeightProducer.h"
 #include "SimDataFormats/GeneratorProducts/interface/GenEventInfoProduct.h"
 
+using namespace std;
+
 class LjmetFactory;
 
 namespace LHAPDF {
@@ -45,7 +47,7 @@ class PdfCalc : public BaseCalc{
   LjmetPdfWeightProducer * pPdfWeights;
   edm::InputTag pdfInfoTag_;
   bool reducedInfo_;
-  string defaultPdfSet_;
+  std::string defaultPdfSet_;
 
 
 };
@@ -132,7 +134,7 @@ int PdfCalc::AnalyzeEvent(edm::EventBase const & event,
 
   } else {
 
-    // use PDF weight producer to calculate vectors of weights
+    // use PDF weight producer to calculate std::vectors of weights
     std::map<std::string,std::vector<double> > mPdfs = pPdfWeights->produce(event);
 
 
@@ -142,7 +144,7 @@ int PdfCalc::AnalyzeEvent(edm::EventBase const & event,
       std::string pdfName = iPdf->first;
       std::vector<double> const & vWeights = iPdf->second;
 
-      // save the vector of weights
+      // save the std::vector of weights
       SetValue("PdfWeightsVec_"+pdfName, vWeights);
 
       // compute and save average +- weights

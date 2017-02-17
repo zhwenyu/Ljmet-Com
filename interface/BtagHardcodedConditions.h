@@ -40,13 +40,13 @@ public:
     
     double GetBtagEfficiency(double pt, double eta, std::string tagger="CSVM");
     double GetBtagScaleFactor(double pt, double eta, std::string tagger="CSVM", int year = 2016);
-    double GetBtagSFUncertUp(double pt, double eta, std::string tagger="CSVM", int year = 2016);//confused
-    double GetBtagSFUncertDown(double pt, double eta, std::string tagger="CSVM", int year = 2016);//confused
+    double GetBtagSFUncertUp(double pt, double eta, std::string tagger="CSVM", int year = 2016);
+    double GetBtagSFUncertDown(double pt, double eta, std::string tagger="CSVM", int year = 2016);
     
-    double GetMistagRate(double pt, double eta, std::string tagger="CSVM"); //ok
-    double GetMistagScaleFactor(double pt, double eta, std::string tagger="CSVM", int year = 2016); //ok
-    double GetMistagSFUncertUp(double pt, double eta, std::string tagger="CSVM", int year = 2016); //ok
-    double GetMistagSFUncertDown(double pt, double eta, std::string tagger="CSVM", int year = 2016); //ok
+    double GetMistagRate(double pt, double eta, std::string tagger="CSVM");
+    double GetMistagScaleFactor(double pt, double eta, std::string tagger="CSVM", int year = 2016);
+    double GetMistagSFUncertUp(double pt, double eta, std::string tagger="CSVM", int year = 2016);
+    double GetMistagSFUncertDown(double pt, double eta, std::string tagger="CSVM", int year = 2016);
     
 private:
     double GetBtagScaleFactor2011(double pt, double eta, std::string tagger="CSVM");

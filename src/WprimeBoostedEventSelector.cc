@@ -47,9 +47,10 @@
 #include "CondFormats/JetMETObjects/interface/JetCorrectorParameters.h"
 
 #include "PhysicsTools/CondLiteIO/interface/RecordWriter.h"
-#include "Cintex/Cintex.h"
+//#include "Cintex/Cintex.h"
 #include "PhysicsTools/JetMCUtils/interface/combination.h"
 
+using namespace std;
 
 using trigger::TriggerObject;
 
@@ -118,7 +119,7 @@ protected:
     edm::Ptr<pat::Muon>     muon0_;
     edm::Ptr<pat::Electron> electron0_;
     
-    map<int,map<int,vector<int> > > mmvBadLaserCalEvents;
+    map<int,map<int,std::vector<int> > > mmvBadLaserCalEvents;
     
 private:
     
@@ -372,7 +373,7 @@ void WprimeBoostedEventSelector::BeginJob( std::map<std::string, edm::ParameterS
     
     if (mbPar["doLaserCalFilt"]){
         std::ifstream inFile("../data/badLaserCalFiltEvents.txt");
-        string line,subString;
+        std::string line,subString;
         int begin,end;
         while(inFile.good()){
             getline(inFile,line);
@@ -389,8 +390,8 @@ void WprimeBoostedEventSelector::BeginJob( std::map<std::string, edm::ParameterS
             subString=line.substr(begin,end-begin);
             int event=atoi(subString.c_str());
             
-            if(mmvBadLaserCalEvents.find(run)==mmvBadLaserCalEvents.end()) mmvBadLaserCalEvents[run]=map<int,vector<int> >();
-            if(mmvBadLaserCalEvents[run].find(lumi)==mmvBadLaserCalEvents[run].end()) mmvBadLaserCalEvents[run][lumi]=vector<int>();
+            if(mmvBadLaserCalEvents.find(run)==mmvBadLaserCalEvents.end()) mmvBadLaserCalEvents[run]=map<int,std::vector<int> >();
+            if(mmvBadLaserCalEvents[run].find(lumi)==mmvBadLaserCalEvents[run].end()) mmvBadLaserCalEvents[run][lumi]=std::vector<int>();
             mmvBadLaserCalEvents[run][lumi].push_back(event);
         }
     }

@@ -12,6 +12,7 @@
 #include "FWCore/Common/interface/EventBase.h"
 #include "DataFormats/VertexReco/interface/Vertex.h"
 #include "EgammaAnalysis/ElectronTools/interface/ElectronEffectiveArea.h"
+#include "RecoEgamma/EgammaTools/interface/ConversionTools.h"
 
 //Math
 #include "CLHEP/Units/GlobalPhysicalConstants.h"
@@ -154,92 +155,92 @@ public: // interface
         }
         
         if (version_ == VETO) {
-            set("deta_EB",     0.016315);
-            set("dphi_EB",     0.252044);
-            set("sihih_EB",    0.011100);
-            set("hoe_EB",      0.345843);
-            set("d0_EB",       0.060279);
-            set("dZ_EB",       0.800538);
-            set("ooemoop_EB",  0.248070);
-            set("reliso_EB",   0.164369);
-            set("deta_EE",     0.010671);
-            set("dphi_EE",     0.245263);
-            set("sihih_EE",    0.033987);
-            set("hoe_EE",      0.134691);
-            set("d0_EE",       0.273097);
-            set("dZ_EE",       0.885860);
-            set("ooemoop_EE",  0.157160);
-            set("reliso_EE",   0.212604);
+            set("deta_EB",     0.013625);
+            set("dphi_EB",     0.230374);
+            set("sihih_EB",    0.011586);
+            set("hoe_EB",      0.181130);
+            set("d0_EB",       0.094095);
+            set("dZ_EB",       0.713070);
+            set("ooemoop_EB",  0.295751);
+            set("reliso_EB",   0.158721);
+            set("deta_EE",     0.011932);
+            set("dphi_EE",     0.255450);
+            set("sihih_EE",    0.031849);
+            set("hoe_EE",      0.223870);
+            set("d0_EE",       0.342293);
+            set("dZ_EE",       0.953461);
+            set("ooemoop_EE",  0.155501);
+            set("reliso_EE",   0.177032);
             set("mHits_EB",    2);
             set("mHits_EE",    3);
-            set("vtxFitConv",  1);
+            set("vtxFitConv",  0);
         }
         
         if (version_ == LOOSE) {
-            set("deta_EB",     0.012442);
-            set("dphi_EB",     0.072624);
-            set("sihih_EB",    0.010557);
-            set("hoe_EB",      0.121476);
-            set("d0_EB",       0.022664);
-            set("dZ_EB",       0.173670);
-            set("ooemoop_EB",  0.221803);
-            set("reliso_EB",   0.120026);
-            set("deta_EE",     0.010654);
-            set("dphi_EE",     0.145129);
-            set("sihih_EE",    0.032602);
-            set("hoe_EE",      0.131862);
-            set("d0_EE",       0.097358);
-            set("dZ_EE",       0.198444);
-            set("ooemoop_EE",  0.142283);
-            set("reliso_EE",   0.162914);
+            set("deta_EB",     0.009277);
+            set("dphi_EB",     0.094739);
+            set("sihih_EB",    0.010331);
+            set("hoe_EB",      0.093068);
+            set("d0_EB",       0.035904);
+            set("dZ_EB",       0.075496);
+            set("ooemoop_EB",  0.189968);
+            set("reliso_EB",   0.130136);
+            set("deta_EE",     0.009833);
+            set("dphi_EE",     0.149934);
+            set("sihih_EE",    0.031838);
+            set("hoe_EE",      0.115754);
+            set("d0_EE",       0.099266);
+            set("dZ_EE",       0.197897);
+            set("ooemoop_EE",  0.140662);
+            set("reliso_EE",   0.163368);
             set("mHits_EB",    1);
             set("mHits_EE",    1);
-            set("vtxFitConv",  1);
+            set("vtxFitConv",  0);
         }
         
         if (version_ == MEDIUM) {
-            set("deta_EB",     0.007641);
-            set("dphi_EB",     0.032643);
-            set("sihih_EB",    0.010399);
-            set("hoe_EB",      0.060662);
-            set("d0_EB",       0.011811);
-            set("dZ_EB",       0.070775);
-            set("ooemoop_EB",  0.153897);
+            set("deta_EB",     0.008925);
+            set("dphi_EB",     0.035973);
+            set("sihih_EB",    0.009996);
+            set("hoe_EB",      0.050537);
+            set("d0_EB",       0.012235);
+            set("dZ_EB",       0.042020);
+            set("ooemoop_EB",  0.091942);
             set("reliso_EB",   0.097213);
-            set("deta_EE",     0.009285);
-            set("dphi_EE",     0.042447);
-            set("sihih_EE",    0.029524);
-            set("hoe_EE",      0.104263);
-            set("d0_EE",       0.051682);
-            set("dZ_EE",       0.180720);
-            set("ooemoop_EE",  0.137468);
-            set("reliso_EE",   0.116708);
+            set("deta_EE",     0.007429);
+            set("dphi_EE",     0.067879);
+            set("sihih_EE",    0.030135);
+            set("hoe_EE",      0.086782);
+            set("d0_EE",       0.036719);
+            set("dZ_EE",       0.138142);
+            set("ooemoop_EE",  0.100683);
+            set("reliso_EE",   0.113254);
             set("mHits_EB",    1);
             set("mHits_EE",    1);
-            set("vtxFitConv",  1);
+            set("vtxFitConv",  0);
         }
         
 
         if (version_ == TIGHT) {
-            set("deta_EB",     0.006574);
-            set("dphi_EB",     0.022868);
-            set("sihih_EB",    0.010181);
-            set("hoe_EB",      0.037553);
-            set("d0_EB",       0.009924);
-            set("dZ_EB",       0.015310);
-            set("ooemoop_EB",  0.131191);
-            set("reliso_EB",   0.074355);
-            set("deta_EE",     0.005681);
-            set("dphi_EE",     0.032046);
-            set("sihih_EE",    0.028766);
-            set("hoe_EE",      0.081902);
-            set("d0_EE",       0.027261);
-            set("dZ_EE",       0.147154);
-            set("ooemoop_EE",  0.106055);
-            set("reliso_EE",   0.090185);
+            set("deta_EB",     0.006046);
+            set("dphi_EB",     0.028092);
+            set("sihih_EB",    0.009947);
+            set("hoe_EB",      0.045772);
+            set("d0_EB",       0.008790);
+            set("dZ_EB",       0.021226);
+            set("ooemoop_EB",  0.020118);
+            set("reliso_EB",   0.069537);
+            set("deta_EE",     0.007057);
+            set("dphi_EE",     0.030159);
+            set("sihih_EE",    0.028237);
+            set("hoe_EE",      0.067778);
+            set("d0_EE",       0.027984);
+            set("dZ_EE",       0.133431);
+            set("ooemoop_EE",  0.098919);
+            set("reliso_EE",   0.078265);
             set("mHits_EB",    1);
             set("mHits_EE",    1);
-            set("vtxFitConv",  1);
+            set("vtxFitConv",  0);
         }
         
         indexDphi_EB_       = index_type(&bits_, "dphi_EB"      );
@@ -283,6 +284,11 @@ public: // interface
         event.getByLabel(rhoSrc_, rhoHandle);
         rhoIso = std::max(*(rhoHandle.product()), 0.0);
         
+	edm::InputTag convLabel_ ("reducedEgamma:reducedConversions");
+	event.getByLabel(convLabel_, conversions);
+        edm::InputTag bsLabel_ ("offlineBeamSpot");
+	event.getByLabel(bsLabel_, bsHandle);
+
         return operator()(electron, ret);
     }
     
@@ -293,11 +299,12 @@ public: // interface
 	if (version_ == HEEP) {
 	    Double_t heepPt = electron.ecalDrivenMomentum().pt();
 	    Double_t heepEta = electron.superCluster()->eta();
+            Int_t heepEcalDriven = electron.ecalDriven();
 	    Double_t heepDetainSeed = electron.deltaEtaSeedClusterTrackAtVtx();
 	    Double_t heepDphiin = electron.deltaPhiSuperClusterTrackAtVtx();
 	    Double_t heepSihih = electron.full5x5_sigmaIetaIeta();
 	    Double_t heepE2x5oE5x5 = electron.full5x5_e5x5()!=0 ? electron.full5x5_e2x5Max()/electron.full5x5_e5x5() : 0;
-	    Double_t heepE1x5oE5x5 = electron.full5x5_e5x5()!=0 ? electron.full5x5_e2x5Max()/electron.full5x5_e5x5() : 0;
+	    Double_t heepE1x5oE5x5 = electron.full5x5_e5x5()!=0 ? electron.full5x5_e1x5()/electron.full5x5_e5x5() : 0;
 	    Double_t heepEnergy = electron.superCluster()->energy();
 	    Double_t heepHoE = electron.hadronicOverEm();
 	    Double_t heepIsoTrkPt = electron.dr03TkSumPt();
@@ -309,11 +316,13 @@ public: // interface
 
             if ( heepPt > 35. && fabs(heepEta) < 1.4442 ) {
 		while (1) {
+                    if (heepEcalDriven == 1) {}
+                    else break;
 		    if (fabs(heepDetainSeed) < 0.004) {}
 		    else break;
 		    if (fabs(heepDphiin) < 0.06) {}
 		    else break;
-		    if (heepHoE*heepEnergy < 0.05*heepEnergy + 2.) {}
+		    if (heepHoE*heepEnergy < 0.05*heepEnergy + 1.) {}
 		    else break;
 		    if (heepE2x5oE5x5 > 0.94 || heepE1x5oE5x5 > 0.83) {}
 		    else break;
@@ -331,11 +340,13 @@ public: // interface
 	    }
 	    else if ( heepPt > 35. && fabs(heepEta) > 1.566 && fabs(heepEta) < 2.5 ) {
 		while (1) {
+                    if (heepEcalDriven == 1) {}
+                    else break;
 		    if (fabs(heepDetainSeed) < 0.006) {}
 		    else break;
 		    if (fabs(heepDphiin) < 0.06) {}
 		    else break;
-		    if (heepHoE*heepEnergy < 0.05*heepEnergy + 12.5) {}
+		    if (heepHoE*heepEnergy < 0.05*heepEnergy + 5.) {}
 		    else break;
 		    if (heepSihih < 0.03) {}
 		    else break;
@@ -362,25 +373,32 @@ public: // interface
 	}
 	else {       
             Double_t scEta = electron.superCluster()->eta();
-            Double_t AEff  = ElectronEffectiveArea::GetElectronEffectiveArea(ElectronEffectiveArea::kEleGammaAndNeutralHadronIso03, scEta, ElectronEffectiveArea::kEleEAData2012);
+            Double_t AEff;
+            if(fabs(scEta) >2.2) AEff = 0.1337;
+            else if(fabs(scEta) >2.0) AEff = 0.0727;
+            else if(fabs(scEta) >1.3) AEff = 0.0632;
+            else if(fabs(scEta) >0.8) AEff = 0.0954;
+            else if(fabs(scEta) >=0.0) AEff = 0.0973;
+
             
-            Double_t chIso = electron.chargedHadronIso();
-            Double_t nhIso = electron.neutralHadronIso();
-            Double_t phIso = electron.photonIso();
             Double_t Deta  = electron.deltaEtaSuperClusterTrackAtVtx();
             Double_t Dphi  = electron.deltaPhiSuperClusterTrackAtVtx();
-            Double_t sihih = electron.sigmaIetaIeta();
-            Double_t HoE   = electron.hadronicOverEm();
-            Double_t D0    = electron.dB();
+            Double_t sihih = electron.full5x5_sigmaIetaIeta();
+            Double_t HoE   = electron.hcalOverEcal();
+            Double_t D0    = (-1.0)*electron.gsfTrack()->dxy(PVtx);
             Double_t DZ    = electron.gsfTrack()->dz(PVtx);//
             
-            
-            Double_t Ooemoop = (1.0/electron.ecalEnergy() - electron.eSuperClusterOverP()/electron.ecalEnergy());
-            Double_t RelIso  = ( chIso + max(0.0, nhIso + phIso - rhoIso*AEff) )/ electron.ecalDrivenMomentum().pt();
+            Double_t Ooemoop;
+            if (electron.ecalEnergy()==0) Ooemoop = 999.;
+            else if (!std::isfinite(electron.ecalEnergy())) Ooemoop = 998.;
+            else Ooemoop = (1.0/electron.ecalEnergy() - electron.eSuperClusterOverP()/electron.ecalEnergy());
             Int_t mHits   =  electron.gsfTrack()->hitPattern().numberOfHits(reco::HitPattern::MISSING_INNER_HITS);
-            Bool_t vtxFitConv = electron.passConversionVeto();
-    
-    	    bool verbosity = false;
+            //Bool_t vtxFitConv = electron.passConversionVeto();
+            const reco::BeamSpot &beamspot = *bsHandle.product();
+            Bool_t vtxFitConv = ConversionTools::hasMatchedConversion(electron, conversions, beamspot.position());
+            reco::GsfElectron::PflowIsolationVariables pfIso = electron.pfIsolationVariables();
+            Double_t RelIso = ( pfIso.sumChargedHadronPt + std::max(0.0, pfIso.sumNeutralHadronEt + pfIso.sumPhotonEt - rhoIso*AEff) ) / electron.pt();
+    	    bool verbosity =false;
     
     	    if (verbosity) {
     	        std::cout << "\tfabs(Deta) = " << fabs(Deta) << std::endl;
@@ -393,6 +411,9 @@ public: // interface
     	        std::cout << "\tRelIso = " << RelIso << std::endl;
     	        std::cout << "\tmHits = " << mHits << std::endl;
     	        std::cout << "\tvtxFitConv = " << vtxFitConv << std::endl;
+                std::cout << "\teta = " << scEta << std::endl;
+                std::cout << "\tisEB = " << electron.isEB() << std::endl;
+                std::cout << "\tisEE = " << electron.isEE() << std::endl;
     	    }
             
             // now apply the cuts
@@ -427,7 +448,7 @@ public: // interface
                 passCut(ret, indexOoemoop_EE_);
                 passCut(ret, indexRelIso_EE_);
                 passCut(ret, indexMHits_EE_);
-            } else if (electron.isEE()) {  // ENDCAPS case
+            } else {  // ENDCAPS case
                 // check the EE cuts
                 if ( fabs(Deta)    <  cut(indexDeta_EE_,  double()) || ignoreCut(indexDeta_EE_)  ) passCut(ret, indexDeta_EE_);
                 else if (verbosity) std::cout<<"failed Deta"<<std::endl;
@@ -464,6 +485,8 @@ public: // interface
             
             setIgnored(ret);
 	}
+	//ret.print(std::cout);
+        //std::cout<<std::endl;
         return (bool)ret;
     }
     
@@ -472,6 +495,8 @@ private: // member variables
     edm::InputTag pvSrc_;
     Int_t PVsize;
     Point PVtx;
+    edm::Handle<reco::ConversionCollection> conversions;
+    edm::Handle<reco::BeamSpot> bsHandle;
     edm::InputTag rhoSrc_;
     Double_t rhoIso;
     index_type indexDphi_EB_;

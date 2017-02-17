@@ -14,7 +14,7 @@
 #include "DataFormats/HLTReco/interface/TriggerEvent.h"
 #include "DataFormats/Math/interface/deltaR.h"
 
-#include "DataFormats/JetReco/interface/CATopJetTagInfo.h"
+#include "DataFormats/BTauReco/interface/CATopJetTagInfo.h"
 class LjmetFactory;
 
 
@@ -158,7 +158,7 @@ int TprimeCalc::AnalyzeEvent(edm::EventBase const & event,
         double chIso = vSelElectrons[0]->chargedHadronIso();
         double nhIso = vSelElectrons[0]->neutralHadronIso();
         double phIso = vSelElectrons[0]->photonIso();
-        _electron_1_RelIso  = ( chIso + max(0.0, nhIso + phIso - rhoIso*AEff) )/ vSelElectrons[0]->ecalDrivenMomentum().pt();
+        _electron_1_RelIso  = ( chIso + std::max(0.0, nhIso + phIso - rhoIso*AEff) )/ vSelElectrons[0]->ecalDrivenMomentum().pt();
 
     }
 
@@ -184,7 +184,7 @@ int TprimeCalc::AnalyzeEvent(edm::EventBase const & event,
         double chIso = vSelElectrons[1]->chargedHadronIso();
         double nhIso = vSelElectrons[1]->neutralHadronIso();
         double phIso = vSelElectrons[1]->photonIso();
-        _electron_2_RelIso  = ( chIso + max(0.0, nhIso + phIso - rhoIso*AEff) )/ vSelElectrons[1]->ecalDrivenMomentum().pt();
+        _electron_2_RelIso  = ( chIso + std::max(0.0, nhIso + phIso - rhoIso*AEff) )/ vSelElectrons[1]->ecalDrivenMomentum().pt();
 
     }
 
@@ -570,7 +570,7 @@ int TprimeCalc::AnalyzeEvent(edm::EventBase const & event,
     edm::Handle<std::vector<pat::Jet> > topJets;
     event.getByLabel(topJetColl, topJets);
 
-    //Four vector
+    //Four std::vector
     std::vector <double> CATopJetPt;
     std::vector <double> CATopJetEta;
     std::vector <double> CATopJetPhi;
@@ -587,7 +587,7 @@ int TprimeCalc::AnalyzeEvent(edm::EventBase const & event,
     std::vector <double> CATopJetTopMass;
     std::vector <double> CATopJetMinPairMass;
 
-    //Daughter four vector and index
+    //Daughter four std::vector and index
     std::vector <double> CATopDaughterPt;
     std::vector <double> CATopDaughterEta;
     std::vector <double> CATopDaughterPhi;
@@ -627,7 +627,7 @@ int TprimeCalc::AnalyzeEvent(edm::EventBase const & event,
     
 
     
-    //Four vector
+    //Four std::vector
     SetValue("CATopJetPt"     , CATopJetPt);
     SetValue("CATopJetEta"    , CATopJetEta);
     SetValue("CATopJetPhi"    , CATopJetPhi);
@@ -644,7 +644,7 @@ int TprimeCalc::AnalyzeEvent(edm::EventBase const & event,
     SetValue("CATopJetTopMass"     , CATopJetTopMass);
     SetValue("CATopJetMinPairMass" , CATopJetMinPairMass);
 
-    //Daughter four vector and index
+    //Daughter four std::vector and index
     SetValue("CATopDaughterPt"     , CATopDaughterPt);
     SetValue("CATopDaughterEta"    , CATopDaughterEta);
     SetValue("CATopDaughterPhi"    , CATopDaughterPhi);
@@ -657,7 +657,7 @@ int TprimeCalc::AnalyzeEvent(edm::EventBase const & event,
     edm::Handle<std::vector<pat::Jet> > CAWJets;
     event.getByLabel(CAWJetColl, CAWJets);
 
-    //Four vector
+    //Four std::vector
     std::vector <double> CAWJetPt;
     std::vector <double> CAWJetEta;
     std::vector <double> CAWJetPhi;
@@ -673,7 +673,7 @@ int TprimeCalc::AnalyzeEvent(edm::EventBase const & event,
     //Mass
     std::vector <double> CAWJetMass;
   
-    //Daughter four vector and index
+    //Daughter four std::vector and index
     std::vector <double> CAWDaughterPt;
     std::vector <double> CAWDaughterMass;
     
@@ -700,7 +700,7 @@ int TprimeCalc::AnalyzeEvent(edm::EventBase const & event,
       wjetIndex_+=1;
       int index = (int)(ijet-CAWJets->begin());
 
-      //Four vector
+      //Four std::vector
       CAWJetPt     . push_back(ijet->pt());
       CAWJetEta    . push_back(ijet->eta());
       CAWJetPhi    . push_back(ijet->phi());
@@ -736,7 +736,7 @@ int TprimeCalc::AnalyzeEvent(edm::EventBase const & event,
       }
     }
 
-    //Four vector
+    //Four std::vector
     SetValue("CAWJetPt"     , CAWJetPt);
     SetValue("CAWJetMass"     , CAWJetMass);
     SetValue("CAWJetEta"    , CAWJetEta);
@@ -753,7 +753,7 @@ int TprimeCalc::AnalyzeEvent(edm::EventBase const & event,
     //Mass
     SetValue("CAWJetMass"     , CAWJetMass);
 
-    //Daughter four vector and index
+    //Daughter four std::vector and index
     
     SetValue("CAWDaughterPt"     , CAWDaughterPt);
     SetValue("CAWDaughterMass"     , CAWDaughterMass);
@@ -816,7 +816,7 @@ int TprimeCalc::AnalyzeEvent(edm::EventBase const & event,
     edm::Handle<std::vector<pat::Jet> > CA8Jets;
     event.getByLabel(CA8JetColl, CA8Jets);
 
-    //Four vector
+    //Four std::vector
     std::vector <double> CA8JetPt;
     std::vector <double> CA8JetEta;
     std::vector <double> CA8JetPhi;
@@ -827,7 +827,7 @@ int TprimeCalc::AnalyzeEvent(edm::EventBase const & event,
 
     for (std::vector<pat::Jet>::const_iterator ijet = CA8Jets->begin(); ijet != CA8Jets->end(); ijet++){
     
-      //Four vector
+      //Four std::vector
       CA8JetPt     . push_back(ijet->pt());
       CA8JetEta    . push_back(ijet->eta());
       CA8JetPhi    . push_back(ijet->phi());
@@ -837,7 +837,7 @@ int TprimeCalc::AnalyzeEvent(edm::EventBase const & event,
       //     CA8JetRCN    . push_back((ijet->chargedEmEnergy()+ijet->chargedHadronEnergy()) / (ijet->neutralEmEnergy()+ijet->neutralHadronEnergy()));    
     }
 
-    //Four vector
+    //Four std::vector
     SetValue("CA8JetPt"     , CA8JetPt);
     SetValue("CA8JetEta"    , CA8JetEta);
     SetValue("CA8JetPhi"    , CA8JetPhi);

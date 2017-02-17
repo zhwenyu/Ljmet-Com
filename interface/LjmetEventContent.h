@@ -9,6 +9,7 @@
 
 #include <iostream>
 #include <vector>
+#include <string>
 #include <map>
 #include <limits>
 #include "TH1.h"
@@ -60,11 +61,12 @@ public:
     
     void SetValue(std::string key, bool value);
     void SetValue(std::string key, int value);
+    void SetValue(std::string key, long long value);
     void SetValue(std::string key, double value);
     void SetValue(std::string key, std::vector<bool> value);
     void SetValue(std::string key, std::vector<int> value);
     void SetValue(std::string key, std::vector<double> value);
-    
+    void SetValue(std::string key, std::vector<std::string> value);
     // histograms: mDoubleHist[module][histname]
     // actual histograms get created by TFileService in the main application
     // based on info in this container
@@ -80,13 +82,16 @@ private:
     std::string mName;
     std::string mLegend;
     TTree * mpTree;
-    std::map<std::string, bool> mBoolBranch;
-    std::map<std::string, int> mIntBranch;
-    std::map<std::string, double> mDoubleBranch;
-    std::map<std::string, std::vector<bool> > mVectorBoolBranch;
-    std::map<std::string, std::vector<int> > mVectorIntBranch;
-    std::map<std::string, std::vector<double> > mVectorDoubleBranch;
+
     
+    std::map<std::string,bool> mBoolBranch;
+    std::map<std::string,int> mIntBranch;
+    std::map<std::string,long long> mLongIntBranch;
+    std::map<std::string,double> mDoubleBranch;
+    std::map<std::string,std::vector<bool> > mVectorBoolBranch;
+    std::map<std::string,std::vector<int> > mVectorIntBranch;
+    std::map<std::string,std::vector<double> > mVectorDoubleBranch;
+    std::map<std::string,std::vector<std::string> > mVectorStringBranch;
     // mDoubleHist[module][histname]=value
     std::map<std::string,std::map<std::string,HistMetadata> > mDoubleHist;
     bool mFirstEntry;

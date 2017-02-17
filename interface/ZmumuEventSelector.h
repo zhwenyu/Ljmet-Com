@@ -312,7 +312,7 @@ bool ZmumuEventSelector::operator()( edm::EventBase const & event, pat::strbitse
     if ( considerCut("Trigger cuts") ) {
       event.getByLabel( triggerSrc_, hltresults_ );
 
-      for ( vector<pat::TriggerPath>::const_iterator trig = hltresults_->begin();
+      for ( std::vector<pat::TriggerPath>::const_iterator trig = hltresults_->begin();
 	    trig!=hltresults_->end();
 	    ++trig){
 	_hlt[trig->name()]=trig->wasAccept();
@@ -376,7 +376,7 @@ bool ZmumuEventSelector::operator()( edm::EventBase const & event, pat::strbitse
 
       // loop over muons
       int muonIndex = 0;
-      for ( vector<pat::Muon>::const_iterator mu = h_muons_->begin();
+      for ( std::vector<pat::Muon>::const_iterator mu = h_muons_->begin();
 	    mu != h_muons_->end(); mu++){
 	  
 	retMuon.set(false);
@@ -447,7 +447,7 @@ bool ZmumuEventSelector::operator()( edm::EventBase const & event, pat::strbitse
 	
       // loop over electrons
       int nElectrons = 0;
-      for ( vector<pat::Electron>::const_iterator el = h_electrons_->begin();
+      for ( std::vector<pat::Electron>::const_iterator el = h_electrons_->begin();
 	    el != h_electrons_->end(); el++){
 	retElectron.set(false);
 	bool pass = (*electronSel_)( *el, retElectron );
@@ -477,7 +477,7 @@ bool ZmumuEventSelector::operator()( edm::EventBase const & event, pat::strbitse
       int nJets = 0;
       int nGoodJets = 0;
       good_jets_ . clear();
-      for (vector<pat::Jet>::const_iterator jet = h_jets_->begin();
+      for (std::vector<pat::Jet>::const_iterator jet = h_jets_->begin();
 	   jet != h_jets_->end(); jet++){
 	  
 	retJet.set(false);

@@ -1,0 +1,13 @@
+universe = vanilla
+Executable = DIRECTORY/PREFIX_JOBID.csh
+Requirements   =  OpSys == "LINUX" && (Arch != "DUMMY")
+request_memory = 4000
+Should_Transfer_Files = YES
+WhenToTransferOutput = ON_EXIT
+Output = DIRECTORY/PREFIX_JOBID.stdout
+Error = DIRECTORY/PREFIX_JOBID.stderr
+Log = DIRECTORY/PREFIX_JOBID.condor.log
+notification = Never
+use_x509userproxy = true
+x509userproxy = /tmp/x509up_u47334
+Queue  1
