@@ -42,6 +42,11 @@ public:
     double GetBtagScaleFactor(double pt, double eta, std::string tagger="CSVM", int year = 2016);
     double GetBtagSFUncertUp(double pt, double eta, std::string tagger="CSVM", int year = 2016);
     double GetBtagSFUncertDown(double pt, double eta, std::string tagger="CSVM", int year = 2016);
+
+    double GetCtagEfficiency(double pt, double eta, std::string tagger="CSVM");
+    double GetCtagScaleFactor(double pt, double eta, std::string tagger="CSVM", int year = 2016);
+    double GetCtagSFUncertUp(double pt, double eta, std::string tagger="CSVM", int year = 2016);
+    double GetCtagSFUncertDown(double pt, double eta, std::string tagger="CSVM", int year = 2016);
     
     double GetMistagRate(double pt, double eta, std::string tagger="CSVM");
     double GetMistagScaleFactor(double pt, double eta, std::string tagger="CSVM", int year = 2016);
@@ -62,6 +67,7 @@ private:
     /////////////Main interface functions 2016///////////
     double GetBtagSF2016(std::string tagger, method Method, shift Shift, double pt, double eta);
     double GetBtagSF2016_comb(std::string tagger, shift Shift, double pt, double eta);
+    double GetCtagSF2016_comb(std::string tagger, shift Shift, double pt, double eta);
     double GetLFSF2016(  std::string tagger, shift Shift, double pt, double eta);
     ///////////// More Specific Getters 2016///////////////////////
     double GetBtagSF2016Loose(method Method, shift Shift, double pt, double eta);
@@ -75,6 +81,10 @@ private:
     double GetBtagSF2016Tight(method Method, shift Shift, double pt, double eta);
     double GetBtagSF2016Tight_mujets(        shift Shift, double pt, double eta);
     double GetBtagSF2016Tight_comb(          shift Shift, double pt, double eta);
+    double GetCtagSF2016Loose_comb(          shift Shift, double pt, double eta);
+    double GetCtagSF2016Loose_subjet(        shift Shift, double pt, double eta);
+    double GetCtagSF2016Medium_comb(         shift Shift, double pt, double eta);
+    double GetCtagSF2016Medium_subjet(       shift Shift, double pt, double eta);
     double GetLFSF2016Tight(  shift Shift, double pt, double eta);
     double GetLFSF2016Loose(  shift Shift, double pt, double eta);
     double GetLFSF2016Medium( shift Shift, double pt, double eta);
