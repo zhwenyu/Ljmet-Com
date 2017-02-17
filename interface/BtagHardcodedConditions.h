@@ -6,6 +6,9 @@
 #include <vector>
 #include <algorithm>
 
+enum shift:char; //{ central, up, down, uncert };
+enum method:char; //{ mujets, comb };
+ 
 class BtagHardcodedConditions{
     
 public:
@@ -49,15 +52,34 @@ private:
     double GetBtagScaleFactor2011(double pt, double eta, std::string tagger="CSVM");
     double GetBtagScaleFactor2012(double pt, double eta, std::string tagger="CSVM");
     double GetBtagScaleFactor2015(double pt, double eta, std::string tagger="CSVM");
-    double GetBtagScaleFactor2016(double pt, double eta, std::string tagger="CSVM");
     double GetBtagSFUncertainty2011(double pt, double eta, std::string tagger="CSVM");
     double GetBtagSFUncertainty2012(double pt, double eta, std::string tagger="CSVM");
     double GetBtagSFUncertainty2015(double pt, double eta, std::string tagger="CSVM");
-    double GetBtagSFUncertainty2016(double pt, double eta, std::string tagger="CSVM");
     double GetMistagSF2011(double pt, double eta, std::string tagger, std::string meanminmax);
     double GetMistagSF2012(double pt, double eta, std::string tagger, std::string meanminmax);
     double GetMistagSF2015(double pt, double eta, std::string tagger, std::string meanminmax);
-    double GetMistagSF2016(double pt, double eta, std::string tagger, std::string meanminmax);
+
+    /////////////Main interface functions 2016///////////
+    double GetBtagSF2016(std::string tagger, method Method, shift Shift, double pt, double eta);
+    double GetBtagSF2016_comb(std::string tagger, shift Shift, double pt, double eta);
+    double GetLFSF2016(  std::string tagger, shift Shift, double pt, double eta);
+    ///////////// More Specific Getters 2016///////////////////////
+    double GetBtagSF2016Loose(method Method, shift Shift, double pt, double eta);
+    double GetBtagSF2016Loose_mujets(        shift Shift, double pt, double eta);
+    double GetBtagSF2016Loose_comb(          shift Shift, double pt, double eta);
+    double GetBtagSF2016Loose_subjet(        shift Shift, double pt, double eta);
+    double GetBtagSF2016Medium(method Method,shift Shift, double pt, double eta);
+    double GetBtagSF2016Medium_mujets(       shift Shift, double pt, double eta);
+    double GetBtagSF2016Medium_comb(         shift Shift, double pt, double eta);
+    double GetBtagSF2016Medium_subjet(       shift Shift, double pt, double eta);
+    double GetBtagSF2016Tight(method Method, shift Shift, double pt, double eta);
+    double GetBtagSF2016Tight_mujets(        shift Shift, double pt, double eta);
+    double GetBtagSF2016Tight_comb(          shift Shift, double pt, double eta);
+    double GetLFSF2016Tight(  shift Shift, double pt, double eta);
+    double GetLFSF2016Loose(  shift Shift, double pt, double eta);
+    double GetLFSF2016Medium( shift Shift, double pt, double eta);
+    double GetLFSF2016Loose_subjet(  shift Shift, double pt, double eta);
+    double GetLFSF2016Medium_subjet( shift Shift, double pt, double eta);
 
     inline void fillArray(float* a, float* b, int n) {
         for (int i=0;i<n;++i) a[i] = b[i];
