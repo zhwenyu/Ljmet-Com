@@ -283,7 +283,23 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
     SetValue("dataM", dataM);
     SetValue("isTau", bIsTau);
 
+    bool badmuonflag = false;
+    bool dupmuonflag = false;	  
 
+    if(!isMc){
+      edm::Handle<edm::TriggerResults > PatTriggerResults;
+      edm::InputTag flagtag = edm::InputTag("TriggerResults::RECO");
+      event.getByLabel( flagtag, PatTriggerResults );
+      const edm::TriggerNames patTrigNames = event.triggerNames(*PatTriggerResults);
+
+      for (unsigned int i=0; i<PatTriggerResults->size(); i++){
+	if (patTrigNames.triggerName(i) == "Flag_badMuons") badmuonflag = PatTriggerResults->accept(patTrigNames.triggerIndex(patTrigNames.triggerName(i)));
+	if (patTrigNames.triggerName(i) == "Flag_duplicateMuons") dupmuonflag = PatTriggerResults->accept(patTrigNames.triggerIndex(patTrigNames.triggerName(i)));
+      }
+    }
+
+    SetValue("flagBadMu",badmuonflag);
+    SetValue("flagDupMu",dupmuonflag);
  
     // Trigger
     std::vector<std::string> vsSelMCTriggersEl, vsSelTriggersEl, vsSelMCTriggersMu, vsSelTriggersMu;
