@@ -644,7 +644,7 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
               }
           }
 	  
-	  if(hbhenoisepass && hbhenoiseisopass && globaltighthalopass && ecaldeadcellpass && eebadscpass && goodvertpass && !badmuflag && !badchadflag){
+	  if(hbhenoisepass && hbhenoiseisopass && globaltighthalopass && ecaldeadcellpass && (mbPar["isMc"] || eebadscpass) && goodvertpass && !badmuflag && !badchadflag){
 	    passCut(ret, "MET filters");
 	  }
 	  else break;
