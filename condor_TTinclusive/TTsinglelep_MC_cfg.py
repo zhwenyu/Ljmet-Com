@@ -39,17 +39,16 @@ process.singleLepCalc.isMc              = cms.bool(condorIsMC)
 process.singleLepCalc.keepFullMChistory = cms.bool(condorIsMC)
 process.singleLepCalc.UseElMVA          = cms.bool(True)
 process.singleLepCalc.saveLooseLeps     = cms.bool(False)
+process.singleLepCalc.saveGenHT         = cms.bool(SAVEGENHT)
 
 # Jet substructure calculator options
 process.load('LJMet.Com.JetSubCalc_cfi')
-process.JetSubCalc.useHTT = cms.bool(False)
 process.JetSubCalc.killHF = cms.bool(False)
 process.JetSubCalc.doNewJEC = cms.bool(True)
 process.JetSubCalc.useL2L3Mass = cms.bool(True)
 process.JetSubCalc.isMc = cms.bool(condorIsMC)
 process.JetSubCalc.MCL2JetParAK8 = cms.string(relBase+'/src/LJMet/Com/data/Summer16RRV3/Summer16_23Sep2016V3_MC_L2Relative_AK8PFchs.txt')
 process.JetSubCalc.MCL3JetParAK8 = cms.string(relBase+'/src/LJMet/Com/data/Summer16RRV3/Summer16_23Sep2016V3_MC_L3Absolute_AK8PFchs.txt')
-process.JetSubCalc.MCPTResAK8 = cms.string(relBase+'/src/LJMet/Com/data/Spring16V10/Spring16_25nsV10_MC_PtResolution_AK8PFchs.txt')
 process.JetSubCalc.MCSF = cms.string(relBase+'/src/LJMet/Com/data/Spring16V10/Spring16_25nsV10_MC_SF_AK4PFchs.txt')
 process.JetSubCalc.DataL2JetParAK8 = cms.string(relBase+'/src/LJMet/Com/data/Summer16RRV3/Summer16_23Sep2016BCDV3_DATA_L2Relative_AK8PFchs.txt')
 process.JetSubCalc.DataL3JetParAK8 = cms.string(relBase+'/src/LJMet/Com/data/Summer16RRV3/Summer16_23Sep2016BCDV3_DATA_L3Absolute_AK8PFchs.txt')
@@ -117,7 +116,7 @@ process.event_selector = cms.PSet(
     # muon cuts
     muon_cuts                = cms.bool(True),
     min_muon                 = cms.int32(0),
-    muon_minpt               = cms.double(30.0),
+    muon_minpt               = cms.double(50.0),
     muon_maxeta              = cms.double(2.4),
     muon_useMiniIso          = cms.bool(True),
     muon_miniIso             = cms.double(0.1),
@@ -133,7 +132,7 @@ process.event_selector = cms.PSet(
     # electron cuts
     electron_cuts            = cms.bool(True),
     min_electron             = cms.int32(0),
-    electron_minpt           = cms.double(30.0),
+    electron_minpt           = cms.double(50.0),
     electron_maxeta          = cms.double(2.5),
     electron_useMiniIso      = cms.bool(True),
     electron_miniIso         = cms.double(0.1),

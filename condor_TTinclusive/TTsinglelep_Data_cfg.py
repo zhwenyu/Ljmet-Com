@@ -39,10 +39,10 @@ process.singleLepCalc.isMc              = cms.bool(condorIsMC)
 process.singleLepCalc.keepFullMChistory = cms.bool(condorIsMC)
 process.singleLepCalc.UseElMVA          = cms.bool(True)
 process.singleLepCalc.saveLooseLeps     = cms.bool(False)
+process.singleLepCalc.saveGenHT     = cms.bool(False)
 
 # Jet substructure calculator options
 process.load('LJMet.Com.JetSubCalc_cfi')
-process.JetSubCalc.useHTT = cms.bool(False)
 process.JetSubCalc.killHF = cms.bool(False)
 process.JetSubCalc.doNewJEC = cms.bool(True)
 process.JetSubCalc.useL2L3Mass = cms.bool(True)
@@ -139,7 +139,7 @@ process.event_selector = cms.PSet(
     # muon cuts
     muon_cuts                = cms.bool(True),
     min_muon                 = cms.int32(0),
-    muon_minpt               = cms.double(30.0),
+    muon_minpt               = cms.double(50.0),
     muon_maxeta              = cms.double(2.4),
     muon_useMiniIso          = cms.bool(True),
     muon_miniIso             = cms.double(0.1),
@@ -155,7 +155,7 @@ process.event_selector = cms.PSet(
     # electron cuts
     electron_cuts            = cms.bool(True),
     min_electron             = cms.int32(0),
-    electron_minpt           = cms.double(30.0),
+    electron_minpt           = cms.double(50.0),
     electron_maxeta          = cms.double(2.5),
     electron_useMiniIso      = cms.bool(True),
     electron_miniIso         = cms.double(0.1),

@@ -9,16 +9,16 @@ import getopt
 import subprocess
 import socket
 import datetime
-files_per_job = 10
+files_per_job = 15
 
 #Absolute path that precedes '/store...'
 # The script checks whether it is an absolute path or not
 
 if (socket.gethostname().find('fnal')>=0):
     brux=bool(False)
-    sePath='\'root://cmseos.fnal.gov/'         # stored on LPC, most of our samples
+#    sePath='\'root://cmseos.fnal.gov/'         # stored on LPC, most of our samples
 #    sePath='\'root://cmsxrootd.fnal.gov/'      # stored elsewhere
-#    sePath='\'root://eoscms.cern.ch/'      # stored at CERN
+    sePath='\'root://eoscms.cern.ch/'      # stored at CERN
     storePath=''
     setupString='source \/cvmfs\/cms.cern.ch\/cmsset_default.csh'
     outPath='root://cmseos.fnal.gov/'          # output on LPC
@@ -30,7 +30,7 @@ else:
 #Configuration options parsed from arguments
 #Switching to getopt for compatibility with older python
 try:
-    opts, args = getopt.getopt(sys.argv[1:], "", ["useMC=", "sample=","fileList=", "outDir=","shift=","submit=","json=","inputTar="])
+    opts, args = getopt.getopt(sys.argv[1:], "", ["useMC=", "sample=","fileList=", "outDir=","shift=","submit=","json=","inputTar=","saveGenHT="])
 except getopt.GetoptError as err:
     print str(err)
     sys.exit(1)
@@ -44,6 +44,7 @@ json     = str('None')
 submit   = bool(False)
 changeJEC= bool(False)
 tarfile  = str('None')
+saveGHT  = bool(False)
 
 for o, a in opts:
     print o, a
@@ -60,6 +61,8 @@ for o, a in opts:
     elif o == "--shift":    shift    = str(a)
     elif o == "--inputTar": tarfile = str(a).split('.')[0]
     elif o == "--json":     json   = str(a)
+    elif o == "--saveGenHT":
+        if a == 'True':     saveGHT = True
     elif o == "--submit":
         if a == 'True':     submit = True
 
@@ -147,6 +150,7 @@ while ( nfiles <= count ):
         line=line.replace('CONDOR_JSON',     json)
         line=line.replace('CONDOR_FILELIST', singleFileList)
         line=line.replace('CONDOR_OUTFILE',  prefix+'_'+str(j))
+        line=line.replace('SAVEGENHT',  saveGHT)
         if 'JECup' in shift  and 'JECup' in line: line=line.replace('False',  'True')
         if 'JECdown' in shift and 'JECdown' in line: line=line.replace('False',  'True')
         if 'JERup' in shift and 'JERup' in line: line=line.replace('False',  'True')
