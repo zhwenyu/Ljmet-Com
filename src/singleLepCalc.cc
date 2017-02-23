@@ -138,8 +138,8 @@ int singleLepCalc::BeginJob()
     if (mPset.exists("isMc"))         isMc = mPset.getParameter<bool>("isMc");
     else                              isMc = false;
 
-    if (mPset.exists("saveGenHT"))    isMc = mPset.getParameter<bool>("saveGenHT");
-    else                              isMc = false;
+    if (mPset.exists("saveGenHT"))    saveGenHT = mPset.getParameter<bool>("saveGenHT");
+    else                              saveGenHT = false;
 
     if (mPset.exists("genParticles")) genParticles_it = mPset.getParameter<edm::InputTag>("genParticles");
     else                              genParticles_it = edm::InputTag("prunedGenParticles");
@@ -1274,15 +1274,24 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
   	  
 	    // Save LHE-level HT calculation from quarks:
 	    if(saveGenHT){
-	      for ( unsigned int icount = 0 ; icount < (unsigned int)EvtHandle->hepeup().NUP; icount++ ) {
-		int pdgid = EvtHandle->hepeup().IDUP[icount];
-		int status = EvtHandle->hepeup().ISTUP[icount];
-		float px = (EvtHandle->hepeup().PUP[icount])[0];
-		float py = (EvtHandle->hepeup().PUP[icount])[1];
-		float pt = sqrt(px*px+py*py);
-		
-		if(status==1 && ((pdgid >= 1 && pdgid < 6) || pdgid == 21)){
-		  HTfromHEPEUP += pt;
+
+	      // Save the madgraph event weight
+	      const lhef::HEPEUP& lheEvent =EvtHandle->hepeup();
+
+	      // Loop over HepEvent entries  
+	      std::vector<lhef::HEPEUP::FiveVector> lheParticles = lheEvent.PUP;
+	      size_t numParticles = lheParticles.size();
+	      for(size_t idxParticle = 0; idxParticle < numParticles; ++idxParticle){
+
+		// PDG ID        
+		int absPdgId = TMath::Abs(lheEvent.IDUP[idxParticle]);
+
+		// Particle status
+		int status = lheEvent.ISTUP[idxParticle];
+
+		// Sum up pt and multiplicity of status 1 quarks and gluons
+		if(status == 1 && ((absPdgId >= 1 && absPdgId <= 6) || absPdgId == 21)){
+		  HTfromHEPEUP += TMath::Sqrt(TMath::Power(lheParticles[idxParticle][0], 2.) + TMath::Power(lheParticles[idxParticle][1], 2.));
 		  NPartonsfromHEPEUP++;
 		}
 	      }
