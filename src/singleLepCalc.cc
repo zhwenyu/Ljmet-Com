@@ -68,6 +68,7 @@ private:
     std::vector<unsigned int> keepMomPDGID;
     std::vector<unsigned int> keepPDGIDForce;
     std::vector<unsigned int> keepStatusForce;
+    bool saveGenHT;
     bool keepFullMChistory;
     bool cleanGenJets;
     bool UseElMVA;
@@ -135,6 +136,9 @@ int singleLepCalc::BeginJob()
     else                                   triggerCollection_ = edm::InputTag("TriggerResults::HLT");
     
     if (mPset.exists("isMc"))         isMc = mPset.getParameter<bool>("isMc");
+    else                              isMc = false;
+
+    if (mPset.exists("saveGenHT"))    isMc = mPset.getParameter<bool>("saveGenHT");
     else                              isMc = false;
 
     if (mPset.exists("genParticles")) genParticles_it = mPset.getParameter<edm::InputTag>("genParticles");
@@ -1269,24 +1273,21 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
   	  if(event.getByLabel(theSrc,EvtHandle)){
   	  
 	    // Save LHE-level HT calculation from quarks:
-	    /*
-	    for ( unsigned int icount = 0 ; icount < (unsigned int)EvtHandle->hepeup().NUP; icount++ ) {
-	      int pdgid = EvtHandle->hepeup().IDUP[icount];
-	      int status = EvtHandle->hepeup().ISTUP[icount];
-	      int mom1id = abs(EvtHandle->hepeup().IDUP[EvtHandle->hepeup().MOTHUP[icount].first-1]);
-	      int mom2id = abs(EvtHandle->hepeup().IDUP[EvtHandle->hepeup().MOTHUP[icount].second-1]);
-	      float px = (EvtHandle->hepeup().PUP[icount])[0];
-	      float py = (EvtHandle->hepeup().PUP[icount])[1];
-	      float pt = sqrt(px*px+py*py);
-	      	      
-	      if(status==1){
-		if(mom1id!=6 && mom2id!=6 && mom1id!=24 && mom2id!=24 && mom1id!=23 && mom2id!=23 && mom1id!=25 && mom2id!=25) {		  
+	    if(saveGenHT){
+	      for ( unsigned int icount = 0 ; icount < (unsigned int)EvtHandle->hepeup().NUP; icount++ ) {
+		int pdgid = EvtHandle->hepeup().IDUP[icount];
+		int status = EvtHandle->hepeup().ISTUP[icount];
+		float px = (EvtHandle->hepeup().PUP[icount])[0];
+		float py = (EvtHandle->hepeup().PUP[icount])[1];
+		float pt = sqrt(px*px+py*py);
+		
+		if(status==1 && ((pdgid >= 1 && pdgid < 6) || pdgid == 21)){
 		  HTfromHEPEUP += pt;
 		  NPartonsfromHEPEUP++;
 		}
 	      }
 	    }
-	    */
+
   	    // Storing LHE weights https://twiki.cern.ch/twiki/bin/viewauth/CMS/LHEReaderCMSSW
   	    // for MC@NLO renormalization and factorization scale. 
   	    // ID numbers 1001 - 1009. (muR,muF) = 
@@ -1500,8 +1501,8 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
     SetValue("MCWeight", MCWeight);
     SetValue("LHEweights", LHEweights);
     SetValue("LHEweightids", LHEweightids);
-    //    SetValue("HTfromHEPUEP", HTfromHEPEUP);
-    //    SetValue("NPartonsfromHEPUEP", NPartonsfromHEPEUP);
+    SetValue("HTfromHEPUEP", HTfromHEPEUP);
+    SetValue("NPartonsfromHEPUEP", NPartonsfromHEPEUP);
 
     return 0;
 }

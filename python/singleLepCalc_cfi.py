@@ -24,5 +24,6 @@ singleLepCalc = cms.PSet(
                          OverrideLHEWeights = cms.bool(False),
                          basePDFname = cms.string("cteq6"),
                          newPDFname = cms.string("PDF4LHC15_nlo_mc_pdfas"),
-                         saveLooseLeps = cms.bool(False)
+                         saveLooseLeps = cms.bool(False),
+                         saveGenHT = cms.bool(False),
                          )
