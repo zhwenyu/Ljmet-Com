@@ -64,6 +64,7 @@ private:
   bool JERup;
   bool JERdn;
   bool useL2L3Mass;
+  std::string puppiCorrPath;
   std::string MCL3;
   std::string MCL2;
   std::string MCSF;
@@ -147,6 +148,9 @@ int JetSubCalc::BeginJob()
 
     if(mPset.exists("useL2L3Mass")) useL2L3Mass = mPset.getParameter<bool>("useL2L3Mass");
     else useL2L3Mass = false;
+
+    if(mPset.exists("puppiCorrPath")) puppiCorrPath = mPset.getParameter<std::string>("puppiCorrPath");
+    else puppiCorrPath = "CMSSW_8_0_26_patch1/src/LJMet/Com/PuppiSoftdropMassCorr/weights/puppiCorr.root";
 
     if(mPset.exists("isMc")) isMc = mPset.getParameter<bool>("isMc");
     else isMc = false;
@@ -235,7 +239,7 @@ int JetSubCalc::BeginJob()
       resolution_SF = JME::JetResolutionScaleFactor(MCSF);    
     }
 
-    TFile* file = TFile::Open("PuppiSoftdropMassCorr/weights/puppiCorr.root","READ");
+    TFile* file = TFile::Open(puppiCorrPath.c_str(),"READ");
     puppisd_corrGEN      = (TF1*)file->Get("puppiJECcorr_gen");
     puppisd_corrRECO_cen = (TF1*)file->Get("puppiJECcorr_reco_0eta1v3");
     puppisd_corrRECO_for = (TF1*)file->Get("puppiJECcorr_reco_1v3eta2v5");
@@ -901,15 +905,18 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * s
 
       thePuppiSoftDrop = puppi_sd.M();
 
-      float genCorr  = 1.;
-      float recoCorr = 1.;
-      float totalWeight = 1.;
-
-      genCorr =  puppisd_corrGEN->Eval(corrak8.pt());
-      if(fabs(corrak8.eta()) <= 1.3 ) recoCorr = puppisd_corrRECO_cen->Eval(corrak8.pt());
-      else recoCorr = puppisd_corrRECO_for->Eval(corrak8.pt());
-      
-      double puppicorr = genCorr * recoCorr;
+      double puppicorr = 1.0;
+      if(isMc){
+	float genCorr  = 1.;
+	float recoCorr = 1.;
+	float totalWeight = 1.;
+	
+	genCorr =  puppisd_corrGEN->Eval(corrak8.pt());
+	if(fabs(corrak8.eta()) <= 1.3 ) recoCorr = puppisd_corrRECO_cen->Eval(corrak8.pt());
+	else recoCorr = puppisd_corrRECO_for->Eval(corrak8.pt());
+	
+	puppicorr = genCorr * recoCorr;
+      }
       double thePuppiSoftDropCorrected = thePuppiSoftDrop*puppicorr;
 
       theJetAK8PUPPISJIndex.push_back(PUPPISubJetIndex);
