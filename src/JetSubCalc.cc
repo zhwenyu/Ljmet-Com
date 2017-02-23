@@ -607,10 +607,18 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * s
       theJetAK8Energy.push_back(corrak8.energy());
       theJetAK8Mass  .push_back(corrak8.mass());
 
-      theJetAK8PUPPIPt.push_back(corrak8.userFloat("ak8PFJetsPuppiValueMap:pt"));  
-      theJetAK8PUPPIEta.push_back(corrak8.userFloat("ak8PFJetsPuppiValueMap:eta")); 
-      theJetAK8PUPPIPhi.push_back(corrak8.userFloat("ak8PFJetsPuppiValueMap:phi")); 
-      theJetAK8PUPPIMass.push_back(corrak8.userFloat("ak8PFJetsPuppiValueMap:mass"));
+      double thePuppiPt = -std::numeric_limits<double>::max();
+      double thePuppiEta = -std::numeric_limits<double>::max();
+      double thePuppiPhi = -std::numeric_limits<double>::max();
+      double thePuppiMass = -std::numeric_limits<double>::max();
+      thePuppiPt = corrak8.userFloat("ak8PFJetsPuppiValueMap:pt");  
+      thePuppiEta = corrak8.userFloat("ak8PFJetsPuppiValueMap:eta"); 
+      thePuppiPhi = corrak8.userFloat("ak8PFJetsPuppiValueMap:phi"); 
+      thePuppiMass = corrak8.userFloat("ak8PFJetsPuppiValueMap:mass");
+      theJetAK8PUPPIPt.push_back(thePuppiPt);
+      theJetAK8PUPPIEta.push_back(thePuppiEta);
+      theJetAK8PUPPIPhi.push_back(thePuppiPhi);
+      theJetAK8PUPPIMass.push_back(thePuppiMass);
 
       double genDR = -99;
       double genpt = -99;
@@ -754,7 +762,6 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * s
       theJetAK8NjettinessTau1.push_back(theNjettinessTau1);
       theJetAK8NjettinessTau2.push_back(theNjettinessTau2);
       theJetAK8NjettinessTau3.push_back(theNjettinessTau3);
-
       theJetAK8PUPPITau1.push_back(thePuppiTau1);
       theJetAK8PUPPITau2.push_back(thePuppiTau2);
       theJetAK8PUPPITau3.push_back(thePuppiTau3);
