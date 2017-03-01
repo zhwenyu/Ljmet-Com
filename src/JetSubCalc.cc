@@ -704,7 +704,7 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * s
 	  }
 	  if (factor_pruned_dn>1) {
 	    JERrand.SetSeed(abs(static_cast<int>(l2l3jet.phi()*1e4)));	   
-	    ptscale_pruned_dn = JERrand.Gaus(thePrunedMass,res*sqrt(factor_pruned_up*factor_pruned_dn - 1.0))/thePrunedMass;
+	    ptscale_pruned_dn = JERrand.Gaus(thePrunedMass,res*sqrt(factor_pruned_dn*factor_pruned_dn - 1.0))/thePrunedMass;
 	  }
 
 	  // JetWtagging TWiki: JMS scale factor = 1, uncertainty = sqrt(JESunc^2 + 0.02^2)
