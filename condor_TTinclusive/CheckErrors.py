@@ -24,7 +24,7 @@ for o, a in opts:
 	if o == '--resubmit': resubmit = a
 	if o == '--resub_num': resub_num = int(a)
 
-rootdir = '/eos/uscms/store/user/jmanagan/'+dir.split('/')[-3]+'/'+dir.split('/')[-2]+'/'
+rootdir = '/eos/uscms/store/user/lpcljm/2016/'+dir.split('/')[-3]+'/'+dir.split('/')[-2]+'/'
 rootdir = rootdir.replace('_logs','')
 print 'checking ROOT files in:',rootdir
 folders = [x for x in os.walk(dir).next()[1]]
@@ -38,11 +38,12 @@ total_roots = 0
 no_log = 0
 empty_log = 0
 copy_fail = 0
+mem_fail = 0
 
 for folder in folders:
         #if folder != 'QCD_HT700to1000_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_25ns': continue
         #if 'Charged' not in folder and 'Single' not in folder: continue
-        #if 'SingleMuon_RRBCDEFG' not in folder: continue
+        if 'TT_Mtt' not in folder: continue
 	if verbose_level > 0:  print; print folder
 
         rootfiles = EOSlist_root_files(rootdir+folder)
@@ -88,6 +89,20 @@ for folder in folders:
 				continue
 		except:
 			pass
+
+		try:
+			current = open(dir + '/'+folder+'/'+file.replace('.jdl','.condor'),'r')
+			good = True
+			for line in current:
+				if 'SYSTEM_PERIODIC_REMOVE' in line: good = False
+			if not good: 
+				if verbose_level > 0: 
+					print '\tMEM FAIL:',file,' and JobIndex:',index
+				mem_fail+=1
+				if resub_num == -1 or resub_num == 3:resub_index.append(index)
+				continue
+		except:
+			pass
 		
 		try:
 			if not os.path.isfile(dir+'/'+folder+'/'+file.replace('.jdl','.log')): 
@@ -113,6 +128,7 @@ for folder in folders:
 			if line.startswith('relBase    = str('): fout.write('relBase    = str(\'CONDOR_RELBASE\')\n')
 			else: fout.write(line)
 		os.system('rm ' + dir + '/' + folder + '/' + folder.replace('/logfiles/','') + '_' + index + '.log')
+		os.system('rm ' + dir + '/' + folder + '/' + folder.replace('/logfiles/','') + '_' + index + '.condor')
 		os.system('condor_submit ' + dir + '/' + folder + '/' + folder.replace('/logfiles/','') + '_' + index + '.jdl')
 		indexind+=1
 	
@@ -123,5 +139,6 @@ print 'TOTAL JOBS: ', total_total
 print 'NO LOG:', no_log
 print 'EMPTY LOG:', empty_log
 print 'XRDCP FAIL:', copy_fail
+print 'MEMORY FAIL:', mem_fail
 print 'ROOT files:', total_roots
 print 'DONE:', total_total - no_log - empty_log - copy_fail
