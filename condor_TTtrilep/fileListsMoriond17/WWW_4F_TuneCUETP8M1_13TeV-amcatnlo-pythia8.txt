@@ -1,0 +1,4 @@
+/store/mc/RunIISummer16MiniAODv2/WWW_4F_TuneCUETP8M1_13TeV-amcatnlo-pythia8/MINIAODSIM/PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/50000/06CEB378-7EC0-E611-8D9B-A0000420FE80.root
+/store/mc/RunIISummer16MiniAODv2/WWW_4F_TuneCUETP8M1_13TeV-amcatnlo-pythia8/MINIAODSIM/PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/50000/4A41203C-74C0-E611-9613-A0000420FE80.root
+/store/mc/RunIISummer16MiniAODv2/WWW_4F_TuneCUETP8M1_13TeV-amcatnlo-pythia8/MINIAODSIM/PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/50000/66078AB8-7EC0-E611-A5A9-0025904AC2C6.root
+/store/mc/RunIISummer16MiniAODv2/WWW_4F_TuneCUETP8M1_13TeV-amcatnlo-pythia8/MINIAODSIM/PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/50000/FA797D56-73C0-E611-885E-A0000420FE80.root
