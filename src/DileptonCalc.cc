@@ -775,6 +775,23 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
     //_____ Muons _____________________________
     //
     
+    //get flag for event having bad pfmuon
+    edm::Handle<edm::TriggerResults > PatTriggerResults;
+    event.getByLabel( edm::InputTag("TriggerResults::PAT"), PatTriggerResults );
+    const edm::TriggerNames patTrigNames = event.triggerNames(*PatTriggerResults);
+
+    bool badmuon = false;
+    bool dupmuon = false;
+
+    for (unsigned int i=0; i<PatTriggerResults->size(); i++){
+      if (patTrigNames.triggerName(i) == "Flag_badMuons") badmuon = PatTriggerResults->accept(patTrigNames.triggerIndex(patTrigNames.triggerName(i)));
+      if (patTrigNames.triggerName(i) == "Flag_duplicateMuons") dupmuon = PatTriggerResults->accept(patTrigNames.triggerIndex(patTrigNames.triggerName(i)));
+    }
+   
+    SetValue("BadMuon",badmuon);
+    SetValue("DupMuon",dupmuon);
+
+    //main muon info
     std::vector <int> muCharge;
     std::vector <bool> muGlobal;
     std::vector <bool> muTracker;
