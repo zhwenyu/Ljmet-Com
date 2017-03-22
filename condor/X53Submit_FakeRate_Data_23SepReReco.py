@@ -14,8 +14,8 @@ import fileinput
 files_per_job = 1
 
 rel_base = os.environ['CMSSW_BASE']
-cmssw = 'CMSSW_8_0_22'
-logdir = 'Jan09'
+cmssw = 'CMSSW_8_0_26_patch1'
+logdir = 'Feb16'
 #outdir = '/eos/uscms/store/user/clint/FakeRate/25ns/'+logdir+'/'
 outdir = '/store/user/lpctlbsm/clint/FakeRate/25ns/'+logdir+'/'
 #outdir = '/eos/uscms/store/user/clint/FakeRate/25ns/'+logdir+'/'
