@@ -871,10 +871,10 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * s
 	PUPPIsubjetMass      = -std::numeric_limits<double>::max();
 	PUPPIsubjetBdisc     = -std::numeric_limits<double>::max();
       
-	PUPPIsubjetPt        = corrsubjet.pt();
-	PUPPIsubjetEta       = corrsubjet.eta();
-	PUPPIsubjetPhi       = corrsubjet.phi();
-	PUPPIsubjetMass      = corrsubjet.mass();
+	PUPPIsubjetPt        = corrsubjet.correctedP4(0).pt();
+	PUPPIsubjetEta       = corrsubjet.correctedP4(0).eta();
+	PUPPIsubjetPhi       = corrsubjet.correctedP4(0).phi();
+	PUPPIsubjetMass      = corrsubjet.correctedP4(0).mass();
 	PUPPIsubjetBdisc     = corrsubjet.bDiscriminator(bDiscriminant); 
 	PUPPIsubjetHFlav     = corrsubjet.hadronFlavour();
 	PUPPIsubjetBTag      = selector->isJetTagged(corrsubjet, event, true, 0, true);
