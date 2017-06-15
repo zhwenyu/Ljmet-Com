@@ -38,7 +38,7 @@ process.load('LJMet.Com.singleLepCalc_cfi')
 process.singleLepCalc.isMc              = cms.bool(condorIsMC)
 process.singleLepCalc.keepFullMChistory = cms.bool(condorIsMC)
 process.singleLepCalc.UseElMVA          = cms.bool(True)
-process.singleLepCalc.saveLooseLeps     = cms.bool(False)
+process.singleLepCalc.saveLooseLeps     = cms.bool(True)
 process.singleLepCalc.saveGenHT         = cms.bool(False)
 
 # Jet substructure calculator options

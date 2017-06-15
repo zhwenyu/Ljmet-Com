@@ -18,7 +18,7 @@ sampleList=[
 # 	'TprimeTprime_M-1700_TuneCUETP8M1_13TeV-madgraph-pythia8.txt', 
 # 	'TprimeTprime_M-1800_TuneCUETP8M1_13TeV-madgraph-pythia8.txt', 
 
-	'BprimeBprime_M-1000_TuneCUETP8M1_13TeV-madgraph-pythia8.txt', 
+# 	'BprimeBprime_M-1000_TuneCUETP8M1_13TeV-madgraph-pythia8.txt', 
 # 	'BprimeBprime_M-1100_TuneCUETP8M1_13TeV-madgraph-pythia8.txt', 
 # 	'BprimeBprime_M-1200_TuneCUETP8M1_13TeV-madgraph-pythia8.txt', 
 # 	'BprimeBprime_M-1300_TuneCUETP8M1_13TeV-madgraph-pythia8.txt', 
@@ -33,6 +33,8 @@ sampleList=[
 
 	###BKG:
 # 	'TT_TuneCUETP8M2T4_13TeV-powheg-pythia8.txt',				  
+# 	'TT_Mtt-1000toInf_TuneCUETP8M2T4_13TeV-powheg-pythia8.txt',
+# 	'TT_Mtt-700to1000_TuneCUETP8M2T4_13TeV-powheg-pythia8.txt',
 										  
 # 	'ST_s-channel_4f_leptonDecays_13TeV-amcatnlo-pythia8_TuneCUETP8M1.txt',	  
 # 	'ST_t-channel_top_4f_leptonDecays_13TeV-powheg-pythia8_TuneCUETP8M1.txt',	  
@@ -94,6 +96,7 @@ sampleList=[
 # 	'WZZ_TuneCUETP8M1_13TeV-amcatnlo-pythia8.txt',
 # 	'ZZZ_TuneCUETP8M1_13TeV-amcatnlo-pythia8.txt',       
 # 						
+	'TTWJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-madspin-pythia8_combined.txt',       
 # 	'TTWJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-madspin-pythia8.txt',       
 # 	'TTWJetsToQQ_TuneCUETP8M1_13TeV-amcatnloFXFX-madspin-pythia8.txt',	  
 # 	'TTZToQQ_TuneCUETP8M1_13TeV-amcatnlo-pythia8.txt',			  
@@ -130,10 +133,11 @@ date='%i_%i_%i'%(cTime.year,cTime.month,cTime.day)
 outdir = 'LJMet80x_3lepTT_Full2016_Moriond17_reMiniAOD_nuBTVSF_modMETfilt_2017_2_24_rizki'
 # outdir = 'LJMet80x_3lepTT_Full2016_Moriond17_reMiniAOD_nuBTVSF_modMETfilt_saveLooseMC_'+date+'_rizki'
 # outdir = 'LJMet80x_3lepTT_Full2016_Moriond17_reMiniAOD_nuBTVSF_modMETfilt_saveVeryLooseMC_'+date+'_rizki'
+# outdir = 'LJMet80x_3lepTT_Full2016_Moriond17_reMiniAOD_nuBTVSF_modMETfilt_saveLooseMC_newTT_'+date+'_rizki'
 
 for sample in sampleList:
-	os.system('python condor_submit.py --useMC True --sample '+sample.split('.')[0]+' --fileList '+thisDir+'fileListsMoriond17/'+sample+' --submit True --inputTar '+tarfile+' --outDir /eos/uscms/store/user/lpcljm/'+outdir+' --shift '+shift)
-# 	os.system('python condor_submit.py --useMC True --sample '+sample.split('.')[0]+' --fileList '+thisDir+'fileListsMoriond17_new/'+sample+' --submit True --inputTar '+tarfile+' --outDir /eos/uscms/store/user/lpcljm/'+outdir+' --shift '+shift)
+# 	os.system('python condor_submit.py --useMC True --sample '+sample.split('.')[0]+' --fileList '+thisDir+'fileListsMoriond17/'+sample+' --submit True --inputTar '+tarfile+' --outDir /eos/uscms/store/user/lpcljm/'+outdir+' --shift '+shift)
+	os.system('python condor_submit.py --useMC True --sample '+sample.split('.')[0]+' --fileList '+thisDir+'fileListsMoriond17_new/'+sample+' --submit True --inputTar '+tarfile+' --outDir /eos/uscms/store/user/lpcljm/'+outdir+' --shift '+shift)
 
 ## shift should be (one at a time): nominal, JECup, JECdown, JERup, JERdown
 ## If you want to use different directory names, edit lines 144 - 147 in condor_submit.py so the config is edited correctly

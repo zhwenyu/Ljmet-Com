@@ -12,7 +12,7 @@ try:
 except getopt.GetoptError as err:
     print str(err)
     sys.exit(1)
-    
+
 verbose_level = 0
 resubmit = '0'
 resub_num = -2
@@ -42,19 +42,19 @@ copy_fail = 0
 for folder in folders:
 # 	if 'TT_' not in folder: continue
 # 	if 'WJets' in folder: continue
-# 	if 'DYJets' in folder: continue 
-# 	if 'ZZZ' not in folder: continue 
+# 	if 'DYJets' in folder: continue
+# 	if 'ZZZ' not in folder: continue
 # 	if 'DYJetsToLL_M-10to50' not in folder: continue
-# 	if 'TTWJetsToLNu' in folder:continue
+# 	if 'DoubleMuon' not in folder: continue
 	if verbose_level > 0:  print; print folder
 
         rootfiles = EOSlist_root_files(rootdir+folder)
         total_roots += len(rootfiles)
 
 	files = [x for x in os.listdir(dir+'/'+folder) if '.jdl' in x]
-	
+
 	os.listdir(dir+'/'+folder)
-	
+
 	resub_index = []
 	count_total = 0
 	for file in files:
@@ -63,14 +63,14 @@ for folder in folders:
 		index = file[file.find('_')+1:file.find('.')]
 		if '_' in index: index = index.split('_')[-1]
 		count_total += 1
-	
+
 		try:
 			current = open(dir + '/'+folder+'/'+file.replace('.jdl','.log'),'r')
 			good = False
 			for line in current:
 				if 'All cuts' in line: good = True
-			if not good: 
-				if verbose_level > 0: 
+			if not good:
+				if verbose_level > 0:
 					print '\tEMPTY LOG:',file,' and JobIndex:',index
 				empty_log+=1
 				if resub_num == -1 or resub_num == 0:resub_index.append(index)
@@ -83,18 +83,18 @@ for folder in folders:
 			good = True
 			for line in current:
 				if 'failure' in line: good = False
-			if not good: 
-				if verbose_level > 0: 
+			if not good:
+				if verbose_level > 0:
 					print '\tXRDCP FAIL:',file,' and JobIndex:',index
 				copy_fail+=1
 				if resub_num == -1 or resub_num == 2:resub_index.append(index)
 				continue
 		except:
 			pass
-		
+
 		try:
-			if not os.path.isfile(dir+'/'+folder+'/'+file.replace('.jdl','.log')): 
-				if verbose_level > 0: 
+			if not os.path.isfile(dir+'/'+folder+'/'+file.replace('.jdl','.log')):
+				if verbose_level > 0:
 					print '\tNO LOG:',file,' and JobIndex:',index
 				no_log += 1
 				if resub_num == -1 or resub_num == 1: resub_index.append(index)
@@ -122,8 +122,8 @@ for folder in folders:
 		#os.system('condor_submit ' + dir + '/' + folder + '/' + folder.replace('/logfiles/','') + '_' + index + '.jdl')
 		os.system('condor_submit ' + folder + '_' + index + '.jdl')
 		indexind+=1
-	
-	
+
+
 
 print
 print 'TOTAL JOBS: ', total_total

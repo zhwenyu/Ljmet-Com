@@ -38,8 +38,8 @@ process.load('LJMet.Com.singleLepCalc_cfi')
 process.singleLepCalc.isMc              = cms.bool(condorIsMC)
 process.singleLepCalc.keepFullMChistory = cms.bool(condorIsMC)
 process.singleLepCalc.UseElMVA          = cms.bool(True)
-process.singleLepCalc.saveLooseLeps     = cms.bool(False)
-process.singleLepCalc.saveGenHT         = cms.bool(False)
+process.singleLepCalc.saveLooseLeps     = cms.bool(True)
+process.singleLepCalc.saveGenHT     = cms.bool(False)
 
 # Jet substructure calculator options
 process.load('LJMet.Com.JetSubCalc_cfi')
@@ -49,6 +49,7 @@ process.JetSubCalc.useL2L3Mass = cms.bool(True)
 process.JetSubCalc.isMc = cms.bool(condorIsMC)
 process.JetSubCalc.MCL2JetParAK8 = cms.string(relBase+'/src/LJMet/Com/data/Summer16RRV3/Summer16_23Sep2016V3_MC_L2Relative_AK8PFchs.txt')
 process.JetSubCalc.MCL3JetParAK8 = cms.string(relBase+'/src/LJMet/Com/data/Summer16RRV3/Summer16_23Sep2016V3_MC_L3Absolute_AK8PFchs.txt')
+process.JetSubCalc.MCPTResAK8 = cms.string(relBase+'/src/LJMet/Com/data/Spring16V10/Spring16_25nsV10_MC_PtResolution_AK8PFchs.txt')
 process.JetSubCalc.MCSF = cms.string(relBase+'/src/LJMet/Com/data/Spring16V10/Spring16_25nsV10_MC_SF_AK4PFchs.txt')
 process.JetSubCalc.DataL2JetParAK8 = cms.string(relBase+'/src/LJMet/Com/data/Summer16RRV3/Summer16_23Sep2016BCDV3_DATA_L2Relative_AK8PFchs.txt')
 process.JetSubCalc.DataL3JetParAK8 = cms.string(relBase+'/src/LJMet/Com/data/Summer16RRV3/Summer16_23Sep2016BCDV3_DATA_L3Absolute_AK8PFchs.txt')
@@ -75,7 +76,7 @@ process.event_selector = cms.PSet(
     trigger_cut  = cms.bool(True),
     dump_trigger = cms.bool(False),
 
-    mctrigger_path_el = cms.vstring(        
+    trigger_path_el = cms.vstring(        
         'HLT_DoubleEle24_22_eta2p1_WPLoose_Gsf_v',            
         'HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v',        
         'HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_v',           
@@ -91,54 +92,52 @@ process.event_selector = cms.PSet(
         'HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v',  
         'HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v',  
         'HLT_Mu17_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v',  
-        'HLT_Mu30_Ele30_CaloIdL_GsfTrkIdVL_v',            
-        'HLT_Mu8_Ele8_CaloIdM_TrackIdM_Mass8_PFHT300_v',  
-        'HLT_Mu8_Ele8_CaloIdM_TrackIdM_Mass8_PFHT250_v',  
-        'HLT_Ele16_Ele12_Ele8_CaloIdL_TrackIdL_v',        
-        'HLT_Mu8_DiEle12_CaloIdL_TrackIdL_v',             
-        'HLT_DiMu9_Ele9_CaloIdL_TrackIdL_v',
-        'digitisation_step',
+        'HLT_Mu30_Ele30_CaloIdL_GsfTrkIdVL_v',                
+        'HLT_Mu8_Ele8_CaloIdM_TrackIdM_Mass8_PFHT300_v',      
+        'HLT_Mu8_Ele8_CaloIdM_TrackIdM_Mass8_PFHT250_v',      
+        'HLT_Ele16_Ele12_Ele8_CaloIdL_TrackIdL_v',            
+        'HLT_Mu8_DiEle12_CaloIdL_TrackIdL_v',                 
+        'HLT_DiMu9_Ele9_CaloIdL_TrackIdL_v',                  
         ),
-    mctrigger_path_mu = cms.vstring(
-        'HLT_DoubleIsoMu17_eta2p1_v',                     
-        'HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_v',          
-        'HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_v',             
-        'HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ_v',        
-        'HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_v',           
-        'HLT_Mu27_TkMu8_v',                               
-        'HLT_Mu30_TkMu11_v',                              
-        'HLT_Mu40_TkMu11_v',                              
-        'HLT_Mu17_Mu8_v',                                 
-        'HLT_Mu17_Mu8_DZ_v',                              
-        'HLT_Mu17_Mu8_SameSign_DZ_v',                     
-        'HLT_Mu20_Mu10_v',                                
-        'HLT_Mu20_Mu10_DZ_v',                              
-        'HLT_Mu20_Mu10_SameSign_DZ_v',                     
-        'HLT_DoubleMu8_Mass8_PFHT300_v',                   
-        'HLT_DoubleMu8_Mass8_PFHT250_v',                   
-        'HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_v',
+    trigger_path_mu = cms.vstring(
+        'HLT_DoubleIsoMu17_eta2p1_v',                         
+        'HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_v',              
+        'HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_v',                 
+        'HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ_v',            
+        'HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_v',               
+        'HLT_Mu27_TkMu8_v',                                   
+        'HLT_Mu30_TkMu11_v',                                  
+        'HLT_Mu40_TkMu11_v',                                  
+        'HLT_Mu17_Mu8_v',                                     
+        'HLT_Mu17_Mu8_DZ_v',                                  
+        'HLT_Mu17_Mu8_SameSign_DZ_v',                         
+        'HLT_Mu20_Mu10_v',                                    
+        'HLT_Mu20_Mu10_DZ_v',                                 
+        'HLT_Mu20_Mu10_SameSign_DZ_v',                        
+        'HLT_DoubleMu8_Mass8_PFHT300_v',                      
+        'HLT_DoubleMu8_Mass8_PFHT250_v',                      
+        'HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_v',   
 		'HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ',
-        'HLT_Mu8_TrkIsoVVL_Ele17_CaloIdL_TrackIdL_IsoVL_v', 
+        'HLT_Mu8_TrkIsoVVL_Ele17_CaloIdL_TrackIdL_IsoVL_v',   
         'HLT_Mu23_TrkIsoVVL_Ele8_CaloIdL_TrackIdL_IsoVL_v',  
         'HLT_Mu23_TrkIsoVVL_Ele8_CaloIdL_TrackIdL_IsoVL_DZ_v',  
-        'HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v',
+        'HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v',  
         'HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v',  
-        'HLT_Mu17_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v',
-        'HLT_Mu30_Ele30_CaloIdL_GsfTrkIdVL_v',
-        'HLT_Mu8_Ele8_CaloIdM_TrackIdM_Mass8_PFHT300_v',
-        'HLT_Mu8_Ele8_CaloIdM_TrackIdM_Mass8_PFHT250_v',
-        'HLT_Mu8_DiEle12_CaloIdL_TrackIdL_v',
-        'HLT_DiMu9_Ele9_CaloIdL_TrackIdL_v',
+        'HLT_Mu17_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v',  
+        'HLT_Mu30_Ele30_CaloIdL_GsfTrkIdVL_v',                
+        'HLT_Mu8_Ele8_CaloIdM_TrackIdM_Mass8_PFHT300_v',      
+        'HLT_Mu8_Ele8_CaloIdM_TrackIdM_Mass8_PFHT250_v',      
+        'HLT_Mu8_DiEle12_CaloIdL_TrackIdL_v',                 
+        'HLT_DiMu9_Ele9_CaloIdL_TrackIdL_v',                  
         'HLT_TripleMu_12_10_5_v',
-        'digitisation_step',
         ),
     
-    trigger_path_el = cms.vstring(''),
-    trigger_path_mu = cms.vstring(''),   
+    mctrigger_path_el = cms.vstring(''),
+    mctrigger_path_mu = cms.vstring(''),   
     
     # PV cuts
     pv_cut         = cms.bool(True),
-    flag_tag       = cms.InputTag('TriggerResults::PAT'),
+    flag_tag       = cms.InputTag('TriggerResults::RECO'),
     metfilters     = cms.bool(True),
     
     # Jet cuts
@@ -194,7 +193,7 @@ process.event_selector = cms.PSet(
         ),
 
     # more lepton cuts
-    min_lepton               = cms.int32(3),    # checks (N tight mu + N tight el) >= cut
+    min_lepton               = cms.int32(0),    # checks (N tight mu + N tight el) >= cut
     max_lepton               = cms.int32(1000),    # checks (N tight mu + N tight el) <= cut
     min_loose_lepton         = cms.int32(3),
     max_loose_lepton         = cms.int32(1000),

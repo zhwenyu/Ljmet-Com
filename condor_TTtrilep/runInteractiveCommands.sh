@@ -1,5 +1,10 @@
 #!/bin/bash
 
+# condor_q rsyarif -const "ClusterId >= 2104661.0 && ClusterId <= 2104773.0" #ttbar
+# 
+# condor_q rsyarif -const "ClusterId >= 2104776.0 && ClusterId <= 2104818.0" #TTW
+
+condor_q rsyarif -const "!(ClusterId >= 2104776.0 && ClusterId <= 2104818.0) && !(ClusterId >= 2104661.0 && ClusterId <= 2104773.0)"
 
 
 # ljmet testData_RRB.py >& TriggerDump_RRB.txt
@@ -19,10 +24,10 @@
 # echo "Checking HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ_v :"
 # grep HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ_v  Trig*.txt
 
-eos root://cmseos.fnal.gov/ rm -r /store/user/lpcljm/LJMet80x_3lepTT_Full2016_2016_12_19_rizki/JECup
-eos root://cmseos.fnal.gov/ rm -r /store/user/lpcljm/LJMet80x_3lepTT_Full2016_2016_12_19_rizki/JECdown
-eos root://cmseos.fnal.gov/ rm -r /store/user/lpcljm/LJMet80x_3lepTT_Full2016_2016_12_19_rizki/JERup
-eos root://cmseos.fnal.gov/ rm -r /store/user/lpcljm/LJMet80x_3lepTT_Full2016_2016_12_19_rizki/JERdown
+# eos root://cmseos.fnal.gov/ rm -r /store/user/lpcljm/LJMet80x_3lepTT_Full2016_2016_12_19_rizki/JECup
+# eos root://cmseos.fnal.gov/ rm -r /store/user/lpcljm/LJMet80x_3lepTT_Full2016_2016_12_19_rizki/JECdown
+# eos root://cmseos.fnal.gov/ rm -r /store/user/lpcljm/LJMet80x_3lepTT_Full2016_2016_12_19_rizki/JERup
+# eos root://cmseos.fnal.gov/ rm -r /store/user/lpcljm/LJMet80x_3lepTT_Full2016_2016_12_19_rizki/JERdown
 
 # eos root://cmseos.fnal.gov/ rm -r /store/user/lpcljm/LJMet80x_3lepTT_Full2016_2016_12_19_rizki/nominal/TTWJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-madspin-pythia8
 # eos root://cmseos.fnal.gov/ rm -r /store/user/lpcljm/LJMet80x_3lepTT_Full2016_2016_12_19_rizki/nominal/TTWJetsToQQ_TuneCUETP8M1_13TeV-amcatnloFXFX-madspin-pythia8
@@ -62,4 +67,4 @@ eos root://cmseos.fnal.gov/ rm -r /store/user/lpcljm/LJMet80x_3lepTT_Full2016_20
 # eos root://cmseos.fnal.gov/ rm -r /store/user/lpcljm/LJMet80x_3lepTT_Full2016_2016_12_19_rizki/nominal/DYJetsToLL_M-10to50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8
 # eos root://cmseos.fnal.gov/ rm -r /store/user/lpcljm/LJMet80x_3lepTT_Full2016_2016_12_19_rizki/nominal/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8
 # eos root://cmseos.fnal.gov/ rm -r /store/user/lpcljm/LJMet80x_3lepTT_Full2016_2016_12_19_rizki/nominal/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8
-# 
+#
