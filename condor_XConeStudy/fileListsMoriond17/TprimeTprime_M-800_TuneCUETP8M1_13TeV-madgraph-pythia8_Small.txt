@@ -1,0 +1,2 @@
+/store/mc/RunIISummer16MiniAODv2/TprimeTprime_M-800_TuneCUETP8M1_13TeV-madgraph-pythia8/MINIAODSIM/PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/50000/00453F68-BFD4-E611-A6B9-0025907DE2A0.root
+/store/mc/RunIISummer16MiniAODv2/TprimeTprime_M-800_TuneCUETP8M1_13TeV-madgraph-pythia8/MINIAODSIM/PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/50000/0A20A005-A5D4-E611-823E-1866DAEA6D08.root

@@ -1,0 +1,1014 @@
+[TpTpCalc]: registering TpTpCalc
+[CATopoCalc]: registering CATopoCalc
+[PileUpCalc]: registering PileUpCalc
+[JetSubCalc]: registering JetSubCalc
+[singleLepSelector]: registering singleLepSelector
+[BTagSFCalc]: registering BTagSFCalc
+[DileptonCalc]: registering DileptonCalc
+[singleLepCalc]: registering singleLepCalc
+[CommonCalc]: registering CommonCalc
+[TTbarMassCalc]: registering TTbarMassCalc
+[DileptonSelector]: registering DileptonSelector
+[XConeCalc]: registering XConeCalc
+[ljmet]: getting parameters from config file
+[ljmet]: the following parameter sets found:
+[ljmet]: hello from ljmet!
+WARNING: AutoLibraryloader::enable() and AutoLibraryLoader.h are deprecated.
+Use FWLiteEnabler::enable() and FWLiteEnabler.h instead
+[ljmet]: CommonCalc
+[ljmet]: JetSubCalc
+[ljmet]: LooseTopElectronSelector
+[ljmet]: LoosepfMuonSelector
+[ljmet]: TopElectronSelector
+[ljmet]: XConeCalc
+[ljmet]: event_selector
+[ljmet]: inputs
+[ljmet]: ljmet
+[ljmet]: outputs
+[ljmet]: pfJetIDSelector
+[ljmet]: pfMuonSelector
+[ljmet]: pvSelector
+[ljmet]: singleLepCalc
+[ljmet]: setting up TFileService
+[ljmet]: Creating output tree
+[ljmet]: booking histograms
+[ljmet]: instantiating the event selector
+b-tag check CSVM pfCombinedInclusiveSecondaryVertexV2BJetTags 0.8484
+--- Reader                   : Booking "Spring15_V1_EB1" of type "BDT" from /uscms_data/d3/rsyarif/Fermilab2017/XConeinLJMet80x/CMSSW_8_0_25/src/LJMet/Com/weights/EIDmva_EB1_10_oldNonTrigSpring15_ConvVarCwoBoolean_TMVA412_FullStatLowPt_PairNegWeightsGlobal_BDT.weights.xml.
+--- MethodBase               : Reading weight file: /uscms_data/d3/rsyarif/Fermilab2017/XConeinLJMet80x/CMSSW_8_0_25/src/LJMet/Com/weights/EIDmva_EB1_10_oldNonTrigSpring15_ConvVarCwoBoolean_TMVA412_FullStatLowPt_PairNegWeightsGlobal_BDT.weights.xml
+--- BDT                      : Read method "BDT" of type "BDT"
+--- BDT                      : MVA method was trained with TMVA Version: 4.1.2
+--- BDT                      : MVA method was trained with ROOT Version: 5.32/00
+--- DataSetInfo              : Added class "Signal"	 with internal class number 0
+--- DataSetInfo              : Added class "Background"	 with internal class number 1
+--- Reader                   : Booked classifier "BDT" of type: "BDT"
+--- Reader                   : Booking "Spring15_V1_EB2" of type "BDT" from /uscms_data/d3/rsyarif/Fermilab2017/XConeinLJMet80x/CMSSW_8_0_25/src/LJMet/Com/weights/EIDmva_EB2_10_oldNonTrigSpring15_ConvVarCwoBoolean_TMVA412_FullStatLowPt_PairNegWeightsGlobal_BDT.weights.xml.
+--- MethodBase               : Reading weight file: /uscms_data/d3/rsyarif/Fermilab2017/XConeinLJMet80x/CMSSW_8_0_25/src/LJMet/Com/weights/EIDmva_EB2_10_oldNonTrigSpring15_ConvVarCwoBoolean_TMVA412_FullStatLowPt_PairNegWeightsGlobal_BDT.weights.xml
+--- BDT                      : Read method "BDT" of type "BDT"
+--- BDT                      : MVA method was trained with TMVA Version: 4.1.2
+--- BDT                      : MVA method was trained with ROOT Version: 5.32/00
+--- Reader                   : Booked classifier "BDT" of type: "BDT"
+--- Reader                   : Booking "Spring15_V1_EE" of type "BDT" from /uscms_data/d3/rsyarif/Fermilab2017/XConeinLJMet80x/CMSSW_8_0_25/src/LJMet/Com/weights/EIDmva_EE_10_oldNonTrigSpring15_ConvVarCwoBoolean_TMVA412_FullStatLowPt_PairNegWeightsGlobal_BDT.weights.xml.
+--- MethodBase               : Reading weight file: /uscms_data/d3/rsyarif/Fermilab2017/XConeinLJMet80x/CMSSW_8_0_25/src/LJMet/Com/weights/EIDmva_EE_10_oldNonTrigSpring15_ConvVarCwoBoolean_TMVA412_FullStatLowPt_PairNegWeightsGlobal_BDT.weights.xml
+--- BDT                      : Read method "BDT" of type "BDT"
+--- BDT                      : MVA method was trained with TMVA Version: 4.1.2
+--- BDT                      : MVA method was trained with ROOT Version: 5.32/00
+--- DataSetInfo              : Added class "Signal"	 with internal class number 0
+--- DataSetInfo              : Added class "Background"	 with internal class number 1
+--- Reader                   : Booked classifier "BDT" of type: "BDT"
+--- Reader                   : Booking "Spring16_V1_EB1" of type "BDT" from /uscms_data/d3/rsyarif/Fermilab2017/XConeinLJMet80x/CMSSW_8_0_25/src/LJMet/Com/weights/electronID_mva_Spring16_GeneralPurpose_V1_EB1_10.weights.xml.
+--- MethodBase               : Reading weight file: /uscms_data/d3/rsyarif/Fermilab2017/XConeinLJMet80x/CMSSW_8_0_25/src/LJMet/Com/weights/electronID_mva_Spring16_GeneralPurpose_V1_EB1_10.weights.xml
+--- BDT                      : Read method "BDT" of type "BDT"
+--- BDT                      : MVA method was trained with TMVA Version: 4.2.0
+--- BDT                      : MVA method was trained with ROOT Version: 6.02/05
+--- DataSetInfo              : Added class "Signal"	 with internal class number 0
+--- DataSetInfo              : Added class "Background"	 with internal class number 1
+--- Reader                   : Booked classifier "BDT" of type: "BDT"
+--- Reader                   : Booking "Spring16_V1_EB2" of type "BDT" from /uscms_data/d3/rsyarif/Fermilab2017/XConeinLJMet80x/CMSSW_8_0_25/src/LJMet/Com/weights/electronID_mva_Spring16_GeneralPurpose_V1_EB2_10.weights.xml.
+--- MethodBase               : Reading weight file: /uscms_data/d3/rsyarif/Fermilab2017/XConeinLJMet80x/CMSSW_8_0_25/src/LJMet/Com/weights/electronID_mva_Spring16_GeneralPurpose_V1_EB2_10.weights.xml
+--- BDT                      : Read method "BDT" of type "BDT"
+--- BDT                      : MVA method was trained with TMVA Version: 4.2.0
+--- BDT                      : MVA method was trained with ROOT Version: 6.02/05
+--- Reader                   : Booked classifier "BDT" of type: "BDT"
+--- Reader                   : Booking "Spring16_V1_EE" of type "BDT" from /uscms_data/d3/rsyarif/Fermilab2017/XConeinLJMet80x/CMSSW_8_0_25/src/LJMet/Com/weights/electronID_mva_Spring16_GeneralPurpose_V1_EE_10.weights.xml.
+--- MethodBase               : Reading weight file: /uscms_data/d3/rsyarif/Fermilab2017/XConeinLJMet80x/CMSSW_8_0_25/src/LJMet/Com/weights/electronID_mva_Spring16_GeneralPurpose_V1_EE_10.weights.xml
+--- BDT                      : Read method "BDT" of type "BDT"
+--- BDT                      : MVA method was trained with TMVA Version: 4.2.0
+--- BDT                      : MVA method was trained with ROOT Version: 6.02/05
+--- DataSetInfo              : Added class "Signal"	 with internal class number 0
+--- DataSetInfo              : Added class "Background"	 with internal class number 1
+--- Reader                   : Booked classifier "BDT" of type: "BDT"
+[singleLepSelector]: jet ID selector configured!
+[singleLepSelector]: pv selector configured!
+[singleLepSelector]: muon selector configured!
+[singleLepSelector]: loose muon selector configured!
+TopElectronSelector: If you want to use version NONE then make sure to provide the selection cuts by yourself 
+[singleLepSelector]: top electron selector configured!
+TopElectronSelector: If you want to use version NONE then make sure to provide the selection cuts by yourself 
+[singleLepSelector]: loose top electron selector configured!
+[singleLepSelector]: config parameters loaded...
+[singleLepSelector]: initializing singleLep selection
+[LjmetFactory]: removing PileUpCalc
+[LjmetFactory]: removing BTagSFCalc
+[LjmetFactory]: removing TprimeCalc
+[LjmetFactory]: removing CATopoCalc
+[LjmetFactory]: removing DileptonCalc
+[LjmetFactory]: removing DileptonEventSelector
+[LjmetFactory]: removing StopCalc
+[LjmetFactory]: removing PdfCalc
+[LjmetFactory]: removing ChargedHiggsCalc
+[LjmetFactory]: removing LjetsTopoCalc
+[LjmetFactory]: removing WprimeCalc
+ JetSubCalc Bdisc = pfCombinedInclusiveSecondaryVertexV2BJetTags
+JetSubCalc: doNewJEC = 1, killHF = 0
+JetSubCalc: using L2+L3 corrected groomed masses
+XConeCalc: XConeR = 0.4
+XConeCalc: XConeNumJets = 6
+XConeCalc: VarNumJets = 1
+XConeCalc: IGNORING XConeNumJets ! 
+XConeCalc: XConeBeta = 2
+XConeCalc: usePFchs = 1
+XConeCalc: DEBUG = 1
+keepFullMChistory 0
+Writing LHE weights (no override).
+[ljmet]: Creating singleLepSelector/jes_correction
+[ljmet]: Creating singleLepSelector/met_correction
+[ljmet]: Creating singleLepSelector/nBtagSfCorrections
+[ljmet]: Setting up chain event
+[ljmet]: Begin loop over events
+[ljmet]: 0 events processed. Processing run 283877, event 2160545855
+[ljmet]: 100 events processed. Processing run 283877, event 2159658876
+-------------------------------------------------------------------------------------
+Collecting PFparticles as Jet constituents
+-------------------------------------------------------------------------------------
+No. of PFparticles (All) : 1564
+N_PF : 17 ( pT = 38.4375, eta = -0.426099, phi = 0.259383, E = 41.9801 )		i_mu : 0(pT = 38.453, eta = -0.426078, phi = 0.259431, E = 41.9967), minMuPF_dR = 5.18661e-05, PF inv mass = 0.105713
+			---> Found lepton match. not clustering into XCone jet!
+N_PF : 17 ( pT = 21.0156, eta = -0.427381, phi = 0.239266, E = 22.9646 )		i_mu : 1(pT = 21.0131, eta = -0.427384, phi = 0.239239, E = 22.9618), minMuPF_dR = 2.71496e-05, PF inv mass = 0.105713
+			---> Found lepton match. not clustering into XCone jet!
+No. of PFparticles (after CHS):	1228
+No. of PFparticles (after lepton cleaning):	1226
+Finding N_opt ... 
+ using tauDiv 
+Threshold = 0.975
+f_opt[1] = 0.939468
+f_opt[2] = 0.98296
+XConeNumJets_optimal = 2
+-------------------------------------------------------------------------------------
+Using the XCone Jet Algorithm
+-------------------------------------------------------------------------------------
+---- 2 XCone Jets ---- R = 0.4
+no. : 0
+      , Jet constituents      : 11
+      , Jet pt                : 19.2688
+      , Jet eta                : -1.65794
+      , Jet phi                : 0.636353
+no. : 1
+      , Jet constituents      : 18
+      , Jet pt                : 62.9365
+      , Jet eta                : 1.49091
+      , Jet phi                : 3.40244
+[LjmetEventContent]: Creating branches in output tree
+[LjmetEventContent]: bool branches created: 15
+[LjmetEventContent]: integer branches created: 32
+[LjmetEventContent]: integer branches created: 1
+[LjmetEventContent]: double branches created: 31
+[LjmetEventContent]: std::vector<bool> branches created: 0
+[LjmetEventContent]: std::vector<int> branches created: 93
+[LjmetEventContent]: std::vector<double> branches created: 256
+[ljmet]: 200 events processed. Processing run 283877, event 2159950663
+[ljmet]: 300 events processed. Processing run 283877, event 2160672737
+[ljmet]: 400 events processed. Processing run 283877, event 2159573918
+[ljmet]: 500 events processed. Processing run 283877, event 2160317053
+-------------------------------------------------------------------------------------
+Collecting PFparticles as Jet constituents
+-------------------------------------------------------------------------------------
+No. of PFparticles (All) : 1190
+N_PF : 2 ( pT = 63.0625, eta = 1.81866, phi = -2.27067, E = 199.461 )		i_mu : 0(pT = 63.0523, eta = 1.81874, phi = -2.27069, E = 199.445), minMuPF_dR = 8.558e-05, PF inv mass = 0.105713
+			---> Found lepton match. not clustering into XCone jet!
+N_PF : 3 ( pT = 31.4219, eta = 0.683187, phi = -1.57192, E = 39.0447 )		i_mu : 1(pT = 31.4209, eta = 0.683186, phi = -1.57187, E = 39.0434), minMuPF_dR = 4.78854e-05, PF inv mass = 0.105713
+			---> Found lepton match. not clustering into XCone jet!
+No. of PFparticles (after CHS):	953
+No. of PFparticles (after lepton cleaning):	951
+Finding N_opt ... 
+ using tauDiv 
+Threshold = 0.975
+f_opt[1] = 0.867813
+f_opt[2] = 0.934136
+f_opt[3] = 0.972394
+f_opt[4] = 0.974482
+f_opt[5] = 0.972971
+f_opt[6] = 0.976455
+XConeNumJets_optimal = 6
+-------------------------------------------------------------------------------------
+Using the XCone Jet Algorithm
+-------------------------------------------------------------------------------------
+---- 6 XCone Jets ---- R = 0.4
+no. : 0
+      , Jet constituents      : 11
+      , Jet pt                : 16.109
+      , Jet eta                : -0.606058
+      , Jet phi                : 1.23675
+no. : 1
+      , Jet constituents      : 13
+      , Jet pt                : 18.588
+      , Jet eta                : 3.54513
+      , Jet phi                : 4.72223
+no. : 2
+      , Jet constituents      : 17
+      , Jet pt                : 17.1379
+      , Jet eta                : 0.615124
+      , Jet phi                : 4.78056
+no. : 3
+      , Jet constituents      : 12
+      , Jet pt                : 18.8623
+      , Jet eta                : 0.414132
+      , Jet phi                : 0.41931
+no. : 4
+      , Jet constituents      : 24
+      , Jet pt                : 47.1228
+      , Jet eta                : 1.84484
+      , Jet phi                : 3.9773
+no. : 5
+      , Jet constituents      : 13
+      , Jet pt                : 90.9895
+      , Jet eta                : -2.22871
+      , Jet phi                : 1.05616
+[ljmet]: 600 events processed. Processing run 283877, event 2160798357
+[ljmet]: 700 events processed. Processing run 283877, event 2159758845
+[ljmet]: 800 events processed. Processing run 283877, event 2159961919
+[ljmet]: 900 events processed. Processing run 283877, event 2162284698
+[ljmet]: 1000 events processed. Processing run 283877, event 2161937411
+[ljmet]: 1100 events processed. Processing run 283877, event 2160918303
+-------------------------------------------------------------------------------------
+Collecting PFparticles as Jet constituents
+-------------------------------------------------------------------------------------
+No. of PFparticles (All) : 1673
+N_PF : 6 ( pT = 47.2812, eta = 1.03128, phi = 0.82776, E = 74.733 )		i_mu : 0(pT = 47.2843, eta = 1.03131, phi = 0.827772, E = 74.7398), minMuPF_dR = 3.52619e-05, PF inv mass = 0.105713
+			---> Found lepton match. not clustering into XCone jet!
+N_PF : 9 ( pT = 32.8438, eta = 0.0913724, phi = -2.1193, E = 32.9811 )		i_mu : 1(pT = 32.8585, eta = 0.0913004, phi = -2.11932, E = 32.9957), minMuPF_dR = 7.44377e-05, PF inv mass = 0.105713
+			---> Found lepton match. not clustering into XCone jet!
+No. of PFparticles (after CHS):	1285
+No. of PFparticles (after lepton cleaning):	1283
+Finding N_opt ... 
+ using tauDiv 
+Threshold = 0.975
+f_opt[1] = 0.972634
+f_opt[2] = 0.987577
+XConeNumJets_optimal = 2
+-------------------------------------------------------------------------------------
+Using the XCone Jet Algorithm
+-------------------------------------------------------------------------------------
+---- 2 XCone Jets ---- R = 0.4
+no. : 0
+      , Jet constituents      : 14
+      , Jet pt                : 18.5229
+      , Jet eta                : -3.45222
+      , Jet phi                : 2.80402
+no. : 1
+      , Jet constituents      : 19
+      , Jet pt                : 33.0437
+      , Jet eta                : -1.04204
+      , Jet phi                : 2.33131
+[ljmet]: 1200 events processed. Processing run 283877, event 2161259263
+-------------------------------------------------------------------------------------
+Collecting PFparticles as Jet constituents
+-------------------------------------------------------------------------------------
+No. of PFparticles (All) : 1443
+N_PF : 15 ( pT = 23.4531, eta = -1.06296, phi = 0.652657, E = 37.9984 )		i_mu : 1(pT = 23.4567, eta = -1.06298, phi = 0.652624, E = 38.0047), minMuPF_dR = 3.71798e-05, PF inv mass = 0.105713
+			---> Found lepton match. not clustering into XCone jet!
+N_PF : 15 ( pT = 25.8906, eta = -1.0712, phi = 0.677462, E = 42.221 )		i_mu : 0(pT = 25.8921, eta = -1.07122, phi = 0.677449, E = 42.2241), minMuPF_dR = 2.40846e-05, PF inv mass = 0.105713
+			---> Found lepton match. not clustering into XCone jet!
+No. of PFparticles (after CHS):	1149
+No. of PFparticles (after lepton cleaning):	1147
+Finding N_opt ... 
+ using tauDiv 
+Threshold = 0.975
+f_opt[1] = 0.937134
+f_opt[2] = 0.971209
+f_opt[3] = 0.978159
+XConeNumJets_optimal = 3
+-------------------------------------------------------------------------------------
+Using the XCone Jet Algorithm
+-------------------------------------------------------------------------------------
+---- 3 XCone Jets ---- R = 0.4
+no. : 0
+      , Jet constituents      : 16
+      , Jet pt                : 22.7578
+      , Jet eta                : -4.29929
+      , Jet phi                : 3.32355
+no. : 1
+      , Jet constituents      : 6
+      , Jet pt                : 22.0319
+      , Jet eta                : 0.339391
+      , Jet phi                : 3.66402
+no. : 2
+      , Jet constituents      : 20
+      , Jet pt                : 53.8931
+      , Jet eta                : -0.339208
+      , Jet phi                : 3.75802
+[ljmet]: 1300 events processed. Processing run 283877, event 2161098435
+[ljmet]: 1400 events processed. Processing run 283877, event 2161261253
+-------------------------------------------------------------------------------------
+Collecting PFparticles as Jet constituents
+-------------------------------------------------------------------------------------
+No. of PFparticles (All) : 1434
+N_PF : 10 ( pT = 44.5, eta = 1.79577, phi = 1.09681, E = 137.73 )		i_mu : 1(pT = 44.4958, eta = 1.79579, phi = 1.09683, E = 137.719), minMuPF_dR = 2.51259e-05, PF inv mass = 0.105713
+			---> Found lepton match. not clustering into XCone jet!
+N_PF : 13 ( pT = 140.75, eta = 1.25999, phi = -1.88961, E = 268.061 )		i_mu : 0(pT = 140.764, eta = 1.2599, phi = -1.88962, E = 268.067), minMuPF_dR = 9.16609e-05, PF inv mass = 0.105713
+			---> Found lepton match. not clustering into XCone jet!
+No. of PFparticles (after CHS):	1186
+No. of PFparticles (after lepton cleaning):	1184
+Finding N_opt ... 
+ using tauDiv 
+Threshold = 0.975
+f_opt[1] = 0.867719
+f_opt[2] = 0.924664
+f_opt[3] = 0.98093
+XConeNumJets_optimal = 3
+-------------------------------------------------------------------------------------
+Using the XCone Jet Algorithm
+-------------------------------------------------------------------------------------
+---- 3 XCone Jets ---- R = 0.4
+no. : 0
+      , Jet constituents      : 14
+      , Jet pt                : 24.9407
+      , Jet eta                : 0.615892
+      , Jet phi                : 2.83879
+no. : 1
+      , Jet constituents      : 22
+      , Jet pt                : 75.1527
+      , Jet eta                : 2.05509
+      , Jet phi                : 4.18634
+no. : 2
+      , Jet constituents      : 20
+      , Jet pt                : 136.306
+      , Jet eta                : 1.20004
+      , Jet phi                : 1.4405
+[ljmet]: 1500 events processed. Processing run 283877, event 2160925073
+[ljmet]: 1600 events processed. Processing run 283877, event 2162225535
+-------------------------------------------------------------------------------------
+Collecting PFparticles as Jet constituents
+-------------------------------------------------------------------------------------
+No. of PFparticles (All) : 1109
+N_PF : 14 ( pT = 30.2969, eta = -0.170843, phi = -1.87232, E = 30.7403 )		i_mu : 1(pT = 30.2956, eta = -0.170752, phi = -1.87233, E = 30.7385), minMuPF_dR = 9.12203e-05, PF inv mass = 0.105713
+			---> Found lepton match. not clustering into XCone jet!
+N_PF : 14 ( pT = 89.8125, eta = -0.175054, phi = -1.85826, E = 91.1922 )		i_mu : 0(pT = 89.8187, eta = -0.175121, phi = -1.8583, E = 91.1996), minMuPF_dR = 8.0603e-05, PF inv mass = 0.105713
+			---> Found lepton match. not clustering into XCone jet!
+No. of PFparticles (after CHS):	977
+No. of PFparticles (after lepton cleaning):	975
+Finding N_opt ... 
+ using tauDiv 
+Threshold = 0.975
+f_opt[1] = 0.963735
+f_opt[2] = 0.974164
+f_opt[3] = 0.970442
+f_opt[4] = 0.988774
+XConeNumJets_optimal = 4
+-------------------------------------------------------------------------------------
+Using the XCone Jet Algorithm
+-------------------------------------------------------------------------------------
+---- 4 XCone Jets ---- R = 0.4
+no. : 0
+      , Jet constituents      : 8
+      , Jet pt                : 11.1244
+      , Jet eta                : -2.42486
+      , Jet phi                : 4.53209
+no. : 1
+      , Jet constituents      : 14
+      , Jet pt                : 25.1287
+      , Jet eta                : -3.26669
+      , Jet phi                : 1.22213
+no. : 2
+      , Jet constituents      : 10
+      , Jet pt                : 20.6537
+      , Jet eta                : -1.65697
+      , Jet phi                : 1.00354
+no. : 3
+      , Jet constituents      : 15
+      , Jet pt                : 28.8544
+      , Jet eta                : -0.709777
+      , Jet phi                : 1.72051
+[ljmet]: 1700 events processed. Processing run 283877, event 2162315356
+[ljmet]: 1800 events processed. Processing run 283877, event 2163151219
+[ljmet]: 1900 events processed. Processing run 283877, event 2162536216
+[ljmet]: 2000 events processed. Processing run 283877, event 2162334557
+[ljmet]: 2100 events processed. Processing run 283877, event 2163007733
+[ljmet]: 2200 events processed. Processing run 283877, event 2163612228
+[ljmet]: 2300 events processed. Processing run 283877, event 2162431363
+[ljmet]: 2400 events processed. Processing run 283877, event 2164978735
+[ljmet]: 2500 events processed. Processing run 283877, event 2163849929
+[ljmet]: 2600 events processed. Processing run 283877, event 2164060063
+[ljmet]: 2700 events processed. Processing run 283877, event 2164799009
+[ljmet]: 2800 events processed. Processing run 283877, event 2164487308
+[ljmet]: 2900 events processed. Processing run 283877, event 2164271320
+[ljmet]: 3000 events processed. Processing run 283877, event 2163904145
+-------------------------------------------------------------------------------------
+Collecting PFparticles as Jet constituents
+-------------------------------------------------------------------------------------
+No. of PFparticles (All) : 1560
+N_PF : 10 ( pT = 100.188, eta = -0.733726, phi = 0.363878, E = 128.387 )		i_mu : 0(pT = 100.215, eta = -0.733667, phi = 0.363902, E = 128.418), minMuPF_dR = 6.34023e-05, PF inv mass = 0.105713
+			---> Found lepton match. not clustering into XCone jet!
+N_PF : 10 ( pT = 36, eta = -0.749107, phi = 0.126469, E = 46.5823 )		i_mu : 1(pT = 36.0072, eta = -0.749173, phi = 0.126489, E = 46.5936), minMuPF_dR = 6.82659e-05, PF inv mass = 0.105713
+			---> Found lepton match. not clustering into XCone jet!
+No. of PFparticles (after CHS):	1237
+No. of PFparticles (after lepton cleaning):	1235
+Finding N_opt ... 
+ using tauDiv 
+Threshold = 0.975
+f_opt[1] = 0.879162
+f_opt[2] = 0.986036
+XConeNumJets_optimal = 2
+-------------------------------------------------------------------------------------
+Using the XCone Jet Algorithm
+-------------------------------------------------------------------------------------
+---- 2 XCone Jets ---- R = 0.4
+no. : 0
+      , Jet constituents      : 16
+      , Jet pt                : 17.5407
+      , Jet eta                : -4.32006
+      , Jet phi                : 3.13327
+no. : 1
+      , Jet constituents      : 15
+      , Jet pt                : 117.667
+      , Jet eta                : -0.598363
+      , Jet phi                : 3.49973
+-------------------------------------------------------------------------------------
+Collecting PFparticles as Jet constituents
+-------------------------------------------------------------------------------------
+No. of PFparticles (All) : 1272
+N_PF : 27 ( pT = 24.375, eta = -1.03458, phi = -1.54858, E = 38.6259 )		i_mu : 0(pT = 35.5983, eta = -1.04097, phi = -1.55184, E = 56.6919), minMuPF_dR = 0.00717569, PF inv mass = 0.105713
+N_PF : 27 ( pT = 24.375, eta = -1.03458, phi = -1.54858, E = 38.6259 )		i_mu : 1(pT = 24.3721, eta = -1.0345, phi = -1.54859, E = 38.6189), minMuPF_dR = 8.06307e-05, PF inv mass = 0.105713
+			---> Found lepton match. not clustering into XCone jet!
+N_PF : 27 ( pT = 35.5938, eta = -1.04099, phi = -1.55181, E = 56.6852 )		i_mu : 0(pT = 35.5983, eta = -1.04097, phi = -1.55184, E = 56.6919), minMuPF_dR = 3.44192e-05, PF inv mass = 0.105713
+N_PF : 27 ( pT = 35.5938, eta = -1.04099, phi = -1.55181, E = 56.6852 )		i_mu : 1(pT = 24.3721, eta = -1.0345, phi = -1.54859, E = 38.6189), minMuPF_dR = 3.44192e-05, PF inv mass = 0.105713
+			---> Found lepton match. not clustering into XCone jet!
+No. of PFparticles (after CHS):	1076
+No. of PFparticles (after lepton cleaning):	1074
+Finding N_opt ... 
+ using tauDiv 
+Threshold = 0.975
+f_opt[1] = 0.896677
+f_opt[2] = 0.911503
+f_opt[3] = 0.945044
+f_opt[4] = 0.978036
+XConeNumJets_optimal = 4
+-------------------------------------------------------------------------------------
+Using the XCone Jet Algorithm
+-------------------------------------------------------------------------------------
+---- 4 XCone Jets ---- R = 0.4
+no. : 0
+      , Jet constituents      : 7
+      , Jet pt                : 20.7726
+      , Jet eta                : -2.5909
+      , Jet phi                : 4.62019
+no. : 1
+      , Jet constituents      : 16
+      , Jet pt                : 48.4733
+      , Jet eta                : -3.64635
+      , Jet phi                : 5.3682
+no. : 2
+      , Jet constituents      : 11
+      , Jet pt                : 71.8552
+      , Jet eta                : -0.367935
+      , Jet phi                : 0.831955
+no. : 3
+      , Jet constituents      : 13
+      , Jet pt                : 93.7205
+      , Jet eta                : -0.876753
+      , Jet phi                : 2.40931
+[ljmet]: 3100 events processed. Processing run 283877, event 2163852536
+[ljmet]: 3200 events processed. Processing run 283877, event 2166315149
+[ljmet]: 3300 events processed. Processing run 283877, event 2165829038
+[ljmet]: 3400 events processed. Processing run 283877, event 2166058176
+-------------------------------------------------------------------------------------
+Collecting PFparticles as Jet constituents
+-------------------------------------------------------------------------------------
+No. of PFparticles (All) : 1386
+N_PF : 3 ( pT = 77.25, eta = 0.498062, phi = -1.45981, E = 87.0313 )		i_mu : 0(pT = 77.2451, eta = 0.498059, phi = -1.45977, E = 87.0257), minMuPF_dR = 4.22878e-05, PF inv mass = 0.105713
+			---> Found lepton match. not clustering into XCone jet!
+N_PF : 7 ( pT = 33.5, eta = 0.0518204, phi = 2.74354, E = 33.5452 )		i_mu : 1(pT = 33.5, eta = 0.051854, phi = 2.74352, E = 33.5452), minMuPF_dR = 4.18646e-05, PF inv mass = 0.105713
+			---> Found lepton match. not clustering into XCone jet!
+No. of PFparticles (after CHS):	1101
+No. of PFparticles (after lepton cleaning):	1099
+Finding N_opt ... 
+ using tauDiv 
+Threshold = 0.975
+f_opt[1] = 0.928721
+f_opt[2] = 0.989802
+XConeNumJets_optimal = 2
+-------------------------------------------------------------------------------------
+Using the XCone Jet Algorithm
+-------------------------------------------------------------------------------------
+---- 2 XCone Jets ---- R = 0.4
+no. : 0
+      , Jet constituents      : 10
+      , Jet pt                : 10.6065
+      , Jet eta                : -0.143589
+      , Jet phi                : 1.52535
+no. : 1
+      , Jet constituents      : 21
+      , Jet pt                : 57.8672
+      , Jet eta                : 0.152174
+      , Jet phi                : 1.18667
+[ljmet]: 3500 events processed. Processing run 283877, event 2165873672
+[ljmet]: 3600 events processed. Processing run 283877, event 2166213368
+-------------------------------------------------------------------------------------
+Collecting PFparticles as Jet constituents
+-------------------------------------------------------------------------------------
+No. of PFparticles (All) : 1192
+N_PF : 1 ( pT = 26.6562, eta = 1.50938, phi = -1.11107, E = 63.2419 )		i_mu : 1(pT = 26.6558, eta = 1.50944, phi = -1.11106, E = 63.2439), minMuPF_dR = 5.3478e-05, PF inv mass = 0.105713
+			---> Found lepton match. not clustering into XCone jet!
+N_PF : 2 ( pT = 35.5, eta = 1.41252, phi = -1.08001, E = 77.2093 )		i_mu : 0(pT = 35.515, eta = 1.41257, phi = -1.08001, E = 77.2457), minMuPF_dR = 5.50518e-05, PF inv mass = 0.105713
+			---> Found lepton match. not clustering into XCone jet!
+No. of PFparticles (after CHS):	993
+No. of PFparticles (after lepton cleaning):	991
+Finding N_opt ... 
+ using tauDiv 
+Threshold = 0.975
+f_opt[1] = 0.884777
+f_opt[2] = 0.95916
+f_opt[3] = 0.981216
+XConeNumJets_optimal = 3
+-------------------------------------------------------------------------------------
+Using the XCone Jet Algorithm
+-------------------------------------------------------------------------------------
+---- 3 XCone Jets ---- R = 0.4
+no. : 0
+      , Jet constituents      : 12
+      , Jet pt                : 16.1833
+      , Jet eta                : -1.10395
+      , Jet phi                : 4.31762
+no. : 1
+      , Jet constituents      : 17
+      , Jet pt                : 31.6691
+      , Jet eta                : 1.32265
+      , Jet phi                : 5.42242
+no. : 2
+      , Jet constituents      : 10
+      , Jet pt                : 94.0252
+      , Jet eta                : -2.52909
+      , Jet phi                : 2.35022
+-------------------------------------------------------------------------------------
+Collecting PFparticles as Jet constituents
+-------------------------------------------------------------------------------------
+No. of PFparticles (All) : 1458
+N_PF : 15 ( pT = 72.5, eta = 0.0571306, phi = -2.21931, E = 72.6184 )		i_mu : 0(pT = 72.4733, eta = 0.0570574, phi = -2.21926, E = 72.5914), minMuPF_dR = 8.54099e-05, PF inv mass = 0.105713
+			---> Found lepton match. not clustering into XCone jet!
+N_PF : 17 ( pT = 24.8125, eta = -0.615802, phi = 0.812916, E = 29.6679 )		i_mu : 1(pT = 24.809, eta = -0.615758, phi = 0.812874, E = 29.6629), minMuPF_dR = 6.07878e-05, PF inv mass = 0.105713
+			---> Found lepton match. not clustering into XCone jet!
+No. of PFparticles (after CHS):	1175
+No. of PFparticles (after lepton cleaning):	1173
+Finding N_opt ... 
+ using tauDiv 
+Threshold = 0.975
+f_opt[1] = 0.973414
+f_opt[2] = 0.986305
+XConeNumJets_optimal = 2
+-------------------------------------------------------------------------------------
+Using the XCone Jet Algorithm
+-------------------------------------------------------------------------------------
+---- 2 XCone Jets ---- R = 0.4
+no. : 0
+      , Jet constituents      : 14
+      , Jet pt                : 16.0027
+      , Jet eta                : -0.701878
+      , Jet phi                : 4.43681
+no. : 1
+      , Jet constituents      : 22
+      , Jet pt                : 30.6031
+      , Jet eta                : -1.25893
+      , Jet phi                : 0.935125
+[ljmet]: 3700 events processed. Processing run 283877, event 2166430840
+[ljmet]: 3800 events processed. Processing run 283877, event 2166159425
+[ljmet]: 3900 events processed. Processing run 283877, event 2165508948
+[ljmet]: 4000 events processed. Processing run 283877, event 2167918784
+[ljmet]: 4100 events processed. Processing run 283877, event 2167965297
+[ljmet]: 4200 events processed. Processing run 283877, event 2166887855
+[ljmet]: 4300 events processed. Processing run 283877, event 2167167825
+[ljmet]: 4400 events processed. Processing run 283877, event 2167452061
+[ljmet]: 4500 events processed. Processing run 283877, event 2166992343
+[ljmet]: 4600 events processed. Processing run 283877, event 2167904579
+[ljmet]: 4700 events processed. Processing run 283877, event 2167411471
+[ljmet]: 4800 events processed. Processing run 283877, event 2169451037
+[ljmet]: 4900 events processed. Processing run 283877, event 2168576325
+[ljmet]: 5000 events processed. Processing run 283877, event 2169325895
+[ljmet]: 5100 events processed. Processing run 283877, event 2168991015
+[ljmet]: 5200 events processed. Processing run 283877, event 2168495177
+-------------------------------------------------------------------------------------
+Collecting PFparticles as Jet constituents
+-------------------------------------------------------------------------------------
+No. of PFparticles (All) : 1231
+N_PF : 10 ( pT = 60.1562, eta = 1.06461, phi = -0.329112, E = 97.5905 )		i_mu : 0(pT = 60.1583, eta = 1.06455, phi = -0.329096, E = 97.5896), minMuPF_dR = 5.72337e-05, PF inv mass = 0.105713
+			---> Found lepton match. not clustering into XCone jet!
+N_PF : 22 ( pT = 22.5938, eta = -0.17542, phi = 2.97148, E = 22.9425 )		i_mu : 1(pT = 22.5871, eta = -0.175453, phi = 2.97147, E = 22.9358), minMuPF_dR = 3.23489e-05, PF inv mass = 0.105713
+			---> Found lepton match. not clustering into XCone jet!
+No. of PFparticles (after CHS):	1030
+No. of PFparticles (after lepton cleaning):	1028
+Finding N_opt ... 
+ using tauDiv 
+Threshold = 0.975
+f_opt[1] = 0.936076
+f_opt[2] = 0.975133
+XConeNumJets_optimal = 2
+-------------------------------------------------------------------------------------
+Using the XCone Jet Algorithm
+-------------------------------------------------------------------------------------
+---- 2 XCone Jets ---- R = 0.4
+no. : 0
+      , Jet constituents      : 22
+      , Jet pt                : 27.2759
+      , Jet eta                : -0.949502
+      , Jet phi                : 3.45563
+no. : 1
+      , Jet constituents      : 12
+      , Jet pt                : 52.9789
+      , Jet eta                : -0.342871
+      , Jet phi                : 2.36423
+[ljmet]: 5300 events processed. Processing run 283877, event 2169158830
+-------------------------------------------------------------------------------------
+Collecting PFparticles as Jet constituents
+-------------------------------------------------------------------------------------
+No. of PFparticles (All) : 1146
+N_PF : 32 ( pT = 45.8125, eta = -0.946318, phi = -2.15895, E = 67.9028 )		i_mu : 0(pT = 45.8009, eta = -0.946369, phi = -2.15893, E = 67.8882), minMuPF_dR = 5.42577e-05, PF inv mass = 0.105713
+			---> Found lepton match. not clustering into XCone jet!
+N_PF : 42 ( pT = 45.5312, eta = -1.63262, phi = 1.85709, E = 120.946 )		i_mu : 1(pT = 45.5359, eta = -1.6326, phi = 1.85705, E = 120.956), minMuPF_dR = 4.16894e-05, PF inv mass = 0.105713
+			---> Found lepton match. not clustering into XCone jet!
+No. of PFparticles (after CHS):	1000
+No. of PFparticles (after lepton cleaning):	998
+Finding N_opt ... 
+ using tauDiv 
+Threshold = 0.975
+f_opt[1] = 0.929803
+f_opt[2] = 0.971969
+f_opt[3] = 0.985674
+XConeNumJets_optimal = 3
+-------------------------------------------------------------------------------------
+Using the XCone Jet Algorithm
+-------------------------------------------------------------------------------------
+---- 3 XCone Jets ---- R = 0.4
+no. : 0
+      , Jet constituents      : 9
+      , Jet pt                : 10.9034
+      , Jet eta                : 1.26518
+      , Jet phi                : 0.63167
+no. : 1
+      , Jet constituents      : 13
+      , Jet pt                : 19.6465
+      , Jet eta                : -1.08148
+      , Jet phi                : 2.99436
+no. : 2
+      , Jet constituents      : 15
+      , Jet pt                : 52.5034
+      , Jet eta                : 1.05521
+      , Jet phi                : 6.13668
+[ljmet]: 5400 events processed. Processing run 283877, event 2168899053
+[ljmet]: 5500 events processed. Processing run 283877, event 2168991179
+[ljmet]: 5600 events processed. Processing run 283877, event 2170525833
+[ljmet]: 5700 events processed. Processing run 283877, event 2170982479
+[ljmet]: 5800 events processed. Processing run 283877, event 2169721584
+[ljmet]: 5900 events processed. Processing run 283877, event 2170953653
+[ljmet]: 6000 events processed. Processing run 283877, event 2170852062
+[ljmet]: 6100 events processed. Processing run 283877, event 2170068117
+-------------------------------------------------------------------------------------
+Collecting PFparticles as Jet constituents
+-------------------------------------------------------------------------------------
+No. of PFparticles (All) : 1801
+N_PF : 5 ( pT = 27.4688, eta = 1.07102, phi = -2.50144, E = 44.788 )		i_mu : 0(pT = 27.465, eta = 1.07105, phi = -2.50148, E = 44.7829), minMuPF_dR = 4.87213e-05, PF inv mass = 0.105713
+			---> Found lepton match. not clustering into XCone jet!
+N_PF : 5 ( pT = 26.1562, eta = 1.06516, phi = -2.38982, E = 42.4513 )		i_mu : 1(pT = 26.1557, eta = 1.06524, phi = -2.38984, E = 42.4533), minMuPF_dR = 8.74248e-05, PF inv mass = 0.105713
+			---> Found lepton match. not clustering into XCone jet!
+No. of PFparticles (after CHS):	1372
+No. of PFparticles (after lepton cleaning):	1370
+Finding N_opt ... 
+ using tauDiv 
+Threshold = 0.975
+f_opt[1] = 0.928516
+f_opt[2] = 0.972434
+f_opt[3] = 0.975177
+XConeNumJets_optimal = 3
+-------------------------------------------------------------------------------------
+Using the XCone Jet Algorithm
+-------------------------------------------------------------------------------------
+---- 3 XCone Jets ---- R = 0.4
+no. : 0
+      , Jet constituents      : 18
+      , Jet pt                : 38.1231
+      , Jet eta                : 0.206767
+      , Jet phi                : 1.56735
+no. : 1
+      , Jet constituents      : 24
+      , Jet pt                : 35.8586
+      , Jet eta                : -1.09023
+      , Jet phi                : 5.60147
+no. : 2
+      , Jet constituents      : 18
+      , Jet pt                : 81.0479
+      , Jet eta                : 0.0320212
+      , Jet phi                : 0.406656
+[ljmet]: 6200 events processed. Processing run 283877, event 2170768242
+[ljmet]: 6300 events processed. Processing run 283877, event 2170678316
+[ljmet]: 6400 events processed. Processing run 283877, event 2170024838
+-------------------------------------------------------------------------------------
+Collecting PFparticles as Jet constituents
+-------------------------------------------------------------------------------------
+No. of PFparticles (All) : 1331
+N_PF : 36 ( pT = 24.2031, eta = -0.377209, phi = -0.749241, E = 25.9457 )		i_mu : 1(pT = 24.2097, eta = -0.377272, phi = -0.749225, E = 25.9534), minMuPF_dR = 6.54941e-05, PF inv mass = 0.105713
+			---> Found lepton match. not clustering into XCone jet!
+N_PF : 62 ( pT = 32.5625, eta = -1.14444, phi = -1.95787, E = 56.3185 )		i_mu : 0(pT = 32.5779, eta = -1.14453, phi = -1.95787, E = 56.349), minMuPF_dR = 8.36982e-05, PF inv mass = 0.105713
+			---> Found lepton match. not clustering into XCone jet!
+No. of PFparticles (after CHS):	1092
+No. of PFparticles (after lepton cleaning):	1090
+Finding N_opt ... 
+ using tauDiv 
+Threshold = 0.975
+f_opt[1] = 0.892155
+f_opt[2] = 0.896641
+f_opt[3] = 0.915399
+f_opt[4] = 0.948987
+f_opt[5] = 0.922045
+f_opt[6] = 0.952704
+f_opt[7] = 0.976975
+XConeNumJets_optimal = 7
+-------------------------------------------------------------------------------------
+Using the XCone Jet Algorithm
+-------------------------------------------------------------------------------------
+---- 7 XCone Jets ---- R = 0.4
+no. : 0
+      , Jet constituents      : 15
+      , Jet pt                : 22.0948
+      , Jet eta                : -0.631012
+      , Jet phi                : 0.540829
+no. : 1
+      , Jet constituents      : 16
+      , Jet pt                : 39.3652
+      , Jet eta                : -2.17008
+      , Jet phi                : 3.86042
+no. : 2
+      , Jet constituents      : 29
+      , Jet pt                : 64.148
+      , Jet eta                : -1.09639
+      , Jet phi                : 6.12325
+no. : 3
+      , Jet constituents      : 21
+      , Jet pt                : 84.5482
+      , Jet eta                : -1.01476
+      , Jet phi                : 0.739747
+no. : 4
+      , Jet constituents      : 18
+      , Jet pt                : 76.8118
+      , Jet eta                : -0.761589
+      , Jet phi                : 1.04865
+no. : 5
+      , Jet constituents      : 24
+      , Jet pt                : 81.3994
+      , Jet eta                : -1.39923
+      , Jet phi                : 4.06959
+no. : 6
+      , Jet constituents      : 20
+      , Jet pt                : 101.695
+      , Jet eta                : 0.344447
+      , Jet phi                : 2.25829
+[ljmet]: 6500 events processed. Processing run 283877, event 2171459206
+-------------------------------------------------------------------------------------
+Collecting PFparticles as Jet constituents
+-------------------------------------------------------------------------------------
+No. of PFparticles (All) : 1318
+N_PF : 0 ( pT = 27.2031, eta = 1.80767, phi = -3.01044, E = 85.1496 )		i_mu : 1(pT = 27.1957, eta = 1.80775, phi = -3.01047, E = 85.1326), minMuPF_dR = 8.19975e-05, PF inv mass = 0.105713
+			---> Found lepton match. not clustering into XCone jet!
+N_PF : 1 ( pT = 142.25, eta = 0.882046, phi = 2.10671, E = 201.268 )		i_mu : 0(pT = 142.297, eta = 0.882031, phi = 2.10669, E = 201.332), minMuPF_dR = 2.32765e-05, PF inv mass = 0.105713
+			---> Found lepton match. not clustering into XCone jet!
+No. of PFparticles (after CHS):	1052
+No. of PFparticles (after lepton cleaning):	1050
+Finding N_opt ... 
+ using tauDiv 
+Threshold = 0.975
+f_opt[1] = 0.846016
+f_opt[2] = 0.969775
+f_opt[3] = 0.970106
+f_opt[4] = 0.984469
+XConeNumJets_optimal = 4
+-------------------------------------------------------------------------------------
+Using the XCone Jet Algorithm
+-------------------------------------------------------------------------------------
+---- 4 XCone Jets ---- R = 0.4
+no. : 0
+      , Jet constituents      : 17
+      , Jet pt                : 15.2961
+      , Jet eta                : 4.24683
+      , Jet phi                : 0.0665587
+no. : 1
+      , Jet constituents      : 13
+      , Jet pt                : 22.2344
+      , Jet eta                : -0.919958
+      , Jet phi                : 4.89769
+no. : 2
+      , Jet constituents      : 13
+      , Jet pt                : 24.9471
+      , Jet eta                : -0.0946444
+      , Jet phi                : 3.86842
+no. : 3
+      , Jet constituents      : 10
+      , Jet pt                : 117.394
+      , Jet eta                : 0.729122
+      , Jet phi                : 5.68827
+[ljmet]: 6600 events processed. Processing run 283877, event 2171802845
+[ljmet]: 6700 events processed. Processing run 283877, event 2172093122
+[ljmet]: 6800 events processed. Processing run 283877, event 2171420705
+[ljmet]: 6900 events processed. Processing run 283877, event 2172204293
+[ljmet]: 7000 events processed. Processing run 283877, event 2171396599
+[ljmet]: 7100 events processed. Processing run 283877, event 2172066501
+[ljmet]: 7200 events processed. Processing run 283877, event 2171726167
+[ljmet]: 7300 events processed. Processing run 283877, event 2173480219
+[ljmet]: 7400 events processed. Processing run 283877, event 2173439947
+[ljmet]: 7500 events processed. Processing run 283877, event 2173730584
+[ljmet]: 7600 events processed. Processing run 283877, event 2173465834
+-------------------------------------------------------------------------------------
+Collecting PFparticles as Jet constituents
+-------------------------------------------------------------------------------------
+No. of PFparticles (All) : 919
+N_PF : 18 ( pT = 33.9688, eta = -0.757897, phi = 1.52739, E = 44.2009 )		i_mu : 1(pT = 33.955, eta = -0.757949, phi = 1.52742, E = 44.1844), minMuPF_dR = 6.27803e-05, PF inv mass = 0.105713
+			---> Found lepton match. not clustering into XCone jet!
+N_PF : 23 ( pT = 58.9062, eta = -1.6599, phi = -2.25788, E = 160.489 )		i_mu : 0(pT = 58.893, eta = -1.65998, phi = -2.25787, E = 160.465), minMuPF_dR = 8.25014e-05, PF inv mass = 0.105713
+			---> Found lepton match. not clustering into XCone jet!
+No. of PFparticles (after CHS):	796
+No. of PFparticles (after lepton cleaning):	794
+Finding N_opt ... 
+ using tauDiv 
+Threshold = 0.975
+f_opt[1] = 0.915883
+f_opt[2] = 0.946349
+f_opt[3] = 0.943805
+f_opt[4] = 0.980848
+XConeNumJets_optimal = 4
+-------------------------------------------------------------------------------------
+Using the XCone Jet Algorithm
+-------------------------------------------------------------------------------------
+---- 4 XCone Jets ---- R = 0.4
+no. : 0
+      , Jet constituents      : 12
+      , Jet pt                : 13.8838
+      , Jet eta                : 0.399629
+      , Jet phi                : 3.36786
+no. : 1
+      , Jet constituents      : 12
+      , Jet pt                : 30.3801
+      , Jet eta                : -1.68018
+      , Jet phi                : 4.16734
+no. : 2
+      , Jet constituents      : 12
+      , Jet pt                : 30.6914
+      , Jet eta                : -1.77487
+      , Jet phi                : 3.32407
+no. : 3
+      , Jet constituents      : 17
+      , Jet pt                : 53.8985
+      , Jet eta                : -4.13892
+      , Jet phi                : 0.308938
+[ljmet]: 7700 events processed. Processing run 283877, event 2172623549
+[ljmet]: 7800 events processed. Processing run 283877, event 2173589239
+-------------------------------------------------------------------------------------
+Collecting PFparticles as Jet constituents
+-------------------------------------------------------------------------------------
+No. of PFparticles (All) : 1505
+N_PF : 5 ( pT = 28.8594, eta = 1.64086, phi = 0.915946, E = 77.2481 )		i_mu : 0(pT = 28.8555, eta = 1.64077, phi = 0.915944, E = 77.2313), minMuPF_dR = 9.01633e-05, PF inv mass = 0.105713
+			---> Found lepton match. not clustering into XCone jet!
+N_PF : 5 ( pT = 28.75, eta = 1.50462, phi = 0.667696, E = 67.9156 )		i_mu : 1(pT = 28.7474, eta = 1.50467, phi = 0.667739, E = 67.9123), minMuPF_dR = 6.43166e-05, PF inv mass = 0.105713
+			---> Found lepton match. not clustering into XCone jet!
+No. of PFparticles (after CHS):	1197
+No. of PFparticles (after lepton cleaning):	1195
+Finding N_opt ... 
+ using tauDiv 
+Threshold = 0.975
+f_opt[1] = 0.922652
+f_opt[2] = 0.974521
+f_opt[3] = 0.988031
+XConeNumJets_optimal = 3
+-------------------------------------------------------------------------------------
+Using the XCone Jet Algorithm
+-------------------------------------------------------------------------------------
+---- 3 XCone Jets ---- R = 0.4
+no. : 0
+      , Jet constituents      : 13
+      , Jet pt                : 15.3587
+      , Jet eta                : 0.715549
+      , Jet phi                : 0.157022
+no. : 1
+      , Jet constituents      : 19
+      , Jet pt                : 26.3247
+      , Jet eta                : 0.253702
+      , Jet phi                : 5.82069
+no. : 2
+      , Jet constituents      : 17
+      , Jet pt                : 73.9885
+      , Jet eta                : 0.973505
+      , Jet phi                : 3.61023
+[ljmet]: 7900 events processed. Processing run 283877, event 2172909818
+-------------------------------------------------------------------------------------
+Collecting PFparticles as Jet constituents
+-------------------------------------------------------------------------------------
+No. of PFparticles (All) : 1568
+N_PF : 6 ( pT = 24.125, eta = 2.15522, phi = -1.31606, E = 105.494 )		i_mu : 1(pT = 24.1319, eta = 2.15516, phi = -1.3161, E = 105.519), minMuPF_dR = 6.754e-05, PF inv mass = 0.105713
+			---> Found lepton match. not clustering into XCone jet!
+N_PF : 12 ( pT = 41.4062, eta = 1.70495, phi = -0.981182, E = 117.653 )		i_mu : 0(pT = 41.3999, eta = 1.70498, phi = -0.981169, E = 117.638), minMuPF_dR = 3.12567e-05, PF inv mass = 0.105713
+			---> Found lepton match. not clustering into XCone jet!
+No. of PFparticles (after CHS):	1295
+No. of PFparticles (after lepton cleaning):	1293
+Finding N_opt ... 
+ using tauDiv 
+Threshold = 0.975
+f_opt[1] = 0.909945
+f_opt[2] = 0.981724
+XConeNumJets_optimal = 2
+-------------------------------------------------------------------------------------
+Using the XCone Jet Algorithm
+-------------------------------------------------------------------------------------
+---- 2 XCone Jets ---- R = 0.4
+no. : 0
+      , Jet constituents      : 12
+      , Jet pt                : 24.6906
+      , Jet eta                : 2.40475
+      , Jet phi                : 5.11488
+no. : 1
+      , Jet constituents      : 16
+      , Jet pt                : 93.6731
+      , Jet eta                : -1.21202
+      , Jet phi                : 2.21334
+[ljmet]: 8000 events processed. Processing run 283877, event 2172939560
+[ljmet]: 8100 events processed. Processing run 283877, event 2173451160
+-------------------------------------------------------------------------------------
+Collecting PFparticles as Jet constituents
+-------------------------------------------------------------------------------------
+No. of PFparticles (All) : 721
+N_PF : 7 ( pT = 22.2656, eta = 0.106754, phi = -0.232429, E = 22.3929 )		i_mu : 1(pT = 22.2595, eta = 0.106751, phi = -0.232416, E = 22.3867), minMuPF_dR = 1.30671e-05, PF inv mass = 0.105713
+			---> Found lepton match. not clustering into XCone jet!
+N_PF : 9 ( pT = 32.25, eta = -0.10181, phi = -0.00087863, E = 32.4175 )		i_mu : 0(pT = 32.2575, eta = -0.101798, phi = -0.00083521, E = 32.4249), minMuPF_dR = 4.49935e-05, PF inv mass = 0.105713
+			---> Found lepton match. not clustering into XCone jet!
+No. of PFparticles (after CHS):	659
+No. of PFparticles (after lepton cleaning):	657
+Finding N_opt ... 
+ using tauDiv 
+Threshold = 0.975
+f_opt[1] = 0.823002
+f_opt[2] = 0.931089
+f_opt[3] = 0.908477
+f_opt[4] = 0.96882
+f_opt[5] = 0.967098
+f_opt[6] = 0.973897
+f_opt[7] = 0.976821
+XConeNumJets_optimal = 7
+-------------------------------------------------------------------------------------
+Using the XCone Jet Algorithm
+-------------------------------------------------------------------------------------
+---- 7 XCone Jets ---- R = 0.4
+no. : 0
+      , Jet constituents      : 8
+      , Jet pt                : 8.88593
+      , Jet eta                : -0.719774
+      , Jet phi                : 5.98115
+no. : 1
+      , Jet constituents      : 9
+      , Jet pt                : 9.23933
+      , Jet eta                : -0.295749
+      , Jet phi                : 5.94328
+no. : 2
+      , Jet constituents      : 5
+      , Jet pt                : 10.8785
+      , Jet eta                : -2.74402
+      , Jet phi                : 6.11621
+no. : 3
+      , Jet constituents      : 10
+      , Jet pt                : 16.5556
+      , Jet eta                : 0.123698
+      , Jet phi                : 3.51631
+no. : 4
+      , Jet constituents      : 14
+      , Jet pt                : 25.4977
+      , Jet eta                : 0.522907
+      , Jet phi                : 3.44544
+no. : 5
+      , Jet constituents      : 10
+      , Jet pt                : 32.2977
+      , Jet eta                : -0.21026
+      , Jet phi                : 0.20937
+no. : 6
+      , Jet constituents      : 22
+      , Jet pt                : 84.5946
+      , Jet eta                : -0.58561
+      , Jet phi                : 3.19821
+[ljmet]: 8200 events processed. Processing run 283877, event 2556297772
+-------------------------------------------------------------------------------------
+Collecting PFparticles as Jet constituents
+-------------------------------------------------------------------------------------
+No. of PFparticles (All) : 1635
+N_PF : 11 ( pT = 32.2812, eta = -0.0415662, phi = 2.78925, E = 32.3093 )		i_mu : 1(pT = 32.2915, eta = -0.0415786, phi = 2.78929, E = 32.3196), minMuPF_dR = 4.30112e-05, PF inv mass = 0.105713
+			---> Found lepton match. not clustering into XCone jet!
+N_PF : 19 ( pT = 55.1875, eta = -0.774743, phi = -1.24154, E = 72.5953 )		i_mu : 0(pT = 55.1722, eta = -0.774723, phi = -1.24158, E = 72.5742), minMuPF_dR = 4.31945e-05, PF inv mass = 0.105713
+			---> Found lepton match. not clustering into XCone jet!
+No. of PFparticles (after CHS):	1261
+No. of PFparticles (after lepton cleaning):	1259
+Finding N_opt ... 
+ using tauDiv 
+Threshold = 0.975
+f_opt[1] = 0.961113
+f_opt[2] = 0.980621
+XConeNumJets_optimal = 2
+-------------------------------------------------------------------------------------
+Using the XCone Jet Algorithm
+-------------------------------------------------------------------------------------
+---- 2 XCone Jets ---- R = 0.4
+no. : 0
+      , Jet constituents      : 15
+      , Jet pt                : 24.8418
+      , Jet eta                : 4.21957
+      , Jet phi                : 2.99835
+no. : 1
+      , Jet constituents      : 17
+      , Jet pt                : 40.4015
+      , Jet eta                : 0.423807
+      , Jet phi                : 4.57902
+[ljmet]: 8300 events processed. Processing run 283877, event 2555754260
+[ljmet]: 8400 events processed. Processing run 283877, event 2555962344
+[ljmet]: 8500 events processed. Processing run 283877, event 2554930066
+[ljmet]: 8600 events processed. Processing run 283877, event 2555259453
+[ljmet]: 8700 events processed. Processing run 283877, event 2555906420
