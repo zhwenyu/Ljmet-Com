@@ -31,6 +31,14 @@ using namespace std;
 #include "fastjet/contrib/NjettinessPlugin.hh"
 #include "fastjet/contrib/XConePlugin.hh"
 
+//JEC
+#include "CondFormats/JetMETObjects/interface/JetCorrectorParameters.h"
+#include "CondFormats/JetMETObjects/interface/FactorizedJetCorrector.h"
+#include "CondFormats/JetMETObjects/interface/JetCorrectionUncertainty.h"
+
+//JER 
+#include "JetMETCorrections/Modules/interface/JetResolution.h"
+
 #include "DataFormats/Math/interface/deltaR.h"
 
 using namespace fastjet;
@@ -64,7 +72,26 @@ private:
   bool		DEBUG;
   
   bool		saveLooseLeps;
-	
+
+
+  std::string MCL1JetPar;
+  std::string MCL2JetPar;
+  std::string MCL3JetPar;
+  std::string DataL1JetPar;
+  std::string DataL2JetPar;
+  std::string DataL3JetPar;
+  std::string DataResJetPar;
+  
+  std::vector<std::string>  jecPayloadsAK4chs;
+
+  boost::shared_ptr<FactorizedJetCorrector>   JetCorrectorAK4chs;
+  boost::shared_ptr<FactorizedJetCorrector>   JetCorrectorAK8chs;
+  boost::shared_ptr<FactorizedJetCorrector>   JetCorrectorAK4pup;
+  boost::shared_ptr<FactorizedJetCorrector>   JetCorrectorAK8pup;
+  boost::shared_ptr<JetCorrectionUncertainty> JetCorrUncertAK4chs;
+  boost::shared_ptr<JetCorrectionUncertainty> JetCorrUncertAK8chs;
+  boost::shared_ptr<JetCorrectionUncertainty> JetCorrUncertAK4pup;
+  boost::shared_ptr<JetCorrectionUncertainty> JetCorrUncertAK8pup;	
 };
 
 static int reg = LjmetFactory::GetInstance()->Register(new XConeCalc(), "XConeCalc");
@@ -128,6 +155,7 @@ int XConeCalc::BeginJob()
    // isMc?
     if(mPset.exists("isMc")) isMc = mPset.getParameter<bool>("isMc");
     else isMc = false;
+//     std::cout << "XConeCalc: isMc = " << isMc << std::endl;
 
    // save Jet constituents?
     if(mPset.exists("saveJetConst")) saveJetConst = mPset.getParameter<bool>("saveJetConst");
@@ -141,6 +169,27 @@ int XConeCalc::BeginJob()
 
     if (mPset.exists("saveLooseLeps")) saveLooseLeps = mPset.getParameter<bool>("saveLooseLeps");
     else                               saveLooseLeps = false;
+
+//    // Apply JEC?
+//     if(mPset.exists("applyJEC")) applyJEC = mPset.getParameter<bool>("applyJEC");
+//     else applyJEC = true; //default
+//     std::cout << "XConeCalc: applyJEC = " << applyJEC << std::endl;
+
+    if(mPset.exists("MCL1JetPar")) MCL1JetPar = mPset.getParameter<std::string>("MCL1JetPar");
+    else MCL1JetPar = "/uscms_data/d3/rsyarif/Fermilab2017/XConeinLJMet80x/CMSSW_8_0_25/src/LJMet/Com/data/Summer16RRV3/Summer16_23Sep2016V3_MC_L1FastJet_AK4PFchs.txt";
+    std::cout << "XConeCalc: Applying (MC) L1 Correction file: " << MCL1JetPar << std::endl;
+
+    if(mPset.exists("MCL2JetPar")) MCL2JetPar = mPset.getParameter<std::string>("MCL2JetPar");
+    else MCL2JetPar = "/uscms_data/d3/rsyarif/Fermilab2017/XConeinLJMet80x/CMSSW_8_0_25/src/LJMet/Com/data/Summer16RRV3/Summer16_23Sep2016V3_MC_L2Relative_AK4PFchs.txt";
+    std::cout << "XConeCalc: Applying (MC) L2 Correction file: " << MCL2JetPar << std::endl;
+
+    if(mPset.exists("MCL3JetPar")) MCL3JetPar = mPset.getParameter<std::string>("MCL3JetPar");
+    else MCL3JetPar = "/uscms_data/d3/rsyarif/Fermilab2017/XConeinLJMet80x/CMSSW_8_0_25/src/LJMet/Com/data/Summer16RRV3/Summer16_23Sep2016V3_MC_L3Absolute_AK4PFchs.txt";
+    std::cout << "XConeCalc: Applying (MC) L3 Correction file: " << MCL3JetPar << std::endl;
+
+	//NEED to implement JEC for DATA HERE!! 
+	
+	//AND JER at some point
 
     return 0;
 }
@@ -167,11 +216,19 @@ int XConeCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * se
 	
 	std::vector<fastjet::PseudoJet> FJConstituents; 
   	int		XConeNumJets_optimal=0;
+
+	std::vector<double> RawXConeJetPt;
+    std::vector<double> RawXConeJetEta;
+    std::vector<double> RawXConeJetPhi;
+    std::vector<double> RawXConeJetEnergy;
+    std::vector<double> RawXConeJetArea;
+
 	std::vector<double> theXConeJetPt;
     std::vector<double> theXConeJetEta;
     std::vector<double> theXConeJetPhi;
     std::vector<double> theXConeJetEnergy;
     std::vector<double> theXConeJetArea;
+
     std::vector<double> theXConeJetConstStartIndex;
     std::vector<double> theXConeJetConstEndIndex;
     //collect constituent info - start
@@ -549,6 +606,40 @@ int XConeCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * se
 
    // and find the jets
    vector<PseudoJet> xcone_jetsA = xcone_seqA.inclusive_jets();
+   
+   // SET UP AK4chs JEC (for XCone chs) 
+   std::vector<JetCorrectorParameters> vParAK4chs;
+   if(isMc){
+	   jecPayloadsAK4chs.push_back(MCL1JetPar);
+	   jecPayloadsAK4chs.push_back(MCL2JetPar);
+	   jecPayloadsAK4chs.push_back(MCL3JetPar);
+   }
+   else{ //NEED TO IMPLEMENT DATA JEC at some point!
+	   jecPayloadsAK4chs.push_back(MCL1JetPar);
+	   jecPayloadsAK4chs.push_back(MCL2JetPar);
+	   jecPayloadsAK4chs.push_back(MCL3JetPar);
+   }
+   for ( std::vector<std::string>::const_iterator ipayload = jecPayloadsAK4chs.begin(),
+//      ipayloadEnd = jecPayloadsAK4chs.end(); ipayload != ipayloadEnd - 1; ++ipayload ) { \\use this if there JECunc in the last entry 
+     ipayloadEnd = jecPayloadsAK4chs.end(); ipayload != ipayloadEnd; ++ipayload ) {
+     if (DEBUG)cout<<"AK4chs JEC txt: "<<*ipayload<<endl;
+     JetCorrectorParameters pars(*ipayload);
+     vParAK4chs.push_back(pars);
+    }
+	JetCorrectorAK4chs   = boost::shared_ptr<FactorizedJetCorrector>  ( new FactorizedJetCorrector(vParAK4chs) );
+	//Need to implement JEC uncert at some point!
+	//JetCorrUncertAK4chs  = boost::shared_ptr<JetCorrectionUncertainty>( new JetCorrectionUncertainty(jecPayloadsAK4chsFinal.back()));
+
+	//SET UP Rho for JEC
+// 	edm::Handle<double> rhoH;
+// 	event.getByToken(rhoToken_, rhoH);
+// 	double rho = *rhoH;
+    edm::Handle<double> rhoHandle;
+    edm::InputTag rhoSrc_("fixedGridRhoFastjetAll", "");
+    event.getByLabel(rhoSrc_, rhoHandle);
+    double rho = std::max(*(rhoHandle.product()), 0.0);
+
+	if (DEBUG) cout<<"rho = "<<rho<<endl;	
 
     if(DEBUG)std::cout << "---- " << N <<" XCone Jets ---- R = "<< XConeR << std::endl;
     int ConstituentStartIndex =0;
@@ -559,14 +650,45 @@ int XConeCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * se
       if(DEBUG)std::cout << "      " <<  "Jet pt			: "<< ijet->pt() << std::endl;
       if(DEBUG)std::cout << "      " <<  "Jet eta			: "<< ijet->eta() << std::endl;
       if(DEBUG)std::cout << "      " <<  "Jet phi			: "<< ijet->phi() << std::endl;
-      if(DEBUG)std::cout << "      " <<  "Jet area		: "<< ijet->area() << std::endl;
+      if(DEBUG)std::cout << "      " <<  "Jet energy		: "<< ijet->e() << std::endl;
+      if(DEBUG)std::cout << "      " <<  "Jet area			: "<< ijet->area() << std::endl;
       
-      theXConeJetPt     . push_back(ijet->pt());
-      theXConeJetEta    . push_back(ijet->eta());
-      theXConeJetPhi    . push_back(ijet->phi());
-      theXConeJetEnergy . push_back(ijet->e());
+      RawXConeJetPt     . push_back(ijet->pt());
+      RawXConeJetEta    . push_back(ijet->eta());
+      RawXConeJetPhi    . push_back(ijet->phi());
+      RawXConeJetEnergy . push_back(ijet->e());
+      RawXConeJetArea   . push_back(ijet->area());
+      
+      if(DEBUG) std::cout << "--- Applying AK4CHS JEC correction to XCone" << std::endl;  
+      //------------------------------------
+      // Applying AK4CHS JEC correction to XCone
+      //------------------------------------
+
+      reco::Candidate::LorentzVector uncorrJet;
+      uncorrJet.SetPx((double)ijet->px());
+      uncorrJet.SetPy((double)ijet->py());
+      uncorrJet.SetPz((double)ijet->pz());
+      uncorrJet.SetE((double)ijet->e());
+      if ( DEBUG ) cout << "   -> before JEC pt,eta,phi,e	= " << uncorrJet.pt() << ",	" << uncorrJet.eta() << ",	" << uncorrJet.phi() << ",	" << uncorrJet.e() << endl;
+      
+      JetCorrectorAK4chs->setJetPt( ijet->pt() );
+      JetCorrectorAK4chs->setJetEta ( ijet->eta() );
+      JetCorrectorAK4chs->setJetE  ( ijet->e() );
+      JetCorrectorAK4chs->setJetA  ( ijet->area() );
+      JetCorrectorAK4chs->setRho   ( rho );
+      double corr = JetCorrectorAK4chs->getCorrection();
+
+      reco::Candidate::LorentzVector corrJet = corr * uncorrJet;
+//       if ( DEBUG ) cout << "   -> after JEC pt,eta,phi,m = " << corrJet.pt() << ", " << corrJet.eta() << ", " << corrJet.phi() << ", " << corrJet.mass() << endl;
+      if ( DEBUG ) cout << "   -> after  JEC pt,eta,phi,e	= " << corrJet.pt() << ",	" << corrJet.eta() << ",	" << corrJet.phi() << ",	" << corrJet.e() << endl;
+      if (DEBUG) cout << "corr: " << corr << endl;
+
+      theXConeJetPt     . push_back(corrJet.pt());
+      theXConeJetEta    . push_back(corrJet.eta());
+      theXConeJetPhi    . push_back(corrJet.phi());
+      theXConeJetEnergy . push_back(corrJet.e());
       theXConeJetArea   . push_back(ijet->area());
-      
+
       //collect constituent info - start
       if(saveJetConst){
 		  theXConeJetConstStartIndex     . push_back(ConstituentStartIndex);
@@ -591,9 +713,15 @@ int XConeCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * se
 			}
 		  }*/
 	  }	
-      //collect constituent info - end
+      //collect constituent info - end  
 
     }
+
+    SetValue("RawXConeJetPt",     RawXConeJetPt);
+    SetValue("RawXConeJetEta",    RawXConeJetEta);
+    SetValue("RawXConeJetPhi",    RawXConeJetPhi);
+    SetValue("RawXConeJetEnergy", RawXConeJetEnergy);
+    SetValue("RawXConeJetArea", RawXConeJetArea);
 
     SetValue("theXConeJetPt",     theXConeJetPt);
     SetValue("theXConeJetEta",    theXConeJetEta);
@@ -776,8 +904,11 @@ int XConeCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * se
 		SetValue("theXConeGenJetConstEnergy", theXConeGenJetConstEnergy);
 
 	}
-	
+
 	//Implementing XCone - end - Rizki
+
+	//Clear JEC vector str
+	jecPayloadsAK4chs  .clear();	
 
     return 0;
 }
