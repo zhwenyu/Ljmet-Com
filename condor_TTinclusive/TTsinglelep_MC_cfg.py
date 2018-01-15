@@ -54,6 +54,7 @@ process.JetSubCalc.DataL2JetParAK8 = cms.string(relBase+'/src/LJMet/Com/data/Sum
 process.JetSubCalc.DataL3JetParAK8 = cms.string(relBase+'/src/LJMet/Com/data/Summer16RRV3/Summer16_23Sep2016BCDV3_DATA_L3Absolute_AK8PFchs.txt')
 process.JetSubCalc.DataL2L3JetParAK8 = cms.string(relBase+'/src/LJMet/Com/data/Summer16RRV3/Summer16_23Sep2016BCDV3_DATA_L2L3Residual_AK8PFchs.txt')
 process.JetSubCalc.UncertaintyAK8 = cms.string(relBase+'/src/LJMet/Com/data/Summer16RRV3/Summer16_23Sep2016V3_MC_Uncertainty_AK8PFchs.txt')
+process.JetSubCalc.puppiCorrPath = cms.string(relBase+'/src/LJMet/Com/PuppiSoftdropMassCorr/weights/puppiCorr.root')
 
 ############################################################
 #
@@ -111,7 +112,7 @@ process.event_selector = cms.PSet(
     jet_maxeta               = cms.double(2.4),
     min_jet                  = cms.int32(2),
     max_jet                  = cms.int32(4000),
-    leading_jet_pt           = cms.double(30.0),
+    leading_jet_pt           = cms.double(50.0),
 
     # muon cuts
     muon_cuts                = cms.bool(True),
@@ -167,7 +168,7 @@ process.event_selector = cms.PSet(
     
     # MET cuts
     met_cuts                 = cms.bool(True),
-    min_met                  = cms.double(20.0),
+    min_met                  = cms.double(30.0),
     max_met                  = cms.double(99999999999.0),
     
     # Btagging cuts

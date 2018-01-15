@@ -9,28 +9,13 @@ import getopt
 import subprocess
 import socket
 import datetime
-files_per_job = 15
+files_per_job = 10
 
-#Absolute path that precedes '/store...'
-# The script checks whether it is an absolute path or not
-
-if (socket.gethostname().find('fnal')>=0):
-    brux=bool(False)
-#    sePath='\'root://cmseos.fnal.gov/'         # stored on LPC, most of our samples
-#    sePath='\'root://cmsxrootd.fnal.gov/'      # stored elsewhere
-    sePath='\'root://eoscms.cern.ch/'      # stored at CERN
-    storePath=''
-    setupString='source \/cvmfs\/cms.cern.ch\/cmsset_default.csh'
-    outPath='root://cmseos.fnal.gov/'          # output on LPC
-    print 'Submitting jobs at FNAL, reading files from: '+sePath+', writing files to: '+outPath
-else:
-    print "Script not done for ", socket.gethostname()
-    exit()
 
 #Configuration options parsed from arguments
 #Switching to getopt for compatibility with older python
 try:
-    opts, args = getopt.getopt(sys.argv[1:], "", ["useMC=", "sample=","fileList=", "outDir=","shift=","submit=","json=","inputTar=","saveGenHT="])
+    opts, args = getopt.getopt(sys.argv[1:], "", ["useMC=", "sample=","fileList=", "outDir=","shift=","submit=","json=","inputTar=","saveGenHT=","accessor="])
 except getopt.GetoptError as err:
     print str(err)
     sys.exit(1)
@@ -44,7 +29,8 @@ json     = str('None')
 submit   = bool(False)
 changeJEC= bool(False)
 tarfile  = str('None')
-saveGHT  = bool(False)
+saveGHT  = str('False')
+accessor = str('eoscms.cern.ch')
 
 for o, a in opts:
     print o, a
@@ -61,10 +47,28 @@ for o, a in opts:
     elif o == "--shift":    shift    = str(a)
     elif o == "--inputTar": tarfile = str(a).split('.')[0]
     elif o == "--json":     json   = str(a)
-    elif o == "--saveGenHT":
-        if a == 'True':     saveGHT = True
+    elif o == "--saveGenHT": saveGHT = str(a)
+    elif o == "--accessor": accessor = str(a)
     elif o == "--submit":
         if a == 'True':     submit = True
+
+
+#Absolute path that precedes '/store...'
+# The script checks whether it is an absolute path or not
+
+if (socket.gethostname().find('fnal')>=0):
+    brux=bool(False)
+#    sePath='\'root://cmseos.fnal.gov/'         # stored on LPC, most of our samples
+#    sePath='\'root://cmsxrootd.fnal.gov/'      # stored elsewhere
+#    sePath='\'root://eoscms.cern.ch/'      # stored at CERN
+    sePath='\'root://'+accessor+'/'      # stored at CERN
+    storePath=''
+    setupString='source \/cvmfs\/cms.cern.ch\/cmsset_default.csh'
+    outPath='root://cmseos.fnal.gov/'          # output on LPC
+    print 'Submitting jobs at FNAL, reading files from: '+sePath+', writing files to: '+outPath
+else:
+    print "Script not done for ", socket.gethostname()
+    exit()
 
 relBase = os.environ['CMSSW_BASE']
 

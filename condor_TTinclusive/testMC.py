@@ -9,7 +9,7 @@ process = cms.Process("LJMetCom")
 #Arguments from condor submit script which are used more than once
 condorIsMC = bool(True)
 relBase    = os.environ['CMSSW_BASE']
-condorJSON = str('none')
+condorJSON = str('Cert_271036-284044_13TeV_23Sep2016ReReco_Collisions16_JSON.txt')
 ############################################################
 #
 # FWLite application options
@@ -18,9 +18,13 @@ process.ljmet.isMc = cms.bool(condorIsMC)
 
 # Exclude some unnecessary calculators from the process
 process.ljmet.excluded_calculators = cms.vstring(
-    #'TpTpCalc',
+    #'JetSubCalc',
+    #'CommonCalc',
+    #'singleLepCalc',
+    'TpTpCalc',
+    'TTbarMassCalc',
     'PileUpCalc',
-#    'BTagSFCalc',
+    'BTagSFCalc',
     'TprimeCalc',
     'CATopoCalc',
     'DileptonCalc',
@@ -85,18 +89,27 @@ process.event_selector = cms.PSet(
     dump_trigger = cms.bool(False),
 
     mctrigger_path_el = cms.vstring(
-        'HLT_Ele27_eta2p1_WPLoose_Gsf_v1', 'HLT_Ele27_eta2p1_WPLoose_Gsf_v2', 'HLT_Ele27_eta2p1_WPLoose_Gsf_v3', 'HLT_Ele27_eta2p1_WPLoose_Gsf_v4', 
-        'HLT_Ele27_eta2p1_WPTight_Gsf_v1', 'HLT_Ele27_eta2p1_WPTight_Gsf_v2', 'HLT_Ele27_eta2p1_WPTight_Gsf_v3', 'HLT_Ele27_eta2p1_WPTight_Gsf_v4', 
         'digitisation_step',
+        'HLT_Ele27_eta2p1_WPLoose_Gsf_HT200_v8',   'HLT_Ele27_eta2p1_WPLoose_Gsf_HT200_v9',   'HLT_Ele27_eta2p1_WPLoose_Gsf_HT200_v10',   
+        'HLT_Ele32_eta2p1_WPTight_Gsf_v7',         'HLT_Ele32_eta2p1_WPTight_Gsf_v8',         'HLT_Ele32_eta2p1_WPTight_Gsf_v9',         
+        'HLT_Ele30_WPTight_Gsf_v1',                'HLT_Ele30_WPTight_Gsf_v2',                'HLT_Ele30_WPTight_Gsf_v3',                
+        'HLT_Ele32_WPTight_Gsf_v1',                'HLT_Ele32_WPTight_Gsf_v2',                'HLT_Ele32_WPTight_Gsf_v3',                
+        'HLT_Ele50_CaloIdVT_GsfTrkIdT_PFJet140_v6','HLT_Ele50_CaloIdVT_GsfTrkIdT_PFJet140_v7','HLT_Ele50_CaloIdVT_GsfTrkIdT_PFJet140_v8',
+        'HLT_Ele50_CaloIdVT_GsfTrkIdT_PFJet165_v6','HLT_Ele50_CaloIdVT_GsfTrkIdT_PFJet165_v7','HLT_Ele50_CaloIdVT_GsfTrkIdT_PFJet165_v8',
+        'HLT_Ele15_IsoVVVL_PFHT350_v7',            'HLT_Ele15_IsoVVVL_PFHT350_v8',            'HLT_Ele15_IsoVVVL_PFHT350_v9',            
+        'HLT_Ele15_IsoVVVL_PFHT400_v5',            'HLT_Ele15_IsoVVVL_PFHT400_v6',            'HLT_Ele15_IsoVVVL_PFHT400_v7',            
         ),
     mctrigger_path_mu = cms.vstring(
-        'HLT_IsoMu20_v1',   'HLT_IsoMu20_v2',   'HLT_IsoMu20_v3',   'HLT_IsoMu20_v4',   'HLT_IsoMu20_v5',
-        'HLT_IsoTkMu20_v1', 'HLT_IsoTkMu20_v2', 'HLT_IsoTkMu20_v3', 'HLT_IsoTkMu20_v4', 'HLT_IsoTkMu20_v5',
-        'HLT_IsoMu24_v1',   'HLT_IsoMu24_v2',   'HLT_IsoMu24_v3',   'HLT_IsoMu24_v4',   'HLT_IsoMu24_v5',
-        'HLT_IsoTkMu24_v1', 'HLT_IsoTkMu24_v2', 'HLT_IsoTkMu24_v3', 'HLT_IsoTkMu24_v4', 'HLT_IsoTkMu24_v5',
         'digitisation_step',
+        'HLT_IsoMu24_v3',                     'HLT_IsoMu24_v4',                     'HLT_IsoMu24_v5',                     
+        'HLT_IsoTkMu24_v3',                   'HLT_IsoTkMu24_v4',                   'HLT_IsoTkMu24_v5',                   
+        'HLT_Mu50_v4',                        'HLT_Mu50_v5',                        'HLT_Mu50_v6',                        
+        'HLT_TkMu50_v2',                      'HLT_TkMu50_v3',                      'HLT_TkMu50_v4',                      
+        'HLT_Mu15_IsoVVVL_PFHT350_v6',        'HLT_Mu15_IsoVVVL_PFHT350_v7',        'HLT_Mu15_IsoVVVL_PFHT350_v8',        
+        'HLT_Mu15_IsoVVVL_PFHT400_v4',        'HLT_Mu15_IsoVVVL_PFHT400_v5',        'HLT_Mu15_IsoVVVL_PFHT400_v6',        
+        'HLT_Mu40_eta2p1_PFJet200_PFJet50_v6','HLT_Mu40_eta2p1_PFJet200_PFJet50_v7','HLT_Mu40_eta2p1_PFJet200_PFJet50_v8',
         ),
-    
+
     trigger_path_el = cms.vstring(''),
     trigger_path_mu = cms.vstring(''),   
     
@@ -107,27 +120,20 @@ process.event_selector = cms.PSet(
     
     # Jet cuts
     jet_cuts                 = cms.bool(True),
-    jet_minpt                = cms.double(30.0),
-    jet_maxeta               = cms.double(5.0),
-    min_jet                  = cms.int32(2),
+    jet_minpt                = cms.double(15.0),
+    jet_maxeta               = cms.double(3.0),
+    min_jet                  = cms.int32(1),
     max_jet                  = cms.int32(4000),
-    leading_jet_pt           = cms.double(50.0),
+    leading_jet_pt           = cms.double(15.0),
 
     # muon cuts
     muon_cuts                = cms.bool(True),
-    muon_selector            = cms.bool(False),
-    muon_selector_medium     = cms.bool(False),
-    muon_reliso              = cms.double(0.2),
-    muon_useMiniIso          = cms.bool(True),
-    muon_miniIso             = cms.double(0.2),
-    loose_muon_miniIso       = cms.double(0.4),
-    muon_minpt               = cms.double(30.0),
-    muon_maxeta              = cms.double(2.4),
     min_muon                 = cms.int32(0),
-    loose_muon_selector      = cms.bool(False),
-    loose_muon_selector_tight = cms.bool(False),
-#    loose_muon_reliso        = cms.double(0.2),
-    loose_muon_reliso        = cms.double(0.4),
+    muon_minpt               = cms.double(50.0),
+    muon_maxeta              = cms.double(2.4),
+    muon_useMiniIso          = cms.bool(True),
+    muon_miniIso             = cms.double(999.9),
+    loose_muon_miniIso       = cms.double(999.9),
     loose_muon_minpt         = cms.double(10.0),
     loose_muon_maxeta        = cms.double(2.4),
     # specify IP cuts
@@ -135,22 +141,18 @@ process.event_selector = cms.PSet(
     muon_dz                  = cms.double(0.5),
     loose_muon_dxy           = cms.double(999999.),
     loose_muon_dz            = cms.double(999999.),
- 
+
     # electron cuts
     electron_cuts            = cms.bool(True),
-    electron_minpt           = cms.double(30.0),
-    electron_maxeta          = cms.double(2.1),
-    electron_useMiniIso      = cms.bool(True),
-    electron_miniIso         = cms.double(0.1),
-#    electron_miniIso         = cms.double(-1),
-    electron_CutsPlusMVA     = cms.bool(False),
     min_electron             = cms.int32(0),
+    electron_minpt           = cms.double(50.0),
+    electron_maxeta          = cms.double(2.5),
+    electron_useMiniIso      = cms.bool(True),
+    electron_miniIso         = cms.double(999.9),
+    loose_electron_miniIso   = cms.double(999.9),
     loose_electron_minpt     = cms.double(10.0),
-    loose_electron_maxeta    = cms.double(2.1),
-    loose_electron_miniIso   = cms.double(0.4),
-#    loose_electron_miniIso   = cms.double(-1),
+    loose_electron_maxeta    = cms.double(2.5),
     UseElMVA                 = cms.bool(True),
-    UseElMVA_tight           = cms.bool(True),
     tight_electron_mva_cuts  = cms.vdouble(0.674,0.744,0.170), # 80X WP80 to recover efficiency of 74X WP80
     loose_electron_mva_cuts  = cms.vdouble(-0.041,0.383,-0.515), # 80X WP90 to recover efficiency of 74X WP90
     #tight_electron_mva_cuts  = cms.vdouble(0.967083,0.929117,0.726311), # ~80% el efficiency WP 74X
@@ -173,17 +175,17 @@ process.event_selector = cms.PSet(
     max_lepton               = cms.int32(1),    # checks (N tight mu + N tight el) <= cut
     min_loose_lepton         = cms.int32(0),
     max_loose_lepton         = cms.int32(1000),
-    second_lepton_veto       = cms.bool(True),  #checks (N tight lep > 0) AND (N loose lep > 0), vetoes if there are loose leptons.
+    second_lepton_veto       = cms.bool(False),  #checks (N tight lep > 0) AND (N loose lep > 0), vetoes if there are loose leptons.
     tau_veto		     = cms.bool(False),
     
     # MET cuts
     met_cuts                 = cms.bool(True),
-    min_met                  = cms.double(20.0),
+    min_met                  = cms.double(0.0),
     max_met                  = cms.double(99999999999.0),
     
     # Btagging cuts
     btagOP                   = cms.string('CSVM'),
-    btag_min_discr           = cms.double(0.800),
+    btag_min_discr           = cms.double(0.8484),
     btag_cuts                = cms.bool(False),
     btag_1                   = cms.bool(False),
     btag_2                   = cms.bool(False),
@@ -231,6 +233,17 @@ process.event_selector = cms.PSet(
     DataL3JetParAK8          = cms.string(relBase+'/src/LJMet/Com/data/Summer16RRV3/Summer16_23Sep2016BCDV3_DATA_L3Absolute_AK8PFchs.txt'),
     DataResJetParAK8         = cms.string(relBase+'/src/LJMet/Com/data/Summer16RRV3/Summer16_23Sep2016BCDV3_DATA_L2L3Residual_AK8PFchs.txt'),
 
+    # Unused parameters
+    muon_reliso              = cms.double(0.2),
+    muon_selector            = cms.bool(False),
+    muon_selector_medium     = cms.bool(False),
+    loose_muon_selector      = cms.bool(False),
+    loose_muon_selector_tight = cms.bool(False),
+    loose_muon_reliso        = cms.double(0.4),
+    electron_CutsPlusMVA     = cms.bool(False),
+    BTagUncertUp             = cms.bool(False), # no longer needed
+    BTagUncertDown           = cms.bool(False), # no longer needed
+ 
     )
 
 
@@ -240,12 +253,14 @@ process.event_selector = cms.PSet(
 #
 
 process.inputs = cms.PSet (
-    nEvents    = cms.int32(1000),
+    nEvents    = cms.int32(40000),
     skipEvents = cms.int32(0),
     lumisToProcess = CfgTypes.untracked(CfgTypes.VLuminosityBlockRange()),
     fileNames  = cms.vstring(
         #'testmc_MINIAOD.root'
-        'root://eoscms.cern.ch//store/mc/RunIISummer16MiniAODv2/WJetsToLNu_HT-400To600_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/MINIAODSIM/PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/120000/868A42F1-BDB5-E611-ADB1-A0000420FE80.root'
+        #'root://eoscms.cern.ch//store/mc/RunIISummer16MiniAODv2/WJetsToLNu_HT-400To600_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/MINIAODSIM/PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/120000/868A42F1-BDB5-E611-ADB1-A0000420FE80.root'
+        #'root://eoscms.cern.ch//store/mc/RunIISummer16MiniAODv2/TprimeTprime_M-1600_TuneCUETP8M1_13TeV-madgraph-pythia8/MINIAODSIM/PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/60000/04DB87A0-CCD4-E611-B98A-B083FED1321B.root',
+        'root://eoscms.cern.ch//store/mc/RunIISummer16MiniAODv2/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/MINIAODSIM/PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/50000/4C7B302E-A1BE-E611-ACD0-0CC47A4D7668.root'
         )
     )
 
@@ -262,7 +277,7 @@ if (not process.ljmet.isMc==cms.bool(True)):
 # Output
 #
 process.outputs = cms.PSet (
-    outputName = cms.string('testmcWJ'),
+    outputName = cms.string('testmc'),
     treeName   = cms.string('ljmet'),
     )
 

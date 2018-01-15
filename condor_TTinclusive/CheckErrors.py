@@ -24,7 +24,8 @@ for o, a in opts:
 	if o == '--resubmit': resubmit = a
 	if o == '--resub_num': resub_num = int(a)
 
-rootdir = '/eos/uscms/store/user/lpcljm/2016/'+dir.split('/')[-3]+'/'+dir.split('/')[-2]+'/'
+#rootdir = '/eos/uscms/store/user/lpcljm/2016/'+dir.split('/')[-3]+'/'+dir.split('/')[-2]+'/'
+rootdir = '/eos/uscms/store/user/lpctlbsm/jmanagan/'+dir.split('/')[-3]+'/'+dir.split('/')[-2]+'/'
 rootdir = rootdir.replace('_logs','')
 print 'checking ROOT files in:',rootdir
 folders = [x for x in os.walk(dir).next()[1]]
@@ -39,11 +40,14 @@ no_log = 0
 empty_log = 0
 copy_fail = 0
 mem_fail = 0
+kill_fail = 0
 
 for folder in folders:
         #if folder != 'QCD_HT700to1000_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_25ns': continue
         #if 'Charged' not in folder and 'Single' not in folder: continue
-        if 'TT_Mtt' not in folder: continue
+        #if 'WW' not in folder: continue
+        #if 'WJetsToLNu_Tune' not in folder: continue
+        #if 'SingleElectron' not in folder and 'Hv3' not in folder: continue
 	if verbose_level > 0:  print; print folder
 
         rootfiles = EOSlist_root_files(rootdir+folder)
@@ -92,14 +96,35 @@ for folder in folders:
 
 		try:
 			current = open(dir + '/'+folder+'/'+file.replace('.jdl','.condor'),'r')
-			good = True
+			overmem = False
+                        killed = False
+                        term = False
+                        iline = 0
+                        overmem_index = 0
+                        kill_index = 0
+                        term_index = 0
 			for line in current:
-				if 'SYSTEM_PERIODIC_REMOVE' in line: good = False
-			if not good: 
+				if 'SYSTEM_PERIODIC_REMOVE' in line: 
+                                    overmem = True
+                                    overmem_index = iline
+                                elif 'condor_rm' in line: 
+                                    killed = True
+                                    kill_index = iline
+                                elif 'Normal termination (return value 0)' in line: 
+                                    term = True
+                                    term_index = iline
+                                iline += 1
+			if overmem and overmem_index > term_index: 
 				if verbose_level > 0: 
 					print '\tMEM FAIL:',file,' and JobIndex:',index
 				mem_fail+=1
 				if resub_num == -1 or resub_num == 3:resub_index.append(index)
+				continue
+			if killed and kill_index > term_index: 
+				if verbose_level > 0: 
+					print '\tKILL_FAIL:',file,' and JobIndex:',index
+				kill_fail+=1
+				if resub_num == -1 or resub_num == 4:resub_index.append(index)
 				continue
 		except:
 			pass
@@ -140,5 +165,6 @@ print 'NO LOG:', no_log
 print 'EMPTY LOG:', empty_log
 print 'XRDCP FAIL:', copy_fail
 print 'MEMORY FAIL:', mem_fail
+print 'KILL_FAIL:', kill_fail
 print 'ROOT files:', total_roots
-print 'DONE:', total_total - no_log - empty_log - copy_fail
+print 'DONE:', total_total - no_log - empty_log - copy_fail - mem_fail - kill_fail
