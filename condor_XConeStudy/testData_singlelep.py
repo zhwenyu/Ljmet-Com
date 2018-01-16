@@ -68,13 +68,32 @@ process.XConeCalc.isMc				 = cms.bool(condorIsMC)
 process.XConeCalc.doGenXCone		 = cms.bool(False)
 process.XConeCalc.DEBUG			     = cms.bool(True)
 process.XConeCalc.saveJetConst		 = cms.bool(False)
-process.XConeCalc.MCL1JetPar               = cms.string(relBase+'/src/LJMet/Com/data/Summer16RRV3/Summer16_23Sep2016V3_MC_L1FastJet_AK4PFchs.txt')
-process.XConeCalc.MCL2JetPar               = cms.string(relBase+'/src/LJMet/Com/data/Summer16RRV3/Summer16_23Sep2016V3_MC_L2Relative_AK4PFchs.txt')
-process.XConeCalc.MCL3JetPar               = cms.string(relBase+'/src/LJMet/Com/data/Summer16RRV3/Summer16_23Sep2016V3_MC_L3Absolute_AK4PFchs.txt')
-process.XConeCalc.DataL1JetPar             = cms.string(relBase+'/src/LJMet/Com/data/Summer16RRV3/Summer16_23Sep2016BCDV3_DATA_L1FastJet_AK4PFchs.txt')
-process.XConeCalc.DataL2JetPar             = cms.string(relBase+'/src/LJMet/Com/data/Summer16RRV3/Summer16_23Sep2016BCDV3_DATA_L2Relative_AK4PFchs.txt')
-process.XConeCalc.DataL3JetPar             = cms.string(relBase+'/src/LJMet/Com/data/Summer16RRV3/Summer16_23Sep2016BCDV3_DATA_L3Absolute_AK4PFchs.txt')
-process.XConeCalc.DataResJetPar            = cms.string(relBase+'/src/LJMet/Com/data/Summer16RRV3/Summer16_23Sep2016BCDV3_DATA_L2L3Residual_AK4PFchs.txt')
+process.XConeCalc.MCL1JetPar               = cms.string(relBase+'/src/LJMet/Com/data/Summer16RRV3/Summer16_23Sep2016V3_MC_L1FastJet')
+process.XConeCalc.MCL2JetPar               = cms.string(relBase+'/src/LJMet/Com/data/Summer16RRV3/Summer16_23Sep2016V3_MC_L2Relative')
+process.XConeCalc.MCL3JetPar               = cms.string(relBase+'/src/LJMet/Com/data/Summer16RRV3/Summer16_23Sep2016V3_MC_L3Absolute')
+process.XConeCalc.JECunc_txtfile           = cms.string(relBase+'/src/LJMet/Com/data/Summer16RRV3/Summer16_23Sep2016V3_MC_Uncertainty')
+process.XConeCalc.JER_txtfile              = cms.string(relBase+'/src/LJMet/Com/data/Spring16V10/Spring16_25nsV10_MC_PtResolution')
+process.XConeCalc.JERSF_txtfile            = cms.string(relBase+'/src/LJMet/Com/data/Spring16V10/Spring16_25nsV10_MC_SF')
+process.XConeCalc.DataL1JetPar_BCD             = cms.string(relBase+'/src/LJMet/Com/data/Summer16RRV3/Summer16_23Sep2016BCDV3_DATA_L1FastJet')
+process.XConeCalc.DataL2JetPar_BCD             = cms.string(relBase+'/src/LJMet/Com/data/Summer16RRV3/Summer16_23Sep2016BCDV3_DATA_L2Relative')
+process.XConeCalc.DataL3JetPar_BCD             = cms.string(relBase+'/src/LJMet/Com/data/Summer16RRV3/Summer16_23Sep2016BCDV3_DATA_L3Absolute')
+process.XConeCalc.DataResJetPar_BCD            = cms.string(relBase+'/src/LJMet/Com/data/Summer16RRV3/Summer16_23Sep2016BCDV3_DATA_L2L3Residual')
+process.XConeCalc.DataL1JetPar_EF             = cms.string(relBase+'/src/LJMet/Com/data/Summer16RRV3/Summer16_23Sep2016EFV3_DATA_L1FastJet')
+process.XConeCalc.DataL2JetPar_EF             = cms.string(relBase+'/src/LJMet/Com/data/Summer16RRV3/Summer16_23Sep2016EFV3_DATA_L2Relative')
+process.XConeCalc.DataL3JetPar_EF             = cms.string(relBase+'/src/LJMet/Com/data/Summer16RRV3/Summer16_23Sep2016EFV3_DATA_L3Absolute')
+process.XConeCalc.DataResJetPar_EF            = cms.string(relBase+'/src/LJMet/Com/data/Summer16RRV3/Summer16_23Sep2016EFV3_DATA_L2L3Residual')
+process.XConeCalc.DataL1JetPar_G             = cms.string(relBase+'/src/LJMet/Com/data/Summer16RRV3/Summer16_23Sep2016GV3_DATA_L1FastJet')
+process.XConeCalc.DataL2JetPar_G             = cms.string(relBase+'/src/LJMet/Com/data/Summer16RRV3/Summer16_23Sep2016GV3_DATA_L2Relative')
+process.XConeCalc.DataL3JetPar_G             = cms.string(relBase+'/src/LJMet/Com/data/Summer16RRV3/Summer16_23Sep2016GV3_DATA_L3Absolute')
+process.XConeCalc.DataResJetPar_G            = cms.string(relBase+'/src/LJMet/Com/data/Summer16RRV3/Summer16_23Sep2016GV3_DATA_L2L3Residual')
+process.XConeCalc.DataL1JetPar_H             = cms.string(relBase+'/src/LJMet/Com/data/Summer16RRV3/Summer16_23Sep2016HV3_DATA_L1FastJet')
+process.XConeCalc.DataL2JetPar_H             = cms.string(relBase+'/src/LJMet/Com/data/Summer16RRV3/Summer16_23Sep2016HV3_DATA_L2Relative')
+process.XConeCalc.DataL3JetPar_H             = cms.string(relBase+'/src/LJMet/Com/data/Summer16RRV3/Summer16_23Sep2016HV3_DATA_L3Absolute')
+process.XConeCalc.DataResJetPar_H            = cms.string(relBase+'/src/LJMet/Com/data/Summer16RRV3/Summer16_23Sep2016HV3_DATA_L2L3Residual')
+process.XConeCalc.JECup			     = cms.bool(False)
+process.XConeCalc.JECdown			 = cms.bool(False)
+process.XConeCalc.JERup			     = cms.bool(False)
+process.XConeCalc.JERdown			 = cms.bool(False)
 
 ############################################################
 #
@@ -271,12 +290,13 @@ process.event_selector = cms.PSet(
 #
 
 process.inputs = cms.PSet (
-    nEvents    = cms.int32(100),
+    nEvents    = cms.int32(1000),
     skipEvents = cms.int32(0),
     lumisToProcess = CfgTypes.untracked(CfgTypes.VLuminosityBlockRange()),
     fileNames  = cms.vstring(
 # 		'root://xrootd-cms.infn.it///store/data/Run2016H/SingleMuon/MINIAOD/03Feb2017_ver2-v1/110000/00633FF0-85EA-E611-811C-001E674FB25C.root',
-		'root://cmsxrootd.fnal.gov///store/data/Run2016H/SingleMuon/MINIAOD/03Feb2017_ver3-v1/80000/0040ECBB-76EA-E611-8FE7-A0000420FE80.root',
+# 		'root://cmsxrootd.fnal.gov///store/data/Run2016H/SingleMuon/MINIAOD/03Feb2017_ver3-v1/80000/0040ECBB-76EA-E611-8FE7-A0000420FE80.root',
+		'root://cmsxrootd.fnal.gov///store/data/Run2016B/DoubleMuon/MINIAOD/03Feb2017_ver2-v2/100000/0005AD9F-64ED-E611-A952-0CC47A78A42C.root',
     )
 )
 
@@ -293,7 +313,9 @@ if (not process.ljmet.isMc==cms.bool(True)):
 #
 process.outputs = cms.PSet (
 #     outputName = cms.string('testdata'),
-    outputName = cms.string('SingleMuon_RRH_testData_LJMetXCone'),
+#     outputName = cms.string('SingleMuon_RRH_testData_LJMetXCone'),
+#     outputName = cms.string('SingleMuon_RRH_testData_LJMetXCone_Jan16-2018'),
+    outputName = cms.string('SingleMuon_RRB_testData_LJMetXCone_Jan16-2018'),
     treeName   = cms.string('ljmet'),
     )
 

@@ -63,18 +63,37 @@ process.XConeCalc.XConeR			 = cms.double(0.4)
 # process.XConeCalc.XConeNumJets		 = cms.int32(10) ##ttbar full hadronic : 6 , TT (with fully hadronic top): 10 ! But it doesn't matter if youa re using VarNumJets
 process.XConeCalc.XConeBeta			 = cms.double(2.0)
 process.XConeCalc.usePFchs			 = cms.bool(True)
-process.XConeCalc.doPUPPI			 = cms.bool(False)
+process.XConeCalc.doPUPPI			 = cms.bool(True)
 process.XConeCalc.isMc				 = cms.bool(condorIsMC)
 process.XConeCalc.doGenXCone		 = cms.bool(False)
 process.XConeCalc.DEBUG			     = cms.bool(True)
 process.XConeCalc.saveJetConst		 = cms.bool(False)
-process.XConeCalc.MCL1JetPar               = cms.string(relBase+'/src/LJMet/Com/data/Summer16RRV3/Summer16_23Sep2016V3_MC_L1FastJet_AK4PFchs.txt')
-process.XConeCalc.MCL2JetPar               = cms.string(relBase+'/src/LJMet/Com/data/Summer16RRV3/Summer16_23Sep2016V3_MC_L2Relative_AK4PFchs.txt')
-process.XConeCalc.MCL3JetPar               = cms.string(relBase+'/src/LJMet/Com/data/Summer16RRV3/Summer16_23Sep2016V3_MC_L3Absolute_AK4PFchs.txt')
-process.XConeCalc.DataL1JetPar             = cms.string(relBase+'/src/LJMet/Com/data/Summer16RRV3/Summer16_23Sep2016BCDV3_DATA_L1FastJet_AK4PFchs.txt')
-process.XConeCalc.DataL2JetPar             = cms.string(relBase+'/src/LJMet/Com/data/Summer16RRV3/Summer16_23Sep2016BCDV3_DATA_L2Relative_AK4PFchs.txt')
-process.XConeCalc.DataL3JetPar             = cms.string(relBase+'/src/LJMet/Com/data/Summer16RRV3/Summer16_23Sep2016BCDV3_DATA_L3Absolute_AK4PFchs.txt')
-process.XConeCalc.DataResJetPar            = cms.string(relBase+'/src/LJMet/Com/data/Summer16RRV3/Summer16_23Sep2016BCDV3_DATA_L2L3Residual_AK4PFchs.txt')
+process.XConeCalc.MCL1JetPar               = cms.string(relBase+'/src/LJMet/Com/data/Summer16RRV3/Summer16_23Sep2016V3_MC_L1FastJet')
+process.XConeCalc.MCL2JetPar               = cms.string(relBase+'/src/LJMet/Com/data/Summer16RRV3/Summer16_23Sep2016V3_MC_L2Relative')
+process.XConeCalc.MCL3JetPar               = cms.string(relBase+'/src/LJMet/Com/data/Summer16RRV3/Summer16_23Sep2016V3_MC_L3Absolute')
+process.XConeCalc.JECunc_txtfile           = cms.string(relBase+'/src/LJMet/Com/data/Summer16RRV3/Summer16_23Sep2016V3_MC_Uncertainty')
+process.XConeCalc.JER_txtfile              = cms.string(relBase+'/src/LJMet/Com/data/Spring16V10/Spring16_25nsV10_MC_PtResolution')
+process.XConeCalc.JERSF_txtfile            = cms.string(relBase+'/src/LJMet/Com/data/Spring16V10/Spring16_25nsV10_MC_SF')
+process.XConeCalc.DataL1JetPar_BCD             = cms.string(relBase+'/src/LJMet/Com/data/Summer16RRV3/Summer16_23Sep2016BCDV3_DATA_L1FastJet')
+process.XConeCalc.DataL2JetPar_BCD             = cms.string(relBase+'/src/LJMet/Com/data/Summer16RRV3/Summer16_23Sep2016BCDV3_DATA_L2Relative')
+process.XConeCalc.DataL3JetPar_BCD             = cms.string(relBase+'/src/LJMet/Com/data/Summer16RRV3/Summer16_23Sep2016BCDV3_DATA_L3Absolute')
+process.XConeCalc.DataResJetPar_BCD            = cms.string(relBase+'/src/LJMet/Com/data/Summer16RRV3/Summer16_23Sep2016BCDV3_DATA_L2L3Residual')
+process.XConeCalc.DataL1JetPar_EF             = cms.string(relBase+'/src/LJMet/Com/data/Summer16RRV3/Summer16_23Sep2016EFV3_DATA_L1FastJet')
+process.XConeCalc.DataL2JetPar_EF             = cms.string(relBase+'/src/LJMet/Com/data/Summer16RRV3/Summer16_23Sep2016EFV3_DATA_L2Relative')
+process.XConeCalc.DataL3JetPar_EF             = cms.string(relBase+'/src/LJMet/Com/data/Summer16RRV3/Summer16_23Sep2016EFV3_DATA_L3Absolute')
+process.XConeCalc.DataResJetPar_EF            = cms.string(relBase+'/src/LJMet/Com/data/Summer16RRV3/Summer16_23Sep2016EFV3_DATA_L2L3Residual')
+process.XConeCalc.DataL1JetPar_G             = cms.string(relBase+'/src/LJMet/Com/data/Summer16RRV3/Summer16_23Sep2016GV3_DATA_L1FastJet')
+process.XConeCalc.DataL2JetPar_G             = cms.string(relBase+'/src/LJMet/Com/data/Summer16RRV3/Summer16_23Sep2016GV3_DATA_L2Relative')
+process.XConeCalc.DataL3JetPar_G             = cms.string(relBase+'/src/LJMet/Com/data/Summer16RRV3/Summer16_23Sep2016GV3_DATA_L3Absolute')
+process.XConeCalc.DataResJetPar_G            = cms.string(relBase+'/src/LJMet/Com/data/Summer16RRV3/Summer16_23Sep2016GV3_DATA_L2L3Residual')
+process.XConeCalc.DataL1JetPar_H             = cms.string(relBase+'/src/LJMet/Com/data/Summer16RRV3/Summer16_23Sep2016HV3_DATA_L1FastJet')
+process.XConeCalc.DataL2JetPar_H             = cms.string(relBase+'/src/LJMet/Com/data/Summer16RRV3/Summer16_23Sep2016HV3_DATA_L2Relative')
+process.XConeCalc.DataL3JetPar_H             = cms.string(relBase+'/src/LJMet/Com/data/Summer16RRV3/Summer16_23Sep2016HV3_DATA_L3Absolute')
+process.XConeCalc.DataResJetPar_H            = cms.string(relBase+'/src/LJMet/Com/data/Summer16RRV3/Summer16_23Sep2016HV3_DATA_L2L3Residual')
+process.XConeCalc.JECup			     = cms.bool(False)
+process.XConeCalc.JECdown			 = cms.bool(False)
+process.XConeCalc.JERup			     = cms.bool(False)
+process.XConeCalc.JERdown			 = cms.bool(False)
 
 ############################################################
 #
@@ -293,7 +312,8 @@ if (not process.ljmet.isMc==cms.bool(True)):
 process.outputs = cms.PSet (
 #     outputName = cms.string('testmc_LJMet'),
 #     outputName = cms.string('QCD_HT300to500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_testMC_singlelep_LJMet'),
-    outputName = cms.string('TT_TuneCUETP8M2T4_13TeV-powheg-pythia8_testMC_singlelep_LJMetXCone'),
+#     outputName = cms.string('TT_TuneCUETP8M2T4_13TeV-powheg-pythia8_testMC_singlelep_LJMetXCone'),
+    outputName = cms.string('TT_TuneCUETP8M2T4_13TeV-powheg-pythia8_testMC_singlelep_LJMetXCone_Jan16-2018'),
     treeName   = cms.string('ljmet'),
     )
 

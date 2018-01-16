@@ -73,25 +73,56 @@ private:
   
   bool		saveLooseLeps;
 
-
   std::string MCL1JetPar;
   std::string MCL2JetPar;
   std::string MCL3JetPar;
-  std::string DataL1JetPar;
-  std::string DataL2JetPar;
-  std::string DataL3JetPar;
-  std::string DataResJetPar;
-  
-  std::vector<std::string>  jecPayloadsAK4chs;
+  std::string JECunc_txtfile;
 
+  std::string DataL1JetPar_BCD;
+  std::string DataL2JetPar_BCD;
+  std::string DataL3JetPar_BCD;
+  std::string DataResJetPar_BCD;
+
+  std::string DataL1JetPar_EF;
+  std::string DataL2JetPar_EF;
+  std::string DataL3JetPar_EF;
+  std::string DataResJetPar_EF;
+
+  std::string DataL1JetPar_G;
+  std::string DataL2JetPar_G;
+  std::string DataL3JetPar_G;
+  std::string DataResJetPar_G;
+
+  std::string DataL1JetPar_H;
+  std::string DataL2JetPar_H;
+  std::string DataL3JetPar_H;
+  std::string DataResJetPar_H;
+
+  std::string JER_txtfile;
+  std::string JERSF_txtfile;
+  
+  //PUPPI JEC JEC
+  std::vector<std::string>  jecPayloadsAK4chs;
   boost::shared_ptr<FactorizedJetCorrector>   JetCorrectorAK4chs;
-  boost::shared_ptr<FactorizedJetCorrector>   JetCorrectorAK8chs;
-  boost::shared_ptr<FactorizedJetCorrector>   JetCorrectorAK4pup;
-  boost::shared_ptr<FactorizedJetCorrector>   JetCorrectorAK8pup;
   boost::shared_ptr<JetCorrectionUncertainty> JetCorrUncertAK4chs;
-  boost::shared_ptr<JetCorrectionUncertainty> JetCorrUncertAK8chs;
-  boost::shared_ptr<JetCorrectionUncertainty> JetCorrUncertAK4pup;
-  boost::shared_ptr<JetCorrectionUncertainty> JetCorrUncertAK8pup;	
+  JME::JetResolution resolution_AK4chs;
+  JME::JetResolutionScaleFactor resolution_SF_AK4chs;
+  
+  //PUPPI JEC JEC
+  std::vector<std::string>  jecPayloadsAK4pup;
+  boost::shared_ptr<FactorizedJetCorrector>   JetCorrectorAK4pup;
+  boost::shared_ptr<JetCorrectionUncertainty> JetCorrUncertAK4pup;  
+  JME::JetResolution resolution_AK4pup;
+  JME::JetResolutionScaleFactor resolution_SF_AK4pup;
+
+  
+  TRandom3 JERrand;
+  
+  bool JECup;
+  bool JECdown;
+  bool JERup;
+  bool JERdown;
+
 };
 
 static int reg = LjmetFactory::GetInstance()->Register(new XConeCalc(), "XConeCalc");
@@ -155,7 +186,7 @@ int XConeCalc::BeginJob()
    // isMc?
     if(mPset.exists("isMc")) isMc = mPset.getParameter<bool>("isMc");
     else isMc = false;
-//     std::cout << "XConeCalc: isMc = " << isMc << std::endl;
+    std::cout << "XConeCalc: isMc = " << isMc << std::endl;
 
    // save Jet constituents?
     if(mPset.exists("saveJetConst")) saveJetConst = mPset.getParameter<bool>("saveJetConst");
@@ -175,22 +206,95 @@ int XConeCalc::BeginJob()
 //     else applyJEC = true; //default
 //     std::cout << "XConeCalc: applyJEC = " << applyJEC << std::endl;
 
+	//JECtxtfiles for MC
     if(mPset.exists("MCL1JetPar")) MCL1JetPar = mPset.getParameter<std::string>("MCL1JetPar");
-    else MCL1JetPar = "/uscms_data/d3/rsyarif/Fermilab2017/XConeinLJMet80x/CMSSW_8_0_25/src/LJMet/Com/data/Summer16RRV3/Summer16_23Sep2016V3_MC_L1FastJet_AK4PFchs.txt";
-    std::cout << "XConeCalc: Applying (MC) L1 Correction file: " << MCL1JetPar << std::endl;
-
+    else MCL1JetPar = "/uscms_data/d3/rsyarif/Fermilab2017/XConeinLJMet80x/CMSSW_8_0_25/src/LJMet/Com/data/Summer16RRV3/Summer16_23Sep2016V3_MC_L1FastJet";
+    if(DEBUG) std::cout << "XConeCalc: Applying (MC) L1 Correction file: " << MCL1JetPar << std::endl;
     if(mPset.exists("MCL2JetPar")) MCL2JetPar = mPset.getParameter<std::string>("MCL2JetPar");
-    else MCL2JetPar = "/uscms_data/d3/rsyarif/Fermilab2017/XConeinLJMet80x/CMSSW_8_0_25/src/LJMet/Com/data/Summer16RRV3/Summer16_23Sep2016V3_MC_L2Relative_AK4PFchs.txt";
-    std::cout << "XConeCalc: Applying (MC) L2 Correction file: " << MCL2JetPar << std::endl;
-
+    else MCL2JetPar = "/uscms_data/d3/rsyarif/Fermilab2017/XConeinLJMet80x/CMSSW_8_0_25/src/LJMet/Com/data/Summer16RRV3/Summer16_23Sep2016V3_MC_L2Relative";
+    if(DEBUG) std::cout << "XConeCalc: Applying (MC) L2 Correction file: " << MCL2JetPar << std::endl;
     if(mPset.exists("MCL3JetPar")) MCL3JetPar = mPset.getParameter<std::string>("MCL3JetPar");
-    else MCL3JetPar = "/uscms_data/d3/rsyarif/Fermilab2017/XConeinLJMet80x/CMSSW_8_0_25/src/LJMet/Com/data/Summer16RRV3/Summer16_23Sep2016V3_MC_L3Absolute_AK4PFchs.txt";
-    std::cout << "XConeCalc: Applying (MC) L3 Correction file: " << MCL3JetPar << std::endl;
+    else MCL3JetPar = "/uscms_data/d3/rsyarif/Fermilab2017/XConeinLJMet80x/CMSSW_8_0_25/src/LJMet/Com/data/Summer16RRV3/Summer16_23Sep2016V3_MC_L3Absolute";
+    if(DEBUG) std::cout << "XConeCalc: Applying (MC) L3 Correction file: " << MCL3JetPar << std::endl;
+    if(mPset.exists("JECunc_txtfile")) JECunc_txtfile = mPset.getParameter<std::string>("JECunc_txtfile");
+    else JECunc_txtfile = "/uscms_data/d3/rsyarif/Fermilab2017/XConeinLJMet80x/CMSSW_8_0_25/src/LJMet/Com/data/Summer16RRV3/Summer16_23Sep2016V3_MC_Uncertainty";
+    if(DEBUG) std::cout << "XConeCalc: Applying (MC) JECunc file: " << JECunc_txtfile << std::endl;
 
-	//NEED to implement JEC for DATA HERE!! 
+	//JER
+    if(mPset.exists("JER_txtfile")) JER_txtfile = mPset.getParameter<std::string>("JER_txtfile");
+    else JER_txtfile = "/uscms_data/d3/rsyarif/Fermilab2017/XConeinLJMet80x/CMSSW_8_0_25/src/LJMet/Com/data/Spring16V10/Spring16_25nsV10_MC_PtResolution";
+    if(DEBUG) std::cout << "XConeCalc: Applying (MC) JER file: " << JER_txtfile << std::endl;
+    if(mPset.exists("JERSF_txtfile")) JERSF_txtfile = mPset.getParameter<std::string>("JERSF_txtfile");
+    else JERSF_txtfile = "/uscms_data/d3/rsyarif/Fermilab2017/XConeinLJMet80x/CMSSW_8_0_25/src/LJMet/Com/data/Spring16V10/Spring16_25nsV10_MC_SF";
+    if(DEBUG) std::cout << "XConeCalc: Applying (MC) JERSF file: " << JERSF_txtfile << std::endl;	  
+
+
+	//JEC and JER up/downs
+    if(mPset.exists("JECup")) JECup = mPset.getParameter<bool>("JECup");
+    else JECup = false;
+    if(mPset.exists("JECdown")) JECdown = mPset.getParameter<bool>("JECdown");
+    else JECdown = false;
+    if(mPset.exists("JERup")) JERup = mPset.getParameter<bool>("JERup");
+    else JERup = false;
+    if(mPset.exists("JERdown")) JERdown = mPset.getParameter<bool>("JERdown");
+    else JERdown = false;
+
+	//JECpayloads/textfiles for DATA - BCD
+    if(mPset.exists("DataL1JetPar_BCD")) DataL1JetPar_BCD = mPset.getParameter<std::string>("DataL1JetPar_BCD");
+    else DataL1JetPar_BCD = "/uscms_data/d3/rsyarif/Fermilab2017/XConeinLJMet80x/CMSSW_8_0_25/src/LJMet/Com/data/Summer16RRV3/Summer16_23Sep2016BCDV3_DATA_L1FastJet";
+    if(DEBUG) std::cout << "XConeCalc: Applying (DATA) L1 Correction file: " << DataL1JetPar_BCD << std::endl;
+    if(mPset.exists("DataL2JetPar_BCD")) DataL2JetPar_BCD = mPset.getParameter<std::string>("DataL2JetPar_BCD");
+    else DataL2JetPar_BCD = "/uscms_data/d3/rsyarif/Fermilab2017/XConeinLJMet80x/CMSSW_8_0_25/src/LJMet/Com/data/Summer16RRV3/Summer16_23Sep2016BCDV3_DATA_L2Relative";
+    if(DEBUG) std::cout << "XConeCalc: Applying (DATA) L2 Correction file: " << DataL2JetPar_BCD << std::endl;
+    if(mPset.exists("DataL3JetPar_BCD")) DataL3JetPar_BCD = mPset.getParameter<std::string>("DataL3JetPar_BCD");
+    else DataL3JetPar_BCD = "/uscms_data/d3/rsyarif/Fermilab2017/XConeinLJMet80x/CMSSW_8_0_25/src/LJMet/Com/data/Summer16RRV3/Summer16_23Sep2016BCDV3_DATA_L3Absolute";
+    if(DEBUG) std::cout << "XConeCalc: Applying (DATA) L3 Correction file: " << DataL3JetPar_BCD << std::endl;
+    if(mPset.exists("DataResJetPar_BCD")) DataResJetPar_BCD = mPset.getParameter<std::string>("DataResJetPar_BCD");
+    else DataResJetPar_BCD = "/uscms_data/d3/rsyarif/Fermilab2017/XConeinLJMet80x/CMSSW_8_0_25/src/LJMet/Com/data/Summer16RRV3/Summer16_23Sep2016BCDV3_DATA_L2L3Residual";
+    if(DEBUG) std::cout << "XConeCalc: Applying (DATA) L2L3Res Correction file: " << DataResJetPar_BCD << std::endl;
+
+	//JECpayloads/textfiles for DATA - EF
+    if(mPset.exists("DataL1JetPar_EF")) DataL1JetPar_EF = mPset.getParameter<std::string>("DataL1JetPar_EF");
+    else DataL1JetPar_EF = "/uscms_data/d3/rsyarif/Fermilab2017/XConeinLJMet80x/CMSSW_8_0_25/src/LJMet/Com/data/Summer16RRV3/Summer16_23Sep2016EFV3_DATA_L1FastJet";
+    if(DEBUG) std::cout << "XConeCalc: Applying (DATA) L1 Correction file: " << DataL1JetPar_EF << std::endl;
+    if(mPset.exists("DataL2JetPar_EF")) DataL2JetPar_EF = mPset.getParameter<std::string>("DataL2JetPar_EF");
+    else DataL2JetPar_EF = "/uscms_data/d3/rsyarif/Fermilab2017/XConeinLJMet80x/CMSSW_8_0_25/src/LJMet/Com/data/Summer16RRV3/Summer16_23Sep2016EFV3_DATA_L2Relative";
+    if(DEBUG) std::cout << "XConeCalc: Applying (DATA) L2 Correction file: " << DataL2JetPar_EF << std::endl;
+    if(mPset.exists("DataL3JetPar_EF")) DataL3JetPar_EF = mPset.getParameter<std::string>("DataL3JetPar_EF");
+    else DataL3JetPar_EF = "/uscms_data/d3/rsyarif/Fermilab2017/XConeinLJMet80x/CMSSW_8_0_25/src/LJMet/Com/data/Summer16RRV3/Summer16_23Sep2016EFV3_DATA_L3Absolute";
+    if(DEBUG) std::cout << "XConeCalc: Applying (DATA) L3 Correction file: " << DataL3JetPar_EF << std::endl;
+    if(mPset.exists("DataResJetPar_EF")) DataResJetPar_EF = mPset.getParameter<std::string>("DataResJetPar_EF");
+    else DataResJetPar_EF = "/uscms_data/d3/rsyarif/Fermilab2017/XConeinLJMet80x/CMSSW_8_0_25/src/LJMet/Com/data/Summer16RRV3/Summer16_23Sep2016EFV3_DATA_L2L3Residual";
+    if(DEBUG) std::cout << "XConeCalc: Applying (DATA) L2L3Res Correction file: " << DataResJetPar_EF << std::endl;
+
+	//JECpayloads/textfiles for DATA - G
+    if(mPset.exists("DataL1JetPar_G")) DataL1JetPar_G = mPset.getParameter<std::string>("DataL1JetPar_G");
+    else DataL1JetPar_G = "/uscms_data/d3/rsyarif/Fermilab2017/XConeinLJMet80x/CMSSW_8_0_25/src/LJMet/Com/data/Summer16RRV3/Summer16_23Sep2016GV3_DATA_L1FastJet";
+    if(DEBUG) std::cout << "XConeCalc: Applying (DATA) L1 Correction file: " << DataL1JetPar_G << std::endl;
+    if(mPset.exists("DataL2JetPar_G")) DataL2JetPar_G = mPset.getParameter<std::string>("DataL2JetPar_G");
+    else DataL2JetPar_G = "/uscms_data/d3/rsyarif/Fermilab2017/XConeinLJMet80x/CMSSW_8_0_25/src/LJMet/Com/data/Summer16RRV3/Summer16_23Sep2016GV3_DATA_L2Relative";
+    if(DEBUG) std::cout << "XConeCalc: Applying (DATA) L2 Correction file: " << DataL2JetPar_G << std::endl;
+    if(mPset.exists("DataL3JetPar_G")) DataL3JetPar_G = mPset.getParameter<std::string>("DataL3JetPar_G");
+    else DataL3JetPar_G = "/uscms_data/d3/rsyarif/Fermilab2017/XConeinLJMet80x/CMSSW_8_0_25/src/LJMet/Com/data/Summer16RRV3/Summer16_23Sep2016GV3_DATA_L3Absolute";
+    if(DEBUG) std::cout << "XConeCalc: Applying (DATA) L3 Correction file: " << DataL3JetPar_G << std::endl;
+    if(mPset.exists("DataResJetPar_G")) DataResJetPar_G = mPset.getParameter<std::string>("DataResJetPar_G");
+    else DataResJetPar_G = "/uscms_data/d3/rsyarif/Fermilab2017/XConeinLJMet80x/CMSSW_8_0_25/src/LJMet/Com/data/Summer16RRV3/Summer16_23Sep2016GV3_DATA_L2L3Residual";
+    if(DEBUG) std::cout << "XConeCalc: Applying (DATA) L2L3Res Correction file: " << DataResJetPar_G << std::endl;
+
+	//JECpayloads/textfiles for DATA - H
+    if(mPset.exists("DataL1JetPar_H")) DataL1JetPar_H = mPset.getParameter<std::string>("DataL1JetPar_H");
+    else DataL1JetPar_H = "/uscms_data/d3/rsyarif/Fermilab2017/XConeinLJMet80x/CMSSW_8_0_25/src/LJMet/Com/data/Summer16RRV3/Summer16_23Sep2016HV3_DATA_L1FastJet";
+    if(DEBUG) std::cout << "XConeCalc: Applying (DATA) L1 Correction file: " << DataL1JetPar_H << std::endl;
+    if(mPset.exists("DataL2JetPar_H")) DataL2JetPar_H = mPset.getParameter<std::string>("DataL2JetPar_H");
+    else DataL2JetPar_H = "/uscms_data/d3/rsyarif/Fermilab2017/XConeinLJMet80x/CMSSW_8_0_25/src/LJMet/Com/data/Summer16RRV3/Summer16_23Sep2016HV3_DATA_L2Relative";
+    if(DEBUG) std::cout << "XConeCalc: Applying (DATA) L2 Correction file: " << DataL2JetPar_H << std::endl;
+    if(mPset.exists("DataL3JetPar_H")) DataL3JetPar_H = mPset.getParameter<std::string>("DataL3JetPar_H");
+    else DataL3JetPar_H = "/uscms_data/d3/rsyarif/Fermilab2017/XConeinLJMet80x/CMSSW_8_0_25/src/LJMet/Com/data/Summer16RRV3/Summer16_23Sep2016HV3_DATA_L3Absolute";
+    if(DEBUG) std::cout << "XConeCalc: Applying (DATA) L3 Correction file: " << DataL3JetPar_H << std::endl;
+    if(mPset.exists("DataResJetPar_H")) DataResJetPar_H = mPset.getParameter<std::string>("DataResJetPar_H");
+    else DataResJetPar_H = "/uscms_data/d3/rsyarif/Fermilab2017/XConeinLJMet80x/CMSSW_8_0_25/src/LJMet/Com/data/Summer16RRV3/Summer16_23Sep2016HV3_DATA_L2L3Residual";
+    if(DEBUG) std::cout << "XConeCalc: Applying (DATA) L2L3Res Correction file: " << DataResJetPar_H << std::endl;	
 	
-	//AND JER at some point
-
     return 0;
 }
 
@@ -356,7 +460,7 @@ int XConeCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * se
    //GEN PArticles
    edm::Handle<std::vector<pat::PackedGenParticle> > Genparticles;
    event.getByLabel(packedGenParticleColl_it, Genparticles);   
-   if(isMc){
+   if(isMc & doGenXCone){
 	   if(DEBUG)cout << "-------------------------------------------------------------------------------------" << endl;
 	   if(DEBUG)cout << "Collecting Genparticles as Jet constituents (For MC)" << endl;
 	   if(DEBUG)cout << "-------------------------------------------------------------------------------------" << endl;
@@ -584,6 +688,16 @@ int XConeCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * se
 	GhostedAreaSpec ghost_spec(3); //set max rapiditiy for creating ghosts.
 	AreaDefinition areaDef(active_area_explicit_ghosts,ghost_spec);   
 	//Attempting to to define jet area - end
+	
+	//SET UP Rho for JEC
+    edm::Handle<double> rhoHandle;
+    edm::InputTag rhoSrc_("fixedGridRhoFastjetAll", "");
+    event.getByLabel(rhoSrc_, rhoHandle);
+    double rho = std::max(*(rhoHandle.product()), 0.0);
+	if (DEBUG) cout<<"SETUP: rho = "<<rho<<endl;	
+
+
+	{ //make PFchs XCone jets - start
 
    if(DEBUG)cout << "-------------------------------------------------------------------------------------" << endl;
    if(DEBUG)cout << "Using the XCone Jet Algorithm" << endl;
@@ -607,39 +721,59 @@ int XConeCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * se
    // and find the jets
    vector<PseudoJet> xcone_jetsA = xcone_seqA.inclusive_jets();
    
-   // SET UP AK4chs JEC (for XCone chs) 
+   // SET UP AK4chs JECpayloads (for XCone chs) 
    std::vector<JetCorrectorParameters> vParAK4chs;
    if(isMc){
-	   jecPayloadsAK4chs.push_back(MCL1JetPar);
-	   jecPayloadsAK4chs.push_back(MCL2JetPar);
-	   jecPayloadsAK4chs.push_back(MCL3JetPar);
+	   jecPayloadsAK4chs.push_back(MCL1JetPar+"_AK4PFchs.txt");
+	   jecPayloadsAK4chs.push_back(MCL2JetPar+"_AK4PFchs.txt");
+	   jecPayloadsAK4chs.push_back(MCL3JetPar+"_AK4PFchs.txt");
+	   jecPayloadsAK4chs.push_back(JECunc_txtfile+"_AK4PFchs.txt");
    }
-   else{ //NEED TO IMPLEMENT DATA JEC at some point!
-	   jecPayloadsAK4chs.push_back(MCL1JetPar);
-	   jecPayloadsAK4chs.push_back(MCL2JetPar);
-	   jecPayloadsAK4chs.push_back(MCL3JetPar);
+   else{ //IMPLEMENT DATA JECpayloads for difference eras.
+	   int iRun   = event.id().run();
+	   if(iRun <= 276811){
+	   		jecPayloadsAK4chs.push_back(DataL1JetPar_BCD+"_AK4PFchs.txt");
+	   		jecPayloadsAK4chs.push_back(DataL2JetPar_BCD+"_AK4PFchs.txt");
+	   		jecPayloadsAK4chs.push_back(DataL3JetPar_BCD+"_AK4PFchs.txt");
+	   		jecPayloadsAK4chs.push_back(DataResJetPar_BCD+"_AK4PFchs.txt");
+	   }
+	   else if(iRun <= 278801){
+	   		jecPayloadsAK4chs.push_back(DataL1JetPar_EF+"_AK4PFchs.txt");
+	   		jecPayloadsAK4chs.push_back(DataL2JetPar_EF+"_AK4PFchs.txt");
+	   		jecPayloadsAK4chs.push_back(DataL3JetPar_EF+"_AK4PFchs.txt");
+	   		jecPayloadsAK4chs.push_back(DataResJetPar_EF+"_AK4PFchs.txt");	   
+	   }
+	   else if(iRun <= 280385){
+	   		jecPayloadsAK4chs.push_back(DataL1JetPar_G+"_AK4PFchs.txt");
+	   		jecPayloadsAK4chs.push_back(DataL2JetPar_G+"_AK4PFchs.txt");
+	   		jecPayloadsAK4chs.push_back(DataL3JetPar_G+"_AK4PFchs.txt");
+	   		jecPayloadsAK4chs.push_back(DataResJetPar_G+"_AK4PFchs.txt");	   
+	   }
+	   else{
+	   		jecPayloadsAK4chs.push_back(DataL1JetPar_H+"_AK4PFchs.txt");
+	   		jecPayloadsAK4chs.push_back(DataL2JetPar_H+"_AK4PFchs.txt");
+	   		jecPayloadsAK4chs.push_back(DataL3JetPar_H+"_AK4PFchs.txt");
+	   		jecPayloadsAK4chs.push_back(DataResJetPar_H+"_AK4PFchs.txt");	   
+	   }
    }
-   for ( std::vector<std::string>::const_iterator ipayload = jecPayloadsAK4chs.begin(),
-//      ipayloadEnd = jecPayloadsAK4chs.end(); ipayload != ipayloadEnd - 1; ++ipayload ) { \\use this if there JECunc in the last entry 
-     ipayloadEnd = jecPayloadsAK4chs.end(); ipayload != ipayloadEnd; ++ipayload ) {
-     if (DEBUG)cout<<"AK4chs JEC txt: "<<*ipayload<<endl;
-     JetCorrectorParameters pars(*ipayload);
-     vParAK4chs.push_back(pars);
-    }
-	JetCorrectorAK4chs   = boost::shared_ptr<FactorizedJetCorrector>  ( new FactorizedJetCorrector(vParAK4chs) );
-	//Need to implement JEC uncert at some point!
-	//JetCorrUncertAK4chs  = boost::shared_ptr<JetCorrectionUncertainty>( new JetCorrectionUncertainty(jecPayloadsAK4chsFinal.back()));
+//    for ( std::vector<std::string>::const_iterator ipayload = jecPayloadsAK4chs.begin(), ipayloadEnd = jecPayloadsAK4chs.end(); ipayload != ipayloadEnd - 1; ++ipayload ) { //use this if want to skip last entry 
+   for ( std::vector<std::string>::const_iterator ipayload = jecPayloadsAK4chs.begin(), ipayloadEnd = jecPayloadsAK4chs.end(); ipayload != ipayloadEnd; ++ipayload ) { //use this if use all entry
+		
+		if(isMc && (ipayload == ipayloadEnd - 1) ) continue; //for MC, skip JECuncer_txtfile at the last entry
+   		if (DEBUG)cout<<"AK4chs JEC txt: "<<*ipayload<<endl;
+   		JetCorrectorParameters pars(*ipayload);
+   		vParAK4chs.push_back(pars);
+   }
 
-	//SET UP Rho for JEC
-// 	edm::Handle<double> rhoH;
-// 	event.getByToken(rhoToken_, rhoH);
-// 	double rho = *rhoH;
-    edm::Handle<double> rhoHandle;
-    edm::InputTag rhoSrc_("fixedGridRhoFastjetAll", "");
-    event.getByLabel(rhoSrc_, rhoHandle);
-    double rho = std::max(*(rhoHandle.product()), 0.0);
+   JetCorrectorAK4chs   = boost::shared_ptr<FactorizedJetCorrector>  ( new FactorizedJetCorrector(vParAK4chs) );
 
-	if (DEBUG) cout<<"rho = "<<rho<<endl;	
+   //Implementing JEC uncert for MC
+   if(isMc) JetCorrUncertAK4chs  = boost::shared_ptr<JetCorrectionUncertainty>( new JetCorrectionUncertainty( jecPayloadsAK4chs.back() ) );
+
+	//SET UP JER payload
+    resolution_AK4chs = JME::JetResolution(JER_txtfile+"_AK4PFchs.txt");
+    resolution_SF_AK4chs = JME::JetResolutionScaleFactor(JERSF_txtfile+"_AK4PFchs.txt");    
+
 
     if(DEBUG)std::cout << "---- " << N <<" XCone Jets ---- R = "<< XConeR << std::endl;
     int ConstituentStartIndex =0;
@@ -659,7 +793,7 @@ int XConeCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * se
       RawXConeJetEnergy . push_back(ijet->e());
       RawXConeJetArea   . push_back(ijet->area());
       
-      if(DEBUG) std::cout << "--- Applying AK4CHS JEC correction to XCone" << std::endl;  
+      if(DEBUG) std::cout << "	--- Applying AK4CHS JEC correction to XCone" << std::endl;  
       //------------------------------------
       // Applying AK4CHS JEC correction to XCone
       //------------------------------------
@@ -669,19 +803,100 @@ int XConeCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * se
       uncorrJet.SetPy((double)ijet->py());
       uncorrJet.SetPz((double)ijet->pz());
       uncorrJet.SetE((double)ijet->e());
-      if ( DEBUG ) cout << "   -> before JEC pt,eta,phi,e	= " << uncorrJet.pt() << ",	" << uncorrJet.eta() << ",	" << uncorrJet.phi() << ",	" << uncorrJet.e() << endl;
+      if ( DEBUG ) cout << "   	-> before JEC pt,eta,phi,e	= " << uncorrJet.pt() << ",	" << uncorrJet.eta() << ",	" << uncorrJet.phi() << ",	" << uncorrJet.e() << endl;
       
       JetCorrectorAK4chs->setJetPt( ijet->pt() );
       JetCorrectorAK4chs->setJetEta ( ijet->eta() );
       JetCorrectorAK4chs->setJetE  ( ijet->e() );
       JetCorrectorAK4chs->setJetA  ( ijet->area() );
       JetCorrectorAK4chs->setRho   ( rho );
-      double corr = JetCorrectorAK4chs->getCorrection();
+      double JECcorr = JetCorrectorAK4chs->getCorrection();
 
-      reco::Candidate::LorentzVector corrJet = corr * uncorrJet;
+      reco::Candidate::LorentzVector corrJet = JECcorr * uncorrJet;
 //       if ( DEBUG ) cout << "   -> after JEC pt,eta,phi,m = " << corrJet.pt() << ", " << corrJet.eta() << ", " << corrJet.phi() << ", " << corrJet.mass() << endl;
-      if ( DEBUG ) cout << "   -> after  JEC pt,eta,phi,e	= " << corrJet.pt() << ",	" << corrJet.eta() << ",	" << corrJet.phi() << ",	" << corrJet.e() << endl;
-      if (DEBUG) cout << "corr: " << corr << endl;
+      if (DEBUG) cout << "		JECcorr : " << JECcorr << endl;
+      if ( DEBUG ) cout << "   	-> after  JEC pt,eta,phi,e	= " << corrJet.pt() << ",	" << corrJet.eta() << ",	" << corrJet.phi() << ",	" << corrJet.e() << endl;
+      
+      if(isMc){
+
+		  //------------------------------------
+		  // Setting up AK4CHS JER for XCone (includes up/downs)
+		  //------------------------------------
+	  
+		  double JERptscale = 1.0;
+
+		  Variation JERsystematic = Variation::NOMINAL;
+		  if(JERup) JERsystematic = Variation::UP;
+		  if(JERdown) JERsystematic = Variation::DOWN;
+
+		  JME::JetParameters parameters;
+		  parameters.setJetPt(corrJet.pt());
+		  parameters.setJetEta(corrJet.eta());
+		  parameters.setRho(rho);
+		  double res = resolution_AK4chs.getResolution(parameters);
+		  double factor = resolution_SF_AK4chs.getScaleFactor(parameters,JERsystematic) - 1;
+	  
+		  if (factor>0) {
+			JERrand.SetSeed(abs(static_cast<int>(ijet->phi()*1e4)));
+			JERptscale = max(0.0, JERrand.Gaus(corrJet.pt(),sqrt(factor*(factor+2))*res*corrJet.pt())/corrJet.pt());
+		  }
+
+		  //------------------------------------
+		  // Setting up AK4CHS JEC uncertainty for XCone
+		  //------------------------------------
+
+		  double JECuncert = 1.0;
+	  
+		  if ( JECup || JECdown ) {
+
+				JetCorrUncertAK4chs->setJetEta(corrJet.eta());
+				JetCorrUncertAK4chs->setJetPt(corrJet.pt()*JERptscale); //why does JECunc requires JER first? 
+
+				if (JECup) { 
+					try{
+							JECuncert = JetCorrUncertAK4chs->getUncertainty(true);
+					}
+					catch(...){ // catch all exceptions. Jet Uncertainty tool throws when binning out of range
+						std::cout << mLegend << "WARNING! Exception thrown by JetCorrectionUncertainty!" << std::endl;
+						std::cout << mLegend << "WARNING! Possibly, trying to correct a jet/MET outside correction range." << std::endl;
+						std::cout << mLegend << "WARNING! Jet/MET will remain uncorrected." << std::endl;
+						JECuncert = 0.0;
+				}
+				JECuncert = 1 + JECuncert; 
+		  }
+				if (JECdown){ 
+					try{
+							JECuncert = JetCorrUncertAK4chs->getUncertainty(false);
+					}
+					catch(...){
+						std::cout << mLegend << "WARNING! Exception thrown by JetCorrectionUncertainty!" << std::endl;
+						std::cout << mLegend << "WARNING! Possibly, trying to correct a jet/MET outside correction range." << std::endl;
+						std::cout << mLegend << "WARNING! Jet/MET will remain uncorrected." << std::endl;
+						JECuncert = 0.0;
+					}
+						JECuncert = 1 - JECuncert; 
+				}
+
+				if (corrJet.pt()*JERptscale < 10.0 && JECup) JECuncert = 2.0;
+				if (corrJet.pt()*JERptscale < 10.0 && JECdown) JECuncert = 0.01;
+
+		  }
+
+		  //------------------------------------
+		  // Apply all jet corrections and uncertainties for XCone
+		  //------------------------------------
+	  
+		  corrJet = JECuncert * JERptscale * JECcorr * uncorrJet;
+		  if (DEBUG) cout << "		JERptscale : " << JERptscale << endl;
+		  if (DEBUG) cout << "   	-> after JER + JEC + up/downs. pt,eta,phi,e	= " << corrJet.pt() << ",	" << corrJet.eta() << ",	" << corrJet.phi() << ",	" << corrJet.e() << endl;
+		  if (DEBUG) cout << "		JECuncert : " << JECuncert << " (1 = Nominal) "<< endl;
+	  
+      }
+
+
+      //------------------------------------
+      // Save corrected XCone jets
+      //------------------------------------
 
       theXConeJetPt     . push_back(corrJet.pt());
       theXConeJetEta    . push_back(corrJet.eta());
@@ -735,6 +950,8 @@ int XConeCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * se
     SetValue("theXConeJetConstEta",    theXConeJetConstEta);
     SetValue("theXConeJetConstPhi",    theXConeJetConstPhi);
     SetValue("theXConeJetConstEnergy", theXConeJetConstEnergy);
+    
+    } //make PFchs XCone jets - end
 
 	if(doPUPPI){
 
@@ -759,6 +976,60 @@ int XConeCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * se
 
 		// and find the jets (PUPPI)
 		vector<PseudoJet> xcone_jetsA_puppi = xcone_seqA_puppi.inclusive_jets();
+		
+		// SET UP AK4pup JECpayloads (for XCone chs) 
+		std::vector<JetCorrectorParameters> vParAK4pup;
+		if(isMc){
+		   jecPayloadsAK4pup.push_back(MCL1JetPar+"_AK4PFPuppi.txt");
+		   jecPayloadsAK4pup.push_back(MCL2JetPar+"_AK4PFPuppi.txt");
+		   jecPayloadsAK4pup.push_back(MCL3JetPar+"_AK4PFPuppi.txt");
+		   jecPayloadsAK4pup.push_back(JECunc_txtfile+"_AK4PFPuppi.txt");
+		}
+		else{ //IMPLEMENT DATA JECpayloads for difference eras.
+		   int iRun   = event.id().run();
+		   if(iRun <= 276811){
+				jecPayloadsAK4pup.push_back(DataL1JetPar_BCD+"_AK4PFPuppi.txt");
+				jecPayloadsAK4pup.push_back(DataL2JetPar_BCD+"_AK4PFPuppi.txt");
+				jecPayloadsAK4pup.push_back(DataL3JetPar_BCD+"_AK4PFPuppi.txt");
+				jecPayloadsAK4pup.push_back(DataResJetPar_BCD+"_AK4PFPuppi.txt");
+		   }
+		   else if(iRun <= 278801){
+				jecPayloadsAK4pup.push_back(DataL1JetPar_EF+"_AK4PFPuppi.txt");
+				jecPayloadsAK4pup.push_back(DataL2JetPar_EF+"_AK4PFPuppi.txt");
+				jecPayloadsAK4pup.push_back(DataL3JetPar_EF+"_AK4PFPuppi.txt");
+				jecPayloadsAK4pup.push_back(DataResJetPar_EF+"_AK4PFPuppi.txt");	   
+		   }
+		   else if(iRun <= 280385){
+				jecPayloadsAK4pup.push_back(DataL1JetPar_G+"_AK4PFPuppi.txt");
+				jecPayloadsAK4pup.push_back(DataL2JetPar_G+"_AK4PFPuppi.txt");
+				jecPayloadsAK4pup.push_back(DataL3JetPar_G+"_AK4PFPuppi.txt");
+				jecPayloadsAK4pup.push_back(DataResJetPar_G+"_AK4PFPuppi.txt");	   
+		   }
+		   else{
+				jecPayloadsAK4pup.push_back(DataL1JetPar_H+"_AK4PFPuppi.txt");
+				jecPayloadsAK4pup.push_back(DataL2JetPar_H+"_AK4PFPuppi.txt");
+				jecPayloadsAK4pup.push_back(DataL3JetPar_H+"_AK4PFPuppi.txt");
+				jecPayloadsAK4pup.push_back(DataResJetPar_H+"_AK4PFPuppi.txt");	   
+		   }
+		}
+		
+		for ( std::vector<std::string>::const_iterator ipayload = jecPayloadsAK4pup.begin(), ipayloadEnd = jecPayloadsAK4pup.end(); ipayload != ipayloadEnd; ++ipayload ) { //use this if use all entry
+	
+			if(isMc && (ipayload == ipayloadEnd - 1) ) continue; //for MC, skip JECuncer_txtfile at the last entry
+			if (DEBUG)cout<<"AK4pup JEC txt: "<<*ipayload<<endl;
+			JetCorrectorParameters pars(*ipayload);
+			vParAK4pup.push_back(pars);
+		}
+		
+		JetCorrectorAK4pup   = boost::shared_ptr<FactorizedJetCorrector>  ( new FactorizedJetCorrector(vParAK4pup) );
+		
+		//Implementing JEC uncert for MC
+		if(isMc) JetCorrUncertAK4pup  = boost::shared_ptr<JetCorrectionUncertainty>( new JetCorrectionUncertainty( jecPayloadsAK4pup.back() ) );
+
+		//SET UP JER payload
+		resolution_AK4pup = JME::JetResolution(JER_txtfile+"_AK4PFPuppi.txt");
+		resolution_SF_AK4pup = JME::JetResolutionScaleFactor(JERSF_txtfile+"_AK4PFPuppi.txt");    
+
 
 		if(DEBUG)std::cout << "---- " << N_puppi <<" XConePUPPI Jets ---- R = "<< XConeR << std::endl;
 		int PUPPIConstituentStartIndex = 0;
@@ -770,6 +1041,112 @@ int XConeCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * se
 		  if(DEBUG)std::cout << "      " <<  "Jet eta			: "<< ijet->eta() << std::endl;
 		  if(DEBUG)std::cout << "      " <<  "Jet phi			: "<< ijet->phi() << std::endl;
 		  if(DEBUG)std::cout << "      " <<  "Jet area		: "<< ijet->area() << std::endl;
+
+		  if(DEBUG) std::cout << "	--- Applying AK4pup JEC correction to XCone" << std::endl;  
+		  //------------------------------------
+		  // Applying AK4pup JEC correction to XCone
+		  //------------------------------------
+
+		  reco::Candidate::LorentzVector uncorrJet;
+		  uncorrJet.SetPx((double)ijet->px());
+		  uncorrJet.SetPy((double)ijet->py());
+		  uncorrJet.SetPz((double)ijet->pz());
+		  uncorrJet.SetE((double)ijet->e());
+		  if ( DEBUG ) cout << "   	-> before JEC pt,eta,phi,e	= " << uncorrJet.pt() << ",	" << uncorrJet.eta() << ",	" << uncorrJet.phi() << ",	" << uncorrJet.e() << endl;
+	  
+		  JetCorrectorAK4pup->setJetPt( ijet->pt() );
+		  JetCorrectorAK4pup->setJetEta ( ijet->eta() );
+		  JetCorrectorAK4pup->setJetE  ( ijet->e() );
+		  JetCorrectorAK4pup->setJetA  ( ijet->area() );
+		  JetCorrectorAK4pup->setRho   ( rho );
+		  double JECcorr = JetCorrectorAK4pup->getCorrection();
+
+		  reco::Candidate::LorentzVector corrJet = JECcorr * uncorrJet;
+	//       if ( DEBUG ) cout << "   -> after JEC pt,eta,phi,m = " << corrJet.pt() << ", " << corrJet.eta() << ", " << corrJet.phi() << ", " << corrJet.mass() << endl;
+		  if (DEBUG) cout << "		JECcorr : " << JECcorr << endl;
+		  if ( DEBUG ) cout << "   	-> after  JEC pt,eta,phi,e	= " << corrJet.pt() << ",	" << corrJet.eta() << ",	" << corrJet.phi() << ",	" << corrJet.e() << endl;
+	  
+		  if(isMc){
+
+			  //------------------------------------
+			  // Setting up AK4pup JER for XCone (includes up/downs)
+			  //------------------------------------
+	  
+			  double JERptscale = 1.0;
+
+			  Variation JERsystematic = Variation::NOMINAL;
+			  if(JERup) JERsystematic = Variation::UP;
+			  if(JERdown) JERsystematic = Variation::DOWN;
+
+			  JME::JetParameters parameters;
+			  parameters.setJetPt(corrJet.pt());
+			  parameters.setJetEta(corrJet.eta());
+			  parameters.setRho(rho);
+			  double res = resolution_AK4pup.getResolution(parameters);
+			  double factor = resolution_SF_AK4pup.getScaleFactor(parameters,JERsystematic) - 1;
+	  
+			  if (factor>0) {
+				JERrand.SetSeed(abs(static_cast<int>(ijet->phi()*1e4)));
+				JERptscale = max(0.0, JERrand.Gaus(corrJet.pt(),sqrt(factor*(factor+2))*res*corrJet.pt())/corrJet.pt());
+			  }
+
+			  //------------------------------------
+			  // Setting up AK4pup JEC uncertainty for XCone
+			  //------------------------------------
+
+			  double JECuncert = 1.0;
+	  
+			  if ( JECup || JECdown ) {
+
+					JetCorrUncertAK4pup->setJetEta(corrJet.eta());
+					JetCorrUncertAK4pup->setJetPt(corrJet.pt()*JERptscale); //why does JECunc requires JER first? 
+
+					if (JECup) { 
+						try{
+								JECuncert = JetCorrUncertAK4pup->getUncertainty(true);
+						}
+						catch(...){ // catch all exceptions. Jet Uncertainty tool throws when binning out of range
+							std::cout << mLegend << "WARNING! Exception thrown by JetCorrectionUncertainty!" << std::endl;
+							std::cout << mLegend << "WARNING! Possibly, trying to correct a jet/MET outside correction range." << std::endl;
+							std::cout << mLegend << "WARNING! Jet/MET will remain uncorrected." << std::endl;
+							JECuncert = 0.0;
+					}
+					JECuncert = 1 + JECuncert; 
+			  }
+					if (JECdown){ 
+						try{
+								JECuncert = JetCorrUncertAK4pup->getUncertainty(false);
+						}
+						catch(...){
+							std::cout << mLegend << "WARNING! Exception thrown by JetCorrectionUncertainty!" << std::endl;
+							std::cout << mLegend << "WARNING! Possibly, trying to correct a jet/MET outside correction range." << std::endl;
+							std::cout << mLegend << "WARNING! Jet/MET will remain uncorrected." << std::endl;
+							JECuncert = 0.0;
+						}
+							JECuncert = 1 - JECuncert; 
+					}
+
+					if (corrJet.pt()*JERptscale < 10.0 && JECup) JECuncert = 2.0;
+					if (corrJet.pt()*JERptscale < 10.0 && JECdown) JECuncert = 0.01;
+
+			  }
+
+			  //------------------------------------
+			  // Apply all jet corrections and uncertainties for XCone
+			  //------------------------------------
+	  
+			  corrJet = JECuncert * JERptscale * JECcorr * uncorrJet;
+			  if (DEBUG) cout << "		JERptscale : " << JERptscale << endl;
+			  if (DEBUG) cout << "   	-> after JER + JEC + up/downs. pt,eta,phi,e	= " << corrJet.pt() << ",	" << corrJet.eta() << ",	" << corrJet.phi() << ",	" << corrJet.e() << endl;
+			  if (DEBUG) cout << "		JECuncert : " << JECuncert << " (1 = Nominal) "<< endl;
+	  
+		  }
+
+
+		  //------------------------------------
+		  // Save corrected XCone jets
+		  //------------------------------------
+
   
 		  theXConePUPPIJetPt     . push_back(ijet->pt());
 		  theXConePUPPIJetEta    . push_back(ijet->eta());
@@ -909,6 +1286,7 @@ int XConeCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * se
 
 	//Clear JEC vector str
 	jecPayloadsAK4chs  .clear();	
+	jecPayloadsAK4pup  .clear();	
 
     return 0;
 }
