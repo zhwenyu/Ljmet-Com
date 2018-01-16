@@ -315,6 +315,7 @@ int XConeCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * se
       vSelElectrons = vSelectedElectrons;
     }
 
+  	float		eventRho;
 
 	//Implementing XCone - start - Rizki
 	
@@ -332,6 +333,7 @@ int XConeCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * se
     std::vector<double> theXConeJetPhi;
     std::vector<double> theXConeJetEnergy;
     std::vector<double> theXConeJetArea;
+    std::vector<double> theXConeJetCorrScale;
 
     std::vector<double> theXConeJetConstStartIndex;
     std::vector<double> theXConeJetConstEndIndex;
@@ -350,6 +352,7 @@ int XConeCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * se
     std::vector<double> theXConePUPPIJetPhi;
     std::vector<double> theXConePUPPIJetEnergy;
     std::vector<double> theXConePUPPIJetArea;
+    std::vector<double> theXConePUPPIJetCorrScale;
     std::vector<double> theXConePUPPIJetConstStartIndex;
     std::vector<double> theXConePUPPIJetConstEndIndex;
     //collect constituent info - start
@@ -695,6 +698,7 @@ int XConeCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * se
     event.getByLabel(rhoSrc_, rhoHandle);
     double rho = std::max(*(rhoHandle.product()), 0.0);
 	if (DEBUG) cout<<"SETUP: rho = "<<rho<<endl;	
+	SetValue("eventRho",     rho);
 
 
 	{ //make PFchs XCone jets - start
@@ -817,14 +821,14 @@ int XConeCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * se
       if (DEBUG) cout << "		JECcorr : " << JECcorr << endl;
       if ( DEBUG ) cout << "   	-> after  JEC pt,eta,phi,e	= " << corrJet.pt() << ",	" << corrJet.eta() << ",	" << corrJet.phi() << ",	" << corrJet.e() << endl;
       
+      double JERptscale = 1.0;
+      double JECuncert = 1.0;
       if(isMc){
 
 		  //------------------------------------
 		  // Setting up AK4CHS JER for XCone (includes up/downs)
 		  //------------------------------------
 	  
-		  double JERptscale = 1.0;
-
 		  Variation JERsystematic = Variation::NOMINAL;
 		  if(JERup) JERsystematic = Variation::UP;
 		  if(JERdown) JERsystematic = Variation::DOWN;
@@ -844,8 +848,6 @@ int XConeCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * se
 		  //------------------------------------
 		  // Setting up AK4CHS JEC uncertainty for XCone
 		  //------------------------------------
-
-		  double JECuncert = 1.0;
 	  
 		  if ( JECup || JECdown ) {
 
@@ -903,6 +905,7 @@ int XConeCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * se
       theXConeJetPhi    . push_back(corrJet.phi());
       theXConeJetEnergy . push_back(corrJet.e());
       theXConeJetArea   . push_back(ijet->area());
+      theXConeJetCorrScale   . push_back(JECuncert * JERptscale * JECcorr);
 
       //collect constituent info - start
       if(saveJetConst){
@@ -1065,15 +1068,15 @@ int XConeCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * se
 	//       if ( DEBUG ) cout << "   -> after JEC pt,eta,phi,m = " << corrJet.pt() << ", " << corrJet.eta() << ", " << corrJet.phi() << ", " << corrJet.mass() << endl;
 		  if (DEBUG) cout << "		JECcorr : " << JECcorr << endl;
 		  if ( DEBUG ) cout << "   	-> after  JEC pt,eta,phi,e	= " << corrJet.pt() << ",	" << corrJet.eta() << ",	" << corrJet.phi() << ",	" << corrJet.e() << endl;
-	  
+		  
+		  double JERptscale = 1.0;
+		  double JECuncert = 1.0;
 		  if(isMc){
 
 			  //------------------------------------
 			  // Setting up AK4pup JER for XCone (includes up/downs)
 			  //------------------------------------
 	  
-			  double JERptscale = 1.0;
-
 			  Variation JERsystematic = Variation::NOMINAL;
 			  if(JERup) JERsystematic = Variation::UP;
 			  if(JERdown) JERsystematic = Variation::DOWN;
@@ -1093,9 +1096,7 @@ int XConeCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * se
 			  //------------------------------------
 			  // Setting up AK4pup JEC uncertainty for XCone
 			  //------------------------------------
-
-			  double JECuncert = 1.0;
-	  
+			  	  
 			  if ( JECup || JECdown ) {
 
 					JetCorrUncertAK4pup->setJetEta(corrJet.eta());
@@ -1153,6 +1154,7 @@ int XConeCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * se
 		  theXConePUPPIJetPhi    . push_back(ijet->phi());
 		  theXConePUPPIJetEnergy . push_back(ijet->e());
 		  theXConePUPPIJetArea   . push_back(ijet->area());
+		  theXConePUPPIJetCorrScale   . push_back(JECuncert * JERptscale * JECcorr);
 
 		  //collect constituent info - start
 		  if(saveJetConst){
