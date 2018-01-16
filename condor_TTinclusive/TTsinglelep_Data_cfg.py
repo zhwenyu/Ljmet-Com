@@ -55,6 +55,7 @@ process.JetSubCalc.DataL2JetParAK8 = cms.string(relBase+'/src/LJMet/Com/data/Sum
 process.JetSubCalc.DataL3JetParAK8 = cms.string(relBase+'/src/LJMet/Com/data/Summer16RRV3/Summer16_23Sep2016BCDV3_DATA_L3Absolute_AK8PFchs.txt')
 process.JetSubCalc.DataL2L3JetParAK8 = cms.string(relBase+'/src/LJMet/Com/data/Summer16RRV3/Summer16_23Sep2016BCDV3_DATA_L2L3Residual_AK8PFchs.txt')
 process.JetSubCalc.UncertaintyAK8 = cms.string(relBase+'/src/LJMet/Com/data/Summer16RRV3/Summer16_23Sep2016V3_MC_Uncertainty_AK8PFchs.txt')
+process.JetSubCalc.puppiCorrPath = cms.string(relBase+'/src/LJMet/Com/PuppiSoftdropMassCorr/weights/puppiCorr.root')
 
 ############################################################
 #
@@ -77,30 +78,43 @@ process.event_selector = cms.PSet(
     dump_trigger = cms.bool(False),
 
     trigger_path_el = cms.vstring(
-        'HLT_Ele32_eta2p1_WPTight_Gsf_v1', 'HLT_Ele32_eta2p1_WPTight_Gsf_v2', 'HLT_Ele32_eta2p1_WPTight_Gsf_v3', 
-        'HLT_Ele32_eta2p1_WPTight_Gsf_v4', 'HLT_Ele32_eta2p1_WPTight_Gsf_v5', 'HLT_Ele32_eta2p1_WPTight_Gsf_v6', 
-        'HLT_Ele32_eta2p1_WPTight_Gsf_v7', 'HLT_Ele32_eta2p1_WPTight_Gsf_v8', 
-        'HLT_Ele32_WPTight_Gsf_v1', 'HLT_Ele32_WPTight_Gsf_v2', 'HLT_Ele32_WPTight_Gsf_v3', 
-        'HLT_Ele32_WPTight_Gsf_v4', 'HLT_Ele32_WPTight_Gsf_v5', 'HLT_Ele32_WPTight_Gsf_v6', 
-        'HLT_Ele32_WPTight_Gsf_v7', 'HLT_Ele32_WPTight_Gsf_v8', 
-        'HLT_Ele30_WPTight_Gsf_v1', 'HLT_Ele30_WPTight_Gsf_v2', 'HLT_Ele30_WPTight_Gsf_v3', 
-        'HLT_Ele27_eta2p1_WPLoose_Gsf_HT200_v1', 'HLT_Ele27_eta2p1_WPLoose_Gsf_HT200_v2', 'HLT_Ele27_eta2p1_WPLoose_Gsf_HT200_v3', 
-        'HLT_Ele27_eta2p1_WPLoose_Gsf_HT200_v4', 'HLT_Ele27_eta2p1_WPLoose_Gsf_HT200_v5', 'HLT_Ele27_eta2p1_WPLoose_Gsf_HT200_v6', 
-        'HLT_Ele27_eta2p1_WPLoose_Gsf_HT200_v7', 'HLT_Ele27_eta2p1_WPLoose_Gsf_HT200_v8', 'HLT_Ele27_eta2p1_WPLoose_Gsf_HT200_v9',
-        'HLT_Ele27_eta2p1_WPLoose_Gsf_HT200_v10', 
-        'HLT_Ele15_IsoVVVL_PFHT350_v1', 'HLT_Ele15_IsoVVVL_PFHT350_v2', 'HLT_Ele15_IsoVVVL_PFHT350_v3',
-        'HLT_Ele15_IsoVVVL_PFHT350_v4', 'HLT_Ele15_IsoVVVL_PFHT350_v5', 'HLT_Ele15_IsoVVVL_PFHT350_v6',
-        'HLT_Ele15_IsoVVVL_PFHT400_v1', 'HLT_Ele15_IsoVVVL_PFHT400_v2', 'HLT_Ele15_IsoVVVL_PFHT400_v3',
-        'HLT_Ele15_IsoVVVL_PFHT400_v4', 'HLT_Ele15_IsoVVVL_PFHT400_v5', 'HLT_Ele15_IsoVVVL_PFHT400_v6',
-        'HLT_Ele45_CaloIdVT_GsfTrkIdT_PFJet200_PFJet50_v3', 'HLT_Ele45_CaloIdVT_GsfTrkIdT_PFJet200_PFJet50_v4',
-        'HLT_Ele45_CaloIdVT_GsfTrkIdT_PFJet200_PFJet50_v5', 'HLT_Ele45_CaloIdVT_GsfTrkIdT_PFJet200_PFJet50_v6',
-        'HLT_Ele45_CaloIdVT_GsfTrkIdT_PFJet200_PFJet50_v7', 'HLT_Ele45_CaloIdVT_GsfTrkIdT_PFJet200_PFJet50_v8', 
-        'HLT_Ele45_CaloIdVT_GsfTrkIdT_PFJet200_PFJet50_v9',
-        'HLT_Ele50_CaloIdVT_GsfTrkIdT_PFJet165_v1', 'HLT_Ele50_CaloIdVT_GsfTrkIdT_PFJet165_v2', 'HLT_Ele50_CaloIdVT_GsfTrkIdT_PFJet165_v3',
-        'HLT_Ele50_CaloIdVT_GsfTrkIdT_PFJet165_v4', 'HLT_Ele50_CaloIdVT_GsfTrkIdT_PFJet165_v5', 'HLT_Ele50_CaloIdVT_GsfTrkIdT_PFJet165_v6',
-        'HLT_Ele50_CaloIdVT_GsfTrkIdT_PFJet165_v7',
-        'HLT_PFHT900_v1', 'HLT_PFHT900_v2', 'HLT_PFHT900_v3', 'HLT_PFHT900_v4', 'HLT_PFHT900_v5', 'HLT_PFHT900_v6',
-        'HLT_PFHT600_v3', 'HLT_PFHT600_v4', 'HLT_PFHT600_v5', 'HLT_PFHT600_v6', 'HLT_PFHT600_v7', 'HLT_PFHT600_v8',
+        # 'HLT_Ele32_eta2p1_WPTight_Gsf_v1', 'HLT_Ele32_eta2p1_WPTight_Gsf_v2', 'HLT_Ele32_eta2p1_WPTight_Gsf_v3', 
+        # 'HLT_Ele32_eta2p1_WPTight_Gsf_v4', 'HLT_Ele32_eta2p1_WPTight_Gsf_v5', 'HLT_Ele32_eta2p1_WPTight_Gsf_v6', 
+        # 'HLT_Ele32_eta2p1_WPTight_Gsf_v7', 'HLT_Ele32_eta2p1_WPTight_Gsf_v8', 
+        # 'HLT_Ele32_WPTight_Gsf_v1', 'HLT_Ele32_WPTight_Gsf_v2', 'HLT_Ele32_WPTight_Gsf_v3', 
+        # 'HLT_Ele32_WPTight_Gsf_v4', 'HLT_Ele32_WPTight_Gsf_v5', 'HLT_Ele32_WPTight_Gsf_v6', 
+        # 'HLT_Ele32_WPTight_Gsf_v7', 'HLT_Ele32_WPTight_Gsf_v8', 
+        # 'HLT_Ele30_WPTight_Gsf_v1', 'HLT_Ele30_WPTight_Gsf_v2', 'HLT_Ele30_WPTight_Gsf_v3', 
+        # 'HLT_Ele27_WPTight_Gsf_v1', 'HLT_Ele27_WPTight_Gsf_v2', 'HLT_Ele27_WPTight_Gsf_v3', 
+        # 'HLT_Ele27_WPTight_Gsf_v4', 'HLT_Ele27_WPTight_Gsf_v5', 'HLT_Ele27_WPTight_Gsf_v6', 'HLT_Ele27_WPTight_Gsf_v7', 
+        # 'HLT_Ele27_eta2p1_WPLoose_Gsf_HT200_v1', 'HLT_Ele27_eta2p1_WPLoose_Gsf_HT200_v2', 'HLT_Ele27_eta2p1_WPLoose_Gsf_HT200_v3', 
+        # 'HLT_Ele27_eta2p1_WPLoose_Gsf_HT200_v4', 'HLT_Ele27_eta2p1_WPLoose_Gsf_HT200_v5', 'HLT_Ele27_eta2p1_WPLoose_Gsf_HT200_v6', 
+        # 'HLT_Ele27_eta2p1_WPLoose_Gsf_HT200_v7', 'HLT_Ele27_eta2p1_WPLoose_Gsf_HT200_v8', 'HLT_Ele27_eta2p1_WPLoose_Gsf_HT200_v9',
+        # 'HLT_Ele27_eta2p1_WPLoose_Gsf_HT200_v10', 
+        # 'HLT_Ele15_IsoVVVL_PFHT350_v1', 'HLT_Ele15_IsoVVVL_PFHT350_v2', 'HLT_Ele15_IsoVVVL_PFHT350_v3',
+        # 'HLT_Ele15_IsoVVVL_PFHT350_v4', 'HLT_Ele15_IsoVVVL_PFHT350_v5', 'HLT_Ele15_IsoVVVL_PFHT350_v6',
+        # 'HLT_Ele15_IsoVVVL_PFHT400_v1', 'HLT_Ele15_IsoVVVL_PFHT400_v2', 'HLT_Ele15_IsoVVVL_PFHT400_v3',
+        # 'HLT_Ele15_IsoVVVL_PFHT400_v4', 'HLT_Ele15_IsoVVVL_PFHT400_v5', 'HLT_Ele15_IsoVVVL_PFHT400_v6',
+        # 'HLT_Ele45_CaloIdVT_GsfTrkIdT_PFJet200_PFJet50_v3', 'HLT_Ele45_CaloIdVT_GsfTrkIdT_PFJet200_PFJet50_v4',
+        # 'HLT_Ele45_CaloIdVT_GsfTrkIdT_PFJet200_PFJet50_v5', 'HLT_Ele45_CaloIdVT_GsfTrkIdT_PFJet200_PFJet50_v6',
+        # 'HLT_Ele45_CaloIdVT_GsfTrkIdT_PFJet200_PFJet50_v7', 'HLT_Ele45_CaloIdVT_GsfTrkIdT_PFJet200_PFJet50_v8', 
+        # 'HLT_Ele45_CaloIdVT_GsfTrkIdT_PFJet200_PFJet50_v9',
+        # 'HLT_Ele50_CaloIdVT_GsfTrkIdT_PFJet165_v1', 'HLT_Ele50_CaloIdVT_GsfTrkIdT_PFJet165_v2', 'HLT_Ele50_CaloIdVT_GsfTrkIdT_PFJet165_v3',
+        # 'HLT_Ele50_CaloIdVT_GsfTrkIdT_PFJet165_v4', 'HLT_Ele50_CaloIdVT_GsfTrkIdT_PFJet165_v5', 'HLT_Ele50_CaloIdVT_GsfTrkIdT_PFJet165_v6',
+        # 'HLT_Ele50_CaloIdVT_GsfTrkIdT_PFJet165_v7',
+        # 'HLT_PFHT900_v1', 'HLT_PFHT900_v2', 'HLT_PFHT900_v3', 'HLT_PFHT900_v4', 'HLT_PFHT900_v5', 'HLT_PFHT900_v6',
+        # 'HLT_PFHT600_v3', 'HLT_PFHT600_v4', 'HLT_PFHT600_v5', 'HLT_PFHT600_v6', 'HLT_PFHT600_v7', 'HLT_PFHT600_v8',
+
+        'HLT_Ele32_eta2p1_WPTight_Gsf_v',
+        'HLT_Ele32_WPTight_Gsf_v',
+        'HLT_Ele30_WPTight_Gsf_v',
+        'HLT_Ele27_WPTight_Gsf_v',
+        'HLT_Ele27_eta2p1_WPLoose_Gsf_HT200_v',
+        'HLT_Ele15_IsoVVVL_PFHT350_v',
+        'HLT_Ele15_IsoVVVL_PFHT400_v',
+        'HLT_Ele45_CaloIdVT_GsfTrkIdT_PFJet200_PFJet50_v3',
+        'HLT_Ele50_CaloIdVT_GsfTrkIdT_PFJet165_v',
+        'HLT_PFHT900_v',
         ),
     trigger_path_mu = cms.vstring(
         'HLT_IsoMu24_v1', 'HLT_IsoMu24_v2', 'HLT_IsoMu24_v3', 'HLT_IsoMu24_v4',
@@ -134,7 +148,7 @@ process.event_selector = cms.PSet(
     jet_maxeta               = cms.double(2.4),
     min_jet                  = cms.int32(2),
     max_jet                  = cms.int32(4000),
-    leading_jet_pt           = cms.double(30.0),
+    leading_jet_pt           = cms.double(50.0),
 
     # muon cuts
     muon_cuts                = cms.bool(True),
@@ -190,7 +204,7 @@ process.event_selector = cms.PSet(
     
     # MET cuts
     met_cuts                 = cms.bool(True),
-    min_met                  = cms.double(20.0),
+    min_met                  = cms.double(30.0),
     max_met                  = cms.double(99999999999.0),
     
     # Btagging cuts
