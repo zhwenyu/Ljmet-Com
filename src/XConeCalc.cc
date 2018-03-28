@@ -946,6 +946,7 @@ int XConeCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * se
     SetValue("theXConeJetPhi",    theXConeJetPhi);
     SetValue("theXConeJetEnergy", theXConeJetEnergy);
     SetValue("theXConeJetArea", theXConeJetArea);
+    SetValue("theXConeJetCorrScale", theXConeJetCorrScale);
 
     SetValue("theXConeJetConstStartIndex",     theXConeJetConstStartIndex);
     SetValue("theXConeJetConstEndIndex",    theXConeJetConstEndIndex);
@@ -1188,6 +1189,7 @@ int XConeCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * se
 		SetValue("theXConePUPPIJetPhi",    theXConePUPPIJetPhi);
 		SetValue("theXConePUPPIJetEnergy", theXConePUPPIJetEnergy);
 		SetValue("theXConePUPPIJetArea", theXConePUPPIJetArea);
+		SetValue("theXConePUPPIJetCorrScale", theXConePUPPIJetCorrScale);
 
 		SetValue("theXConePUPPIJetConstStartIndex",     theXConePUPPIJetConstStartIndex);
 		SetValue("theXConePUPPIJetConstEndIndex",     theXConePUPPIJetConstEndIndex);
