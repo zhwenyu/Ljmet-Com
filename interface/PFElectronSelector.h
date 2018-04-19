@@ -155,7 +155,7 @@ public: // interface
         ret.set(false);
         
         double mva = electron.mva_e_pi();
-        double missingHits = electron.gsfTrack()->hitPattern().numberOfHits(reco::HitPattern::MISSING_INNER_HITS);
+        double missingHits = electron.gsfTrack()->hitPattern().numberOfAllHits(reco::HitPattern::MISSING_INNER_HITS);
         double corr_d0 = electron.dB();
         
         // in >= 39x conversion rejection variables are accessible from Gsf electron

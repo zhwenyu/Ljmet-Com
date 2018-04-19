@@ -1329,7 +1329,7 @@ double BaseEventSelector::mvaValue(const pat::Electron & electron, edm::EventBas
     allMVAVars.fbrem           = electron.fbrem();
   
     allMVAVars.gsfhits         = electron.gsfTrack()->hitPattern().trackerLayersWithMeasurement();
-    allMVAVars.expectedMissingInnerHits = electron.gsfTrack()->hitPattern().numberOfHits(reco::HitPattern::MISSING_INNER_HITS);
+    allMVAVars.expectedMissingInnerHits = electron.gsfTrack()->hitPattern().numberOfAllHits(reco::HitPattern::MISSING_INNER_HITS);
   
     reco::ConversionRef conv_ref = ConversionTools::matchedConversion(electron, conversions, beamspot.position());
     double vertexFitProbability = -1.; 
@@ -1443,7 +1443,7 @@ double BaseEventSelector::mvaValue_alt(const pat::Electron & electron, edm::Even
     allMVAVars_alt.fbrem           = electron.fbrem();
   
     allMVAVars_alt.gsfhits         = electron.gsfTrack()->hitPattern().trackerLayersWithMeasurement();
-    allMVAVars_alt.expectedMissingInnerHits = electron.gsfTrack()->hitPattern().numberOfHits(reco::HitPattern::MISSING_INNER_HITS);
+    allMVAVars_alt.expectedMissingInnerHits = electron.gsfTrack()->hitPattern().numberOfAllHits(reco::HitPattern::MISSING_INNER_HITS);
   
     reco::ConversionRef conv_ref = ConversionTools::matchedConversion(electron, conversions, beamspot.position());
     double vertexFitProbability = -1.; 
