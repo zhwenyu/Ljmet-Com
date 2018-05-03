@@ -15,6 +15,7 @@
 #include "DataFormats/HLTReco/interface/TriggerEvent.h"
 #include "DataFormats/Common/interface/TriggerResults.h"
 #include "DataFormats/PatCandidates/interface/TriggerObject.h"
+#include "DataFormats/PatCandidates/interface/TriggerObjectStandAlone.h"
 #include "FWCore/Common/interface/TriggerNames.h"
 #include "DataFormats/Math/interface/deltaR.h"
 #include "EgammaAnalysis/ElectronTools/interface/ElectronEffectiveArea.h"
@@ -848,6 +849,7 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
         for (unsigned int iel = 0; iel < elTrigMatchFilters.size(); iel++) {
             trigmatched = false;
             for(pat::TriggerObjectStandAlone obj : *mhEdmTriggerObjectColl){       
+	        obj.unpackFilterLabels(event,*mhEdmTriggerResults);
                 obj.unpackPathNames(names);
                 for(unsigned h = 0; h < obj.filterLabels().size(); ++h){
                     if ( obj.filterLabels()[h]!=elTrigMatchFilters[iel] ) {
@@ -868,6 +870,7 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
         for (unsigned int imu = 0; imu < muTrigMatchFilters.size(); imu++) {
             trigmatched = false;
             for(pat::TriggerObjectStandAlone obj : *mhEdmTriggerObjectColl){       
+	        obj.unpackFilterLabels(event,*mhEdmTriggerResults);
                 obj.unpackPathNames(names);
                 for(unsigned h = 0; h < obj.filterLabels().size(); ++h){
                     if ( obj.filterLabels()[h]!=muTrigMatchFilters[imu] ) {
@@ -919,24 +922,23 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
     //   std::vector <double> AK8JetRCN;       
     for (std::vector<pat::Jet>::const_iterator ijet = AK8Jets->begin(); ijet != AK8Jets->end(); ijet++){
 
-	// PF Loose
-	bool looseJetID = false;
+      if(ijet->pt() < 170) continue; // not all info there for lower pt
+      //PF Tight
+	bool tightJetID = false;
 	pat::Jet rawJet = ijet->correctedJet(0);
 	if(abs(rawJet.eta()) <= 2.7){
-	  looseJetID = (rawJet.neutralHadronEnergyFraction() < 0.99 && 
-			rawJet.neutralEmEnergyFraction() < 0.99 && 
+	  tightJetID = (rawJet.neutralHadronEnergyFraction() < 0.9 && 
+			rawJet.neutralEmEnergyFraction() < 0.9 && 
 			(rawJet.chargedMultiplicity()+rawJet.neutralMultiplicity()) > 1) && 
 	    ((abs(rawJet.eta()) <= 2.4 && 
 	      rawJet.chargedHadronEnergyFraction() > 0 && 
-	      rawJet.chargedEmEnergyFraction() < 0.99 && 
+	      //rawJet.chargedEmEnergyFraction() < 0.99 && 
 	      rawJet.chargedMultiplicity() > 0) || 
 	     abs(rawJet.eta()) > 2.4);
-	}else if(abs(rawJet.eta()) <= 3.0){
-	  looseJetID = rawJet.neutralEmEnergyFraction() > 0.01 && rawJet.neutralHadronEnergyFraction() < 0.98 && rawJet.neutralMultiplicity() > 2;
-	}else{
-	  looseJetID = rawJet.neutralEmEnergyFraction() < 0.9 && rawJet.neutralMultiplicity() > 10;
+	}else{ 
+	  tightJetID = true;
 	}
-	if(!looseJetID) continue;	
+	if(!tightJetID) continue;	
 
         if (doAllJetSyst) {
             TLorentzVector lvak8_jesup = selector->correctJet(*ijet, event,true,false,1);

@@ -579,23 +579,21 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * s
     for (std::vector<pat::Jet>::const_iterator ijet = theAK8Jets->begin(); ijet != theAK8Jets->end(); ijet++) {
       int index = (int)(ijet-theAK8Jets->begin());
 
+      bool tightJetID = false;
       pat::Jet rawJet = ijet->correctedJet(0);
-      bool looseJetID = false;
       if(abs(rawJet.eta()) <= 2.7){
-	looseJetID = (rawJet.neutralHadronEnergyFraction() < 0.99 && 
-		      rawJet.neutralEmEnergyFraction() < 0.99 && 
+	tightJetID = (rawJet.neutralHadronEnergyFraction() < 0.9 && 
+		      rawJet.neutralEmEnergyFraction() < 0.9 && 
 		      (rawJet.chargedMultiplicity()+rawJet.neutralMultiplicity()) > 1) && 
 	  ((abs(rawJet.eta()) <= 2.4 && 
 	    rawJet.chargedHadronEnergyFraction() > 0 && 
-	    rawJet.chargedEmEnergyFraction() < 0.99 && 
+	    //rawJet.chargedEmEnergyFraction() < 0.99 && 
 	    rawJet.chargedMultiplicity() > 0) || 
 	   abs(rawJet.eta()) > 2.4);
-      }else if(abs(rawJet.eta()) <= 3.0){
-	looseJetID = rawJet.neutralEmEnergyFraction() > 0.01 && rawJet.neutralHadronEnergyFraction() < 0.98 && rawJet.neutralMultiplicity() > 2;
-      }else{
-	looseJetID = rawJet.neutralEmEnergyFraction() < 0.9 && rawJet.neutralMultiplicity() > 10;
+      }else{ 
+	tightJetID = true;
       }
-      if(!looseJetID) continue;	
+      if(!tightJetID) continue;	
 
       pat::Jet corrak8;
       if(doNewJEC){

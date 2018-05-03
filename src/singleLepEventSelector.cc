@@ -30,11 +30,9 @@
 #include "DataFormats/PatCandidates/interface/Tau.h"
 #include "DataFormats/PatCandidates/interface/TriggerObject.h"
 #include "FWCore/Common/interface/TriggerNames.h"
-//#include "PhysicsTools/SelectorUtils/interface/PFElectronSelector.h"
 #include "LJMet/Com/interface/TopElectronSelector.h"
 #include "PhysicsTools/SelectorUtils/interface/PFJetIDSelectionFunctor.h"
 #include "LJMet/Com/interface/PFMuonSelector.h"
-//#include "PhysicsTools/SelectorUtils/interface/PFMuonSelector.h"
 
 #include "PhysicsTools/SelectorUtils/interface/PVSelector.h"
 #include "PhysicsTools/SelectorUtils/interface/PVObjectSelector.h"
@@ -144,16 +142,16 @@ void singleLepEventSelector::BeginJob( std::map<std::string, edm::ParameterSet c
 
     std::string _key;
 
-        _key = "pfJetIDSelector";
+    _key = "pfJetIDSelector";
     if ( par.find(_key)!=par.end() ){
-        jetSel_ = boost::shared_ptr<PFJetIDSelectionFunctor>( new PFJetIDSelectionFunctor(par[_key]) );
-        std::cout << mLegend << "jet ID selector configured!"
-                  << std::endl;
+      jetSel_ = boost::shared_ptr<PFJetIDSelectionFunctor>( new PFJetIDSelectionFunctor(par[_key]) );
+      std::cout << mLegend << "jet ID selector configured!"
+		<< std::endl;
     }
     else {
-        std::cout << mLegend << "jet ID selector not configured, exiting"
-                  << std::endl;
-        std::exit(-1);
+      std::cout << mLegend << "jet ID selector not configured, exiting"
+		<< std::endl;
+      std::exit(-1);
     }
     
     _key = "pvSelector";
@@ -641,51 +639,6 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
                 retMuon.set(false);	
                 bool pass = false;
     
-                /*if ((*_imu).globalTrack().isNonnull() and (*_imu).globalTrack().isAvailable()) {
-                    reco::TrackRef tunePBestTrack = (*_imu).tunePMuonBestTrack();
-                    reco::TrackRef globalTrack = (*_imu).globalTrack();
-                    reco::TrackRef combinedTrack;
-                    if ((*_imu).combinedMuon().isNonnull() and (*_imu).combinedMuon().isAvailable()) combinedTrack = (*_imu).combinedMuon();
-                    reco::TrackRef innerTrack;
-                    if ((*_imu).innerTrack().isNonnull() and (*_imu).innerTrack().isAvailable()) innerTrack = (*_imu).innerTrack();
-                    reco::TrackRef outerTrack;
-                    if ((*_imu).outerTrack().isNonnull() and (*_imu).outerTrack().isAvailable()) outerTrack = (*_imu).outerTrack();
-                    reco::TrackRef pickyTrack;
-                    if ((*_imu).pickyTrack().isNonnull() and (*_imu).pickyTrack().isAvailable()) pickyTrack = (*_imu).pickyTrack();
-        
-                    reco::Muon::MuonTrackType tunePBestTrackType = (*_imu).tunePMuonBestTrackType();
-                    std::cout<<"Best track type is ";
-                    switch (int(tunePBestTrackType)) {
-                        case 1:
-                            std::cout<<"InnerTrack"<<std::endl;
-                            break;
-                        case 2:
-                            std::cout<<"OuterTrack"<<std::endl;
-                            break;
-                        case 3:
-                            std::cout<<"CombinedTrack"<<std::endl;
-                            break;
-                        case 4:
-                            std::cout<<"TPFMS"<<std::endl;
-                            break;
-                        case 5:
-                            std::cout<<"Picky"<<std::endl;
-                            break;
-                        case 6:
-                            std::cout<<"DYT"<<std::endl;
-                            break;
-                        default:
-                            std::cout<<"Unknown("<<tunePBestTrackType<<")"<<std::endl;
-                    }
-                    std::cout<<"PF       : "<<(*_imu).pt()<<std::endl;
-                    std::cout<<"tuneP    : "<<tunePBestTrack->pt()<<" w/ quality "<<tunePBestTrack->qualityMask()<<std::endl;
-                    std::cout<<"global   : "<<globalTrack->pt()<<" w/ quality "<<globalTrack->qualityMask()<<std::endl;
-                    if ((*_imu).combinedMuon().isNonnull() and (*_imu).combinedMuon().isAvailable()) std::cout<<"combined : "<<combinedTrack->pt()<<" w/ quality "<<combinedTrack->qualityMask()<<std::endl;
-                    if ((*_imu).innerTrack().isNonnull() and (*_imu).innerTrack().isAvailable()) std::cout<<"inner    : "<<innerTrack->pt()<<" w/ quality "<<innerTrack->qualityMask()<<std::endl;
-                    if ((*_imu).outerTrack().isNonnull() and (*_imu).outerTrack().isAvailable()) std::cout<<"outer    : "<<outerTrack->pt()<<" w/ quality "<<outerTrack->qualityMask()<<std::endl;
-                    if ((*_imu).pickyTrack().isNonnull() and (*_imu).pickyTrack().isAvailable()) std::cout<<"picky    : "<<pickyTrack->pt()<<" w/ quality "<<pickyTrack->qualityMask()<<std::endl;
-                }*/
-
                 //muon cuts
                 while(1){
 
@@ -694,19 +647,7 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
                         else break; // fail
 		    }
 		    else {
-                        //if ( mbPar["muon_selector_medium"] && (*_imu).isMediumMuon() ){ }
-                        // *!*!*! TEMPORARY FOR ICHEP, RESULT OF DECREASED EFFICIENCY FROM HIP !*!*!*
-                        bool ismediummuon = false;
-                        if ( mbPar["muon_selector_medium"] ){ 
-                            bool goodGlob = (*_imu).isGlobalMuon() && 
-                                (*_imu).globalTrack()->normalizedChi2() < 3 && 
-                                (*_imu).combinedQuality().chi2LocalPosition < 12 && 
-                                (*_imu).combinedQuality().trkKink < 20; 
-                            ismediummuon = (*_imu).isLooseMuon() &&
-                                (*_imu).innerTrack()->validFraction() > 0.49 && 
-                                (*_imu).segmentCompatibility() > (goodGlob ? 0.303 : 0.451); 
-                        }
-                        if ( mbPar["muon_selector_medium"] && ismediummuon ) { }
+		        if ( mbPar["muon_selector_medium"] && (*_imu).isMediumMuon() ){ }
                         else if ( !mbPar["muon_selector_medium"] && (*_imu).isTightMuon(*mvSelPVs[0]) ){ }
 		        else break; // fail
 
@@ -975,13 +916,7 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
 
 	    if(_itau->tauID("byLooseCombinedIsolationDeltaBetaCorr3Hits")){}
 	    else break;
-		
-	    //if(_itau->tauID("againstElectronTightMVA6")){}
-	    //else break;
-		
-	    //if(_itau->tauID("againstMuonLoose3")){}
-	    //else break;
-		
+
 	    if(_itau->pt() > 20 && fabs(_itau->eta()) < 2.4 ){}
 	    else break;
 		
@@ -1065,12 +1000,6 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
 
 		  const std::vector<edm::Ptr<reco::Candidate> > _ijet_consts = _ijet->daughterPtrVector();
 		  for ( std::vector<edm::Ptr<reco::Candidate> >::const_iterator _i_const = _ijet_consts.begin(); _i_const != _ijet_consts.end(); ++_i_const){
-		    /*if ( (*_i_const).key() == cleaningMuons[0]->originalObjectRef().key() ) {
-		      tmpJet.setP4( _ijet->p4() - cleaningMuons[0]->p4() );
-		      jetP4 = correctJet(tmpJet, event);
-		      if (mbPar["debug"]) std::cout << "Corrected Jet : pT = " << jetP4.Pt() << " eta = " << jetP4.Eta() << " phi = " << jetP4.Phi() << std::endl;
-		      _cleaned = true;
-		      }*////old ref mathcing method, appears to be depreciated in CMSSW_7_4_X(?) 
 		    for (unsigned int muI = 0; muI < muDaughters.size(); muI++) {
 		      if ( (*_i_const).key() == muDaughters[muI].key() ) {
 			tmpJet.setP4( tmpJet.p4() - muDaughters[muI]->p4() );
@@ -1092,29 +1021,6 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
 		  }
 		}
 	      }
-	      // zprime method (gives same results as far as i can tell)
-	      /*if (_ijet->muonMultiplicity() > 0) {
-		double muEchk = (_ijet->correctedJet(0).energy()*_ijet->muonEnergyFraction()-cleaningMuons[0]->energy())/cleaningMuons[0]->energy();
-		if ( !(muEchk < -0.1 || (muEchk > 0.1 && _ijet->muonMultiplicity()==1)) ) {
-		tmpJet.setP4( _ijet->correctedJet(0).p4()-cleaningMuons[0]->p4() );
-		if (tmpJet.pt() > 5 && deltaR(_ijet->correctedJet(0).p4(),tmpJet.p4()) > 1.57) std::cout << "Lepton-Jet cleaning flipped direction, not cleaning!" << std::endl;
-		else {
-		jetP4 = correctJet(tmpJet, event);
-		if (mbPar["debug"]) std::cout << "Corrected Jet : pT = " << jetP4.Pt() << " eta = " << jetP4.Eta() << " phi = " << jetP4.Phi() << std::endl;
-		_cleaned = true;
-		}
-		}
-		}*/
-	      //old deltaR matching method
-	      /*for (unsigned int id = 0, nd = (*_ijet).numberOfDaughters(); id < nd; ++id) {
-		const pat::PackedCandidate &_ijet_const = dynamic_cast<const pat::PackedCandidate &>(*(*_ijet).daughter(id));
-		if ( deltaR(cleaningMuons[0]->p4(),_ijet_const.p4()) < 0.001 ) {
-		tmpJet.setP4( _ijet->p4()-cleaningMuons[0]->p4() );
-		jetP4 = correctJet(tmpJet, event);
-		if (mbPar["debug"]) std::cout << "Corrected Jet : pT = " << jetP4.Pt() << " eta = " << jetP4.Eta() << " phi = " << jetP4.Phi() << std::endl;
-		_cleaned = true;
-		}
-		}*/
             
 	      for(unsigned int iel = 0; iel < cleaningElectrons.size(); iel++){
 		if ( deltaR(cleaningElectrons[iel]->p4(),_ijet->p4()) < mdPar["LepJetDR"]){ //0.6 ){
@@ -1151,19 +1057,6 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
 		  }
 		}
 	      }
-	      /*if (_ijet->electronMultiplicity() > 0) {
-		  double elEchk = (_ijet->correctedJet(0).energy()*_ijet->chargedEmEnergyFraction()-cleaningElectrons[0]->energy())/cleaningElectrons[0]->energy();
-		  if (mbPar["debug"]) std::cout<<"Non-zero electron multiplicity in jet, jet_chEm_Energy = "<<_ijet->correctedJet(0).energy()*_ijet->chargedEmEnergyFraction()<<std::endl;
-		  if ( !(elEchk < -0.1 || (elEchk > 0.1 && _ijet->electronMultiplicity()==1)) ) {
-		  //tmpJet.setP4( _ijet->correctedJet(0).p4()-cleaningElectrons[0]->p4() );
-		  if (tmpJet.pt() > 5 && deltaR(_ijet->correctedJet(0).p4(),tmpJet.p4()) > 1.57) std::cout << "Lepton-Jet cleaning flipped direction, not cleaning!" << std::endl;
-		  else {
-		  //jetP4 = correctJet(tmpJet, event);
-		  if (mbPar["debug"]) std::cout << "Corrected Jet : pT = " << jetP4.Pt() << " eta = " << jetP4.Eta() << " phi = " << jetP4.Phi() << std::endl;
-		  //_cleaned = true;
-		  }
-		  }
-		  }*/
 	    }
 
 	    if (!_cleaned) {
@@ -1182,16 +1075,29 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
             // jet cuts
             while(1){ 
 
-	        // quality cuts
-	        if (fabs(_ijet->correctedJet(0).eta()) < 2.7 && (*jetSel_)( *_ijet, retJet ) ){ } 
+	        // PF Jet ID
+	        if (fabs(_ijet->correctedJet(0).eta()) < 2.4 &&
+		    _ijet->correctedJet(0).neutralHadronEnergyFraction() < 0.90 &&
+		    _ijet->correctedJet(0).neutralEmEnergyFraction() < 0.90 &&
+		    _ijet->correctedJet(0).chargedMultiplicity()+_ijet->correctedJet(0).neutralMultiplicity() > 1 &&
+		    _ijet->correctedJet(0).chargedHadronEnergyFraction() > 0 &&
+		    _ijet->correctedJet(0).chargedMultiplicity() > 0
+		    ){ } 
+	        else if (fabs(_ijet->correctedJet(0).eta()) >= 2.4 && 
+			 fabs(_ijet->correctedJet(0).eta()) < 2.7 &&
+			 _ijet->correctedJet(0).neutralHadronEnergyFraction() < 0.90 &&
+			 _ijet->correctedJet(0).neutralEmEnergyFraction() < 0.90 &&
+			 _ijet->correctedJet(0).chargedMultiplicity()+_ijet->correctedJet(0).neutralMultiplicity() > 1
+			 ){ } 
 	        else if (fabs(_ijet->correctedJet(0).eta()) >= 2.7 && 
 			 fabs(_ijet->correctedJet(0).eta()) < 3.0 && 
-			 _ijet->correctedJet(0).neutralEmEnergyFraction() > 0.01 && 
-			 _ijet->correctedJet(0).neutralHadronEnergyFraction() < 0.98 &&
+			 _ijet->correctedJet(0).neutralEmEnergyFraction() > 0.02 && 
+			 _ijet->correctedJet(0).neutralEmEnergyFraction() < 0.99 &&
 			 _ijet->correctedJet(0).neutralMultiplicity() > 2
 			 ){ }
 		else if (fabs(_ijet->correctedJet(0).eta()) >= 3.0 && 
-			 _ijet->correctedJet(0).neutralEmEnergyFraction() < 0.9 && 
+			 _ijet->correctedJet(0).neutralEmEnergyFraction() < 0.9 &&
+			 _ijet->correctedJet(0).neutralHadronEnergyFraction() > 0.02 &&
 			 _ijet->correctedJet(0).neutralMultiplicity() > 10
 			 ){ }
 	        else break; // fail 
