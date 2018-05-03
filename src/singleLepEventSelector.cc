@@ -441,97 +441,104 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
         bool passTrigMuMC = false;
         bool passTrigElData = false;
         bool passTrigMuData = false;
-
+	
         if ( considerCut("Trigger") ) {
-
-            if (mbPar["debug"]) std::cout<<"trigger cuts..."<<std::endl;
-
-            event.getByLabel( mtPar["trigger_collection"], mhEdmTriggerResults );
-            const edm::TriggerNames trigNames = event.triggerNames(*mhEdmTriggerResults);
-
-            bool passTrig = false;
-            unsigned int _tSize = mhEdmTriggerResults->size();
-
-
-            // dump trigger names
-            if (bFirstEntry && mbPar["dump_trigger"]){
-                for (unsigned int i=0; i<_tSize; i++){
-                    std::string trigName = trigNames.triggerName(i);
-                    std::cout << i << "   " << trigName;
-                    bool fired = mhEdmTriggerResults->accept(trigNames.triggerIndex(trigName));
-                    std::cout <<", FIRED = "<<fired<<std::endl;
-                } 
-            }
-
-            mvSelTriggersEl.clear();
-            mvSelMCTriggersEl.clear();
-            mvSelTriggersMu.clear();
-            mvSelMCTriggersMu.clear();
-
-            int passTrigEl = 0;
-            for (unsigned int ipath = 0; ipath < mvsPar["mctrigger_path_el"].size(); ipath++){
-                unsigned int _tIndex = trigNames.triggerIndex(mvsPar["mctrigger_path_el"].at(ipath));
-                if ( _tIndex<_tSize){
-                    if (mhEdmTriggerResults->accept(_tIndex)){
-                        passTrigEl = 1;
-                        mvSelMCTriggersEl[mvsPar["mctrigger_path_el"].at(ipath)] = 1;
-                    }
-                    else mvSelMCTriggersEl[mvsPar["mctrigger_path_el"].at(ipath)] = 0;
-                }
-                else mvSelMCTriggersEl[mvsPar["mctrigger_path_el"].at(ipath)] = 0;
-            }
-            if (passTrigEl>0) passTrigElMC = true;
-
-            int passTrigMu = 0;
-            for (unsigned int ipath = 0; ipath < mvsPar["mctrigger_path_mu"].size(); ipath++){
-                unsigned int _tIndex = trigNames.triggerIndex(mvsPar["mctrigger_path_mu"].at(ipath));
-                if ( _tIndex<_tSize){
-                    if (mhEdmTriggerResults->accept(_tIndex)){
-                        passTrigMu = 1;
-                        mvSelMCTriggersMu[mvsPar["mctrigger_path_mu"].at(ipath)] = 1;
-                    }
-                    else mvSelMCTriggersMu[mvsPar["mctrigger_path_mu"].at(ipath)] = 0;
-                }
-                else mvSelMCTriggersMu[mvsPar["mctrigger_path_mu"].at(ipath)] = 0;
-            }
-            if (passTrigMu>0) passTrigMuMC = true;
-
-            //Loop over each data channel separately
-            passTrigEl = 0;
-            for (unsigned int ipath = 0; ipath < mvsPar["trigger_path_el"].size(); ipath++){
-                unsigned int _tIndex = trigNames.triggerIndex(mvsPar["trigger_path_el"].at(ipath));
-                if ( _tIndex<_tSize){
-                    if (mhEdmTriggerResults->accept(_tIndex)){
-                        passTrigEl = 1;
-                        mvSelTriggersEl[mvsPar["trigger_path_el"].at(ipath)] = 1;
-                    }
-                    else mvSelTriggersEl[mvsPar["trigger_path_el"].at(ipath)] = 0;
-                }
-                else mvSelTriggersEl[mvsPar["trigger_path_el"].at(ipath)] = 0;
-            }
-            if (passTrigEl>0) passTrigElData = true;
-
-            passTrigMu = 0;
-            for (unsigned int ipath = 0; ipath < mvsPar["trigger_path_mu"].size(); ipath++){
-                unsigned int _tIndex = trigNames.triggerIndex(mvsPar["trigger_path_mu"].at(ipath));
-                if ( _tIndex<_tSize){
-                    if (mhEdmTriggerResults->accept(_tIndex)){
-                        passTrigMu = 1;
-                        mvSelTriggersMu[mvsPar["trigger_path_mu"].at(ipath)] = 1;
-                    }
-                    else mvSelTriggersMu[mvsPar["trigger_path_mu"].at(ipath)] = 0;
-                }
-                else mvSelTriggersMu[mvsPar["trigger_path_mu"].at(ipath)] = 0;
-            }
-            if (passTrigMu>0) passTrigMuData = true;
-
-            if (mbPar["isMc"] && (passTrigMuMC||passTrigElMC) ) passTrig = true;
-            if (!mbPar["isMc"] && (passTrigMuData||passTrigElData) ) passTrig = true;
-
-
-            if ( ignoreCut("Trigger") || passTrig ) passCut(ret, "Trigger");
-            else break;
-
+	  
+	  if (mbPar["debug"]) std::cout<<"trigger cuts..."<<std::endl;
+	  
+	  event.getByLabel( mtPar["trigger_collection"], mhEdmTriggerResults );
+	  const edm::TriggerNames trigNames = event.triggerNames(*mhEdmTriggerResults);
+	  
+	  bool passTrig = false;
+	  unsigned int _tSize = mhEdmTriggerResults->size();
+	  
+	  
+	  // dump trigger names
+	  if (bFirstEntry && mbPar["dump_trigger"]){
+	    for (unsigned int i=0; i<_tSize; i++){
+	      std::string trigName = trigNames.triggerName(i);
+	      std::cout << i << "   " << trigName;
+	      bool fired = mhEdmTriggerResults->accept(trigNames.triggerIndex(trigName));
+	      std::cout <<", FIRED = "<<fired<<std::endl;
+	    } 
+	  }
+	  
+	  mvSelTriggersEl.clear();
+	  mvSelMCTriggersEl.clear();
+	  mvSelTriggersMu.clear();
+	  mvSelMCTriggersMu.clear();
+	  
+	  int passTrigEl = 0;
+	  if (mbPar["debug"]) std::cout<<"	In MC El trig list: "<<std::endl;
+	  for (unsigned int ipath = 0; ipath < mvsPar["mctrigger_path_el"].size() && mvsPar["mctrigger_path_el"].at(0)!="" ; ipath++){
+	    for(unsigned int i=0; i<_tSize; i++){
+	      std::string trigName = trigNames.triggerName(i);
+	      if (trigName.find(mvsPar["mctrigger_path_el"].at(ipath)) == std::string::npos) continue;
+	      if (mhEdmTriggerResults->accept(trigNames.triggerIndex(trigName))) {
+		passTrigEl = 1;
+		mvSelMCTriggersEl[mvsPar["mctrigger_path_el"].at(ipath)] = 1;
+		if (mbPar["debug"]) std::cout << "		" << trigNames.triggerName(i)  << std::endl;
+	      }
+	      else mvSelMCTriggersEl[mvsPar["mctrigger_path_el"].at(ipath)] = 0;
+	    }
+	  }
+	  if (passTrigEl>0) passTrigElMC = true;
+	  
+	  int passTrigMu = 0;
+	  if (mbPar["debug"]) std::cout<<"	In MC Mu trig list: "<<std::endl;
+	  for (unsigned int ipath = 0; ipath < mvsPar["mctrigger_path_mu"].size() && mvsPar["mctrigger_path_mu"].at(0)!="" ; ipath++){
+	    for(unsigned int i=0; i<_tSize; i++){
+	      std::string trigName = trigNames.triggerName(i);
+	      if ( trigName.find(mvsPar["mctrigger_path_mu"].at(ipath)) == std::string::npos) continue;
+	      if (mhEdmTriggerResults->accept(trigNames.triggerIndex(trigName))){
+		passTrigMu = 1;
+		mvSelMCTriggersMu[mvsPar["mctrigger_path_mu"].at(ipath)] = 1;
+		if (mbPar["debug"]) std::cout << "		" << trigNames.triggerName(i)  << std::endl;
+	      }
+	      else mvSelMCTriggersMu[mvsPar["mctrigger_path_mu"].at(ipath)] = 0;
+	    }
+	  }
+	  if (passTrigMu>0) passTrigMuMC = true;
+	  
+	  //Loop over each data channel separately
+	  passTrigEl = 0;
+	  if (mbPar["debug"]) std::cout<<"	In Data El trig list: "<<std::endl;
+	  for (unsigned int ipath = 0; ipath < mvsPar["trigger_path_el"].size() && mvsPar["trigger_path_el"].at(0)!="" ; ipath++){
+	    for(unsigned int i=0; i<_tSize; i++){
+	      std::string trigName = trigNames.triggerName(i);
+	      if ( trigName.find(mvsPar["trigger_path_el"].at(ipath)) == std::string::npos) continue;
+	      if (mhEdmTriggerResults->accept(trigNames.triggerIndex(trigName))){
+		passTrigEl = 1;
+		mvSelTriggersEl[mvsPar["trigger_path_el"].at(ipath)] = 1;
+		if (mbPar["debug"]) std::cout << "		" << trigNames.triggerName(i)  << std::endl;
+	      }
+	      else mvSelTriggersEl[mvsPar["trigger_path_el"].at(ipath)] = 0;
+	    }
+	  }
+	  if (passTrigEl>0) passTrigElData = true;
+	  
+	  passTrigMu = 0;
+	  if (mbPar["debug"]) std::cout<<"	In Data Mu trig list: "<<std::endl;
+	  for (unsigned int ipath = 0; ipath < mvsPar["trigger_path_mu"].size() && mvsPar["trigger_path_mu"].at(0)!="" ; ipath++){
+	    for(unsigned int i=0; i<_tSize; i++){
+	      std::string trigName = trigNames.triggerName(i);
+	      if ( trigName.find(mvsPar["trigger_path_mu"].at(ipath)) == std::string::npos) continue;
+	      if (mhEdmTriggerResults->accept(trigNames.triggerIndex(trigName))){
+		passTrigMu = 1;
+		mvSelTriggersMu[mvsPar["trigger_path_mu"].at(ipath)] = 1;
+		if (mbPar["debug"]) std::cout << "		" << trigNames.triggerName(i)  << std::endl;
+	      }
+	      else mvSelTriggersMu[mvsPar["trigger_path_mu"].at(ipath)] = 0;
+	    }
+	  }
+	  if (passTrigMu>0) passTrigMuData = true;
+	  
+	  if (mbPar["isMc"] && (passTrigMuMC||passTrigElMC) ) passTrig = true;
+	  if (!mbPar["isMc"] && (passTrigMuData||passTrigElData) ) passTrig = true;  
+	  
+	  if ( ignoreCut("Trigger") || passTrig ) passCut(ret, "Trigger");
+	  else break;
+	  
         } // end of trigger cuts
     
     
@@ -567,84 +574,31 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
 	  event.getByLabel( mtPar["flag_tag"], PatTriggerResults );
 	  const edm::TriggerNames patTrigNames = event.triggerNames(*PatTriggerResults);
 	  
+          bool goodvertpass = false;
+	  bool globaltighthalopass = false;
 	  bool hbhenoisepass = false;
 	  bool hbhenoiseisopass = false;
-	  bool globaltighthalopass = false;
 	  bool ecaldeadcellpass = false;
+	  bool badpfmuonpass = false;
+	  bool badchargedcandpass = false;
 	  bool eebadscpass = false;
-          bool goodvertpass = false;
+	  bool eebadcalibpass = false;
+
 	  
 	  for (unsigned int i=0; i<PatTriggerResults->size(); i++){
+	    if (patTrigNames.triggerName(i) == "Flag_goodVertices") goodvertpass = PatTriggerResults->accept(patTrigNames.triggerIndex(patTrigNames.triggerName(i)));
+	    if (patTrigNames.triggerName(i) == "Flag_globalTightHalo2016Filter") globaltighthalopass = PatTriggerResults->accept(patTrigNames.triggerIndex(patTrigNames.triggerName(i)));
 	    if (patTrigNames.triggerName(i) == "Flag_HBHENoiseFilter") hbhenoisepass = PatTriggerResults->accept(patTrigNames.triggerIndex(patTrigNames.triggerName(i)));
 	    if (patTrigNames.triggerName(i) == "Flag_HBHENoiseIsoFilter") hbhenoiseisopass = PatTriggerResults->accept(patTrigNames.triggerIndex(patTrigNames.triggerName(i)));
-	    if (patTrigNames.triggerName(i) == "Flag_globalTightHalo2016Filter") globaltighthalopass = PatTriggerResults->accept(patTrigNames.triggerIndex(patTrigNames.triggerName(i)));
 	    if (patTrigNames.triggerName(i) == "Flag_EcalDeadCellTriggerPrimitiveFilter") ecaldeadcellpass = PatTriggerResults->accept(patTrigNames.triggerIndex(patTrigNames.triggerName(i)));
+	    if (patTrigNames.triggerName(i) == "Flag_BadPFMuonFilter") badpfmuonpass = PatTriggerResults->accept(patTrigNames.triggerIndex(patTrigNames.triggerName(i)));
+	    if (patTrigNames.triggerName(i) == "Flag_BadChargedCandidateFilter") badchargedcandpass = PatTriggerResults->accept(patTrigNames.triggerIndex(patTrigNames.triggerName(i)));
 	    if (patTrigNames.triggerName(i) == "Flag_eeBadScFilter") eebadscpass = PatTriggerResults->accept(patTrigNames.triggerIndex(patTrigNames.triggerName(i)));
-	    if (patTrigNames.triggerName(i) == "Flag_goodVertices") goodvertpass = PatTriggerResults->accept(patTrigNames.triggerIndex(patTrigNames.triggerName(i)));// this shouldn't actually be necessary since we do this manually, but I add it just for completeness
+	    if (patTrigNames.triggerName(i) == "Flag_ecalBadCalibFilter") eebadcalibpass = PatTriggerResults->accept(patTrigNames.triggerIndex(patTrigNames.triggerName(i)));
+
 	  }
-
-          //get muons and packed pfcandidates
-          event.getByLabel( mtPar["muon_collection"], mhMuons );      
-	  edm::Handle<pat::PackedCandidateCollection> packedPFCands;
-          edm::InputTag packedPFCandsLabel_("packedPFCandidates");
-          event.getByLabel(packedPFCandsLabel_, packedPFCands);
-          //___________________________Bad Muon Filter________________________________||
-          double maxDR = 0.001;
-          double minMuonTrackRelErr = 0.5;
-          int suspiciousAlgo=14;
-          double minMuPt = 100;
-          //minDz = 1;                                                                                                                                                                
-          bool badmuflag = false;
-
-          //___________________________Bad Charged Hadron Filter________________________________||
-          double minPtDiffRel = -0.5;
-
-          bool badchadflag = false;
-
-          for (std::vector<pat::Muon>::const_iterator _imu = mhMuons->begin(); _imu != mhMuons->end(); _imu++){
-              bool foundBadTrack = false;
-              if ((*_imu).innerTrack().isNonnull()) {
-                  reco::TrackRef it = (*_imu).innerTrack();
-                  if (it->pt() < minMuPt or it->quality(reco::TrackBase::TrackQuality::highPurity) or it->ptError()/it->pt() < minMuonTrackRelErr) {}
-                  else if (it->originalAlgo()==suspiciousAlgo and it->algo()==suspiciousAlgo) {
-                      foundBadTrack = true;
-                  }
-              }
-              if (foundBadTrack) {
-                  //   std::cout<<"there is suspicious muon"<<std::endl;
-                  for (std::vector<pat::PackedCandidate>::const_iterator cand = packedPFCands->begin(); cand != packedPFCands->end(); cand++){
-                      if ((*cand).pt() >= minMuPt and abs((*cand).pdgId()) == 13) {
-                          if (deltaR( (*_imu).eta(), (*_imu).phi(), (*cand).eta(), (*cand).phi() ) < maxDR) {
-                              badmuflag = true;
-                              break;
-                          }
-                      }
-                  }
-              }
-
-              //----------------
-
-              if ( (*_imu).pt() < minMuPt and (*_imu).innerTrack().isNonnull()) {
-                  reco::TrackRef it = (*_imu).innerTrack();
-                  if (it->quality(reco::TrackBase::TrackQuality::highPurity) or it->ptError()/it->pt() < minMuonTrackRelErr) {}
-                  // All events had a drastically high pt error on the inner muon track (fac. ~10). Require at least 0.5
-                  else {
-                      for (std::vector<pat::PackedCandidate>::const_iterator cand = packedPFCands->begin(); cand != packedPFCands->end(); cand++){
-                          if (abs((*cand).pdgId()) == 211) {
-                              // Require very loose similarity in pt (one-sided).
-                              double dPtRel =  ( (*cand).pt() - it->pt() )/(0.5*((*cand).pt() + it->pt()));
-                              //  Flag the event bad if dR is tiny  
-                              if (deltaR( it->eta(), it->phi(), (*cand).eta(), (*cand).phi() ) < maxDR and dPtRel > minPtDiffRel) {
-                                  badchadflag = true;
-                                  break;
-                              }
-                          }
-                      }
-                  }
-              }
-          }
 	  
-	  if(hbhenoisepass && hbhenoiseisopass && globaltighthalopass && ecaldeadcellpass && (mbPar["isMc"] || eebadscpass) && goodvertpass && !badmuflag && !badchadflag){
+	  if(hbhenoisepass && hbhenoiseisopass && globaltighthalopass && ecaldeadcellpass && (mbPar["isMc"] || eebadscpass) && goodvertpass && badpfmuonpass && badchargedcandpass && eebadcalibpass){
 	    passCut(ret, "MET filters");
 	  }
 	  else break;
@@ -655,6 +609,12 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
         //_____ Muon cuts ________________________________
         //      
         // loop over muons
+
+	//get muons and packed pfcandidates
+	event.getByLabel( mtPar["muon_collection"], mhMuons );      
+	edm::Handle<pat::PackedCandidateCollection> packedPFCands;
+	edm::InputTag packedPFCandsLabel_("packedPFCandidates");
+	event.getByLabel(packedPFCandsLabel_, packedPFCands);
 
         int _n_muons  = 0;
         int nSelMuons = 0;
