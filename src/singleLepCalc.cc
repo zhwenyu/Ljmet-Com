@@ -1003,6 +1003,10 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
     std::vector <int>    AK4JetBTag_lSFup;
     std::vector <int>    AK4JetBTag_lSFdn;
     std::vector <double> AK4JetBDisc;
+    std::vector <double> AK4JetBDeepCSVb;
+    std::vector <double> AK4JetBDeepCSVbb;
+    std::vector <double> AK4JetBDeepCSVc;
+    std::vector <double> AK4JetBDeepCSVudsg;
     std::vector <int>    AK4JetFlav;
 
     //std::vector <double> AK4JetRCN;   
@@ -1021,9 +1025,13 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
       AK4JetBTag_lSFup.push_back(selector->isJetTagged(*ii, event, true, 3));
       AK4JetBTag_lSFdn.push_back(selector->isJetTagged(*ii, event, true, 4));
 
-      //AK4JetRCN    . push_back(((*ijet)->chargedEmEnergy()+(*ijet)->chargedHadronEnergy()) / ((*ijet)->neutralEmEnergy()+(*ijet)->neutralHadronEnergy()));
-      AK4JetBDisc  . push_back(ii->bDiscriminator( "pfCombinedInclusiveSecondaryVertexV2BJetTags" ));
-      AK4JetFlav   . push_back(abs(ii->hadronFlavour()));
+      //AK4JetRCN        . push_back(((*ijet)->chargedEmEnergy()+(*ijet)->chargedHadronEnergy()) / ((*ijet)->neutralEmEnergy()+(*ijet)->neutralHadronEnergy()));
+      AK4JetBDisc        . push_back(ii->bDiscriminator( "pfCombinedInclusiveSecondaryVertexV2BJetTags" ));
+      AK4JetBDeepCSVb    . push_back(ii->bDiscriminator( "pfDeepCSVJetTags:probb" ));
+      AK4JetBDeepCSVbb   . push_back(ii->bDiscriminator( "pfDeepCSVJetTags:probbb" ));
+      AK4JetBDeepCSVc    . push_back(ii->bDiscriminator( "pfDeepCSVJetTags:probc" ));
+      AK4JetBDeepCSVudsg . push_back(ii->bDiscriminator( "pfDeepCSVJetTags:probudsg" ));
+      AK4JetFlav         . push_back(abs(ii->hadronFlavour()));
 
       //HT
       AK4HT += ii->pt(); 
@@ -1086,9 +1094,13 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
     SetValue("AK4JetBTag_bSFdn"   , AK4JetBTag_bSFdn);
     SetValue("AK4JetBTag_lSFup"   , AK4JetBTag_lSFup);
     SetValue("AK4JetBTag_lSFdn"   , AK4JetBTag_lSFdn);
-    //SetValue("AK4JetRCN"    , AK4JetRCN);
-    SetValue("AK4JetBDisc"  , AK4JetBDisc);
-    SetValue("AK4JetFlav"   , AK4JetFlav);
+    //SetValue("AK4JetRCN"          , AK4JetRCN);
+    SetValue("AK4JetBDisc"          , AK4JetBDisc);
+    SetValue("AK4JetBDeepCSVb"      , AK4JetBDeepCSVb);
+    SetValue("AK4JetBDeepCSVbb"     , AK4JetBDeepCSVbb);
+    SetValue("AK4JetBDeepCSVc"      , AK4JetBDeepCSVc);
+    SetValue("AK4JetBDeepCSVudsg"   , AK4JetBDeepCSVudsg);
+    SetValue("AK4JetFlav"           , AK4JetFlav);
 
     // MET
     double _met = -9999.0;
