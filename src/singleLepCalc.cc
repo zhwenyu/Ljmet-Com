@@ -1,6 +1,6 @@
 /*
  Calculator for a generic single lepton analysis
- 
+alskdjfhalskdfjhalsdkfjhaxsxc 
  Author: Joshua Swanson, 2014
  */
 
@@ -378,6 +378,16 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
     std::vector <int> muIsTight;
     std::vector <int> muIsMedium;
     std::vector<int> muIsLoose;
+    std::vector<int> muIsMediumPrompt;
+    std::vector<int> muIsGlobalHighPt;
+    std::vector<int> muIsTrkHighPt;
+    std::vector<int> muIsMvaLoose;
+    std::vector<int> muIsMvaMedium;
+    std::vector<int> muIsMvaTight;
+    std::vector<int> muIsMiniIsoLoose;
+    std::vector<int> muIsMiniIsoMedium;
+    std::vector<int> muIsMiniIsoTight;
+    std::vector<int> muIsMiniIsoVeryTight;
 
     //Generator level information -- MC matching
     std::vector<double> muGen_Reco_dr;
@@ -427,9 +437,19 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
             muInnerEta    . push_back((*imu)->innerTrack()->eta());
             muInnerPhi    . push_back((*imu)->innerTrack()->phi());
 
-            muIsTight.push_back((*imu)->isTightMuon(goodPVs.at(0)));
-            muIsMedium.push_back(ismediummuon);
-            muIsLoose.push_back((*imu)->isLooseMuon());
+            muIsTight.push_back((*imu)->passed(reco::Muon::CutBasedIdTight));
+            muIsMedium.push_back((*imu)->passed(reco::Muon::CutBasedIdMedium));
+	    muIsMediumPrompt.push_back((*imu)->passed(reco::Muon::CutBasedIdMediumPrompt));
+            muIsLoose.push_back((*imu)->passed(reco::Muon::CutBasedIdLoose));
+	    muIsGlobalHighPt.push_back((*imu)->passed(reco::Muon::CutBasedIdGlobalHighPt));
+	    muIsTrkHighPt.push_back((*imu)->passed(reco::Muon::CutBasedIdTrkHighPt));
+	    muIsMvaLoose.push_back((*imu)->passed(reco::Muon::MvaLoose));
+	    muIsMvaMedium.push_back((*imu)->passed(reco::Muon::MvaMedium));
+	    muIsMvaTight.push_back((*imu)->passed(reco::Muon::MvaTight));
+	    muIsMiniIsoLoose.push_back((*imu)->passed(reco::Muon::MiniIsoLoose));
+	    muIsMiniIsoMedium.push_back((*imu)->passed(reco::Muon::MiniIsoMedium));
+	    muIsMiniIsoTight.push_back((*imu)->passed(reco::Muon::MiniIsoTight));
+	    muIsMiniIsoVeryTight.push_back((*imu)->passed(reco::Muon::MiniIsoVeryTight));
 
             muGlobal.push_back(((*imu)->isGlobalMuon()<<2)+(*imu)->isTrackerMuon());
             //chi2
@@ -515,7 +535,17 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
     SetValue("muEnergy" , muEnergy);
     SetValue("muIsTight", muIsTight);
     SetValue("muIsMedium", muIsMedium);
-    SetValue("muIsLoose",muIsLoose); 
+    SetValue("muIsMediumPrompt",muIsMediumPrompt);
+    SetValue("muIsLoose",muIsLoose);
+    SetValue("muIsGlobalHighPt",muIsGlobalHighPt);
+    SetValue("muIsTrkHighPt",muIsTrkHighPt);
+    SetValue("muIsMvaLoose",muIsMvaLoose);
+    SetValue("muIsMvaMedium",muIsMvaMedium);
+    SetValue("muIsMvaTight",muIsMvaTight);
+    SetValue("muIsMiniIsoLoose",muIsMiniIsoLoose);
+    SetValue("muIsMiniIsoMedium",muIsMiniIsoMedium);
+    SetValue("muIsMiniIsoTight",muIsMiniIsoTight);
+    SetValue("muIsMiniIsoVeryTight",muIsMiniIsoVeryTight);
     //Quality criteria
     SetValue("muChi2"   , muChi2);
     SetValue("muDxy"    , muDxy);
@@ -1003,6 +1033,10 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
     std::vector <int>    AK4JetBTag_lSFup;
     std::vector <int>    AK4JetBTag_lSFdn;
     std::vector <double> AK4JetBDisc;
+    std::vector <double> AK4JetBDeepCSVb;
+    std::vector <double> AK4JetBDeepCSVbb;
+    std::vector <double> AK4JetBDeepCSVc;
+    std::vector <double> AK4JetBDeepCSVudsg;
     std::vector <int>    AK4JetFlav;
 
     //std::vector <double> AK4JetRCN;   
@@ -1021,9 +1055,13 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
       AK4JetBTag_lSFup.push_back(selector->isJetTagged(*ii, event, true, 3));
       AK4JetBTag_lSFdn.push_back(selector->isJetTagged(*ii, event, true, 4));
 
-      //AK4JetRCN    . push_back(((*ijet)->chargedEmEnergy()+(*ijet)->chargedHadronEnergy()) / ((*ijet)->neutralEmEnergy()+(*ijet)->neutralHadronEnergy()));
-      AK4JetBDisc  . push_back(ii->bDiscriminator( "pfCombinedInclusiveSecondaryVertexV2BJetTags" ));
-      AK4JetFlav   . push_back(abs(ii->hadronFlavour()));
+      //AK4JetRCN        . push_back(((*ijet)->chargedEmEnergy()+(*ijet)->chargedHadronEnergy()) / ((*ijet)->neutralEmEnergy()+(*ijet)->neutralHadronEnergy()));
+      AK4JetBDisc        . push_back(ii->bDiscriminator( "pfCombinedInclusiveSecondaryVertexV2BJetTags" ));
+      AK4JetBDeepCSVb    . push_back(ii->bDiscriminator( "pfDeepCSVJetTags:probb" ));
+      AK4JetBDeepCSVbb   . push_back(ii->bDiscriminator( "pfDeepCSVJetTags:probbb" ));
+      AK4JetBDeepCSVc    . push_back(ii->bDiscriminator( "pfDeepCSVJetTags:probc" ));
+      AK4JetBDeepCSVudsg . push_back(ii->bDiscriminator( "pfDeepCSVJetTags:probudsg" ));
+      AK4JetFlav         . push_back(abs(ii->hadronFlavour()));
 
       //HT
       AK4HT += ii->pt(); 
@@ -1086,9 +1124,13 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
     SetValue("AK4JetBTag_bSFdn"   , AK4JetBTag_bSFdn);
     SetValue("AK4JetBTag_lSFup"   , AK4JetBTag_lSFup);
     SetValue("AK4JetBTag_lSFdn"   , AK4JetBTag_lSFdn);
-    //SetValue("AK4JetRCN"    , AK4JetRCN);
-    SetValue("AK4JetBDisc"  , AK4JetBDisc);
-    SetValue("AK4JetFlav"   , AK4JetFlav);
+    //SetValue("AK4JetRCN"          , AK4JetRCN);
+    SetValue("AK4JetBDisc"          , AK4JetBDisc);
+    SetValue("AK4JetBDeepCSVb"      , AK4JetBDeepCSVb);
+    SetValue("AK4JetBDeepCSVbb"     , AK4JetBDeepCSVbb);
+    SetValue("AK4JetBDeepCSVc"      , AK4JetBDeepCSVc);
+    SetValue("AK4JetBDeepCSVudsg"   , AK4JetBDeepCSVudsg);
+    SetValue("AK4JetFlav"           , AK4JetFlav);
 
     // MET
     double _met = -9999.0;
