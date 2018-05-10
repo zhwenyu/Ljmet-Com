@@ -86,22 +86,31 @@ process.event_selector = cms.PSet(
 
     mctrigger_path_el = cms.vstring(
         #'digitisation_step',
-        'HLT_Ele38_WPTight_Gsf',
-        'HLT_Ele40_WPTight_Gsf',
-        'HLT_Ele50_CaloIdVT_GsfTrkIdT_PFJet165',
-        'HLT_Ele15_IsoVVVL_PFHT400',
-        'HLT_Ele50_IsoVVVL_PFHT400'
+        'HLT_Ele35_WPTight_Gsf_v7',
+        'HLT_Ele38_WPTight_Gsf_v7',
+        'HLT_Ele40_WPTight_Gsf_v7',
+        'HLT_Ele28_eta2p1_WPTight_Gsf_HT150_v11',
+        'HLT_Ele15_IsoVVVL_PFHT450_PFMET50_v14',
+        'HLT_Ele15_IsoVVVL_PFHT450_v14',
+        'HLT_Ele50_IsoVVVL_PFHT450_v14',
+        'HLT_Ele15_IsoVVVL_PFHT600_v18',
+        'HLT_Ele50_CaloIdVT_GsfTrkIdT_PFJet165_v16',
+        'HLT_Ele115_CaloIdVT_GsfTrkIdT_v12'
         ),
+
     mctrigger_path_mu = cms.vstring(
         #'digitisation_step',
-        'HLT_IsoMu27',
-        'HLT_IsoTkMu27',
-        'HLT_Mu50',
-        'HLT_TkMu50',
-        'HLT_Mu55',
-        'HLT_TkMu55',
-        'HLT_Mu15_IsoVVVL_PFHT400',
-        'HLT_Mu50_IsoVVVL_PFHT400',
+        'HLT_IsoMu24_v11',
+        'HLT_IsoMu24_eta2p1_v13',
+        'HLT_IsoMu27_v14',
+        'HLT_IsoMu30_v2',
+        'HLT_Mu50_v12',
+        'HLT_Mu55_v2',
+        'HLT_Mu15_IsoVVVL_PFHT450_CaloBTagCSV_4p5_v7',
+        'HLT_Mu15_IsoVVVL_PFHT450_PFMET50_v13',
+        'HLT_Mu15_IsoVVVL_PFHT450_v13',
+        'HLT_Mu50_IsoVVVL_PFHT450_v13',
+        'HLT_Mu15_IsoVVVL_PFHT600_v17'
         ),
 
     trigger_path_el = cms.vstring(''),
