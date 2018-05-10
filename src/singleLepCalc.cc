@@ -1,6 +1,6 @@
 /*
  Calculator for a generic single lepton analysis
- 
+alskdjfhalskdfjhalsdkfjhaxsxc 
  Author: Joshua Swanson, 2014
  */
 
@@ -378,6 +378,16 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
     std::vector <int> muIsTight;
     std::vector <int> muIsMedium;
     std::vector<int> muIsLoose;
+    std::vector<int> muIsMediumPrompt;
+    std::vector<int> muIsGlobalHighPt;
+    std::vector<int> muIsTrkHighPt;
+    std::vector<int> muIsMvaLoose;
+    std::vector<int> muIsMvaMedium;
+    std::vector<int> muIsMvaTight;
+    std::vector<int> muIsMiniIsoLoose;
+    std::vector<int> muIsMiniIsoMedium;
+    std::vector<int> muIsMiniIsoTight;
+    std::vector<int> muIsMiniIsoVeryTight;
 
     //Generator level information -- MC matching
     std::vector<double> muGen_Reco_dr;
@@ -427,9 +437,19 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
             muInnerEta    . push_back((*imu)->innerTrack()->eta());
             muInnerPhi    . push_back((*imu)->innerTrack()->phi());
 
-            muIsTight.push_back((*imu)->isTightMuon(goodPVs.at(0)));
-            muIsMedium.push_back(ismediummuon);
-            muIsLoose.push_back((*imu)->isLooseMuon());
+            muIsTight.push_back((*imu)->passed(reco::Muon::CutBasedIdTight));
+            muIsMedium.push_back((*imu)->passed(reco::Muon::CutBasedIdMedium));
+	    muIsMediumPrompt.push_back((*imu)->passed(reco::Muon::CutBasedIdMediumPrompt));
+            muIsLoose.push_back((*imu)->passed(reco::Muon::CutBasedIdLoose));
+	    muIsGlobalHighPt.push_back((*imu)->passed(reco::Muon::CutBasedIdGlobalHighPt));
+	    muIsTrkHighPt.push_back((*imu)->passed(reco::Muon::CutBasedIdTrkHighPt));
+	    muIsMvaLoose.push_back((*imu)->passed(reco::Muon::MvaLoose));
+	    muIsMvaMedium.push_back((*imu)->passed(reco::Muon::MvaMedium));
+	    muIsMvaTight.push_back((*imu)->passed(reco::Muon::MvaTight));
+	    muIsMiniIsoLoose.push_back((*imu)->passed(reco::Muon::MiniIsoLoose));
+	    muIsMiniIsoMedium.push_back((*imu)->passed(reco::Muon::MiniIsoMedium));
+	    muIsMiniIsoTight.push_back((*imu)->passed(reco::Muon::MiniIsoTight));
+	    muIsMiniIsoVeryTight.push_back((*imu)->passed(reco::Muon::MiniIsoVeryTight));
 
             muGlobal.push_back(((*imu)->isGlobalMuon()<<2)+(*imu)->isTrackerMuon());
             //chi2
@@ -515,7 +535,17 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
     SetValue("muEnergy" , muEnergy);
     SetValue("muIsTight", muIsTight);
     SetValue("muIsMedium", muIsMedium);
-    SetValue("muIsLoose",muIsLoose); 
+    SetValue("muIsMediumPrompt",muIsMediumPrompt);
+    SetValue("muIsLoose",muIsLoose);
+    SetValue("muIsGlobalHighPt",muIsGlobalHighPt);
+    SetValue("muIsTrkHighPt",muIsTrkHighPt);
+    SetValue("muIsMvaLoose",muIsMvaLoose);
+    SetValue("muIsMvaMedium",muIsMvaMedium);
+    SetValue("muIsMvaTight",muIsMvaTight);
+    SetValue("muIsMiniIsoLoose",muIsMiniIsoLoose);
+    SetValue("muIsMiniIsoMedium",muIsMiniIsoMedium);
+    SetValue("muIsMiniIsoTight",muIsMiniIsoTight);
+    SetValue("muIsMiniIsoVeryTight",muIsMiniIsoVeryTight);
     //Quality criteria
     SetValue("muChi2"   , muChi2);
     SetValue("muDxy"    , muDxy);
