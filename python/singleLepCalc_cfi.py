@@ -26,4 +26,8 @@ singleLepCalc = cms.PSet(
                          newPDFname = cms.string("PDF4LHC15_nlo_mc_pdfas"),
                          saveLooseLeps = cms.bool(False),
                          saveGenHT = cms.bool(False),
+                         tight_electron_mva_cuts  = cms.vdouble(0.96165,8.75794,3.13902,0.93193,8.84606,3.59851,0.88993,10.12423,4.35279), # Fall17 noiso WP90 c, tau, A for EB1, EB2, and then EE
+                         loose_electron_mva_cuts  = cms.vdouble(-0.86,-0.81,-0.72), # Fall17 noiso WP HZZ exact cuts
+                         tight_electron_mvaiso_cuts  = cms.vdouble(0.97177,8.91285,1.97124,0.945875,8.83104,2.40850,0.89791,9.81408,4.17158), # Fall17 iso WP90 c, tau, A for EB1, EB2, and then EE
+                         loose_electron_mvaiso_cuts  = cms.vdouble(-0.83,-0.77,-0.69), # Fall17 iso WP HZZ exact cuts
                          )

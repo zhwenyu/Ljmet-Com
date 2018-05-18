@@ -188,13 +188,13 @@ void BaseEventSelector::BeginJob(std::map<std::string, edm::ParameterSet const >
                 mvsPar["ElMVAweightFiles"].push_back("../weights/EIDmva_EB2_10_oldNonTrigSpring15_ConvVarCwoBoolean_TMVA412_FullStatLowPt_PairNegWeightsGlobal_BDT.weights.xml");
                 mvsPar["ElMVAweightFiles"].push_back("../weights/EIDmva_EE_10_oldNonTrigSpring15_ConvVarCwoBoolean_TMVA412_FullStatLowPt_PairNegWeightsGlobal_BDT.weights.xml");
             }
-            if ( par[_key].exists("ElMVAweightFiles_alt") )
-                mvsPar["ElMVAweightFiles_alt"] = par[_key].getParameter<std::vector<std::string> >("ElMVAweightFiles_alt");
-            if (mvsPar["ElMVAweightFiles_alt"].size()!=3) {
-                mvsPar["ElMVAweightFiles_alt"].clear();
-                mvsPar["ElMVAweightFiles_alt"].push_back("../weights/electronID_mva_Spring16_GeneralPurpose_V1_EB1_10.weights.xml");
-                mvsPar["ElMVAweightFiles_alt"].push_back("../weights/electronID_mva_Spring16_GeneralPurpose_V1_EB2_10.weights.xml");
-                mvsPar["ElMVAweightFiles_alt"].push_back("../weights/electronID_mva_Spring16_GeneralPurpose_V1_EE_10.weights.xml");
+            if ( par[_key].exists("ElMVAweightFiles_iso") )
+                mvsPar["ElMVAweightFiles_iso"] = par[_key].getParameter<std::vector<std::string> >("ElMVAweightFiles_iso");
+            if (mvsPar["ElMVAweightFiles_iso"].size()!=3) {
+                mvsPar["ElMVAweightFiles_iso"].clear();
+                mvsPar["ElMVAweightFiles_iso"].push_back("../weights/electronID_mva_Spring16_GeneralPurpose_V1_EB1_10.weights.xml");
+                mvsPar["ElMVAweightFiles_iso"].push_back("../weights/electronID_mva_Spring16_GeneralPurpose_V1_EB2_10.weights.xml");
+                mvsPar["ElMVAweightFiles_iso"].push_back("../weights/electronID_mva_Spring16_GeneralPurpose_V1_EE_10.weights.xml");
             }
             // these are for 25ns, and are up-to-date as of Sep 24 2015
             // this needs to be checked periodically, as well as the list of variables for the MVA
@@ -476,11 +476,11 @@ void BaseEventSelector::BeginJob(std::map<std::string, edm::ParameterSet const >
         // Pure ECAL -> shower shapes
         tmpTMVAReader_EB.AddVariable("ele_oldsigmaietaieta", &allMVAVars.see);
         tmpTMVAReader_EB.AddVariable("ele_oldsigmaiphiiphi", &allMVAVars.spp);
-        tmpTMVAReader_EB.AddVariable("ele_oldcircularity",   &allMVAVars.OneMinusE1x5E5x5);
+        tmpTMVAReader_EB.AddVariable("ele_oldcircularity",   &allMVAVars.circularity);
         tmpTMVAReader_EB.AddVariable("ele_oldr9",            &allMVAVars.R9);
         tmpTMVAReader_EB.AddVariable("ele_scletawidth",      &allMVAVars.etawidth);
         tmpTMVAReader_EB.AddVariable("ele_sclphiwidth",      &allMVAVars.phiwidth);
-        tmpTMVAReader_EB.AddVariable("ele_he",               &allMVAVars.HoE);
+        tmpTMVAReader_EB.AddVariable("ele_oldhe",               &allMVAVars.HoE);
         
         //Pure tracking variables
         tmpTMVAReader_EB.AddVariable("ele_kfhits",           &allMVAVars.kfhits);
@@ -503,30 +503,17 @@ void BaseEventSelector::BeginJob(std::map<std::string, edm::ParameterSet const >
         tmpTMVAReader_EB.AddVariable("ele_deltaphiin",      &allMVAVars.dphi);
         tmpTMVAReader_EB.AddVariable("ele_deltaetaseed",    &allMVAVars.detacalo);
 
-        // Spectator variables  
-        tmpTMVAReader_EB.AddSpectator("ele_pT",             &allMVAVars.pt);
-        tmpTMVAReader_EB.AddSpectator("ele_isbarrel",       &allMVAVars.isBarrel);
-        tmpTMVAReader_EB.AddSpectator("ele_isendcap",       &allMVAVars.isEndcap);
-        tmpTMVAReader_EB.AddSpectator("scl_eta",            &allMVAVars.SCeta);
-      
-        tmpTMVAReader_EB.AddSpectator("ele_eClass",                 &allMVAVars.eClass);
-        tmpTMVAReader_EB.AddSpectator("ele_pfRelIso",               &allMVAVars.pfRelIso);
-        tmpTMVAReader_EB.AddSpectator("ele_expected_inner_hits",    &allMVAVars.expectedInnerHits);
-        tmpTMVAReader_EB.AddSpectator("ele_vtxconv",                &allMVAVars.vtxconv);
-        tmpTMVAReader_EB.AddSpectator("mc_event_weight",            &allMVAVars.mcEventWeight);
-        tmpTMVAReader_EB.AddSpectator("mc_ele_CBmatching_category", &allMVAVars.mcCBmatchingCategory);
+        tmpTMVAReader_EB.AddVariable("rho",    &allMVAVars.rho);
 
         // Pure ECAL -> shower shapes
         tmpTMVAReader_EE.AddVariable("ele_oldsigmaietaieta", &allMVAVars.see);
         tmpTMVAReader_EE.AddVariable("ele_oldsigmaiphiiphi", &allMVAVars.spp);
-        tmpTMVAReader_EE.AddVariable("ele_oldcircularity",   &allMVAVars.OneMinusE1x5E5x5);
+        tmpTMVAReader_EE.AddVariable("ele_oldcircularity",   &allMVAVars.circularity);
         tmpTMVAReader_EE.AddVariable("ele_oldr9",            &allMVAVars.R9);
         tmpTMVAReader_EE.AddVariable("ele_scletawidth",      &allMVAVars.etawidth);
         tmpTMVAReader_EE.AddVariable("ele_sclphiwidth",      &allMVAVars.phiwidth);
-        tmpTMVAReader_EE.AddVariable("ele_he",               &allMVAVars.HoE);
-        // Endcap only variables
-        tmpTMVAReader_EE.AddVariable("ele_psEoverEraw",    &allMVAVars.PreShowerOverRaw);
-        
+        tmpTMVAReader_EE.AddVariable("ele_oldhe",               &allMVAVars.HoE);
+       
         //Pure tracking variables
         tmpTMVAReader_EE.AddVariable("ele_kfhits",           &allMVAVars.kfhits);
         tmpTMVAReader_EE.AddVariable("ele_kfchi2",           &allMVAVars.kfchi2);
@@ -548,102 +535,107 @@ void BaseEventSelector::BeginJob(std::map<std::string, edm::ParameterSet const >
         tmpTMVAReader_EE.AddVariable("ele_deltaphiin",      &allMVAVars.dphi);
         tmpTMVAReader_EE.AddVariable("ele_deltaetaseed",    &allMVAVars.detacalo);
 
-        // Spectator variables  
-        tmpTMVAReader_EE.AddSpectator("ele_pT",             &allMVAVars.pt);
-        tmpTMVAReader_EE.AddSpectator("ele_isbarrel",       &allMVAVars.isBarrel);
-        tmpTMVAReader_EE.AddSpectator("ele_isendcap",       &allMVAVars.isEndcap);
-        tmpTMVAReader_EE.AddSpectator("scl_eta",            &allMVAVars.SCeta);
-      
-        tmpTMVAReader_EE.AddSpectator("ele_eClass",                 &allMVAVars.eClass);
-        tmpTMVAReader_EE.AddSpectator("ele_pfRelIso",               &allMVAVars.pfRelIso);
-        tmpTMVAReader_EE.AddSpectator("ele_expected_inner_hits",    &allMVAVars.expectedInnerHits);
-        tmpTMVAReader_EE.AddSpectator("ele_vtxconv",                &allMVAVars.vtxconv);
-        tmpTMVAReader_EE.AddSpectator("mc_event_weight",            &allMVAVars.mcEventWeight);
-        tmpTMVAReader_EE.AddSpectator("mc_ele_CBmatching_category", &allMVAVars.mcCBmatchingCategory);
+        tmpTMVAReader_EE.AddVariable("rho",    &allMVAVars.rho);
 
-        tmpTMVAReader_EB.BookMVA( "Spring15_V1_EB1",  mvsPar["ElMVAweightFiles"].at(0) );
-        tmpTMVAReader_EB.BookMVA( "Spring15_V1_EB2",  mvsPar["ElMVAweightFiles"].at(1) );
-        tmpTMVAReader_EE.BookMVA(  "Spring15_V1_EE",   mvsPar["ElMVAweightFiles"].at(2) );
-
-        //----alt----
-
-        tmpTMVAReader_EB_alt.SetOptions("!Color:Silent:!Error");
-        tmpTMVAReader_EE_alt.SetOptions("!Color:Silent:!Error");
-
-        // Pure ECAL -> shower shapes
-        tmpTMVAReader_EB_alt.AddVariable("ele_oldsigmaietaieta", &allMVAVars_alt.see);
-        tmpTMVAReader_EB_alt.AddVariable("ele_oldsigmaiphiiphi", &allMVAVars_alt.spp);
-        tmpTMVAReader_EB_alt.AddVariable("ele_oldcircularity",   &allMVAVars_alt.OneMinusE1x5E5x5);
-        tmpTMVAReader_EB_alt.AddVariable("ele_oldr9",            &allMVAVars_alt.R9);
-        tmpTMVAReader_EB_alt.AddVariable("ele_scletawidth",      &allMVAVars_alt.etawidth);
-        tmpTMVAReader_EB_alt.AddVariable("ele_sclphiwidth",      &allMVAVars_alt.phiwidth);
-        tmpTMVAReader_EB_alt.AddVariable("ele_oldhe",               &allMVAVars_alt.HoE);
-        
-        //Pure tracking variables
-        tmpTMVAReader_EB_alt.AddVariable("ele_kfhits",           &allMVAVars_alt.kfhits);
-        tmpTMVAReader_EB_alt.AddVariable("ele_kfchi2",           &allMVAVars_alt.kfchi2);
-        tmpTMVAReader_EB_alt.AddVariable("ele_gsfchi2",        &allMVAVars_alt.gsfchi2);
-      
-        // Energy matching
-        tmpTMVAReader_EB_alt.AddVariable("ele_fbrem",           &allMVAVars_alt.fbrem);
-      
-        tmpTMVAReader_EB_alt.AddVariable("ele_gsfhits",         &allMVAVars_alt.gsfhits);
-        tmpTMVAReader_EB_alt.AddVariable("ele_expected_inner_hits",             &allMVAVars_alt.expectedMissingInnerHits);
-        tmpTMVAReader_EB_alt.AddVariable("ele_conversionVertexFitProbability",  &allMVAVars_alt.convVtxFitProbability);
-      
-        tmpTMVAReader_EB_alt.AddVariable("ele_ep",              &allMVAVars_alt.EoP);
-        tmpTMVAReader_EB_alt.AddVariable("ele_eelepout",        &allMVAVars_alt.eleEoPout);
-        tmpTMVAReader_EB_alt.AddVariable("ele_IoEmIop",         &allMVAVars_alt.IoEmIoP);
-        
-        // Geometrical matchings
-        tmpTMVAReader_EB_alt.AddVariable("ele_deltaetain",      &allMVAVars_alt.deta);
-        tmpTMVAReader_EB_alt.AddVariable("ele_deltaphiin",      &allMVAVars_alt.dphi);
-        tmpTMVAReader_EB_alt.AddVariable("ele_deltaetaseed",    &allMVAVars_alt.detacalo);
-
-        // Spectator variables  
-        tmpTMVAReader_EB_alt.AddVariable("ele_pt",              &allMVAVars_alt.pt);
-        tmpTMVAReader_EB_alt.AddVariable("scl_eta",             &allMVAVars_alt.SCeta);
-      
-        // Pure ECAL -> shower shapes
-        tmpTMVAReader_EE_alt.AddVariable("ele_oldsigmaietaieta", &allMVAVars_alt.see);
-        tmpTMVAReader_EE_alt.AddVariable("ele_oldsigmaiphiiphi", &allMVAVars_alt.spp);
-        tmpTMVAReader_EE_alt.AddVariable("ele_oldcircularity",   &allMVAVars_alt.OneMinusE1x5E5x5);
-        tmpTMVAReader_EE_alt.AddVariable("ele_oldr9",            &allMVAVars_alt.R9);
-        tmpTMVAReader_EE_alt.AddVariable("ele_scletawidth",      &allMVAVars_alt.etawidth);
-        tmpTMVAReader_EE_alt.AddVariable("ele_sclphiwidth",      &allMVAVars_alt.phiwidth);
-        tmpTMVAReader_EE_alt.AddVariable("ele_oldhe",            &allMVAVars_alt.HoE);
-        
-        //Pure tracking variables
-        tmpTMVAReader_EE_alt.AddVariable("ele_kfhits",           &allMVAVars_alt.kfhits);
-        tmpTMVAReader_EE_alt.AddVariable("ele_kfchi2",           &allMVAVars_alt.kfchi2);
-        tmpTMVAReader_EE_alt.AddVariable("ele_gsfchi2",        &allMVAVars_alt.gsfchi2);
-      
-        // Energy matching
-        tmpTMVAReader_EE_alt.AddVariable("ele_fbrem",           &allMVAVars_alt.fbrem);
-      
-        tmpTMVAReader_EE_alt.AddVariable("ele_gsfhits",         &allMVAVars_alt.gsfhits);
-        tmpTMVAReader_EE_alt.AddVariable("ele_expected_inner_hits",             &allMVAVars_alt.expectedMissingInnerHits);
-        tmpTMVAReader_EE_alt.AddVariable("ele_conversionVertexFitProbability",  &allMVAVars_alt.convVtxFitProbability);
-      
-        tmpTMVAReader_EE_alt.AddVariable("ele_ep",              &allMVAVars_alt.EoP);
-        tmpTMVAReader_EE_alt.AddVariable("ele_eelepout",        &allMVAVars_alt.eleEoPout);
-        tmpTMVAReader_EE_alt.AddVariable("ele_IoEmIop",         &allMVAVars_alt.IoEmIoP);
-        
-        // Geometrical matchings
-        tmpTMVAReader_EE_alt.AddVariable("ele_deltaetain",      &allMVAVars_alt.deta);
-        tmpTMVAReader_EE_alt.AddVariable("ele_deltaphiin",      &allMVAVars_alt.dphi);
-        tmpTMVAReader_EE_alt.AddVariable("ele_deltaetaseed",    &allMVAVars_alt.detacalo);
-
-        // Spectator variables  
-        tmpTMVAReader_EE_alt.AddVariable("ele_pt",              &allMVAVars_alt.pt);
-        tmpTMVAReader_EE_alt.AddVariable("scl_eta",             &allMVAVars_alt.SCeta);
-      
         // Endcap only variables
-        tmpTMVAReader_EE_alt.AddVariable("ele_psEoverEraw",    &allMVAVars_alt.PreShowerOverRaw);
+        tmpTMVAReader_EE.AddVariable("ele_psEoverEraw",    &allMVAVars.PreShowerOverRaw);
 
-        tmpTMVAReader_EB_alt.BookMVA( "Spring16_V1_EB1",  mvsPar["ElMVAweightFiles_alt"].at(0) );
-        tmpTMVAReader_EB_alt.BookMVA( "Spring16_V1_EB2",  mvsPar["ElMVAweightFiles_alt"].at(1) );
-        tmpTMVAReader_EE_alt.BookMVA(  "Spring16_V1_EE",   mvsPar["ElMVAweightFiles_alt"].at(2) );
+        tmpTMVAReader_EB.BookMVA( "Fall17_EB1",  mvsPar["ElMVAweightFiles"].at(0) );
+        tmpTMVAReader_EB.BookMVA( "Fall17_EB2",  mvsPar["ElMVAweightFiles"].at(1) );
+        tmpTMVAReader_EE.BookMVA( "Fall17_EE",   mvsPar["ElMVAweightFiles"].at(2) );
+
+        //----iso----
+
+        tmpTMVAReader_EB_iso.SetOptions("!Color:Silent:!Error");
+        tmpTMVAReader_EE_iso.SetOptions("!Color:Silent:!Error");
+
+        // Pure ECAL -> shower shapes
+        tmpTMVAReader_EB_iso.AddVariable("ele_oldsigmaietaieta", &allMVAVars_iso.see);
+        tmpTMVAReader_EB_iso.AddVariable("ele_oldsigmaiphiiphi", &allMVAVars_iso.spp);
+        tmpTMVAReader_EB_iso.AddVariable("ele_oldcircularity",   &allMVAVars_iso.circularity);
+        tmpTMVAReader_EB_iso.AddVariable("ele_oldr9",            &allMVAVars_iso.R9);
+        tmpTMVAReader_EB_iso.AddVariable("ele_scletawidth",      &allMVAVars_iso.etawidth);
+        tmpTMVAReader_EB_iso.AddVariable("ele_sclphiwidth",      &allMVAVars_iso.phiwidth);
+        tmpTMVAReader_EB_iso.AddVariable("ele_oldhe",            &allMVAVars_iso.HoE);
+        
+        //Pure tracking variables
+        tmpTMVAReader_EB_iso.AddVariable("ele_kfhits",           &allMVAVars_iso.kfhits);
+        tmpTMVAReader_EB_iso.AddVariable("ele_kfchi2",           &allMVAVars_iso.kfchi2);
+        tmpTMVAReader_EB_iso.AddVariable("ele_gsfchi2",          &allMVAVars_iso.gsfchi2);
+      
+        // Energy matching
+        tmpTMVAReader_EB_iso.AddVariable("ele_fbrem",           &allMVAVars_iso.fbrem);
+      
+        tmpTMVAReader_EB_iso.AddVariable("ele_gsfhits",         &allMVAVars_iso.gsfhits);
+        tmpTMVAReader_EB_iso.AddVariable("ele_expected_inner_hits",             &allMVAVars_iso.expectedMissingInnerHits);
+        tmpTMVAReader_EB_iso.AddVariable("ele_conversionVertexFitProbability",  &allMVAVars_iso.convVtxFitProbability);
+      
+        tmpTMVAReader_EB_iso.AddVariable("ele_ep",              &allMVAVars_iso.EoP);
+        tmpTMVAReader_EB_iso.AddVariable("ele_eelepout",        &allMVAVars_iso.eleEoPout);
+        tmpTMVAReader_EB_iso.AddVariable("ele_IoEmIop",         &allMVAVars_iso.IoEmIoP);
+        
+        // Geometrical matchings
+        tmpTMVAReader_EB_iso.AddVariable("ele_deltaetain",      &allMVAVars_iso.deta);
+        tmpTMVAReader_EB_iso.AddVariable("ele_deltaphiin",      &allMVAVars_iso.dphi);
+        tmpTMVAReader_EB_iso.AddVariable("ele_deltaetaseed",    &allMVAVars_iso.detacalo);
+
+	// Isolation
+	tmpTMVAReader_EB_iso.AddVariable("ele_pfPhotonIso",     &allMVAVars_iso.pfPhotonIso);
+	tmpTMVAReader_EB_iso.AddVariable("ele_pfChargedHadIso",     &allMVAVars_iso.pfChargedHadIso);
+	tmpTMVAReader_EB_iso.AddVariable("ele_pfNeutralHadIso",     &allMVAVars_iso.pfNeutralHadIso);
+
+        tmpTMVAReader_EB_iso.AddVariable("rho",    &allMVAVars_iso.rho);
+
+        // Spectator variables  
+        //tmpTMVAReader_EB_iso.AddVariable("ele_pt",              &allMVAVars_iso.pt);
+        //tmpTMVAReader_EB_iso.AddVariable("scl_eta",             &allMVAVars_iso.SCeta);
+      
+        // Pure ECAL -> shower shapes
+        tmpTMVAReader_EE_iso.AddVariable("ele_oldsigmaietaieta", &allMVAVars_iso.see);
+        tmpTMVAReader_EE_iso.AddVariable("ele_oldsigmaiphiiphi", &allMVAVars_iso.spp);
+        tmpTMVAReader_EE_iso.AddVariable("ele_oldcircularity",   &allMVAVars_iso.circularity);
+        tmpTMVAReader_EE_iso.AddVariable("ele_oldr9",            &allMVAVars_iso.R9);
+        tmpTMVAReader_EE_iso.AddVariable("ele_scletawidth",      &allMVAVars_iso.etawidth);
+        tmpTMVAReader_EE_iso.AddVariable("ele_sclphiwidth",      &allMVAVars_iso.phiwidth);
+        tmpTMVAReader_EE_iso.AddVariable("ele_oldhe",            &allMVAVars_iso.HoE);
+        
+        //Pure tracking variables
+        tmpTMVAReader_EE_iso.AddVariable("ele_kfhits",           &allMVAVars_iso.kfhits);
+        tmpTMVAReader_EE_iso.AddVariable("ele_kfchi2",           &allMVAVars_iso.kfchi2);
+        tmpTMVAReader_EE_iso.AddVariable("ele_gsfchi2",        &allMVAVars_iso.gsfchi2);
+      
+        // Energy matching
+        tmpTMVAReader_EE_iso.AddVariable("ele_fbrem",           &allMVAVars_iso.fbrem);
+      
+        tmpTMVAReader_EE_iso.AddVariable("ele_gsfhits",         &allMVAVars_iso.gsfhits);
+        tmpTMVAReader_EE_iso.AddVariable("ele_expected_inner_hits",             &allMVAVars_iso.expectedMissingInnerHits);
+        tmpTMVAReader_EE_iso.AddVariable("ele_conversionVertexFitProbability",  &allMVAVars_iso.convVtxFitProbability);
+      
+        tmpTMVAReader_EE_iso.AddVariable("ele_ep",              &allMVAVars_iso.EoP);
+        tmpTMVAReader_EE_iso.AddVariable("ele_eelepout",        &allMVAVars_iso.eleEoPout);
+        tmpTMVAReader_EE_iso.AddVariable("ele_IoEmIop",         &allMVAVars_iso.IoEmIoP);
+        
+        // Geometrical matchings
+        tmpTMVAReader_EE_iso.AddVariable("ele_deltaetain",      &allMVAVars_iso.deta);
+        tmpTMVAReader_EE_iso.AddVariable("ele_deltaphiin",      &allMVAVars_iso.dphi);
+        tmpTMVAReader_EE_iso.AddVariable("ele_deltaetaseed",    &allMVAVars_iso.detacalo);
+
+        // Spectator variables  
+	// tmpTMVAReader_EE_iso.AddVariable("ele_pt",              &allMVAVars_iso.pt);
+	// tmpTMVAReader_EE_iso.AddVariable("scl_eta",             &allMVAVars_iso.SCeta);
+	// Isolation
+	tmpTMVAReader_EE_iso.AddVariable("ele_pfPhotonIso",     &allMVAVars_iso.pfPhotonIso);
+	tmpTMVAReader_EE_iso.AddVariable("ele_pfChargedHadIso",     &allMVAVars_iso.pfChargedHadIso);
+	tmpTMVAReader_EE_iso.AddVariable("ele_pfNeutralHadIso",     &allMVAVars_iso.pfNeutralHadIso);
+      
+        tmpTMVAReader_EE_iso.AddVariable("rho",    &allMVAVars_iso.rho);
+
+        // Endcap only variables
+        tmpTMVAReader_EE_iso.AddVariable("ele_psEoverEraw",    &allMVAVars_iso.PreShowerOverRaw);
+
+        tmpTMVAReader_EB_iso.BookMVA( "Fall17_iso_EB1",  mvsPar["ElMVAweightFiles_iso"].at(0) );
+        tmpTMVAReader_EB_iso.BookMVA( "Fall17_iso_EB2",  mvsPar["ElMVAweightFiles_iso"].at(1) );
+        tmpTMVAReader_EE_iso.BookMVA( "Fall17_iso_EE",   mvsPar["ElMVAweightFiles_iso"].at(2) );
     }
  
 }
@@ -1339,11 +1331,15 @@ double BaseEventSelector::mvaValue(const pat::Electron & electron, edm::EventBas
     event.getByLabel(bsLabel_, bsHandle);
     const reco::BeamSpot &beamspot = *bsHandle.product();
 
+    edm::Handle<double> rhoHandle;
+    edm::InputTag rhoSrc_("fixedGridRhoFastjetAll", "");
+    event.getByLabel(rhoSrc_, rhoHandle);
+    allMVAVars.rho = std::max(*(rhoHandle.product()), 0.0);
 
     // Pure ECAL -> shower shapes
     allMVAVars.see            = electron.full5x5_sigmaIetaIeta();
     allMVAVars.spp            = electron.full5x5_sigmaIphiIphi();
-    allMVAVars.OneMinusE1x5E5x5 = 1. - electron.full5x5_e1x5() / electron.full5x5_e5x5();
+    allMVAVars.circularity = 1. - electron.full5x5_e1x5() / electron.full5x5_e5x5();
     allMVAVars.R9             = electron.full5x5_r9();
     allMVAVars.etawidth       = electron.superCluster()->etaWidth();
     allMVAVars.phiwidth       = electron.superCluster()->phiWidth();
@@ -1370,16 +1366,17 @@ double BaseEventSelector::mvaValue(const pat::Electron & electron, edm::EventBas
     allMVAVars.fbrem           = electron.fbrem();
   
     allMVAVars.gsfhits         = electron.gsfTrack()->hitPattern().trackerLayersWithMeasurement();
-    allMVAVars.expectedMissingInnerHits = electron.gsfTrack()->hitPattern().numberOfAllHits(reco::HitPattern::MISSING_INNER_HITS);
+    allMVAVars.expectedMissingInnerHits = electron.gsfTrack()->hitPattern().numberOfLostHits(reco::HitPattern::MISSING_INNER_HITS);
   
     reco::ConversionRef conv_ref = ConversionTools::matchedConversion(electron, conversions, beamspot.position());
-    double vertexFitProbability = -1.; 
+    double convVtxFitProbability = -1.; 
     if(!conv_ref.isNull()) {
-      const reco::Vertex &vtx = conv_ref.get()->conversionVertex(); if (vtx.isValid()) {
-        vertexFitProbability = TMath::Prob( vtx.chi2(), vtx.ndof());
+      const reco::Vertex &vtx = conv_ref.get()->conversionVertex(); 
+      if (vtx.isValid()) {
+        convVtxFitProbability = (float)TMath::Prob( vtx.chi2(), vtx.ndof());
       } 
     }
-    allMVAVars.convVtxFitProbability    = vertexFitProbability;
+    allMVAVars.convVtxFitProbability    = convVtxFitProbability;
   
     allMVAVars.EoP             = electron.eSuperClusterOverP();
     allMVAVars.eleEoPout       = electron.eEleClusterOverPout();
@@ -1411,30 +1408,31 @@ double BaseEventSelector::mvaValue(const pat::Electron & electron, edm::EventBas
 
     // Constrain values
 
+    if(allMVAVars.circularity < -1.) allMVAVars.circularity = -1;
+    if(allMVAVars.circularity > 2.) allMVAVars.circularity = 2.; 
+    if(allMVAVars.R9 > 5) allMVAVars.R9 = 5;
+    if(allMVAVars.kfchi2 > 10.) allMVAVars.kfchi2 = 10.;
+    if(allMVAVars.gsfchi2 > 200.) allMVAVars.gsfchi2 = 200;
     if(allMVAVars.fbrem < -1.) allMVAVars.fbrem = -1.;
-    allMVAVars.deta = fabs(allMVAVars.deta);
-    if(allMVAVars.deta > 0.06) allMVAVars.deta = 0.06;
-    allMVAVars.dphi = fabs(allMVAVars.dphi);
-    if(allMVAVars.dphi > 0.6) allMVAVars.dphi = 0.6;
     if(allMVAVars.EoP > 20.) allMVAVars.EoP = 20.;
     if(allMVAVars.eleEoPout > 20.) allMVAVars.eleEoPout = 20.;
-    allMVAVars.detacalo = fabs(allMVAVars.detacalo);
+    if(allMVAVars.deta < -0.06) allMVAVars.deta = -0.06;
+    if(allMVAVars.deta > 0.06) allMVAVars.deta = 0.06;
+    if(allMVAVars.dphi < -0.6) allMVAVars.dphi = -0.6;
+    if(allMVAVars.dphi > 0.6) allMVAVars.dphi = 0.6;
+    if(allMVAVars.detacalo < -0.2) allMVAVars.detacalo = -0.2;
     if(allMVAVars.detacalo > 0.2) allMVAVars.detacalo = 0.2;
-    if(allMVAVars.OneMinusE1x5E5x5 < -1.) allMVAVars.OneMinusE1x5E5x5 = -1;
-    if(allMVAVars.OneMinusE1x5E5x5 > 2.) allMVAVars.OneMinusE1x5E5x5 = 2.; 
-    if(allMVAVars.R9 > 5) allMVAVars.R9 = 5;
-    if(allMVAVars.gsfchi2 > 200.) allMVAVars.gsfchi2 = 200;
-    if(allMVAVars.kfchi2 > 10.) allMVAVars.kfchi2 = 10.;
+
 
     double cutValue;
-    if (fabs(allMVAVars.SCeta)<=0.8) cutValue = tmpTMVAReader_EB.EvaluateMVA( "Spring15_V1_EB1" );
-    else if (fabs(allMVAVars.SCeta)<=1.479) cutValue = tmpTMVAReader_EB.EvaluateMVA( "Spring15_V1_EB2" );
-    else cutValue = tmpTMVAReader_EE.EvaluateMVA( "Spring15_V1_EE" );
+    if (fabs(allMVAVars.SCeta)<=0.8) cutValue = tmpTMVAReader_EB.EvaluateMVA( "Fall17_EB1" );
+    else if (fabs(allMVAVars.SCeta)<=1.479) cutValue = tmpTMVAReader_EB.EvaluateMVA( "Fall17_EB2" );
+    else cutValue = tmpTMVAReader_EE.EvaluateMVA( "Fall17_EE" );
     //std::cout<<"cutValue = "<<cutValue<<std::endl;
 
     return cutValue;	
 }
-double BaseEventSelector::mvaValue_alt(const pat::Electron & electron, edm::EventBase const & event)
+double BaseEventSelector::mvaValue_iso(const pat::Electron & electron, edm::EventBase const & event)
 {
        
     edm::Handle<std::vector<reco::Vertex> > pvtxHandle;
@@ -1453,17 +1451,22 @@ double BaseEventSelector::mvaValue_alt(const pat::Electron & electron, edm::Even
     event.getByLabel(bsLabel_, bsHandle);
     const reco::BeamSpot &beamspot = *bsHandle.product();
 
+    edm::Handle<double> rhoHandle;
+    edm::InputTag rhoSrc_("fixedGridRhoFastjetAll", "");
+    event.getByLabel(rhoSrc_, rhoHandle);
+    allMVAVars_iso.rho = std::max(*(rhoHandle.product()), 0.0);
+
 
     // Pure ECAL -> shower shapes
-    allMVAVars_alt.see            = electron.full5x5_sigmaIetaIeta();
-    allMVAVars_alt.spp            = electron.full5x5_sigmaIphiIphi();
-    allMVAVars_alt.OneMinusE1x5E5x5 = 1. - electron.full5x5_e1x5() / electron.full5x5_e5x5();
-    allMVAVars_alt.R9             = electron.full5x5_r9();
-    allMVAVars_alt.etawidth       = electron.superCluster()->etaWidth();
-    allMVAVars_alt.phiwidth       = electron.superCluster()->phiWidth();
-    allMVAVars_alt.HoE            = electron.full5x5_hcalOverEcal();
+    allMVAVars_iso.see            = electron.full5x5_sigmaIetaIeta();
+    allMVAVars_iso.spp            = electron.full5x5_sigmaIphiIphi();
+    allMVAVars_iso.circularity = 1. - electron.full5x5_e1x5() / electron.full5x5_e5x5();
+    allMVAVars_iso.R9             = electron.full5x5_r9();
+    allMVAVars_iso.etawidth       = electron.superCluster()->etaWidth();
+    allMVAVars_iso.phiwidth       = electron.superCluster()->phiWidth();
+    allMVAVars_iso.HoE            = electron.full5x5_hcalOverEcal();
     // Endcap only variables
-    allMVAVars_alt.PreShowerOverRaw  = electron.superCluster()->preshowerEnergy() / electron.superCluster()->rawEnergy();
+    allMVAVars_iso.PreShowerOverRaw  = electron.superCluster()->preshowerEnergy() / electron.superCluster()->rawEnergy();
   
     // To get to CTF track information in pat::Electron, we have to have the pointer
     // to pat::Electron, it is not accessible from the pointer to reco::GsfElectron.
@@ -1476,63 +1479,68 @@ double BaseEventSelector::mvaValue_alt(const pat::Electron & electron, edm::Even
     bool validKF = (myTrackRef.isAvailable() && (myTrackRef.isNonnull()) );  
   
     //Pure tracking variables
-    allMVAVars_alt.kfhits         = (validKF) ? myTrackRef->hitPattern().trackerLayersWithMeasurement() : -1. ;
-    allMVAVars_alt.kfchi2          = (validKF) ? myTrackRef->normalizedChi2() : 0;
-    allMVAVars_alt.gsfchi2         = electron.gsfTrack()->normalizedChi2();
+    allMVAVars_iso.kfhits         = (validKF) ? myTrackRef->hitPattern().trackerLayersWithMeasurement() : -1. ;
+    allMVAVars_iso.kfchi2          = (validKF) ? myTrackRef->normalizedChi2() : 0;
+    allMVAVars_iso.gsfchi2         = electron.gsfTrack()->normalizedChi2();
   
     // Energy matching
-    allMVAVars_alt.fbrem           = electron.fbrem();
+    allMVAVars_iso.fbrem           = electron.fbrem();
   
-    allMVAVars_alt.gsfhits         = electron.gsfTrack()->hitPattern().trackerLayersWithMeasurement();
-    allMVAVars_alt.expectedMissingInnerHits = electron.gsfTrack()->hitPattern().numberOfAllHits(reco::HitPattern::MISSING_INNER_HITS);
+    allMVAVars_iso.gsfhits         = electron.gsfTrack()->hitPattern().trackerLayersWithMeasurement();
+    allMVAVars_iso.expectedMissingInnerHits = electron.gsfTrack()->hitPattern().numberOfLostHits(reco::HitPattern::MISSING_INNER_HITS);
   
     reco::ConversionRef conv_ref = ConversionTools::matchedConversion(electron, conversions, beamspot.position());
     double vertexFitProbability = -1.; 
     if(!conv_ref.isNull()) {
       const reco::Vertex &vtx = conv_ref.get()->conversionVertex(); if (vtx.isValid()) {
-        vertexFitProbability = TMath::Prob( vtx.chi2(), vtx.ndof());
+        vertexFitProbability = (float)TMath::Prob( vtx.chi2(), vtx.ndof());
       } 
     }
-    allMVAVars_alt.convVtxFitProbability    = vertexFitProbability;
+    allMVAVars_iso.convVtxFitProbability    = vertexFitProbability;
   
-    allMVAVars_alt.EoP             = electron.eSuperClusterOverP();
-    allMVAVars_alt.eleEoPout       = electron.eEleClusterOverPout();
-    allMVAVars_alt.IoEmIoP         = (1.0/electron.ecalEnergy()) - (1.0 / electron.trackMomentumAtVtx().R() );
+    allMVAVars_iso.EoP             = electron.eSuperClusterOverP();
+    allMVAVars_iso.eleEoPout       = electron.eEleClusterOverPout();
+    allMVAVars_iso.IoEmIoP         = (1.0/electron.ecalEnergy()) - (1.0 / electron.trackMomentumAtVtx().R() );
   
     // Geometrical matchings
-    allMVAVars_alt.deta            = electron.deltaEtaSuperClusterTrackAtVtx();
-    allMVAVars_alt.dphi            = electron.deltaPhiSuperClusterTrackAtVtx();
-    allMVAVars_alt.detacalo        = electron.deltaEtaSeedClusterTrackAtCalo();
+    allMVAVars_iso.deta            = electron.deltaEtaSuperClusterTrackAtVtx();
+    allMVAVars_iso.dphi            = electron.deltaPhiSuperClusterTrackAtVtx();
+    allMVAVars_iso.detacalo        = electron.deltaEtaSeedClusterTrackAtCalo();
+
+    // Isolation, new for 2017 MVA
+    allMVAVars.pfChargedHadIso = (electron.pfIsolationVariables()).sumChargedHadronPt;
+    allMVAVars.pfNeutralHadIso = (electron.pfIsolationVariables()).sumNeutralHadronEt;
+    allMVAVars.pfPhotonIso = (electron.pfIsolationVariables()).sumPhotonEt;
 
     // Spectator variables  
-    allMVAVars_alt.pt              = electron.pt();
-    allMVAVars_alt.SCeta           = electron.superCluster()->eta();
+    allMVAVars_iso.pt              = electron.pt();
+    allMVAVars_iso.SCeta           = electron.superCluster()->eta();
     constexpr float ebeeSplit = 1.479;
-    allMVAVars_alt.isBarrel        = ( fabs(allMVAVars_alt.SCeta) < ebeeSplit );
-    allMVAVars_alt.isEndcap        = ( fabs(allMVAVars_alt.SCeta) >= ebeeSplit );
+    allMVAVars_iso.isBarrel        = ( fabs(allMVAVars_iso.SCeta) < ebeeSplit );
+    allMVAVars_iso.isEndcap        = ( fabs(allMVAVars_iso.SCeta) >= ebeeSplit );
 
 
     // Constrain values
 
-    if(allMVAVars_alt.fbrem < -1.) allMVAVars_alt.fbrem = -1.;
-    allMVAVars_alt.deta = fabs(allMVAVars_alt.deta);
-    if(allMVAVars_alt.deta > 0.06) allMVAVars_alt.deta = 0.06;
-    allMVAVars_alt.dphi = fabs(allMVAVars_alt.dphi);
-    if(allMVAVars_alt.dphi > 0.6) allMVAVars_alt.dphi = 0.6;
-    if(allMVAVars_alt.EoP > 20.) allMVAVars_alt.EoP = 20.;
-    if(allMVAVars_alt.eleEoPout > 20.) allMVAVars_alt.eleEoPout = 20.;
-    allMVAVars_alt.detacalo = fabs(allMVAVars_alt.detacalo);
-    if(allMVAVars_alt.detacalo > 0.2) allMVAVars_alt.detacalo = 0.2;
-    if(allMVAVars_alt.OneMinusE1x5E5x5 < -1.) allMVAVars_alt.OneMinusE1x5E5x5 = -1;
-    if(allMVAVars_alt.OneMinusE1x5E5x5 > 2.) allMVAVars_alt.OneMinusE1x5E5x5 = 2.; 
-    if(allMVAVars_alt.R9 > 5) allMVAVars_alt.R9 = 5;
-    if(allMVAVars_alt.gsfchi2 > 200.) allMVAVars_alt.gsfchi2 = 200;
-    if(allMVAVars_alt.kfchi2 > 10.) allMVAVars_alt.kfchi2 = 10.;
+    if(allMVAVars_iso.circularity < -1.) allMVAVars_iso.circularity = -1;
+    if(allMVAVars_iso.circularity > 2.) allMVAVars_iso.circularity = 2.; 
+    if(allMVAVars_iso.R9 > 5) allMVAVars_iso.R9 = 5;
+    if(allMVAVars_iso.kfchi2 > 10.) allMVAVars_iso.kfchi2 = 10.;
+    if(allMVAVars_iso.gsfchi2 > 200.) allMVAVars_iso.gsfchi2 = 200;
+    if(allMVAVars_iso.fbrem < -1.) allMVAVars_iso.fbrem = -1.;
+    if(allMVAVars_iso.EoP > 20.) allMVAVars_iso.EoP = 20.;
+    if(allMVAVars_iso.eleEoPout > 20.) allMVAVars_iso.eleEoPout = 20.;
+    if(allMVAVars_iso.deta < -0.06) allMVAVars_iso.deta = -0.06;
+    if(allMVAVars_iso.deta > 0.06) allMVAVars_iso.deta = 0.06;
+    if(allMVAVars_iso.dphi < -0.6) allMVAVars_iso.dphi = -0.6;
+    if(allMVAVars_iso.dphi > 0.6) allMVAVars_iso.dphi = 0.6;
+    if(allMVAVars_iso.detacalo < -0.2) allMVAVars_iso.detacalo = -0.2;
+    if(allMVAVars_iso.detacalo > 0.2) allMVAVars_iso.detacalo = 0.2;
 
     double cutValue;
-    if (fabs(allMVAVars_alt.SCeta)<=0.8) cutValue = tmpTMVAReader_EB_alt.EvaluateMVA( "Spring16_V1_EB1" );
-    else if (fabs(allMVAVars_alt.SCeta)<=1.479) cutValue = tmpTMVAReader_EB_alt.EvaluateMVA( "Spring16_V1_EB2" );
-    else cutValue = tmpTMVAReader_EE_alt.EvaluateMVA( "Spring16_V1_EE" );
+    if (fabs(allMVAVars_iso.SCeta)<=0.8) cutValue = tmpTMVAReader_EB_iso.EvaluateMVA( "Fall17_iso_EB1" );
+    else if (fabs(allMVAVars_iso.SCeta)<=1.479) cutValue = tmpTMVAReader_EB_iso.EvaluateMVA( "Fall17_iso_EB2" );
+    else cutValue = tmpTMVAReader_EE_iso.EvaluateMVA( "Fall17_iso_EE" );
     //std::cout<<"cutValue = "<<cutValue<<std::endl;
 
     return cutValue;	

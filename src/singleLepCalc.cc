@@ -69,6 +69,10 @@ private:
     std::vector<unsigned int> keepMomPDGID;
     std::vector<unsigned int> keepPDGIDForce;
     std::vector<unsigned int> keepStatusForce;
+    std::vector<double>       tightElMVA;
+    std::vector<double>       looseElMVA;
+    std::vector<double>       tightElMVAiso;
+    std::vector<double>       looseElMVAiso;
     bool saveGenHT;
     bool keepFullMChistory;
     bool cleanGenJets;
@@ -203,6 +207,18 @@ int singleLepCalc::BeginJob()
 
     if (mPset.exists("doAllJetSyst"))  doAllJetSyst = mPset.getParameter<bool>("doAllJetSyst");
     else                               doAllJetSyst = false;
+
+    if (mPset.exists("tight_electron_mva_cuts")) tightElMVA = mPset.getParameter< std::vector<double> >("tight_electron_mva_cuts");
+    else tightElMVA = {0.96165,8.75794,3.13902,0.93193,8.84606,3.59851,0.88993,10.12423,4.35279};
+
+    if (mPset.exists("loose_electron_mva_cuts")) looseElMVA = mPset.getParameter< std::vector<double> >("loose_electron_mva_cuts");
+    else looseElMVA = {-0.86,-0.81,-0.72};
+
+    if (mPset.exists("tight_electron_mvaiso_cuts")) tightElMVAiso = mPset.getParameter< std::vector<double> >("tight_electron_mvaiso_cuts");
+    else tightElMVAiso = {0.97177,8.91285,1.97124,0.945875,8.83104,2.40850,0.89791,9.81408,4.17158};
+
+    if (mPset.exists("loose_electron_mvaiso_cuts")) looseElMVAiso = mPset.getParameter< std::vector<double> >("loose_electron_mvaiso_cuts");
+    else looseElMVAiso = {-0.83,-0.77,-0.69};
 
     return 0;
 }
@@ -592,7 +608,11 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
     std::vector <int>    elVtxFitConv;    
 
     std::vector <double> elMVAValue;
-    std::vector <double> elMVAValue_alt;
+    std::vector <double> elMVAValue_iso;
+    std::vector <int>    elIsMVATight;
+    std::vector <int>    elIsMVALoose;
+    std::vector <int>    elIsMVATightIso;
+    std::vector <int>    elIsMVALooseIso;
  
     //Extra info about isolation
     std::vector <double> elChIso;
@@ -717,8 +737,35 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
 
             if (UseElMVA) {
                 elMVAValue.push_back( selector->mvaValue(iel->operator*(),event) );
-                elMVAValue_alt.push_back( selector->mvaValue_alt(iel->operator*(),event) );
+                elMVAValue_iso.push_back( selector->mvaValue_iso(iel->operator*(),event) );
+		bool mvapass = 0;
+		bool mvapassloose = 0;
+		bool mvapassiso = 0;
+		bool mvapassisoloose = 0;
+		if ( fabs((*iel)->superCluster()->eta())<=0.8){
+		  mvapass = selector->mvaValue(iel->operator*(),event) > (tightElMVA.at(0) - tightElMVA.at(2)*exp(-1*(*iel)->pt()/tightElMVA.at(1)));
+		  mvapassiso = selector->mvaValue(iel->operator*(),event) > (tightElMVAiso.at(0) - tightElMVAiso.at(2)*exp(-1*(*iel)->pt()/tightElMVAiso.at(1)));
+		  mvapassloose = selector->mvaValue(iel->operator*(),event) > looseElMVA.at(0);
+		  mvapassisoloose = selector->mvaValue(iel->operator*(),event) > looseElMVAiso.at(0);
+		}
+		else if ( fabs((*iel)->superCluster()->eta())<=1.479){
+		  mvapass = selector->mvaValue(iel->operator*(),event) > (tightElMVA.at(3) - tightElMVA.at(5)*exp(-1*(*iel)->pt()/tightElMVA.at(4)));
+		  mvapassiso = selector->mvaValue(iel->operator*(),event) > (tightElMVAiso.at(3) - tightElMVAiso.at(5)*exp(-1*(*iel)->pt()/tightElMVAiso.at(4)));
+		  mvapassloose = selector->mvaValue(iel->operator*(),event) > looseElMVA.at(1);
+		  mvapassisoloose = selector->mvaValue(iel->operator*(),event) > looseElMVAiso.at(1);
+		}
+		else{
+		  mvapass = selector->mvaValue(iel->operator*(),event) > (tightElMVA.at(6) - tightElMVA.at(8)*exp(-1*(*iel)->pt()/tightElMVA.at(7)));
+		  mvapassiso = selector->mvaValue(iel->operator*(),event) > (tightElMVAiso.at(6) - tightElMVAiso.at(8)*exp(-1*(*iel)->pt()/tightElMVAiso.at(7)));
+		  mvapassloose = selector->mvaValue(iel->operator*(),event) > looseElMVA.at(2);
+		  mvapassisoloose = selector->mvaValue(iel->operator*(),event) > looseElMVAiso.at(2);
+		}
+		elIsMVATight.push_back(mvapass);
+		elIsMVALoose.push_back(mvapassloose);
+		elIsMVATightIso.push_back(mvapassiso);
+		elIsMVALooseIso.push_back(mvapassisoloose);
             }
+	    
 
             if(isMc && keepFullMChistory){
                 //cout << "start\n";
@@ -800,7 +847,11 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
     SetValue("elVtxFitConv", elVtxFitConv);
 
     SetValue("elMVAValue", elMVAValue);
-    SetValue("elMVAValue_alt", elMVAValue_alt);
+    SetValue("elMVAValue_iso", elMVAValue_iso);
+    SetValue("elIsMVATight", elIsMVATight);
+    SetValue("elIsMVALoose", elIsMVALoose);
+    SetValue("elIsMVATightIso",elIsMVATightIso);
+    SetValue("elIsMVALooseIso",elIsMVALooseIso);
 
     //Extra info about isolation
     SetValue("elChIso" , elChIso);
