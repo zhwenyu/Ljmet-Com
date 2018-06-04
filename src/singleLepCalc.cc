@@ -640,8 +640,11 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
     std::vector <int>    elVtxFitConv;    
 
     std::vector <double> elMVAValue;
-    std::vector <double> elMVAValue_alt;
-
+    std::vector <double> elMVAValue_iso;
+    std::vector <int>    elIsMVATight;
+    std::vector <int>    elIsMVALoose;
+    std::vector <int>    elIsMVATightIso;
+    std::vector <int>    elIsMVALooseIso;
 
     //Extra info about isolation
     std::vector <double> elChIso;
@@ -652,10 +655,6 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
     std::vector <double> elEcalPFClusterIso;
     std::vector <double> elHcalPFClusterIso;
     std::vector <double> elDR03TkSumPt;
-
-    std::vector <double>    elIsTightEndCap;
-    std::vector <double>    elIsMediumEndCap;
-    std::vector <double>    elIsLooseEndCap;
 
     //mother-information
     //Generator level information -- MC matching
@@ -670,6 +669,7 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
     std::vector<double> elMother_energy;
     std::vector<int> elMother_id;
     std::vector<int> elMother_status;
+
     //Matched gen electron information:
     std::vector<double> elMatchedPt;
     std::vector<double> elMatchedEta;
@@ -677,6 +677,11 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
     std::vector<double> elMatchedEnergy;
 
     std::vector<double> elIsTightBarrel;
+
+    std::vector<double> elIsTightEndCap;
+    std::vector<double> elIsMediumEndCap;
+    std::vector<double> elIsLooseEndCap;
+    std::vector<double> elIsVetoEndCap;
 
     edm::Handle<double> rhoHandle;
     event.getByLabel(rhoSrc_, rhoHandle);
@@ -770,29 +775,65 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
             elVtxFitConv.push_back((*iel)->passConversionVeto());
             elNotConversion.push_back((*iel)->passConversionVeto());
 
-<<<<<<< HEAD
-            float dEtaSeed = (*iel)->deltaEtaSuperClusterTrackAtVtx() - (*iel)->superCluster()->eta() + (*iel)->superCluster()->seed()->eta();
-            bool isTightEndCap = ( (*iel)->full5x5_sigmaIetaIeta() < .0305
-                                   && abs(dEtaSeed) < .00567
-                                   && abs((*iel)->deltaPhiSuperClusterTrackAtVtx()) < .0165
-				   && );
-
-	    elIsTightEndCap.push_back(isTightEndCap);
-
-=======
-	    float dEtaInSeed =  (*iel)->deltaEtaSuperClusterTrackAtVtx() - (*iel)->superCluster()->eta() + (*iel)->superCluster()->seed()->eta();
+	    float dEtaInSeedBarrel =  (*iel)->deltaEtaSuperClusterTrackAtVtx() - (*iel)->superCluster()->eta() + (*iel)->superCluster()->seed()->eta();
 	    bool istightbarrel = ( (*iel)->full5x5_sigmaIetaIeta() < 0.0104 
-				   && fabs(dEtaInSeed) < 0.00353 
+				   && fabs(dEtaInSeedBarrel) < 0.00353 
 				   && fabs((*iel)->deltaPhiSuperClusterTrackAtVtx()) < 0.0499
 				   && ( (*iel)->hcalOverEcal() < 0.026 + 1.12/(*iel)->energy() + 0.0368*rhoIso/(*iel)->energy() )
 				   && relIso < 0.0361 
 				   && ( fabs(1.0/(*iel)->ecalEnergy() - (*iel)->eSuperClusterOverP()/(*iel)->ecalEnergy()) < 0.0278 )
-				   && (*iel)->gsfTrack()->hitPattern().numberOfLostHits(reco::HitPattern::MISSING_INNER_HITS) < 1
+				   && (*iel)->gsfTrack()->hitPattern().numberOfLostHits(reco::HitPattern::MISSING_INNER_HITS) <= 1
 				   && (*iel)->passConversionVeto()
 				   );
 
+	    float dEtaInSeedEndCap =  (*iel)->deltaEtaSuperClusterTrackAtVtx() - (*iel)->superCluster()->eta() + (*iel)->superCluster()->seed()->eta();
+	    bool istightendcap = ( (*iel)->full5x5_sigmaIetaIeta() < 0.0305 
+				   && fabs(dEtaInSeedEndCap) < 0.00567
+				   && fabs((*iel)->deltaPhiSuperClusterTrackAtVtx()) < 0.0165
+				   && ( (*iel)->hcalOverEcal() < 0.026 + .5/(*iel)->energy() + 0.201*rhoIso/(*iel)->energy() )
+				   && relIso < 0.094 
+				   && ( fabs(1.0/(*iel)->ecalEnergy() - (*iel)->eSuperClusterOverP()/(*iel)->ecalEnergy()) < 0.0158 )
+				   && (*iel)->gsfTrack()->hitPattern().numberOfLostHits(reco::HitPattern::MISSING_INNER_HITS) <= 1
+				   && (*iel)->passConversionVeto()
+				   );
+
+	    bool ismediumendcap = ( (*iel)->full5x5_sigmaIetaIeta() < 0.0309 
+				   && fabs(dEtaInSeedEndCap) < 0.00625
+				   && fabs((*iel)->deltaPhiSuperClusterTrackAtVtx()) < 0.0355
+				   && ( (*iel)->hcalOverEcal() < 0.026 + .5/(*iel)->energy() + 0.201*rhoIso/(*iel)->energy() )
+				   && relIso < 0.143 
+				   && ( fabs(1.0/(*iel)->ecalEnergy() - (*iel)->eSuperClusterOverP()/(*iel)->ecalEnergy()) < 0.0335 )
+				   && (*iel)->gsfTrack()->hitPattern().numberOfLostHits(reco::HitPattern::MISSING_INNER_HITS) <= 1
+				   && (*iel)->passConversionVeto()
+				   );
+
+	    bool islooseendcap = ( (*iel)->full5x5_sigmaIetaIeta() < 0.0356
+				   && fabs(dEtaInSeedEndCap) < 0.0072
+				   && fabs((*iel)->deltaPhiSuperClusterTrackAtVtx()) < 0.147
+				   && ( (*iel)->hcalOverEcal() < 0.0414 + .5/(*iel)->energy() + 0.201*rhoIso/(*iel)->energy() )
+				   && relIso < 0.146 
+				   && ( fabs(1.0/(*iel)->ecalEnergy() - (*iel)->eSuperClusterOverP()/(*iel)->ecalEnergy()) < 0.0875 )
+				   && (*iel)->gsfTrack()->hitPattern().numberOfLostHits(reco::HitPattern::MISSING_INNER_HITS) <= 1
+				   && (*iel)->passConversionVeto()
+				   );
+
+	    bool isvetoendcap = ( (*iel)->full5x5_sigmaIetaIeta() < 0.0445 
+				   && fabs(dEtaInSeedEndCap) < 0.00984
+				   && fabs((*iel)->deltaPhiSuperClusterTrackAtVtx()) < 0.0157
+				   && ( (*iel)->hcalOverEcal() < 0.05 + .5/(*iel)->energy() + 0.201*rhoIso/(*iel)->energy() )
+				   && relIso < 0.185
+				   && ( fabs(1.0/(*iel)->ecalEnergy() - (*iel)->eSuperClusterOverP()/(*iel)->ecalEnergy()) < 0.0962 )
+				   && (*iel)->gsfTrack()->hitPattern().numberOfLostHits(reco::HitPattern::MISSING_INNER_HITS) <= 3
+				   && (*iel)->passConversionVeto()
+				   );
+
+
 	    elIsTightBarrel.push_back(istightbarrel);
->>>>>>> upstream/CMSSW_9_4_X
+	    elIsTightEndCap.push_back(istightendcap);
+            elIsMediumEndCap.push_back(ismediumendcap);
+            elIsLooseEndCap.push_back(islooseendcap);
+            elIsVetoEndCap.push_back(isvetoendcap);
+
 
             if (UseElMVA) {
                 elMVAValue.push_back( selector->mvaValue(iel->operator*(),event) );
@@ -887,6 +928,11 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
     SetValue("elScPixCharge", elScPixCharge);
 
     SetValue("elIsTightBarrel", elIsTightBarrel);
+
+    SetValue("elIsTightEndCap", elIsTightEndCap);
+    SetValue("elIsMediumEndCap", elIsMediumEndCap);
+    SetValue("elIsLooseEndCap", elIsLooseEndCap);
+    SetValue("elIsVetoEndCap", elIsVetoEndCap);
 
     //Quality requirements
     SetValue("elRelIso" , elRelIso); //Isolation
