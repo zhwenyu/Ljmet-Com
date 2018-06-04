@@ -121,6 +121,8 @@ singleLepCalc::~singleLepCalc()
 
 int singleLepCalc::BeginJob()
 {
+  cout << "This file is actually used!" << endl;
+
     if (mPset.exists("dataType"))     dataType = mPset.getParameter<std::string>("dataType");
     else                              dataType = "None"; 
 
@@ -643,7 +645,7 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
     std::vector <int>    elIsMVALoose;
     std::vector <int>    elIsMVATightIso;
     std::vector <int>    elIsMVALooseIso;
- 
+
     //Extra info about isolation
     std::vector <double> elChIso;
     std::vector <double> elNhIso;
@@ -667,6 +669,7 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
     std::vector<double> elMother_energy;
     std::vector<int> elMother_id;
     std::vector<int> elMother_status;
+
     //Matched gen electron information:
     std::vector<double> elMatchedPt;
     std::vector<double> elMatchedEta;
@@ -677,6 +680,11 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
     std::vector<double> elIsMediumBarrel;
     std::vector<double> elIsLooseBarrel;
     std::vector<double> elIsVetoBarrel;
+
+    std::vector<double> elIsTightEndCap;
+    std::vector<double> elIsMediumEndCap;
+    std::vector<double> elIsLooseEndCap;
+    std::vector<double> elIsVetoEndCap;
 
     edm::Handle<double> rhoHandle;
     event.getByLabel(rhoSrc_, rhoHandle);
@@ -781,7 +789,54 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
 				   && (*iel)->passConversionVeto()
 				   );
 
+	    float dEtaInSeedEndCap =  (*iel)->deltaEtaSuperClusterTrackAtVtx() - (*iel)->superCluster()->eta() + (*iel)->superCluster()->seed()->eta();
+	    bool istightendcap = ( (*iel)->full5x5_sigmaIetaIeta() < 0.0305 
+				   && fabs(dEtaInSeedEndCap) < 0.00567
+				   && fabs((*iel)->deltaPhiSuperClusterTrackAtVtx()) < 0.0165
+				   && ( (*iel)->hcalOverEcal() < 0.026 + .5/(*iel)->energy() + 0.201*rhoIso/(*iel)->energy() )
+				   && relIso < 0.094 
+				   && ( fabs(1.0/(*iel)->ecalEnergy() - (*iel)->eSuperClusterOverP()/(*iel)->ecalEnergy()) < 0.0158 )
+				   && (*iel)->gsfTrack()->hitPattern().numberOfLostHits(reco::HitPattern::MISSING_INNER_HITS) <= 1
+				   && (*iel)->passConversionVeto()
+				   );
+
+	    bool ismediumendcap = ( (*iel)->full5x5_sigmaIetaIeta() < 0.0309 
+				   && fabs(dEtaInSeedEndCap) < 0.00625
+				   && fabs((*iel)->deltaPhiSuperClusterTrackAtVtx()) < 0.0355
+				   && ( (*iel)->hcalOverEcal() < 0.026 + .5/(*iel)->energy() + 0.201*rhoIso/(*iel)->energy() )
+				   && relIso < 0.143 
+				   && ( fabs(1.0/(*iel)->ecalEnergy() - (*iel)->eSuperClusterOverP()/(*iel)->ecalEnergy()) < 0.0335 )
+				   && (*iel)->gsfTrack()->hitPattern().numberOfLostHits(reco::HitPattern::MISSING_INNER_HITS) <= 1
+				   && (*iel)->passConversionVeto()
+				   );
+
+	    bool islooseendcap = ( (*iel)->full5x5_sigmaIetaIeta() < 0.0356
+				   && fabs(dEtaInSeedEndCap) < 0.0072
+				   && fabs((*iel)->deltaPhiSuperClusterTrackAtVtx()) < 0.147
+				   && ( (*iel)->hcalOverEcal() < 0.0414 + .5/(*iel)->energy() + 0.201*rhoIso/(*iel)->energy() )
+				   && relIso < 0.146 
+				   && ( fabs(1.0/(*iel)->ecalEnergy() - (*iel)->eSuperClusterOverP()/(*iel)->ecalEnergy()) < 0.0875 )
+				   && (*iel)->gsfTrack()->hitPattern().numberOfLostHits(reco::HitPattern::MISSING_INNER_HITS) <= 1
+				   && (*iel)->passConversionVeto()
+				   );
+
+	    bool isvetoendcap = ( (*iel)->full5x5_sigmaIetaIeta() < 0.0445 
+				   && fabs(dEtaInSeedEndCap) < 0.00984
+				   && fabs((*iel)->deltaPhiSuperClusterTrackAtVtx()) < 0.0157
+				   && ( (*iel)->hcalOverEcal() < 0.05 + .5/(*iel)->energy() + 0.201*rhoIso/(*iel)->energy() )
+				   && relIso < 0.185
+				   && ( fabs(1.0/(*iel)->ecalEnergy() - (*iel)->eSuperClusterOverP()/(*iel)->ecalEnergy()) < 0.0962 )
+				   && (*iel)->gsfTrack()->hitPattern().numberOfLostHits(reco::HitPattern::MISSING_INNER_HITS) <= 3
+				   && (*iel)->passConversionVeto()
+				   );
+
+
 	    elIsTightBarrel.push_back(istightbarrel);
+	    elIsTightEndCap.push_back(istightendcap);
+            elIsMediumEndCap.push_back(ismediumendcap);
+            elIsLooseEndCap.push_back(islooseendcap);
+            elIsVetoEndCap.push_back(isvetoendcap);
+
 
 	    bool ismediumbarrel = ( (*iel)->full5x5_sigmaIetaIeta() < 0.0105
                                    && fabs(dEtaInSeedBarrel) < 0.00365
@@ -916,6 +971,11 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
     SetValue("elIsMediumBarrel",elIsMediumBarrel);
     SetValue("elIsLooseBarrel",elIsLooseBarrel);
     SetValue("elIsVetoBarrel",elIsVetoBarrel);
+
+    SetValue("elIsTightEndCap", elIsTightEndCap);
+    SetValue("elIsMediumEndCap", elIsMediumEndCap);
+    SetValue("elIsLooseEndCap", elIsLooseEndCap);
+    SetValue("elIsVetoEndCap", elIsVetoEndCap);
 
     //Quality requirements
     SetValue("elRelIso" , elRelIso); //Isolation
