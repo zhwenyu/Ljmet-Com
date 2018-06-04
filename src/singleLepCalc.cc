@@ -69,6 +69,10 @@ private:
     std::vector<unsigned int> keepMomPDGID;
     std::vector<unsigned int> keepPDGIDForce;
     std::vector<unsigned int> keepStatusForce;
+    std::vector<double>       tightElMVA;
+    std::vector<double>       looseElMVA;
+    std::vector<double>       tightElMVAiso;
+    std::vector<double>       looseElMVAiso;
     bool saveGenHT;
     bool keepFullMChistory;
     bool cleanGenJets;
@@ -205,6 +209,18 @@ int singleLepCalc::BeginJob()
 
     if (mPset.exists("doAllJetSyst"))  doAllJetSyst = mPset.getParameter<bool>("doAllJetSyst");
     else                               doAllJetSyst = false;
+
+    if (mPset.exists("tight_electron_mva_cuts")) tightElMVA = mPset.getParameter< std::vector<double> >("tight_electron_mva_cuts");
+    else tightElMVA = {0.96165,8.75794,3.13902,0.93193,8.84606,3.59851,0.88993,10.12423,4.35279};
+
+    if (mPset.exists("loose_electron_mva_cuts")) looseElMVA = mPset.getParameter< std::vector<double> >("loose_electron_mva_cuts");
+    else looseElMVA = {-0.86,-0.81,-0.72};
+
+    if (mPset.exists("tight_electron_mvaiso_cuts")) tightElMVAiso = mPset.getParameter< std::vector<double> >("tight_electron_mvaiso_cuts");
+    else tightElMVAiso = {0.97177,8.91285,1.97124,0.945875,8.83104,2.40850,0.89791,9.81408,4.17158};
+
+    if (mPset.exists("loose_electron_mvaiso_cuts")) looseElMVAiso = mPset.getParameter< std::vector<double> >("loose_electron_mvaiso_cuts");
+    else looseElMVAiso = {-0.83,-0.77,-0.69};
 
     return 0;
 }
@@ -626,9 +642,6 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
     std::vector <double> elMVAValue;
     std::vector <double> elMVAValue_alt;
 
-    std::vector <double>    elIsTightEndCap;
-    std::vector <double>    elIsMediumEndCap;
-    std::vector <double>    elIsLooseEndCap;
 
     //Extra info about isolation
     std::vector <double> elChIso;
@@ -639,6 +652,10 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
     std::vector <double> elEcalPFClusterIso;
     std::vector <double> elHcalPFClusterIso;
     std::vector <double> elDR03TkSumPt;
+
+    std::vector <double>    elIsTightEndCap;
+    std::vector <double>    elIsMediumEndCap;
+    std::vector <double>    elIsLooseEndCap;
 
     //mother-information
     //Generator level information -- MC matching
@@ -658,6 +675,8 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
     std::vector<double> elMatchedEta;
     std::vector<double> elMatchedPhi;
     std::vector<double> elMatchedEnergy;
+
+    std::vector<double> elIsTightBarrel;
 
     edm::Handle<double> rhoHandle;
     event.getByLabel(rhoSrc_, rhoHandle);
@@ -693,13 +712,13 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
             //Isolation
             double scEta = (*iel)->superCluster()->eta();
             double AEff;
-            if(fabs(scEta) >2.4) AEff = 0.2687;
-            else if(fabs(scEta) >2.3) AEff = 0.2243;
-            else if(fabs(scEta) >2.2) AEff = 0.1903;
-            else if(fabs(scEta) >2.0) AEff = 0.1534;
-            else if(fabs(scEta) >1.479) AEff = 0.1411;
-            else if(fabs(scEta) >0.1) AEff = 0.1862;
-            else AEff = 0.1752;
+            if(fabs(scEta) >2.4) AEff = 0.1524;
+            else if(fabs(scEta) >2.3) AEff = 0.1204;
+            else if(fabs(scEta) >2.2) AEff = 0.1051;
+            else if(fabs(scEta) >2.0) AEff = 0.0854;
+            else if(fabs(scEta) >1.479) AEff = 0.1073;
+            else if(fabs(scEta) >1.0) AEff = 0.1626;
+            else AEff = 0.1566;
   
             double chIso = ((*iel)->pfIsolationVariables()).sumChargedHadronPt;
             double nhIso = ((*iel)->pfIsolationVariables()).sumNeutralHadronEt;
@@ -751,6 +770,7 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
             elVtxFitConv.push_back((*iel)->passConversionVeto());
             elNotConversion.push_back((*iel)->passConversionVeto());
 
+<<<<<<< HEAD
             float dEtaSeed = (*iel)->deltaEtaSuperClusterTrackAtVtx() - (*iel)->superCluster()->eta() + (*iel)->superCluster()->seed()->eta();
             bool isTightEndCap = ( (*iel)->full5x5_sigmaIetaIeta() < .0305
                                    && abs(dEtaSeed) < .00567
@@ -759,11 +779,52 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
 
 	    elIsTightEndCap.push_back(isTightEndCap);
 
+=======
+	    float dEtaInSeed =  (*iel)->deltaEtaSuperClusterTrackAtVtx() - (*iel)->superCluster()->eta() + (*iel)->superCluster()->seed()->eta();
+	    bool istightbarrel = ( (*iel)->full5x5_sigmaIetaIeta() < 0.0104 
+				   && fabs(dEtaInSeed) < 0.00353 
+				   && fabs((*iel)->deltaPhiSuperClusterTrackAtVtx()) < 0.0499
+				   && ( (*iel)->hcalOverEcal() < 0.026 + 1.12/(*iel)->energy() + 0.0368*rhoIso/(*iel)->energy() )
+				   && relIso < 0.0361 
+				   && ( fabs(1.0/(*iel)->ecalEnergy() - (*iel)->eSuperClusterOverP()/(*iel)->ecalEnergy()) < 0.0278 )
+				   && (*iel)->gsfTrack()->hitPattern().numberOfLostHits(reco::HitPattern::MISSING_INNER_HITS) < 1
+				   && (*iel)->passConversionVeto()
+				   );
+
+	    elIsTightBarrel.push_back(istightbarrel);
+>>>>>>> upstream/CMSSW_9_4_X
 
             if (UseElMVA) {
                 elMVAValue.push_back( selector->mvaValue(iel->operator*(),event) );
-                elMVAValue_alt.push_back( selector->mvaValue_alt(iel->operator*(),event) );
+                elMVAValue_iso.push_back( selector->mvaValue_iso(iel->operator*(),event) );
+		bool mvapass = 0;
+		bool mvapassloose = 0;
+		bool mvapassiso = 0;
+		bool mvapassisoloose = 0;
+		if ( fabs((*iel)->superCluster()->eta())<=0.8){
+		  mvapass = selector->mvaValue(iel->operator*(),event) > (tightElMVA.at(0) - tightElMVA.at(2)*exp(-1*(*iel)->pt()/tightElMVA.at(1)));
+		  mvapassiso = selector->mvaValue(iel->operator*(),event) > (tightElMVAiso.at(0) - tightElMVAiso.at(2)*exp(-1*(*iel)->pt()/tightElMVAiso.at(1)));
+		  mvapassloose = selector->mvaValue(iel->operator*(),event) > looseElMVA.at(0);
+		  mvapassisoloose = selector->mvaValue(iel->operator*(),event) > looseElMVAiso.at(0);
+		}
+		else if ( fabs((*iel)->superCluster()->eta())<=1.479){
+		  mvapass = selector->mvaValue(iel->operator*(),event) > (tightElMVA.at(3) - tightElMVA.at(5)*exp(-1*(*iel)->pt()/tightElMVA.at(4)));
+		  mvapassiso = selector->mvaValue(iel->operator*(),event) > (tightElMVAiso.at(3) - tightElMVAiso.at(5)*exp(-1*(*iel)->pt()/tightElMVAiso.at(4)));
+		  mvapassloose = selector->mvaValue(iel->operator*(),event) > looseElMVA.at(1);
+		  mvapassisoloose = selector->mvaValue(iel->operator*(),event) > looseElMVAiso.at(1);
+		}
+		else{
+		  mvapass = selector->mvaValue(iel->operator*(),event) > (tightElMVA.at(6) - tightElMVA.at(8)*exp(-1*(*iel)->pt()/tightElMVA.at(7)));
+		  mvapassiso = selector->mvaValue(iel->operator*(),event) > (tightElMVAiso.at(6) - tightElMVAiso.at(8)*exp(-1*(*iel)->pt()/tightElMVAiso.at(7)));
+		  mvapassloose = selector->mvaValue(iel->operator*(),event) > looseElMVA.at(2);
+		  mvapassisoloose = selector->mvaValue(iel->operator*(),event) > looseElMVAiso.at(2);
+		}
+		elIsMVATight.push_back(mvapass);
+		elIsMVALoose.push_back(mvapassloose);
+		elIsMVATightIso.push_back(mvapassiso);
+		elIsMVALooseIso.push_back(mvapassisoloose);
             }
+	    
 
             if(isMc && keepFullMChistory){
                 //cout << "start\n";
@@ -825,6 +886,8 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
     SetValue("elCtfCharge", elCtfCharge);
     SetValue("elScPixCharge", elScPixCharge);
 
+    SetValue("elIsTightBarrel", elIsTightBarrel);
+
     //Quality requirements
     SetValue("elRelIso" , elRelIso); //Isolation
     SetValue("elMiniIso" , elMiniIso); //Mini Isolation
@@ -845,7 +908,11 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
     SetValue("elVtxFitConv", elVtxFitConv);
 
     SetValue("elMVAValue", elMVAValue);
-    SetValue("elMVAValue_alt", elMVAValue_alt);
+    SetValue("elMVAValue_iso", elMVAValue_iso);
+    SetValue("elIsMVATight", elIsMVATight);
+    SetValue("elIsMVALoose", elIsMVALoose);
+    SetValue("elIsMVATightIso",elIsMVATightIso);
+    SetValue("elIsMVALooseIso",elIsMVALooseIso);
 
     //Extra info about isolation
     SetValue("elChIso" , elChIso);

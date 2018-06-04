@@ -43,7 +43,7 @@
 //#include "TVector3.h"
 
 struct MVAElectronVars {
-    Float_t see, spp, OneMinusE1x5E5x5, R9, etawidth, phiwidth, HoE, PreShowerOverRaw, kfhits, kfchi2, gsfchi2, fbrem, convVtxFitProbability, EoP, eleEoPout, IoEmIoP, deta, dphi, detacalo, gsfhits, expectedMissingInnerHits, pt, isBarrel, isEndcap, SCeta, eClass, pfRelIso, expectedInnerHits, vtxconv, mcEventWeight, mcCBmatchingCategory;
+  Float_t see, spp, circularity, R9, etawidth, phiwidth, HoE, PreShowerOverRaw, kfhits, kfchi2, gsfchi2, fbrem, convVtxFitProbability, EoP, eleEoPout, IoEmIoP, deta, dphi, detacalo, gsfhits, expectedMissingInnerHits, pt, isBarrel, isEndcap, SCeta, eClass, pfRelIso, expectedInnerHits, vtxconv, mcEventWeight, mcCBmatchingCategory, rho, pfPhotonIso, pfChargedHadIso, pfNeutralHadIso;
 };
 
 class BaseEventSelector : public EventSelector {
@@ -183,7 +183,7 @@ public:
     TLorentzVector correctMet(const pat::MET & met, edm::EventBase const & event, std::vector<pat::Jet> jets, unsigned int syst = 0, bool useHF = true);
     TLorentzVector correctMet(const pat::MET & met, edm::EventBase const & event, std::vector<edm::Ptr<pat::Jet> > jets, unsigned int syst = 0, bool useHF = true);
     double mvaValue(const pat::Electron & electron, edm::EventBase const & event);
-    double mvaValue_alt(const pat::Electron & electron, edm::EventBase const & event);
+    double mvaValue_iso(const pat::Electron & electron, edm::EventBase const & event);
     
 protected:
     std::vector<edm::Ptr<pat::Jet>> mvAllJets;
@@ -302,9 +302,9 @@ private:
     MVAElectronVars allMVAVars;
     TMVA::Reader tmpTMVAReader_EB;
     TMVA::Reader tmpTMVAReader_EE;
-    MVAElectronVars allMVAVars_alt;
-    TMVA::Reader tmpTMVAReader_EB_alt;
-    TMVA::Reader tmpTMVAReader_EE_alt;
+    MVAElectronVars allMVAVars_iso;
+    TMVA::Reader tmpTMVAReader_EB_iso;
+    TMVA::Reader tmpTMVAReader_EE_iso;
     
     TRandom3 JERrand;
     
