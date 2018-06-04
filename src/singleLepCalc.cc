@@ -674,6 +674,9 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
     std::vector<double> elMatchedEnergy;
 
     std::vector<double> elIsTightBarrel;
+    std::vector<double> elIsMediumBarrel;
+    std::vector<double> elIsLooseBarrel;
+    std::vector<double> elIsVetoBarrel;
 
     edm::Handle<double> rhoHandle;
     event.getByLabel(rhoSrc_, rhoHandle);
@@ -767,19 +770,56 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
             elVtxFitConv.push_back((*iel)->passConversionVeto());
             elNotConversion.push_back((*iel)->passConversionVeto());
 
-	    float dEtaInSeed =  (*iel)->deltaEtaSuperClusterTrackAtVtx() - (*iel)->superCluster()->eta() + (*iel)->superCluster()->seed()->eta();
+	    float dEtaInSeedBarrel =  (*iel)->deltaEtaSuperClusterTrackAtVtx() - (*iel)->superCluster()->eta() + (*iel)->superCluster()->seed()->eta();
 	    bool istightbarrel = ( (*iel)->full5x5_sigmaIetaIeta() < 0.0104 
-				   && fabs(dEtaInSeed) < 0.00353 
+				   && fabs(dEtaInSeedBarrel) < 0.00353 
 				   && fabs((*iel)->deltaPhiSuperClusterTrackAtVtx()) < 0.0499
 				   && ( (*iel)->hcalOverEcal() < 0.026 + 1.12/(*iel)->energy() + 0.0368*rhoIso/(*iel)->energy() )
 				   && relIso < 0.0361 
 				   && ( fabs(1.0/(*iel)->ecalEnergy() - (*iel)->eSuperClusterOverP()/(*iel)->ecalEnergy()) < 0.0278 )
-				   && (*iel)->gsfTrack()->hitPattern().numberOfLostHits(reco::HitPattern::MISSING_INNER_HITS) < 1
+				   && (*iel)->gsfTrack()->hitPattern().numberOfLostHits(reco::HitPattern::MISSING_INNER_HITS) <= 1
 				   && (*iel)->passConversionVeto()
 				   );
 
 	    elIsTightBarrel.push_back(istightbarrel);
 
+	    bool ismediumbarrel = ( (*iel)->full5x5_sigmaIetaIeta() < 0.0105
+                                   && fabs(dEtaInSeedBarrel) < 0.00365
+                                   && fabs((*iel)->deltaPhiSuperClusterTrackAtVtx()) < 0.0588
+                                   && ( (*iel)->hcalOverEcal() < 0.026 + 1.12/(*iel)->energy() + 0.0368*rhoIso/(*iel)->energy() )
+                                   && relIso < 0.0718
+                                   && ( fabs(1.0/(*iel)->ecalEnergy() - (*iel)->eSuperClusterOverP()/(*iel)->ecalEnergy()) < 0.0327 )
+                                   && (*iel)->gsfTrack()->hitPattern().numberOfLostHits(reco::HitPattern::MISSING_INNER_HITS) <= 1
+                                   && (*iel)->passConversionVeto()
+                                   );
+
+	    elIsMediumBarrel.push_back(ismediumbarrel);
+
+	    bool isloosebarrel = ( (*iel)->full5x5_sigmaIetaIeta() < 0.0105
+				    && fabs(dEtaInSeedBarrel) < 0.00387
+				    && fabs((*iel)->deltaPhiSuperClusterTrackAtVtx()) < 0.0716
+				    && ( (*iel)->hcalOverEcal() < 0.05 + 1.12/(*iel)->energy() + 0.0368*rhoIso/(*iel)->energy() )
+                                    && relIso < 0.133
+				    && ( fabs(1.0/(*iel)->ecalEnergy() - (*iel)->eSuperClusterOverP()/(*iel)->ecalEnergy()) < 0.129 )
+				    && (*iel)->gsfTrack()->hitPattern().numberOfLostHits(reco::HitPattern::MISSING_INNER_HITS) <= 1
+				    && (*iel)->passConversionVeto()
+				    );
+
+	    elIsLooseBarrel.push_back(isloosebarrel);
+
+	    bool isvetobarrel = ( (*iel)->full5x5_sigmaIetaIeta() < 0.0128
+				   && fabs(dEtaInSeedBarrel) < 0.00523
+				   && fabs((*iel)->deltaPhiSuperClusterTrackAtVtx()) < 0.159
+				   && ( (*iel)->hcalOverEcal() < 0.05 + 1.12/(*iel)->energy() + 0.0368*rhoIso/(*iel)->energy() )
+                                   && relIso < 0.168
+				   && ( fabs(1.0/(*iel)->ecalEnergy() - (*iel)->eSuperClusterOverP()/(*iel)->ecalEnergy()) < 0.193 )
+				   && (*iel)->gsfTrack()->hitPattern().numberOfLostHits(reco::HitPattern::MISSING_INNER_HITS) <= 2
+				   && (*iel)->passConversionVeto()
+				   );
+
+	    elIsVetoBarrel.push_back(isvetobarrel);
+
+			
             if (UseElMVA) {
                 elMVAValue.push_back( selector->mvaValue(iel->operator*(),event) );
                 elMVAValue_iso.push_back( selector->mvaValue_iso(iel->operator*(),event) );
@@ -873,6 +913,9 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
     SetValue("elScPixCharge", elScPixCharge);
 
     SetValue("elIsTightBarrel", elIsTightBarrel);
+    SetValue("elIsMediumBarrel",elIsMediumBarrel);
+    SetValue("elIsLooseBarrel",elIsLooseBarrel);
+    SetValue("elIsVetoBarrel",elIsVetoBarrel);
 
     //Quality requirements
     SetValue("elRelIso" , elRelIso); //Isolation
