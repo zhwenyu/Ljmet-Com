@@ -673,6 +673,8 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
     std::vector<double> elMatchedPhi;
     std::vector<double> elMatchedEnergy;
 
+    std::vector<double> elIsTightBarrel;
+
     edm::Handle<double> rhoHandle;
     event.getByLabel(rhoSrc_, rhoHandle);
     double rhoIso = std::max(*(rhoHandle.product()), 0.0);
@@ -707,13 +709,13 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
             //Isolation
             double scEta = (*iel)->superCluster()->eta();
             double AEff;
-            if(fabs(scEta) >2.4) AEff = 0.2687;
-            else if(fabs(scEta) >2.3) AEff = 0.2243;
-            else if(fabs(scEta) >2.2) AEff = 0.1903;
-            else if(fabs(scEta) >2.0) AEff = 0.1534;
-            else if(fabs(scEta) >1.479) AEff = 0.1411;
-            else if(fabs(scEta) >0.1) AEff = 0.1862;
-            else AEff = 0.1752;
+            if(fabs(scEta) >2.4) AEff = 0.1524;
+            else if(fabs(scEta) >2.3) AEff = 0.1204;
+            else if(fabs(scEta) >2.2) AEff = 0.1051;
+            else if(fabs(scEta) >2.0) AEff = 0.0854;
+            else if(fabs(scEta) >1.479) AEff = 0.1073;
+            else if(fabs(scEta) >1.0) AEff = 0.1626;
+            else AEff = 0.1566;
   
             double chIso = ((*iel)->pfIsolationVariables()).sumChargedHadronPt;
             double nhIso = ((*iel)->pfIsolationVariables()).sumNeutralHadronEt;
@@ -764,6 +766,19 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
             elMHits.push_back((*iel)->gsfTrack()->hitPattern().numberOfAllHits(reco::HitPattern::MISSING_INNER_HITS));
             elVtxFitConv.push_back((*iel)->passConversionVeto());
             elNotConversion.push_back((*iel)->passConversionVeto());
+
+	    float dEtaInSeed =  (*iel)->deltaEtaSuperClusterTrackAtVtx() - (*iel)->superCluster()->eta() + (*iel)->superCluster()->seed()->eta();
+	    bool istightbarrel = ( (*iel)->full5x5_sigmaIetaIeta() < 0.0104 
+				   && fabs(dEtaInSeed) < 0.00353 
+				   && fabs((*iel)->deltaPhiSuperClusterTrackAtVtx()) < 0.0499
+				   && ( (*iel)->hcalOverEcal() < 0.026 + 1.12/(*iel)->energy() + 0.0368*rhoIso/(*iel)->energy() )
+				   && relIso < 0.0361 
+				   && ( fabs(1.0/(*iel)->ecalEnergy() - (*iel)->eSuperClusterOverP()/(*iel)->ecalEnergy()) < 0.0278 )
+				   && (*iel)->gsfTrack()->hitPattern().numberOfLostHits(reco::HitPattern::MISSING_INNER_HITS) < 1
+				   && (*iel)->passConversionVeto()
+				   );
+
+	    elIsTightBarrel.push_back(istightbarrel);
 
             if (UseElMVA) {
                 elMVAValue.push_back( selector->mvaValue(iel->operator*(),event) );
@@ -856,6 +871,8 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
     SetValue("elGsfCharge", elGsfCharge);
     SetValue("elCtfCharge", elCtfCharge);
     SetValue("elScPixCharge", elScPixCharge);
+
+    SetValue("elIsTightBarrel", elIsTightBarrel);
 
     //Quality requirements
     SetValue("elRelIso" , elRelIso); //Isolation
