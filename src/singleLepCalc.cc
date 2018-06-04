@@ -117,6 +117,8 @@ singleLepCalc::~singleLepCalc()
 
 int singleLepCalc::BeginJob()
 {
+  cout << "This file is actually used!" << endl;
+
     if (mPset.exists("dataType"))     dataType = mPset.getParameter<std::string>("dataType");
     else                              dataType = "None"; 
 
@@ -623,7 +625,11 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
 
     std::vector <double> elMVAValue;
     std::vector <double> elMVAValue_alt;
- 
+
+    std::vector <double>    elIsTightEndCap;
+    std::vector <double>    elIsMediumEndCap;
+    std::vector <double>    elIsLooseEndCap;
+
     //Extra info about isolation
     std::vector <double> elChIso;
     std::vector <double> elNhIso;
@@ -744,6 +750,15 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
             elMHits.push_back((*iel)->gsfTrack()->hitPattern().numberOfAllHits(reco::HitPattern::MISSING_INNER_HITS));
             elVtxFitConv.push_back((*iel)->passConversionVeto());
             elNotConversion.push_back((*iel)->passConversionVeto());
+
+            float dEtaSeed = (*iel)->deltaEtaSuperClusterTrackAtVtx() - (*iel)->superCluster()->eta() + (*iel)->superCluster()->seed()->eta();
+            bool isTightEndCap = ( (*iel)->full5x5_sigmaIetaIeta() < .0305
+                                   && abs(dEtaSeed) < .00567
+                                   && abs((*iel)->deltaPhiSuperClusterTrackAtVtx()) < .0165
+				   && );
+
+	    elIsTightEndCap.push_back(isTightEndCap);
+
 
             if (UseElMVA) {
                 elMVAValue.push_back( selector->mvaValue(iel->operator*(),event) );
