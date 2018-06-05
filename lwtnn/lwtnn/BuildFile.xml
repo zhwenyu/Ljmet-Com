@@ -1,0 +1,11 @@
+<use   name="boost"/>
+<use   name="eigen"/>
+<use   name="root"/>
+<use   name="rootMinuit"/>
+
+<Flags CXXFLAGS="-lboost_system"/>
+
+<export>
+  <lib   name="1"/>
+</export>
+
