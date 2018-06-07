@@ -121,8 +121,6 @@ singleLepCalc::~singleLepCalc()
 
 int singleLepCalc::BeginJob()
 {
-  cout << "This file is actually used!" << endl;
-
     if (mPset.exists("dataType"))     dataType = mPset.getParameter<std::string>("dataType");
     else                              dataType = "None"; 
 

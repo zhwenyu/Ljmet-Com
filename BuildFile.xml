@@ -18,6 +18,7 @@
 <use name="DataFormats/FWLite"/>
 <use name="PhysicsTools/FWLite"/>
 <use name="root"/>
+<use name="roottmva"/>
 <use name="clhep"/>
 <use name="RecoBTag/PerformanceDB"/>
 <use name="CondFormats/PhysicsToolsObjects"/>
@@ -33,9 +34,12 @@
 <use name="lhapdf"/>
 <use name="fastjet"/>
 <use name="fastjet-contrib"/>
+<use name="PhysicsTools/CandUtils"/>
+<use name="lwtnn/lwtnn"/>
 
 <export>
     <lib name="1"/>
 </export>
 <flags CXXFLAGS="-g -O0 -Wno-error=unused-variable -Wno-error=unused-but-set-variable -Wno-error=delete-non-virtual-dtor -Wno-unused-variable -Wno-delete-non-virtual-dtor -Wno-unused-but-set-variable"/>
+
 
