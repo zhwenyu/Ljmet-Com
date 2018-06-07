@@ -1,3 +1,4 @@
+
 /*
  Calculator for substructure variables
  
@@ -419,14 +420,6 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * s
     std::vector<double> theJetAK8SoftDrop_JMRup;
     std::vector<double> theJetAK8SoftDrop_JMRdn;    
 
-    std::vector<double> theJetAK8CHSSJPt;
-    std::vector<double> theJetAK8CHSSJEta;
-    std::vector<double> theJetAK8CHSSJPhi;
-    std::vector<double> theJetAK8CHSSJMass;
-    std::vector<double> theJetAK8CHSSJCSV;
-    std::vector<int>    theJetAK8CHSSJHFlav;
-    std::vector<double> theJetAK8CHSSJBTag;
-
     std::vector<int>    theJetAK8SJIndex;
     std::vector<int>    theJetAK8SJSize;
 
@@ -830,7 +823,7 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * s
     SetValue("theJetAK8SoftDrop_JMRup", theJetAK8SoftDrop_JMRup);
     SetValue("theJetAK8SoftDrop_JMRdn", theJetAK8SoftDrop_JMRdn);
 
-    SetValue("theJetAK8PrunedMass",   theJetAK8CHSPrunedMass);
+    SetValue("theJetAK8CHSPrunedMass",   theJetAK8CHSPrunedMass);
     SetValue("theJetAK8CHSSoftDropMass", theJetAK8CHSSoftDropMass);
     
     SetValue("theJetAK8NjettinessTau1", theJetAK8NjettinessTau1);
@@ -869,14 +862,6 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * s
     SetValue("theJetAK8SDSubjetNDeepCSVM_lSFup",theJetAK8SDSubjetNDeepCSVM_lSFup);
     SetValue("theJetAK8SDSubjetNDeepCSVM_lSFdn",theJetAK8SDSubjetNDeepCSVM_lSFdn);
 
-
-    SetValue("theJetAK8CHSSJPt",   theJetAK8CHSSJPt);   
-    SetValue("theJetAK8CHSSJEta",  theJetAK8CHSSJEta);  
-    SetValue("theJetAK8CHSSJPhi",  theJetAK8CHSSJPhi);  
-    SetValue("theJetAK8CHSSJMass", theJetAK8CHSSJMass); 
-    SetValue("theJetAK8CHSSJCSV",  theJetAK8CHSSJCSV);  
-    SetValue("theJetAK8CHSSJHFlav", theJetAK8CHSSJHFlav);
-    SetValue("theJetAK8CHSSJBTag",  theJetAK8CHSSJBTag);  
     SetValue("theJetAK8SJIndex",theJetAK8SJIndex);
     SetValue("theJetAK8SJSize", theJetAK8SJSize); 
 
@@ -1016,9 +1001,9 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * s
 	      b = p.daughter(0);
 	    }
 	    while(W->numberOfDaughters() == 1) W = W->daughter(0);
-            if(W->daughter(1)->pdgId() == 22) W = W->daughter(0);
-            while(W->numberOfDaughters() == 1) W = W->daughter(0);
-	    if(W->daughter(1)->pdgId()==22) cout << "weird W decay to photons" << endl;
+	    if(W->daughter(1)->pdgId() == 22) W = W->daughter(0);	    
+	    while(W->numberOfDaughters() == 1) W = W->daughter(0);
+	    if(W->daughter(1)->pdgId() == 22) W = W->daughter(0);
             while(W->numberOfDaughters() == 1) W = W->daughter(0);
 	    if(W->daughter(1)->pdgId()==22) cout << "weird W decay to photons" << endl;
 
