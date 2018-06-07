@@ -128,7 +128,7 @@ int JetSubCalc::BeginJob()
     else                              genParticles_it = edm::InputTag("prunedGenParticles");
 
     if (mPset.exists("bDiscriminant")) bDiscriminant = mPset.getParameter<std::string>("bDiscriminant");
-    else bDiscriminant = "pfCombinedInclusiveSecondaryVertexV2BJetTags";
+    else bDiscriminant = "pfDeepCSVJetTags:probb";
     
     std::cout << " JetSubCalc Bdisc = " << bDiscriminant << std::endl;
     
@@ -271,16 +271,6 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * s
     std::vector<double> theJetEnergy;
     std::vector<double> theJetCSV;
 
-    std::vector<double> theJetCEmEnergy;
-    std::vector<double> theJetNEmEnergy;
-    std::vector<double> theJetCEmEFrac;
-    std::vector<double> theJetNEmEFrac;
-    std::vector<double> theJetCHadEnergy;
-    std::vector<double> theJetNHadEnergy;
-    std::vector<double> theJetCHadEFrac;
-    std::vector<double> theJetNHadEFrac;
-    std::vector<double> theJetMuonEFrac;
-
     // Additional variables related to the associated secondary vertex if there is one
     // Mass of the vertex
     std::vector<double> theJetVtxMass;
@@ -304,6 +294,11 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * s
     std::vector<double> theJetDaughterPhi;
     std::vector<double> theJetDaughterEnergy;
     
+    std::vector <double> theJetCSVb;
+    std::vector <double> theJetCSVbb;
+    std::vector <double> theJetCSVc;
+    std::vector <double> theJetCSVudsg;
+
     std::vector<int> theJetDaughterMotherIndex;
     std::vector<int> theJetCSVLSubJets;
     std::vector<int> theJetCSVMSubJets;
@@ -351,7 +346,11 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * s
       theJetPhi    . push_back(ijet->phi());
       theJetEnergy . push_back(ijet->energy());
       
-      theJetCSV.push_back(ijet->bDiscriminator( bDiscriminant ));
+      theJetCSVb.    push_back(ijet->bDiscriminator( bDiscriminant ));
+      theJetCSVbb.   push_back(ijet->bDiscriminator( "pfDeepCSVJetTags:probbb" ));
+      theJetCSVc.    push_back(ijet->bDiscriminator( "pfDeepCSVJetTags:probc" ));
+      theJetCSVudsg. push_back(ijet->bDiscriminator( "pfDeepCSVJetTags:probudsg" ));
+
       theJetBTag.push_back(selector->isJetTagged(*ijet, event, true, 0));
       theJetBTag_bSFup.push_back(selector->isJetTagged(*ijet, event, true, 1));
       theJetBTag_bSFdn.push_back(selector->isJetTagged(*ijet, event, true, 2));
@@ -359,17 +358,6 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * s
       theJetBTag_lSFdn.push_back(selector->isJetTagged(*ijet, event, true, 4));
       theJetPFlav.push_back(abs(ijet->partonFlavour()));
       theJetHFlav.push_back(abs(ijet->hadronFlavour()));
-
-      theJetCEmEnergy.push_back(ijet->chargedEmEnergy());
-      theJetNEmEnergy.push_back(ijet->neutralEmEnergy());
-      theJetCEmEFrac.push_back(ijet->chargedEmEnergyFraction());
-      theJetNEmEFrac.push_back(ijet->neutralEmEnergyFraction());	    
-
-      theJetCHadEnergy.push_back(ijet->chargedHadronEnergy());
-      theJetNHadEnergy.push_back(ijet->neutralHadronEnergy());
-      theJetCHadEFrac.push_back(ijet->chargedHadronEnergyFraction());
-      theJetNHadEFrac.push_back(ijet->neutralHadronEnergyFraction());      
-      theJetMuonEFrac.push_back(ijet->muonEnergyFraction());
 
       theJetIndex.push_back(index);
       theJetnDaughters.push_back((int)ijet->numberOfDaughters());
@@ -399,7 +387,12 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * s
     SetValue("theJetEta",    theJetEta);
     SetValue("theJetPhi",    theJetPhi);
     SetValue("theJetEnergy", theJetEnergy);
-    SetValue("theJetCSV",    theJetCSV);
+
+    SetValue("theJetCSVb",    theJetCSVb);
+    SetValue("theJetCSVbb",   theJetCSVbb);
+    SetValue("theJetCSVc",    theJetCSVc);
+    SetValue("theJetCSVudsg", theJetCSVudsg);
+
     SetValue("theJetPFlav",  theJetPFlav);
     SetValue("theJetHFlav",  theJetHFlav);
     SetValue("theJetBTag",   theJetBTag);
@@ -407,16 +400,6 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * s
     SetValue("theJetBTag_bSFdn",   theJetBTag_bSFdn);
     SetValue("theJetBTag_lSFup",   theJetBTag_lSFup);
     SetValue("theJetBTag_lSFdn",   theJetBTag_lSFdn);
-
-    SetValue("theJetCEmEnergy", theJetCEmEnergy); 
-    SetValue("theJetNEmEnergy", theJetNEmEnergy); 
-    SetValue("theJetCEmEFrac",  theJetCEmEFrac);  
-    SetValue("theJetNEmEFrac",  theJetNEmEFrac);  
-    SetValue("theJetCHadEnergy",theJetCHadEnergy);
-    SetValue("theJetNHadEnergy",theJetNHadEnergy);
-    SetValue("theJetCHadEFrac", theJetCHadEFrac); 
-    SetValue("theJetNHadEFrac", theJetNHadEFrac); 
-    SetValue("theJetMuonEFrac", theJetMuonEFrac);
 
     SetValue("theJetHT", theJetHT);    
     SetValue("theJetLeadPt", leading_pt);
@@ -454,31 +437,31 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * s
     std::vector<double> theJetAK8CHadEFrac;
     std::vector<double> theJetAK8NHadEFrac;
 
-    // PUPPI values
-    std::vector<double> theJetAK8PUPPIPt;
-    std::vector<double> theJetAK8PUPPIEta;
-    std::vector<double> theJetAK8PUPPIPhi;
-    std::vector<double> theJetAK8PUPPIMass;
-    std::vector<double> theJetAK8PUPPITau1;
-    std::vector<double> theJetAK8PUPPITau2;
-    std::vector<double> theJetAK8PUPPITau3;
-    std::vector<double> theJetAK8PUPPISoftDropRaw;    
-    std::vector<double> theJetAK8PUPPISoftDropCorr;    
-    std::vector<double> theJetAK8PUPPISoftDrop;    
-    std::vector<double> theJetAK8PUPPISoftDrop_JMSup;    
-    std::vector<double> theJetAK8PUPPISoftDrop_JMSdn;    
-    std::vector<double> theJetAK8PUPPISoftDrop_JMRup;
-    std::vector<double> theJetAK8PUPPISoftDrop_JMRdn;    
+    // CHS values
+    std::vector<double> theJetAK8CHSPt;
+    std::vector<double> theJetAK8CHSEta;
+    std::vector<double> theJetAK8CHSPhi;
+    std::vector<double> theJetAK8CHSMass;
+    std::vector<double> theJetAK8CHSTau1;
+    std::vector<double> theJetAK8CHSTau2;
+    std::vector<double> theJetAK8CHSTau3;
+    std::vector<double> theJetAK8CHSoftDropRaw;    
+    std::vector<double> theJetAK8CHSSoftDropCorr;    
+    std::vector<double> theJetAK8CHSSoftDrop;    
+    std::vector<double> theJetAK8CHSSoftDrop_JMSup;    
+    std::vector<double> theJetAK8CHSSoftDrop_JMSdn;    
+    std::vector<double> theJetAK8CHSSoftDrop_JMRup;
+    std::vector<double> theJetAK8CHSSoftDrop_JMRdn;    
 
-    std::vector<double> theJetAK8PUPPISJPt;
-    std::vector<double> theJetAK8PUPPISJEta;
-    std::vector<double> theJetAK8PUPPISJPhi;
-    std::vector<double> theJetAK8PUPPISJMass;
-    std::vector<double> theJetAK8PUPPISJCSV;
-    std::vector<int>    theJetAK8PUPPISJHFlav;
-    std::vector<double> theJetAK8PUPPISJBTag;
-    std::vector<int> theJetAK8PUPPISJIndex;
-    std::vector<int> theJetAK8PUPPISJSize;
+    std::vector<double> theJetAK8CHSSJPt;
+    std::vector<double> theJetAK8CHSSJEta;
+    std::vector<double> theJetAK8CHSSJPhi;
+    std::vector<double> theJetAK8CHSSJMass;
+    std::vector<double> theJetAK8CHSSJCSV;
+    std::vector<int>    theJetAK8CHSSJHFlav;
+    std::vector<double> theJetAK8CHSSJBTag;
+    std::vector<int>    theJetAK8CHSSJIndex;
+    std::vector<int>    theJetAK8CHSSJSize;
     
     // Pruned, trimmed and filtered masses available
     std::vector<double> theJetAK8PrunedMass;
@@ -488,6 +471,11 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * s
     std::vector<double> theJetAK8PrunedMassWtagUncerts_JMRup;
     std::vector<double> theJetAK8PrunedMassWtagUncerts_JMRdn;
     std::vector<double> theJetAK8SoftDropMass;
+
+    std::vetor<double> theJetAK8SoftDropn2b1;
+    std::vetor<double> theJetAK8SoftDropn2b2;
+    std::vetor<double> theJetAK8SoftDropn3b1;
+    std::vetor<double> theJetAK8SoftDropn3b2;
     
     // n-subjettiness variables tau1, tau2, and tau3 available
     std::vector<double> theJetAK8NjettinessTau1;
@@ -515,12 +503,15 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * s
     std::vector<int> theJetAK8SDSubjetNCSVM_bSFup;
     std::vector<int> theJetAK8SDSubjetNCSVM_bSFdn;
     
+    std::vetor<int>  theJetAK8DoubleBtag;
+
     double topMass, minMass, jetCharge;
     int nSubJets;
     double thePuppiSoftDrop;
     double thePrunedMass,theSoftDropMass;
     double theNjettinessTau1, theNjettinessTau2, theNjettinessTau3;
     double thePuppiTau1, thePuppiTau2, thePuppiTau3;
+    double theSoftDropn2b1, theSoftDropn2b2, theSoftDropn3b1, theSoftDropn3b2;
 
     double SDsubjetPt;
     double SDsubjetEta; 
@@ -541,23 +532,23 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * s
     int nSDSubsCSVM_lSFdn;
     int SDSubJetIndex;
 
-    double PUPPIsubjetPt;
-    double PUPPIsubjetEta; 
-    double PUPPIsubjetPhi;      
-    double PUPPIsubjetMass;      
-    double PUPPIsubjetBdisc;     
-    int    PUPPIsubjetHFlav;
-    double PUPPIsubjetBTag;     
+    double CHSsubjetPt;
+    double CHSsubjetEta; 
+    double CHSsubjetPhi;      
+    double CHSsubjetMass;      
+    double CHSsubjetBdisc;     
+    int    CHSsubjetHFlav;
+    double CHSsubjetBTag;     
 
-    int nPUPPISubJets;
-    int nPUPPISubsCSVL;
-    int nPUPPISubsCSVM;
-    int nPUPPISubsCSVMSF;
-    int nPUPPISubsCSVM_bSFup;
-    int nPUPPISubsCSVM_bSFdn;
-    int nPUPPISubsCSVM_lSFup;
-    int nPUPPISubsCSVM_lSFdn;
-    int PUPPISubJetIndex;
+    int nCHSSubJets;
+    int nCHSSubsCSVL;
+    int nCHSSubsCSVM;
+    int nCHSSubsCSVMSF;
+    int nCHSSubsCSVM_bSFup;
+    int nCHSSubsCSVM_bSFdn;
+    int nCHSSubsCSVM_lSFup;
+    int nCHSSubsCSVM_lSFdn;
+    int CHSSubJetIndex;
 
     int iRun   = event.id().run();
     if(!isMc){
@@ -610,18 +601,20 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * s
       theJetAK8Energy.push_back(corrak8.energy());
       theJetAK8Mass  .push_back(corrak8.mass());
 
-      double thePuppiPt = -std::numeric_limits<double>::max();
-      double thePuppiEta = -std::numeric_limits<double>::max();
-      double thePuppiPhi = -std::numeric_limits<double>::max();
-      double thePuppiMass = -std::numeric_limits<double>::max();
-      thePuppiPt = corrak8.userFloat("ak8PFJetsPuppiValueMap:pt");  
-      thePuppiEta = corrak8.userFloat("ak8PFJetsPuppiValueMap:eta"); 
-      thePuppiPhi = corrak8.userFloat("ak8PFJetsPuppiValueMap:phi"); 
-      thePuppiMass = corrak8.userFloat("ak8PFJetsPuppiValueMap:mass");
-      theJetAK8PUPPIPt.push_back(thePuppiPt);
-      theJetAK8PUPPIEta.push_back(thePuppiEta);
-      theJetAK8PUPPIPhi.push_back(thePuppiPhi);
-      theJetAK8PUPPIMass.push_back(thePuppiMass);
+      theJetAK8DoubleBtag  .push_back(ijet->bDiscriminator( "pfBoostedDoubleSecondaryVertexAK8BJetTags" ))
+
+      double theCHSPt = -std::numeric_limits<double>::max();
+      double theCHSEta = -std::numeric_limits<double>::max();
+      double theCHSPhi = -std::numeric_limits<double>::max();
+      double theCHSMass = -std::numeric_limits<double>::max();
+      theCHSPt = corrak8.userFloat("ak8PFJetsCHSValueMap:pt");  
+      theCHSEta = corrak8.userFloat("ak8PFJetsCHSValueMap:eta"); 
+      theCHSPhi = corrak8.userFloat("ak8PFJetsCHSValueMap:phi"); 
+      theCHSMass = corrak8.userFloat("ak8PFJetsCHSValueMap:mass");
+      theJetAK8CHSPt.push_back(theCHSPt);
+      theJetAK8CHSEta.push_back(theCHSEta);
+      theJetAK8CHSPhi.push_back(theCHSPhi);
+      theJetAK8CHSMass.push_back(theCHSMass);
 
       double genDR = -99;
       double genpt = -99;
@@ -643,96 +636,33 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * s
       thePrunedMass   = -std::numeric_limits<double>::max();
       theSoftDropMass = -std::numeric_limits<double>::max();
       thePuppiSoftDrop = -std::numeric_limits<double>::max();
-
-      double unc = 1.0;
-      double unc_pruned_up = 1.0;
-      double unc_pruned_dn = 1.0;
-      double unc_softdrop_up = 1.0;
-      double unc_softdrop_dn = 1.0;
-      double ptscale_pruned = 1.0;
-      double ptscale_pruned_up = 1.0;
-      double ptscale_pruned_dn = 1.0;
-      
-      if(useL2L3Mass){
-	edm::Handle<double> rhoHandle;
-	edm::InputTag rhoSrc_("fixedGridRhoFastjetAll", "");
-	event.getByLabel(rhoSrc_, rhoHandle);
-	double rho = std::max(*(rhoHandle.product()), 0.0);
-
-	pat::Jet l2l3jet = *ijet;
-	jecak8->setJetEta(l2l3jet.correctedJet(0).eta());
-	jecak8->setJetPt(l2l3jet.correctedJet(0).pt());
-	jecak8->setJetE(l2l3jet.correctedJet(0).energy());
-	jecak8->setJetA(l2l3jet.jetArea());
-	jecak8->setRho(rho);
-	double corr = jecak8->getCorrection();
-
-	l2l3jet.scaleEnergy(corr);
-
-	if(corr == 1.0) cout << "L2+L3 correction is 1.0" << endl;
 	
-	thePrunedMass   = corr*(double)l2l3jet.userFloat("ak8PFJetsCHSPrunedMass");
-	theSoftDropMass = corr*(double)l2l3jet.userFloat("ak8PFJetsCHSSoftDropMass");		       
+      theCHSPrunedMass   = (double)corrak8.userFloat("ak8PFJetsCHSValueMap:ak8PFJetsCHSPrunedMass");
+      theCHSSoftDropMass = (double)corrak8.userFloat("ak8PFJetsCHSValueMap:ak8PFJetsCHSSoftDropMass");
+      theSoftDropMass = (double)corrak8.userFloat("ak8PFJetsPuppiSoftDropMass");		       	
 
-	// Apply JER uncertainty + W tagging uncertainty addition for pruned mass only
-	// Talked to Jim -- they recommend mass as the smearing input with no gen info used.
-	if(isMc){
-	  //JME::JetParameters parameters;
-	  //parameters.setJetPt(l2l3jet.pt());
-	  //parameters.setJetEta(l2l3jet.eta());
-	  //parameters.setRho(rho);
-	  //Variation JERcentral = Variation::NOMINAL;
-	  //Variation JERshifted = Variation::UP; // symmetric
-	  //double uncert = fabs(resolution_SF.getScaleFactor(parameters,JERcentral) - resolution_SF.getScaleFactor(parameters,JERshifted));
-	  //if(fabs(l2l3jet.eta()) > 2.5) uncert_pruned = sqrt(uncert*uncert + 0.18*0.18);
+      theCHSTau1 = std::numeric_limits<double>::max();
+      theCHSTau2 = std::numeric_limits<double>::max();
+      theCHSTau3 = std::numeric_limits<double>::max();
+      theCHSTau1 = (double)corrak8.userFloat("ak8PFJetsCHSValueMap:NjettinessAK8CHSTau1");
+      theCHSTau2 = (double)corrak8.userFloat("ak8PFJetsCHSValueMap:NjettinessAK8CHSTau2");
+      theCHSTau3 = (double)corrak8.userFloat("ak8PFJetsCHSValueMap:NjettinessAK8CHSTau3");
 
-	  double res = 8.01/thePrunedMass;
-	  double factor_pruned = 1.23;
-	  double uncert_pruned = 0.18;
-	  double factor_pruned_up = factor_pruned + uncert_pruned;
-	  double factor_pruned_dn = factor_pruned - uncert_pruned;
+      theNjettinessTau1 = std::numeric_limits<double>::max();
+      theNjettinessTau2 = std::numeric_limits<double>::max();
+      theNjettinessTau3 = std::numeric_limits<double>::max();
+      theNjettinessTau1 = (double)corrak8.userFloat("ak8PFJetsPuppiValueMap:NjettinessAK8PuppiTau1");
+      theNjettinessTau2 = (double)corrak8.userFloat("ak8PFJetsPuppiValueMap:NjettinessAK8PuppiTau2");
+      theNjettinessTau3 = (double)corrak8.userFloat("ak8PFJetsPuppiValueMap:NjettinessAK8PuppiTau3");
 
-	  if (factor_pruned>1) {
-	    JERrand.SetSeed(abs(static_cast<int>(l2l3jet.phi()*1e4)));	   
-	    ptscale_pruned = 1 + JERrand.Gaus(0,res)*sqrt(factor_pruned*factor_pruned - 1.0);
-	  }
-	  if (factor_pruned_up>1) {
-	    JERrand.SetSeed(abs(static_cast<int>(l2l3jet.phi()*1e4)));	   
-	    ptscale_pruned_up = 1 + JERrand.Gaus(0,res)*sqrt(factor_pruned_up*factor_pruned_up - 1.0);
-	  }
-	  if (factor_pruned_dn>1) {
-	    JERrand.SetSeed(abs(static_cast<int>(l2l3jet.phi()*1e4)));	   
-	    ptscale_pruned_dn = 1 + JERrand.Gaus(0,res)*sqrt(factor_pruned_dn*factor_pruned_dn - 1.0);
-	  }
-
-	  //jecUnc->setJetEta(l2l3jet.eta());
-	  //jecUnc->setJetPt(l2l3jet.pt());
-	  //unc = jecUnc->getUncertainty(true);
-	  unc_pruned_up = 1.023; // + sqrt(unc*unc + 0.023*0.023);
-
-	  //jecUnc->setJetEta(l2l3jet.eta());
-	  //jecUnc->setJetPt(l2l3jet.pt());
-	  //unc = jecUnc->getUncertainty(false);
-	  unc_pruned_dn = 0.977; //1 - sqrt(unc*unc + 0.023*0.023);
-	}
-      }else{
-	thePrunedMass   = (double)corrak8.userFloat("ak8PFJetsCHSPrunedMass");
-	theSoftDropMass = (double)corrak8.userFloat("ak8PFJetsCHSSoftDropMass");
-      }
-
-      theNjettinessTau1 = -std::numeric_limits<double>::max();
-      theNjettinessTau2 = -std::numeric_limits<double>::max();
-      theNjettinessTau3 = -std::numeric_limits<double>::max();
-      theNjettinessTau1 = (double)corrak8.userFloat("NjettinessAK8:tau1");
-      theNjettinessTau2 = (double)corrak8.userFloat("NjettinessAK8:tau2");
-      theNjettinessTau3 = (double)corrak8.userFloat("NjettinessAK8:tau3");
-
-      thePuppiTau1 = -std::numeric_limits<double>::max();
-      thePuppiTau2 = -std::numeric_limits<double>::max();
-      thePuppiTau3 = -std::numeric_limits<double>::max();
-      thePuppiTau1 = (double)corrak8.userFloat("ak8PFJetsPuppiValueMap:NjettinessAK8PuppiTau1");
-      thePuppiTau2 = (double)corrak8.userFloat("ak8PFJetsPuppiValueMap:NjettinessAK8PuppiTau2");
-      thePuppiTau3 = (double)corrak8.userFloat("ak8PFJetsPuppiValueMap:NjettinessAK8PuppiTau3");
+      theSoftDropn2b1 = std::numeric_limits<double>::max();
+      theSoftDropn2b2 = std::numeric_limits<double>::max();
+      theSoftDropn3b1 = std::numeric_limits<double>::max();
+      theSoftDropn3b2 = std::numeric_limits<double>::max();
+      theSoftDropn2b1 = ak8PFJetsPuppiSoftDropValueMap:nb1AK8PuppiSoftDropN2;
+      theSoftDropn2b2 = ak8PFJetsPuppiSoftDropValueMap:nb2AK8PuppiSoftDropN2;
+      theSoftDropn3b1 = ak8PFJetsPuppiSoftDropValueMap:nb1AK8PuppiSoftDropN3;
+      theSoftDropn3b2 = ak8PFJetsPuppiSoftDropValueMap:nb2AK8PuppiSoftDropN3;
 
       theJetAK8CSV.push_back(corrak8.bDiscriminator( bDiscriminant ));
       theJetAK8DoubleB.push_back(corrak8.bDiscriminator("pfBoostedDoubleSecondaryVertexAK8BJetTags"));
@@ -755,12 +685,17 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * s
       theJetAK8PrunedMassWtagUncerts_JMRup.push_back(thePrunedMass*ptscale_pruned_up);
       theJetAK8PrunedMassWtagUncerts_JMRdn.push_back(thePrunedMass*ptscale_pruned_dn);
       
-      theJetAK8NjettinessTau1.push_back(theNjettinessTau1);
-      theJetAK8NjettinessTau2.push_back(theNjettinessTau2);
-      theJetAK8NjettinessTau3.push_back(theNjettinessTau3);
-      theJetAK8PUPPITau1.push_back(thePuppiTau1);
-      theJetAK8PUPPITau2.push_back(thePuppiTau2);
-      theJetAK8PUPPITau3.push_back(thePuppiTau3);
+      theCHSTau1.push_back(theCHSTau1);
+      theCHSTau2.push_back(theCHSTau2);
+      theCHSTau3.push_back(theCHSTau3);
+      theNjettinessTau1.push_back(theNjettinessTau1);
+      theNjettinessTau2.push_back(theNjettinessTau2);
+      theNjettinessTau3.push_back(theNjettinessTau3);
+
+      theJetAK8SoftDropn2b1.push_back(theSoftDropn2b1);
+      theJetAK8SoftDropn2b2.push_back(theSoftDropn2b2);
+      theJetAK8SoftDropn3b1.push_back(theSoftDropn3b1);
+      theJetAK8SoftDropn3b2.push_back(theSoftDropn3b2);
 
       theJetAK8nDaughters.push_back((int)corrak8.numberOfDaughters());
       theJetAK8Index.push_back(index);
@@ -797,9 +732,13 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * s
       nSDSubsCSVM_lSFdn = 0;
       double maxSubCSV = 0;
 
-      auto const & sdSubjets = corrak8.subjets("SoftDrop");
+      TLorentzVector puppi_softdrop, puppi_softdrop_subjet;
+      auto const & sdSubjets = corrak8.subjets("SoftDropPuppi");
       nSDSubJets = (int)sdSubjets.size();
       for ( auto const & it : sdSubjets ) {
+
+	puppi_softdrop_subjet.SetPtEtaPhiM(it->correctedP4(0).pt(),it->correctedP4(0).eta(),it->correctedP4(0).phi(),it->correctedP4(0).mass());
+	puppi_softdrop+=puppi_softdrop_subjet;
 
 	pat::Jet corrsubjet;
 	if(doNewJEC){
@@ -850,47 +789,7 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * s
       theJetAK8SDSubjetNCSVM_lSFup.push_back(nSDSubsCSVM_lSFup);
       theJetAK8SDSubjetNCSVM_lSFdn.push_back(nSDSubsCSVM_lSFdn);
 
-      // Get PUPPI Soft drop subjets for subjet b-tagging
-      PUPPISubJetIndex = (int)theJetAK8PUPPISJPt.size();
-      nPUPPISubJets  = std::numeric_limits<int>::min();
-      TLorentzVector puppi_sd, puppi_sd_subjet;
-      puppi_sd.SetPtEtaPhiM(0,0,0,0);
-
-      auto const & puppiSubjets = ijet->subjets("SoftDropPuppi");
-      nPUPPISubJets = (int)puppiSubjets.size();
-      for ( auto const & it : puppiSubjets ) {
-
-	pat::Jet corrsubjet;
-	corrsubjet = *it;
-
-	PUPPIsubjetPt        = -std::numeric_limits<double>::max();
-	PUPPIsubjetEta       = -std::numeric_limits<double>::max();
-	PUPPIsubjetPhi       = -std::numeric_limits<double>::max();
-	PUPPIsubjetMass      = -std::numeric_limits<double>::max();
-	PUPPIsubjetBdisc     = -std::numeric_limits<double>::max();
-      
-	PUPPIsubjetPt        = corrsubjet.correctedP4(0).pt();
-	PUPPIsubjetEta       = corrsubjet.correctedP4(0).eta();
-	PUPPIsubjetPhi       = corrsubjet.correctedP4(0).phi();
-	PUPPIsubjetMass      = corrsubjet.correctedP4(0).mass();
-	PUPPIsubjetBdisc     = corrsubjet.bDiscriminator(bDiscriminant); 
-	PUPPIsubjetHFlav     = corrsubjet.hadronFlavour();
-	PUPPIsubjetBTag      = selector->isJetTagged(corrsubjet, event, true, 0, true);
-
-	puppi_sd_subjet.SetPtEtaPhiM(PUPPIsubjetPt, PUPPIsubjetEta, PUPPIsubjetPhi, PUPPIsubjetMass);
-	puppi_sd += puppi_sd_subjet;
-
-	theJetAK8PUPPISJPt.push_back(SDsubjetPt);
-	theJetAK8PUPPISJEta.push_back(SDsubjetEta);
-	theJetAK8PUPPISJPhi.push_back(SDsubjetPhi);
-	theJetAK8PUPPISJMass.push_back(SDsubjetMass);
-	theJetAK8PUPPISJCSV.push_back(SDsubjetBdisc);
-	theJetAK8PUPPISJHFlav.push_back(SDsubjetHFlav);
-	theJetAK8PUPPISJBTag.push_back(SDsubjetBTag);
-
-      }
-
-      thePuppiSoftDrop = puppi_sd.M();
+      // Get CHS Soft drop subjets for subjet b-tagging
 
       double puppicorr = 1.0;
       if(isMc){
@@ -904,45 +803,46 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * s
 	
 	puppicorr = genCorr * recoCorr;
       }
-      double thePuppiSoftDropCorrected = thePuppiSoftDrop*puppicorr;
 
-      double ptscale_puppisd = 1.0;
-      double ptscale_puppisd_up = 1.0;
-      double ptscale_puppisd_dn = 1.0;
-      double unc_puppisd_up = 1.0;
-      double unc_puppisd_dn = 1.0;
-      if(isMc){
-	double res = 10.1/thePuppiSoftDropCorrected;
-	double factor_puppisd = 1;
-	double uncert_puppisd = 0.20;
-	double factor_puppisd_up = factor_puppisd + uncert_puppisd;
-	double factor_puppisd_dn = factor_puppisd - uncert_puppisd;
-	
-	if (factor_puppisd>1) {
-	  JERrand.SetSeed(abs(static_cast<int>(corrak8.phi()*1e4)));	   
-	  ptscale_puppisd = 1 + JERrand.Gaus(0,res)*sqrt(factor_puppisd*factor_puppisd - 1.0);
-	}
-	if (factor_puppisd_up>1) {
-	  JERrand.SetSeed(abs(static_cast<int>(corrak8.phi()*1e4)));	   
-	  ptscale_puppisd_up = 1 + JERrand.Gaus(0,res)*sqrt(factor_puppisd_up*factor_puppisd_up - 1.0);
-	}
-	if (factor_puppisd_dn>1) {
-	  JERrand.SetSeed(abs(static_cast<int>(corrak8.phi()*1e4)));	   
-	  ptscale_puppisd_dn = 1 + JERrand.Gaus(0,res)*sqrt(factor_puppisd_dn*factor_puppisd_dn - 1.0);
-	}
-	unc_puppisd_up = 1.0094; // + sqrt(unc*unc + 0.023*0.023);
-	unc_puppisd_dn = 0.9906; //1 - sqrt(unc*unc + 0.023*0.023);
+      thePuppiSoftDrop = puppi_sd.M();
+      double theSoftDropCorrected = thePuppiSoftDrop*puppicorr;
+
+      double ptscale_sd = 1.0;
+      double ptscale_sd_up = 1.0;
+      double ptscale_sd_dn = 1.0;
+      double unc_sd_up = 1.0;
+      double unc_sd_dn = 1.0;
+
+      double res = 10.1/theSoftDropCorrected;
+      double factor_sd = 1;
+      double uncert_sd = 0.20;
+      double factor_sd_up = factor_chssd + uncert_chssd;
+      double factor_sd_dn = factor_chssd - uncert_chssd;
+      
+      if (factor_sd>1) {
+	JERrand.SetSeed(abs(static_cast<int>(corrak8.phi()*1e4)));	   
+	ptscale_sd = 1 + JERrand.Gaus(0,res)*sqrt(factor_sd*factor_sd - 1.0);
       }
+      if (factor_sd_up>1) {
+	JERrand.SetSeed(abs(static_cast<int>(corrak8.phi()*1e4)));	   
+	ptscale_sd_up = 1 + JERrand.Gaus(0,res)*sqrt(factor_sd_up*factor_sd_up - 1.0);
+      }
+      if (factor_sd_dn>1) {
+	JERrand.SetSeed(abs(static_cast<int>(corrak8.phi()*1e4)));	   
+	ptscale_sd_dn = 1 + JERrand.Gaus(0,res)*sqrt(factor_sd_dn*factor_sd_dn - 1.0);
+      }
+      unc_sd_up = 1.0094; // + sqrt(unc*unc + 0.023*0.023);
+      unc_sd_dn = 0.9906; //1 - sqrt(unc*unc + 0.023*0.023);
 
-      theJetAK8PUPPISJIndex.push_back(PUPPISubJetIndex);
-      theJetAK8PUPPISJSize.push_back(nPUPPISubJets);
-      theJetAK8PUPPISoftDropRaw.push_back(thePuppiSoftDrop);
-      theJetAK8PUPPISoftDropCorr.push_back(thePuppiSoftDropCorrected);
-      theJetAK8PUPPISoftDrop.push_back(thePuppiSoftDropCorrected*ptscale_puppisd);
-      theJetAK8PUPPISoftDrop_JMSup.push_back(thePuppiSoftDropCorrected*ptscale_puppisd*unc_puppisd_up);
-      theJetAK8PUPPISoftDrop_JMSdn.push_back(thePuppiSoftDropCorrected*ptscale_puppisd*unc_puppisd_dn);
-      theJetAK8PUPPISoftDrop_JMRup.push_back(thePuppiSoftDropCorrected*ptscale_puppisd_up);
-      theJetAK8PUPPISoftDrop_JMRdn.push_back(thePuppiSoftDropCorrected*ptscale_puppisd_dn);
+      theJetAK8SJIndex.push_back(SDSubJetIndex);
+      theJetAK8SJSize.push_back(nSubJets);
+      theJetAK8SoftDropRaw.push_back(theSoftDrop);
+      theJetAK8SoftDropCorr.push_back(theSoftDropCorrected);
+      theJetAK8SoftDrop.push_back(theSoftDropCorrected*ptscale_chssd);
+      theJetAK8SoftDrop_JMSup.push_back(theSoftDropCorrected*ptscale_chssd*unc_chssd_up);
+      theJetAK8SoftDrop_JMSdn.push_back(theSoftDropCorrected*ptscale_chssd*unc_chssd_dn);
+      theJetAK8SoftDrop_JMRup.push_back(theSoftDropCorrected*ptscale_chssd_up);
+      theJetAK8SoftDrop_JMRdn.push_back(theSoftDropCorrected*ptscale_chssd_dn);
 
     }
 
@@ -957,17 +857,19 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * s
     SetValue("theJetAK8GenDR",  theJetAK8GenDR);
     SetValue("theJetAK8GenMass",  theJetAK8GenMass);
 
-    SetValue("theJetAK8PUPPIPt",     theJetAK8PUPPIPt);
-    SetValue("theJetAK8PUPPIEta",    theJetAK8PUPPIEta);
-    SetValue("theJetAK8PUPPIPhi",    theJetAK8PUPPIPhi);
-    SetValue("theJetAK8PUPPIMass", theJetAK8PUPPIMass);
-    SetValue("theJetAK8PUPPISoftDropRaw", theJetAK8PUPPISoftDropRaw);
-    SetValue("theJetAK8PUPPISoftDropCorr", theJetAK8PUPPISoftDropCorr);
-    SetValue("theJetAK8PUPPISoftDrop", theJetAK8PUPPISoftDrop);
-    SetValue("theJetAK8PUPPISoftDrop_JMSup", theJetAK8PUPPISoftDrop_JMSup);
-    SetValue("theJetAK8PUPPISoftDrop_JMSdn", theJetAK8PUPPISoftDrop_JMSdn);
-    SetValue("theJetAK8PUPPISoftDrop_JMRup", theJetAK8PUPPISoftDrop_JMRup);
-    SetValue("theJetAK8PUPPISoftDrop_JMRdn", theJetAK8PUPPISoftDrop_JMRdn);
+    SetValue("theJetAK8DoubleBtag", theJetAK8DoubleBtag);
+
+    SetValue("theJetAK8CHSPt",     theJetAK8CHSPt);
+    SetValue("theJetAK8CHSEta",    theJetAK8CHSEta);
+    SetValue("theJetAK8CHSPhi",    theJetAK8CHSPhi);
+    SetValue("theJetAK8CHSMass", theJetAK8CHSMass);
+    SetValue("theJetAK8SoftDropRaw", theJetAK8SoftDropRaw);
+    SetValue("theJetAK8SoftDropCorr", theJetAK8SoftDropCorr);
+    SetValue("theJetAK8SoftDrop", theJetAK8SoftDrop);
+    SetValue("theJetAK8SoftDrop_JMSup", theJetAK8SoftDrop_JMSup);
+    SetValue("theJetAK8SoftDrop_JMSdn", theJetAK8SoftDrop_JMSdn);
+    SetValue("theJetAK8SoftDrop_JMRup", theJetAK8SoftDrop_JMRup);
+    SetValue("theJetAK8SoftDrop_JMRdn", theJetAK8SoftDrop_JMRdn);
 
     SetValue("theJetAK8CEmEnergy", theJetAK8CEmEnergy); 
     SetValue("theJetAK8NEmEnergy", theJetAK8NEmEnergy); 
@@ -989,9 +891,14 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * s
     SetValue("theJetAK8NjettinessTau1", theJetAK8NjettinessTau1);
     SetValue("theJetAK8NjettinessTau2", theJetAK8NjettinessTau2);
     SetValue("theJetAK8NjettinessTau3", theJetAK8NjettinessTau3);
-    SetValue("theJetAK8PUPPITau1", theJetAK8PUPPITau1);
-    SetValue("theJetAK8PUPPITau2", theJetAK8PUPPITau2);
-    SetValue("theJetAK8PUPPITau3", theJetAK8PUPPITau3);
+    SetValue("theJetAK8CHSTau1", theJetAK8CHSTau1);
+    SetValue("theJetAK8CHSTau2", theJetAK8CHSTau2);
+    SetValue("theJetAK8CHSTau3", theJetAK8CHSTau3);
+
+    SetValue("theJetAK8SoftDropn2b1",theJetAK8SoftDropn2b1);
+    SetValue("theJetAK8SoftDropn2b2",theJetAK8SoftDropn2b2);
+    SetValue("theJetAK8SoftDropn3b1",theJetAK8SoftDropn3b1);
+    SetValue("theJetAK8SoftDropn3b2",theJetAK8SoftDropn3b2);
 
     SetValue("theJetAK8Mass",   theJetAK8Mass);
     SetValue("theJetAK8nDaughters", theJetAK8nDaughters);
@@ -1013,15 +920,15 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * s
     SetValue("theJetAK8SDSubjetNCSVM_lSFup",theJetAK8SDSubjetNCSVM_lSFup);
     SetValue("theJetAK8SDSubjetNCSVM_lSFdn",theJetAK8SDSubjetNCSVM_lSFdn);
 
-    SetValue("theJetAK8PUPPISJPt",   theJetAK8PUPPISJPt);   
-    SetValue("theJetAK8PUPPISJEta",  theJetAK8PUPPISJEta);  
-    SetValue("theJetAK8PUPPISJPhi",  theJetAK8PUPPISJPhi);  
-    SetValue("theJetAK8PUPPISJMass", theJetAK8PUPPISJMass); 
-    SetValue("theJetAK8PUPPISJCSV",  theJetAK8PUPPISJCSV);  
-    SetValue("theJetAK8PUPPISJHFlav", theJetAK8PUPPISJHFlav);
-    SetValue("theJetAK8PUPPISJBTag",  theJetAK8PUPPISJBTag);  
-    SetValue("theJetAK8PUPPISJIndex",theJetAK8PUPPISJIndex);
-    SetValue("theJetAK8PUPPISJSize", theJetAK8PUPPISJSize); 
+    SetValue("theJetAK8CHSSJPt",   theJetAK8CHSSJPt);   
+    SetValue("theJetAK8CHSSJEta",  theJetAK8CHSSJEta);  
+    SetValue("theJetAK8CHSSJPhi",  theJetAK8CHSSJPhi);  
+    SetValue("theJetAK8CHSSJMass", theJetAK8CHSSJMass); 
+    SetValue("theJetAK8CHSSJCSV",  theJetAK8CHSSJCSV);  
+    SetValue("theJetAK8CHSSJHFlav", theJetAK8CHSSJHFlav);
+    SetValue("theJetAK8CHSSJBTag",  theJetAK8CHSSJBTag);  
+    SetValue("theJetAK8SJIndex",theJetAK8SJIndex);
+    SetValue("theJetAK8SJSize", theJetAK8SJSize); 
 
 
     //////////////// TRUE HADRONIC W/Z/H/Top decays //////////////////
