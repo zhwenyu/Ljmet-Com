@@ -1,4 +1,5 @@
 /*
+
 Created:        28 November 2017
 Last Updated:    4 December 2017
 Justin Pilot
@@ -120,7 +121,7 @@ int BestCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * sel
   std::vector <double> m12_jet;
   std::vector <double> m23_jet;
   std::vector <double> m13_jet;
-
+  
   std::vector <double> m1234top;
   std::vector <double> m12top;
   std::vector <double> m23top;
@@ -193,6 +194,7 @@ int BestCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * sel
   std::vector <int>    dnn_largest;
 
   std::vector <double> AK8JetCSV;
+
   //   std::vector <double> AK8JetRCN;                                                                                                                                                                    
   for (std::vector<pat::Jet>::const_iterator ijet = AK8Jets->begin(); ijet != AK8Jets->end(); ijet++){
 
@@ -224,44 +226,51 @@ int BestCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * sel
     AK8JetCSV    . push_back(ijet->bDiscriminator( "pfCombinedInclusiveSecondaryVertexV2BJetTags" ));
     //     AK8JetRCN    . push_back((ijet->chargedEmEnergy()+ijet->chargedHadronEnergy()) / (ijet->neutralEmEnergy()+ijet->neutralHadronEnergy()));
 
-    std::map<std::string,double> varMap;
     std::map<std::string,double> myMap;
+    std::map<std::string,double> varMap;
+    myMap = {
+      {"dnn_QCD",  -999},
+      {"dnn_Top",  -999},
+      {"dnn_Higgs",-999},
+      {"dnn_Z",    -999},
+      {"dnn_W",    -999}
+    };
     varMap = {
-      {"bDisc",          -999},
-      {"bDisc1",         -999},
-      {"bDisc2",         -999},
-      {"et",             -999},
-      {"eta",            -999},
-      {"mass",           -999},
-      {"SDmass",         -999},
-      {"tau32",          -999},
-      {"tau21",          -999},
-      {"q",              -999},
-      {"m1234_jet",      -999},
-      {"m12_jet",        -999},
-      {"m23_jet",        -999},
-      {"m13_jet",        -999},
-      {"m1234top",       -999},
-      {"m12top",         -999},
-      {"m23top",         -999},
-      {"m13top",         -999},
-      {"m1234W",         -999},
-      {"m12W",           -999},
-      {"m23W",           -999},
-      {"m13W",           -999},
-      {"m1234Z",         -999},
-      {"m12Z",           -999},
-      {"m23Z",           -999},
-      {"m13Z",           -999},
-      {"m1234H",         -999},
-      {"m12H",           -999},
-      {"m23H",           -999},
-      {"m13H",           -999},
-      {"pzOverp_top",    -999},
-      {"pzOverp_W",      -999},
-      {"pzOverp_Z",      -999},
-      {"pzOverp_H",      -999},
-      {"pzOverp_jet",    -999},
+      {"bDisc",      -999},
+      {"bDisc1",     -999},
+      {"bDisc2",     -999},
+      {"et",         -999},
+      {"eta",        -999},
+      {"mass",       -999},
+      {"SDmass",     -999},
+      {"tau32",      -999},
+      {"tau21",      -999},
+      {"q",          -999},
+      {"m1234_jet",  -999},
+      {"m12_jet",    -999},
+      {"m23_jet",    -999},
+      {"m13_jet",    -999},
+      {"m1234top",   -999},
+      {"m12top",     -999},
+      {"m23top",     -999},
+      {"m13top",     -999},
+      {"m1234W",     -999},
+      {"m12W",       -999},
+      {"m23W",       -999},
+      {"m13W",       -999},
+      {"m1234Z",     -999},
+      {"m12Z",       -999},
+      {"m23Z",       -999},
+      {"m13Z",       -999},
+      {"m1234H",     -999},
+      {"m12H",       -999},
+      {"m23H",       -999},
+      {"m13H",       -999},
+      {"pzOverp_top",-999},
+      {"pzOverp_W",  -999},
+      {"pzOverp_Z",  -999},
+      {"pzOverp_H",  -999},
+      {"pzOverp_jet",-999},
       {"Njets_top",      -999},
       {"Njets_W",        -999},
       {"Njets_Z",        -999},
@@ -301,44 +310,28 @@ int BestCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * sel
       {"aplanarityH",    -999},
       {"thrustH",        -999}
     };
-    myMap = {
-      {"dnn_qcd",  -999},
-      {"dnn_top",  -999},
-      {"dnn_higgs",-999},
-      {"dnn_z",    -999},
-      {"dnn_w",    -999}
-    };
-    
+
     auto const& thisSubjets   = ijet->subjets("SoftDropPuppi");
     unsigned int numDaughters = ijet->numberOfDaughters();
-    int largest = -4;
+    int largest = 8;
 
     if (thisSubjets.size() >= m_numSubjetsMin && numDaughters >= m_numDaughtersMin){
-      varMap = execute(*ijet);
-      myMap = m_lwtnn->compute(BestCalc::execute(*ijet));
+      varMap = BestCalc::execute(*ijet);
+      myMap = m_lwtnn->compute(varMap);
 
       if (myMap["dnn_qcd"] > myMap["dnn_top"] && myMap["dnn_qcd"] > myMap["dnn_higgs"] && myMap["dnn_qcd"] > myMap["dnn_z"] && myMap["dnn_qcd"] > myMap["dnn_w"]){
-        largest = 0;
+	largest = 0;
       } else if (myMap["dnn_top"] > myMap["dnn_qcd"] && myMap["dnn_top"] > myMap["dnn_higgs"] && myMap["dnn_top"] > myMap["dnn_z"] && myMap["dnn_top"] > myMap["dnn_w"]){
-        largest = 2;
+	largest = 1;
       } else if (myMap["dnn_higgs"] > myMap["dnn_top"] && myMap["dnn_higgs"] > myMap["dnn_qcd"] && myMap["dnn_higgs"] > myMap["dnn_z"] && myMap["dnn_higgs"] > myMap["dnn_w"]){
-        largest = 4;
+	largest = 2;
       } else if (myMap["dnn_z"] > myMap["dnn_top"] && myMap["dnn_z"] > myMap["dnn_higgs"] && myMap["dnn_z"] > myMap["dnn_qcd"] && myMap["dnn_z"] > myMap["dnn_w"]){
-        largest = 6;
+	largest = 3;
       } else if (myMap["dnn_w"] > myMap["dnn_top"] && myMap["dnn_w"] > myMap["dnn_higgs"] && myMap["dnn_w"] > myMap["dnn_qcd"] && myMap["dnn_w"] > myMap["dnn_z"]){
-        largest = 8;
-      } else {
-        largest = -4;
-      }
+	largest = 4;
+      } else
+	largest = 8;
     }
-
-    dnn_QCD.push_back(myMap["dnn_qcd"]);
-    dnn_Top.push_back(myMap["dnn_top"]);
-    dnn_Higgs.push_back(myMap["dnn_higgs"]);
-    dnn_Z.push_back(myMap["dnn_z"]);
-    dnn_W.push_back(myMap["dnn_w"]);
-
-    dnn_largest.push_back(largest);
 
     bDisc.push_back(varMap["bDisc"]);
     bDisc1.push_back(varMap["bDisc1"]);
@@ -376,24 +369,18 @@ int BestCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * sel
     m12H.push_back(varMap["m12H"]);
     m23H.push_back(varMap["m23H"]);
     m13H.push_back(varMap["m13H"]);
-    
+
     pzOverp_top.push_back(varMap["pzOverp_top"]);
     pzOverp_W.push_back(varMap["pzOverp_W"]);
     pzOverp_Z.push_back(varMap["pzOverp_Z"]);
     pzOverp_H.push_back(varMap["pzOverp_H"]);
     pzOverp_jet.push_back(varMap["pzOverp_jet"]);
 
-    dnn_QCD.push_back(myMap["dnn_QCD"]);
-    dnn_Top.push_back(myMap["dnn_Top"]);
-    dnn_Higgs.push_back(myMap["dnn_Higgs"]);
-    dnn_Z.push_back(myMap["dnn_Z"]);
-    dnn_W.push_back(myMap["dnn_W"]);
-
     Njets_top.push_back(varMap["Njets_top"]);
     Njets_W.push_back(varMap["Njets_W"]);
     Njets_Z.push_back(varMap["Njets_Z"]);
     Njets_H.push_back(varMap["Njets_H"]);
-    Njets_jet.push_back(varMap["Njets_jet"]);    
+    Njets_jet.push_back(varMap["Njets_jet"]);
     Njets_orig.push_back(varMap["Njets_orig"]);
 
     FWmoment1top.push_back(varMap["FWmoment1top"]);
@@ -431,8 +418,17 @@ int BestCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * sel
     sphericityH.push_back(varMap["sphericityH"]);
     aplanarityH.push_back(varMap["aplanarityH"]);
     thrustH.push_back(varMap["thrustH"]);
-  }
 
+
+    dnn_QCD.push_back(myMap["dnn_qcd"]);
+    dnn_Top.push_back(myMap["dnn_top"]);
+    dnn_Higgs.push_back(myMap["dnn_higgs"]);
+    dnn_Z.push_back(myMap["dnn_z"]);
+    dnn_W.push_back(myMap["dnn_w"]);
+
+    dnn_largest.push_back(largest);
+    
+  }
 
   //Four std::vector                                                                                                                                                                                      
   SetValue("AK8JetPt"     , AK8JetPt);
@@ -447,9 +443,9 @@ int BestCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * sel
   SetValue("AK8JetEnergy_jesdn"     , AK8JetEnergy_jesdn);
   SetValue("AK8JetEnergy_jerup"     , AK8JetEnergy_jerup);
   SetValue("AK8JetEnergy_jerdn"     , AK8JetEnergy_jerdn);
-
   SetValue("AK8JetCSV"    , AK8JetCSV);
-  SetValue("dnn_QCD",dnn_QCD);
+  
+  SetValue("dnn_QCD", dnn_QCD);
   SetValue("dnn_Top",dnn_Top);
   SetValue("dnn_Higgs",dnn_Higgs);
   SetValue("dnn_Z",dnn_Z);
