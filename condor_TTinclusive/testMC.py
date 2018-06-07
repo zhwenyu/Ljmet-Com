@@ -35,6 +35,10 @@ process.ljmet.excluded_calculators = cms.vstring(
 # common calculator options
 process.load('LJMet.Com.commonCalc_cfi')
 
+# BestCalc options
+process.load('LJMet.Com.BestCalc_cfi')
+process.BestCalc.dnnFile = cms.string(relBase+'/src/LJMet/Com/data/BEST_mlp.json')
+
 # singleLep calculator options
 process.load('LJMet.Com.singleLepCalc_cfi')
 process.singleLepCalc.isMc              = cms.bool(condorIsMC)
@@ -256,7 +260,7 @@ process.event_selector = cms.PSet(
 #
 
 process.inputs = cms.PSet (
-    nEvents    = cms.int32(10000),
+    nEvents    = cms.int32(2000),
     skipEvents = cms.int32(0),
     lumisToProcess = CfgTypes.untracked(CfgTypes.VLuminosityBlockRange()),
     fileNames  = cms.vstring(
