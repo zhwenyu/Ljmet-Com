@@ -18,6 +18,7 @@
 <use name="DataFormats/FWLite"/>
 <use name="PhysicsTools/FWLite"/>
 <use name="root"/>
+<use name="roottmva"/>
 <use name="clhep"/>
 <use name="RecoBTag/PerformanceDB"/>
 <use name="CondFormats/PhysicsToolsObjects"/>
@@ -33,6 +34,8 @@
 <use name="lhapdf"/>
 <use name="fastjet"/>
 <use name="fastjet-contrib"/>
+<use name="PhysicsTools/CandUtils"/>
+<use name="lwtnn/lwtnn"/>
 
 <export>
     <lib name="1"/>
