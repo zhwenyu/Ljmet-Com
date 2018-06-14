@@ -647,12 +647,12 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
                         else break; // fail
 		    }
 		    else {
-		        if ( mbPar["muon_selector_medium"] && (*_imu).isMediumMuon() ){ }
-                        else if ( !mbPar["muon_selector_medium"] && (*_imu).isTightMuon(*mvSelPVs[0]) ){ }
+		      if ( mbPar["muon_selector_medium"] && (*_imu).passed(reco::Muon::CutBasedIdMedium) ){ }
+                        else if ( !mbPar["muon_selector_medium"] && (*_imu).passed(reco::Muon::CutBasedIdTight) ){ }
 		        else break; // fail
 
-			pat::Muon* muptr = new pat::Muon(*_imu);
-			float miniIso = getPFMiniIsolation_EffectiveArea(packedPFCands, dynamic_cast<const reco::Candidate* > (muptr), 0.05, 0.2, 10., false, false,myRhoJetsNC);
+		        //pat::Muon* muptr = new pat::Muon(*_imu);
+			//float miniIso = getPFMiniIsolation_EffectiveArea(packedPFCands, dynamic_cast<const reco::Candidate* > (muptr), 0.05, 0.2, 10., false, false,myRhoJetsNC);
 
                         double chIso = (*_imu).pfIsolationR04().sumChargedHadronPt;
                         double nhIso = (*_imu).pfIsolationR04().sumNeutralHadronEt;
@@ -663,9 +663,9 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
 
 		        double pfIso = (chIso + std::max(0.,nhIso + gIso - 0.5*puIso))/pt;
 
-		        if (!mbPar["muon_useMiniIso"] && pfIso<mdPar["muon_reliso"] ) {delete muptr;}
-			else if (mbPar["muon_useMiniIso"] && miniIso<mdPar["muon_miniIso"] ) {delete muptr;}
-			else{delete muptr;  break;}
+		        if (!mbPar["muon_useMiniIso"] && pfIso<mdPar["muon_reliso"] ) {}
+			else if (mbPar["muon_useMiniIso"] && (*_imu).passed(reco::Muon::MiniIsoTight) ) {}
+			else{ break;}
 		    }
 
                     if (mvSelPVs.size() > 0){
