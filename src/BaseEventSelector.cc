@@ -1196,49 +1196,53 @@ pat::Jet BaseEventSelector::correctJetReturnPatJet(const pat::Jet & jet, edm::Ev
 bool BaseEventSelector::isJetTagged(const pat::Jet & jet, edm::EventBase const & event, bool applySF, int shiftflag, bool subjetflag)
 {
     bool _isTagged = false;
+
+    if (jet.bDiscriminator("pfDeepCSVJetTags:probb")+jet.bDiscriminator("pfDeepCSVJetTags:probbb") > 0.4941) _isTagged = true;
+
+    // NOT SET UP FOR DEEPCSV YET
+
+    // if ( jet.bDiscriminator( msPar["btagger"] ) > bTagCut ) _isTagged = true;
     
-    if ( jet.bDiscriminator( msPar["btagger"] ) > bTagCut ) _isTagged = true;
+    // string tagger = msPar["btagOP"];
+    // if (subjetflag) tagger += "subjet";
+
+    // if (mbPar["isMc"] && applySF) {
+    //     TLorentzVector lvjet = correctJet(jet, event);
+        
+    //     int _jetFlavor = abs(jet.hadronFlavour());
+    // 	double _heavySf = 1.0;
+    // 	double _heavyEff = 1.0;
+    // 	double _lightSf = 1.0;
+    // 	double _lightEff = 1.0;
+
+    // 	_heavySf = mBtagCond.GetBtagScaleFactor(lvjet.Et(), lvjet.Eta(), tagger);
+    // 	if (shiftflag == 1 ||  mbPar["BTagUncertUp"] ) _heavySf += mBtagCond.GetBtagSFUncertUp(lvjet.Et(), lvjet.Eta(), tagger);
+    // 	else if (shiftflag == 2 ||  mbPar["BTagUncertDown"] ) _heavySf -= mBtagCond.GetBtagSFUncertDown(lvjet.Et(), lvjet.Eta(), tagger);
+    // 	_heavyEff = mBtagCond.GetBtagEfficiency(lvjet.Et(), lvjet.Eta(), tagger);       
+
+    // 	if(_jetFlavor == 4){
+    // 	  _heavySf = mBtagCond.GetCtagScaleFactor(lvjet.Et(), lvjet.Eta(), tagger);
+    // 	  if (shiftflag == 1 ||  mbPar["BTagUncertUp"] ) _heavySf += mBtagCond.GetCtagSFUncertUp(lvjet.Et(), lvjet.Eta(), tagger);
+    // 	  else if (shiftflag == 2 ||  mbPar["BTagUncertDown"] ) _heavySf -= mBtagCond.GetCtagSFUncertDown(lvjet.Et(), lvjet.Eta(), tagger);
+    // 	  _heavyEff = mBtagCond.GetCtagEfficiency(lvjet.Et(), lvjet.Eta(), tagger);       
+    // 	}
+
+    // 	_lightSf = mBtagCond.GetMistagScaleFactor(lvjet.Et(), lvjet.Eta(), tagger);
+    // 	if (shiftflag == 3 || mbPar["MistagUncertUp"] ) _lightSf += mBtagCond.GetMistagSFUncertUp(lvjet.Et(), lvjet.Eta(), tagger);
+    // 	else if (shiftflag == 4 ||  mbPar["MistagUncertDown"] ) _lightSf -= mBtagCond.GetMistagSFUncertDown(lvjet.Et(), lvjet.Eta(), tagger);
+    // 	_lightEff = mBtagCond.GetMistagRate(lvjet.Et(), lvjet.Eta(), tagger);
     
-    string tagger = msPar["btagOP"];
-    if (subjetflag) tagger += "subjet";
-
-    if (mbPar["isMc"] && applySF) {
-        TLorentzVector lvjet = correctJet(jet, event);
+    //     mBtagSfUtil.SetSeed(abs(static_cast<int>(sin(jet.phi())*1e5)));
         
-        int _jetFlavor = abs(jet.hadronFlavour());
-	double _heavySf = 1.0;
-	double _heavyEff = 1.0;
-	double _lightSf = 1.0;
-	double _lightEff = 1.0;
+    //     // sanity check
+    //     bool _orig_tag = _isTagged;
 
-	_heavySf = mBtagCond.GetBtagScaleFactor(lvjet.Et(), lvjet.Eta(), tagger);
-	if (shiftflag == 1 ||  mbPar["BTagUncertUp"] ) _heavySf += mBtagCond.GetBtagSFUncertUp(lvjet.Et(), lvjet.Eta(), tagger);
-	else if (shiftflag == 2 ||  mbPar["BTagUncertDown"] ) _heavySf -= mBtagCond.GetBtagSFUncertDown(lvjet.Et(), lvjet.Eta(), tagger);
-	_heavyEff = mBtagCond.GetBtagEfficiency(lvjet.Et(), lvjet.Eta(), tagger);       
-
-	if(_jetFlavor == 4){
-	  _heavySf = mBtagCond.GetCtagScaleFactor(lvjet.Et(), lvjet.Eta(), tagger);
-	  if (shiftflag == 1 ||  mbPar["BTagUncertUp"] ) _heavySf += mBtagCond.GetCtagSFUncertUp(lvjet.Et(), lvjet.Eta(), tagger);
-	  else if (shiftflag == 2 ||  mbPar["BTagUncertDown"] ) _heavySf -= mBtagCond.GetCtagSFUncertDown(lvjet.Et(), lvjet.Eta(), tagger);
-	  _heavyEff = mBtagCond.GetCtagEfficiency(lvjet.Et(), lvjet.Eta(), tagger);       
-	}
-
-	_lightSf = mBtagCond.GetMistagScaleFactor(lvjet.Et(), lvjet.Eta(), tagger);
-	if (shiftflag == 3 || mbPar["MistagUncertUp"] ) _lightSf += mBtagCond.GetMistagSFUncertUp(lvjet.Et(), lvjet.Eta(), tagger);
-	else if (shiftflag == 4 ||  mbPar["MistagUncertDown"] ) _lightSf -= mBtagCond.GetMistagSFUncertDown(lvjet.Et(), lvjet.Eta(), tagger);
-	_lightEff = mBtagCond.GetMistagRate(lvjet.Et(), lvjet.Eta(), tagger);
-    
-        mBtagSfUtil.SetSeed(abs(static_cast<int>(sin(jet.phi())*1e5)));
+    //     mBtagSfUtil.modifyBTagsWithSF(_isTagged, _jetFlavor, _heavySf, _heavyEff, _lightSf, _lightEff);
         
-        // sanity check
-        bool _orig_tag = _isTagged;
-
-        mBtagSfUtil.modifyBTagsWithSF(_isTagged, _jetFlavor, _heavySf, _heavyEff, _lightSf, _lightEff);
+    //     // sanity check
+    //     if (_isTagged != _orig_tag) ++mNBtagSfCorrJets;
         
-        // sanity check
-        if (_isTagged != _orig_tag) ++mNBtagSfCorrJets;
-        
-    } // end of btag scale factor corrections
+    // } // end of btag scale factor corrections
     return _isTagged;
 }
 
