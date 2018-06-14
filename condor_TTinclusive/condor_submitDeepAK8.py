@@ -132,7 +132,7 @@ def get_input(num, list):
 j = 1
 nfiles = 1
 
-tempdir = '/uscms_data/d3/jblee/'+outputdir.split('/')[-1]+'_logs/'+shift+'/'+prefix
+tempdir = '/uscms_data/d3/jmanagan/'+outputdir.split('/')[-1]+'_logs/'+shift+'/'+prefix
 if not os.path.exists(tempdir): os.makedirs(tempdir)
 
 print 'CONDOR work dir: '+tempdir
