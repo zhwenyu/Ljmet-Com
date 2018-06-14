@@ -93,7 +93,7 @@ int DeepAK8Calc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * 
 
   //Size Check to make sure AK8Jets and the b, j, W... vectors are the same length
   if(DeepAK8_raw_B->size() != AK8Jets->size()) {
-    cerr << "WARNING: THE DeepAK8Jets VECTOR IS SIZE " << AK8Jets->size() << ", AND THE OTHER VECTORS ARE SIZE " << DeepAK8_raw_B->size() << endl;
+    cout << "WARNING: THE DeepAK8Jets VECTOR IS SIZE " << AK8Jets->size() << ", AND THE OTHER VECTORS ARE SIZE " << DeepAK8_raw_B->size() << endl;
   }
 
   int i = 0; //i is an iterator
