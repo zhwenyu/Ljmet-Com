@@ -3,7 +3,7 @@ import FWCore.ParameterSet.Config as cms
 # ---------------------------------------------------------
 from FWCore.ParameterSet.VarParsing import VarParsing
 options = VarParsing('analysis')
-options.inputFiles = CONDOR_FILELIST
+options.inputFiles = [CONDOR_FILELIST]
 options.maxEvents = -1
 options.parseArguments()
 
