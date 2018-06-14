@@ -1,9 +1,11 @@
 import FWCore.ParameterSet.Config as cms
 
 BestCalc = cms.PSet(
+
     #dnnFile = cms.string(relBase+'/src/LJMet/Com/data/BEST_mlp.json'), #
     #    dnnFile = cms.string(relBase+'/src/LJMet/Com/data/BEST_mlp.json'), #                                                                                                                             
     dnnFile = cms.string('/uscms_data/d3/saj32265/CMSSW_9_4_6_patch1/src/LJMet/Com/data/BEST_mlp.json'), #  
+
     numSubjetsMin = cms.int32(2),
     numDaughtersMin = cms.int32(2),
     jetSoftDropMassMin = cms.double(1.0),

@@ -121,8 +121,6 @@ singleLepCalc::~singleLepCalc()
 
 int singleLepCalc::BeginJob()
 {
-  cout << "This file is actually used!" << endl;
-
     if (mPset.exists("dataType"))     dataType = mPset.getParameter<std::string>("dataType");
     else                              dataType = "None"; 
 
@@ -1123,7 +1121,7 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
     //   std::vector <double> AK8JetRCN;       
     for (std::vector<pat::Jet>::const_iterator ijet = AK8Jets->begin(); ijet != AK8Jets->end(); ijet++){
 
-      if(ijet->pt() < 170) continue; // not all info there for lower pt
+      if(ijet->pt() < 200) continue; // not all info there for lower pt
       //PF Tight
 	bool tightJetID = false;
 	pat::Jet rawJet = ijet->correctedJet(0);

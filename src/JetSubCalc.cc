@@ -401,15 +401,6 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * s
     std::vector<double> theJetAK8GenDR;
     std::vector<double> theJetAK8GenMass;
 
-    std::vector<double> theJetAK8CEmEnergy;
-    std::vector<double> theJetAK8NEmEnergy;
-    std::vector<double> theJetAK8CEmEFrac;
-    std::vector<double> theJetAK8NEmEFrac;
-    std::vector<double> theJetAK8CHadEnergy;
-    std::vector<double> theJetAK8NHadEnergy;
-    std::vector<double> theJetAK8CHadEFrac;
-    std::vector<double> theJetAK8NHadEFrac;
-
     // CHS values
     std::vector<double> theJetAK8CHSPt;
     std::vector<double> theJetAK8CHSEta;
@@ -470,8 +461,6 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * s
     std::vector<double> theJetAK8SoftDropn2b2;
     std::vector<double> theJetAK8SoftDropn3b2;
     
-    std::vector<int>  theJetAK8DoubleBtag;
-
     double topMass, minMass, jetCharge;
     int nSubJets;
     double theSoftDrop;
@@ -572,8 +561,6 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * s
       theJetAK8Energy.push_back(corrak8.energy());
       theJetAK8Mass  .push_back(corrak8.mass());
 
-      theJetAK8DoubleBtag  .push_back(ijet->bDiscriminator( "pfBoostedDoubleSecondaryVertexAK8BJetTags" ));
-
       double theCHSPt = -std::numeric_limits<double>::max();
       double theCHSEta = -std::numeric_limits<double>::max();
       double theCHSPhi = -std::numeric_limits<double>::max();
@@ -637,16 +624,6 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * s
 
       theJetAK8CSV.push_back(corrak8.bDiscriminator( bDiscriminant ));
       theJetAK8DoubleB.push_back(corrak8.bDiscriminator("pfBoostedDoubleSecondaryVertexAK8BJetTags"));
-
-      theJetAK8CEmEnergy.push_back(corrak8.chargedEmEnergy());
-      theJetAK8NEmEnergy.push_back(corrak8.neutralEmEnergy());
-      theJetAK8CEmEFrac.push_back(corrak8.chargedEmEnergyFraction());
-      theJetAK8NEmEFrac.push_back(corrak8.neutralEmEnergyFraction());	    
-
-      theJetAK8CHadEnergy.push_back(corrak8.chargedHadronEnergy());
-      theJetAK8NHadEnergy.push_back(corrak8.neutralHadronEnergy());
-      theJetAK8CHadEFrac.push_back(corrak8.chargedHadronEnergyFraction());
-      theJetAK8NHadEFrac.push_back(corrak8.neutralHadronEnergyFraction());
       
       theJetAK8CHSPrunedMass.push_back(theCHSPrunedMass); // JEC only
       theJetAK8CHSSoftDropMass.push_back(theCHSSoftDropMass); // JEC only
@@ -834,8 +811,6 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * s
     SetValue("theJetAK8GenDR",  theJetAK8GenDR);
     SetValue("theJetAK8GenMass",  theJetAK8GenMass);
 
-    SetValue("theJetAK8DoubleBtag", theJetAK8DoubleBtag);
-
     SetValue("theJetAK8CHSPt",     theJetAK8CHSPt);
     SetValue("theJetAK8CHSEta",    theJetAK8CHSEta);
     SetValue("theJetAK8CHSPhi",    theJetAK8CHSPhi);
@@ -847,15 +822,6 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * s
     SetValue("theJetAK8SoftDrop_JMSdn", theJetAK8SoftDrop_JMSdn);
     SetValue("theJetAK8SoftDrop_JMRup", theJetAK8SoftDrop_JMRup);
     SetValue("theJetAK8SoftDrop_JMRdn", theJetAK8SoftDrop_JMRdn);
-
-    SetValue("theJetAK8CEmEnergy", theJetAK8CEmEnergy); 
-    SetValue("theJetAK8NEmEnergy", theJetAK8NEmEnergy); 
-    SetValue("theJetAK8CEmEFrac",  theJetAK8CEmEFrac);  
-    SetValue("theJetAK8NEmEFrac",  theJetAK8NEmEFrac);  
-    SetValue("theJetAK8CHadEnergy",theJetAK8CHadEnergy);
-    SetValue("theJetAK8NHadEnergy",theJetAK8NHadEnergy);
-    SetValue("theJetAK8CHadEFrac", theJetAK8CHadEFrac); 
-    SetValue("theJetAK8NHadEFrac", theJetAK8NHadEFrac); 
 
     SetValue("theJetAK8CHSPrunedMass",   theJetAK8CHSPrunedMass);
     SetValue("theJetAK8CHSSoftDropMass", theJetAK8CHSSoftDropMass);
@@ -1040,6 +1006,7 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * s
 	    if(W->daughter(1)->pdgId() == 22) W = W->daughter(0);
             while(W->numberOfDaughters() == 1) W = W->daughter(0);
 	    if(W->daughter(1)->pdgId()==22) cout << "weird W decay to photons" << endl;
+
 	    HadronicVHtD0Pt.push_back( b->pt());
 	    HadronicVHtD0Eta.push_back( b->eta());
 	    HadronicVHtD0Phi.push_back( b->phi());
