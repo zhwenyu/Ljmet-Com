@@ -259,11 +259,13 @@ process.event_selector = cms.PSet(
 #
 
 process.inputs = cms.PSet (
-    nEvents    = cms.int32(2000),
+    nEvents    = cms.int32(10000),
     skipEvents = cms.int32(0),
     lumisToProcess = CfgTypes.untracked(CfgTypes.VLuminosityBlockRange()),
     fileNames  = cms.vstring(
-        'root://cmsxrootd.fnal.gov//store/mc/RunIIFall17MiniAODv2/TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8/MINIAODSIM/PU2017_12Apr2018_94X_mc2017_realistic_v14-v2/70000/FED255F1-4E59-E811-A452-008CFAE452C8.root',
+        '~jmanagan/nobackup/Tprime1700test_deepak8.root'
+        #'/uscms_data/d3/saj32265/Tprime1700test.root'
+        #'root://cmsxrootd.fnal.gov//store/mc/RunIIFall17MiniAODv2/TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8/MINIAODSIM/PU2017_12Apr2018_94X_mc2017_realistic_v14-v2/70000/FED255F1-4E59-E811-A452-008CFAE452C8.root',
         #'root://cmsxrootd.fnal.gov//store/mc/RunIIFall17MiniAOD/X53X53To2L2Nu_M-1000_LH_TuneCP5_13TeV-madgraph-pythia8/MINIAODSIM/PU2017_94X_mc2017_realistic_v11-v1/60000/3E4C0366-DB28-E811-BE99-A4BF01125628.root'
         #'testmc_MINIAOD.root'
         #'root://eoscms.cern.ch//store/mc/RunIISummer16MiniAODv2/WJetsToLNu_HT-400To600_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/MINIAODSIM/PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/120000/868A42F1-BDB5-E611-ADB1-A0000420FE80.root'

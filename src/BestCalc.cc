@@ -419,7 +419,6 @@ int BestCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * sel
     aplanarityH.push_back(varMap["aplanarityH"]);
     thrustH.push_back(varMap["thrustH"]);
 
-
     dnn_QCD.push_back(myMap["dnn_qcd"]);
     dnn_Top.push_back(myMap["dnn_top"]);
     dnn_Higgs.push_back(myMap["dnn_higgs"]);
