@@ -38,7 +38,7 @@ int DeepAK8Calc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * 
   std::vector<double> decorr_H;
   std::vector<double> decorr_T;
 
-   //getByLabel
+  //getByLabel
   edm::InputTag AK8JetColl = edm::InputTag("slimmedJetsAK8");
   edm::Handle<std::vector<pat::Jet> > AK8Jets;
   event.getByLabel(AK8JetColl, AK8Jets);
@@ -91,11 +91,9 @@ int DeepAK8Calc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * 
   edm::Handle<std::vector<float> > DeepAK8Decorr_raw_T;
   event.getByLabel(DeepAK8DecorrrawT, DeepAK8Decorr_raw_T);
 
-
-
   //Size Check to make sure AK8Jets and the b, j, W... vectors are the same length
   if(DeepAK8_raw_B->size() != AK8Jets->size()) {
-    cout << "THE DeepAK8Jets VECTOR IS SIZE " << AK8Jets->size() << ", AND THE OTHER VECTORS ARE SIZE " << DeepAK8_raw_B->size() << endl;
+    cout << "WARNING: THE DeepAK8Jets VECTOR IS SIZE " << AK8Jets->size() << ", AND THE OTHER VECTORS ARE SIZE " << DeepAK8_raw_B->size() << endl;
   }
 
   int i = 0; //i is an iterator
