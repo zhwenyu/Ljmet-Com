@@ -87,23 +87,16 @@ int BestCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * sel
   //Four std::vector
                                   
   std::vector <double> AK8JetPt;
-  std::vector <double> AK8JetPt_jesup;
-  std::vector <double> AK8JetPt_jesdn;
-  std::vector <double> AK8JetPt_jerup;
-  std::vector <double> AK8JetPt_jerdn;
   std::vector <double> AK8JetEta;
   std::vector <double> AK8JetPhi;
   std::vector <double> AK8JetEnergy;
-  std::vector <double> AK8JetEnergy_jesup;
-  std::vector <double> AK8JetEnergy_jesdn;
-  std::vector <double> AK8JetEnergy_jerup;
-  std::vector <double> AK8JetEnergy_jerdn;
 
   std::vector <double> dnn_QCD;
   std::vector <double> dnn_Top;
   std::vector <double> dnn_Higgs;
   std::vector <double> dnn_Z;
   std::vector <double> dnn_W;
+  std::vector <double> dnn_B;
 
   std::vector <double> bDisc;
   std::vector <double> bDisc1;
@@ -229,11 +222,12 @@ int BestCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * sel
     std::map<std::string,double> myMap;
     std::map<std::string,double> varMap;
     myMap = {
-      {"dnn_QCD",  -999},
-      {"dnn_Top",  -999},
-      {"dnn_Higgs",-999},
-      {"dnn_Z",    -999},
-      {"dnn_W",    -999}
+      {"dnn_qcd",  -999},
+      {"dnn_top",  -999},
+      {"dnn_higgs",-999},
+      {"dnn_z",    -999},
+      {"dnn_w",    -999},
+      {"dnn_b",    -999}
     };
     varMap = {
       {"bDisc",      -999},
@@ -313,24 +307,26 @@ int BestCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * sel
 
     auto const& thisSubjets   = ijet->subjets("SoftDropPuppi");
     unsigned int numDaughters = ijet->numberOfDaughters();
-    int largest = 8;
+    int largest = 10;
 
     if (thisSubjets.size() >= m_numSubjetsMin && numDaughters >= m_numDaughtersMin){
       varMap = BestCalc::execute(*ijet);
       myMap = m_lwtnn->compute(varMap);
 
-      if (myMap["dnn_qcd"] > myMap["dnn_top"] && myMap["dnn_qcd"] > myMap["dnn_higgs"] && myMap["dnn_qcd"] > myMap["dnn_z"] && myMap["dnn_qcd"] > myMap["dnn_w"]){
+      if (myMap["dnn_qcd"] > myMap["dnn_top"] && myMap["dnn_qcd"] > myMap["dnn_higgs"] && myMap["dnn_qcd"] > myMap["dnn_z"] && myMap["dnn_qcd"] > myMap["dnn_w"] && myMap["dnn_qcd"] > myMap["dnn_b"]){
 	largest = 0;
-      } else if (myMap["dnn_top"] > myMap["dnn_qcd"] && myMap["dnn_top"] > myMap["dnn_higgs"] && myMap["dnn_top"] > myMap["dnn_z"] && myMap["dnn_top"] > myMap["dnn_w"]){
+      } else if (myMap["dnn_top"] > myMap["dnn_qcd"] && myMap["dnn_top"] > myMap["dnn_higgs"] && myMap["dnn_top"] > myMap["dnn_z"] && myMap["dnn_top"] > myMap["dnn_w"] && myMap["dnn_top"] > myMap["dnn_b"]){
 	largest = 1;
-      } else if (myMap["dnn_higgs"] > myMap["dnn_top"] && myMap["dnn_higgs"] > myMap["dnn_qcd"] && myMap["dnn_higgs"] > myMap["dnn_z"] && myMap["dnn_higgs"] > myMap["dnn_w"]){
+      } else if (myMap["dnn_higgs"] > myMap["dnn_top"] && myMap["dnn_higgs"] > myMap["dnn_qcd"] && myMap["dnn_higgs"] > myMap["dnn_z"] && myMap["dnn_higgs"] > myMap["dnn_w"] && myMap["dnn_higgs"] > myMap["dnn_b"]){
 	largest = 2;
-      } else if (myMap["dnn_z"] > myMap["dnn_top"] && myMap["dnn_z"] > myMap["dnn_higgs"] && myMap["dnn_z"] > myMap["dnn_qcd"] && myMap["dnn_z"] > myMap["dnn_w"]){
+      } else if (myMap["dnn_z"] > myMap["dnn_top"] && myMap["dnn_z"] > myMap["dnn_higgs"] && myMap["dnn_z"] > myMap["dnn_qcd"] && myMap["dnn_z"] > myMap["dnn_w"] && myMap["dnn_z"] > myMap["dnn_b"]){
 	largest = 3;
-      } else if (myMap["dnn_w"] > myMap["dnn_top"] && myMap["dnn_w"] > myMap["dnn_higgs"] && myMap["dnn_w"] > myMap["dnn_qcd"] && myMap["dnn_w"] > myMap["dnn_z"]){
+      } else if (myMap["dnn_w"] > myMap["dnn_top"] && myMap["dnn_w"] > myMap["dnn_higgs"] && myMap["dnn_w"] > myMap["dnn_qcd"] && myMap["dnn_w"] > myMap["dnn_z"] && myMap["dnn_w"] > myMap["dnn_b"]){
 	largest = 4;
+      } else if (myMap["dnn_b"] > myMap["dnn_top"] && myMap["dnn_b"] > myMap["dnn_higgs"] && myMap["dnn_b"] > myMap["dnn_qcd"] && myMap["dnn_b"] > myMap["dnn_z"] && myMap["dnn_b"] > myMap["dnn_w"]){
+        largest = 5;
       } else
-	largest = 8;
+	largest = 10;
     }
 
     bDisc.push_back(varMap["bDisc"]);
@@ -424,6 +420,7 @@ int BestCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * sel
     dnn_Higgs.push_back(myMap["dnn_higgs"]);
     dnn_Z.push_back(myMap["dnn_z"]);
     dnn_W.push_back(myMap["dnn_w"]);
+    dnn_B.push_back(myMap["dnn_b"]);
 
     dnn_largest.push_back(largest);
     
@@ -431,17 +428,9 @@ int BestCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * sel
 
   //Four std::vector                                                                                                                                                                                      
   SetValue("AK8JetPt"     , AK8JetPt);
-  SetValue("AK8JetPt_jesup"     , AK8JetPt_jesup);
-  SetValue("AK8JetPt_jesdn"     , AK8JetPt_jesdn);
-  SetValue("AK8JetPt_jerup"     , AK8JetPt_jerup);
-  SetValue("AK8JetPt_jerdn"     , AK8JetPt_jerdn);
   SetValue("AK8JetEta"    , AK8JetEta);
   SetValue("AK8JetPhi"    , AK8JetPhi);
   SetValue("AK8JetEnergy" , AK8JetEnergy);
-  SetValue("AK8JetEnergy_jesup"     , AK8JetEnergy_jesup);
-  SetValue("AK8JetEnergy_jesdn"     , AK8JetEnergy_jesdn);
-  SetValue("AK8JetEnergy_jerup"     , AK8JetEnergy_jerup);
-  SetValue("AK8JetEnergy_jerdn"     , AK8JetEnergy_jerdn);
   SetValue("AK8JetCSV"    , AK8JetCSV);
   
   SetValue("dnn_QCD", dnn_QCD);
@@ -449,6 +438,7 @@ int BestCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * sel
   SetValue("dnn_Higgs",dnn_Higgs);
   SetValue("dnn_Z",dnn_Z);
   SetValue("dnn_W",dnn_W);
+  SetValue("dnn_B",dnn_B);
 
   SetValue("dnn_largest",dnn_largest);
 
@@ -548,13 +538,13 @@ std::map<std::string,double> BestCalc::execute( const pat::Jet& jet ){
   getJetValues(jet);                            // update m_BESTvars
 
   // set values (testing)
-  m_NNresults = {
+  /*  m_NNresults = {
     {"dnn_qcd",  0.7},
     {"dnn_top",  0.6},
     {"dnn_higgs",0.5},
     {"dnn_z",    0.4},
     {"dnn_w",    0.3}
-  };
+    };*/
 
   //m_NNresults = m_lwtnn->compute(m_BESTvars);
 
