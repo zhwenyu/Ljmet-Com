@@ -30,6 +30,9 @@ int DeepAK8Calc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * 
   std::vector<double> dnn_Z;
   std::vector<double> dnn_H;
   std::vector<double> dnn_T;
+
+  std::vector<int> dnn_largest;
+  std::vector<int> decorr_largest;
   
   std::vector<double> decorr_B;
   std::vector<double> decorr_J;
@@ -124,6 +127,41 @@ int DeepAK8Calc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * 
       i++;
       continue;
     }
+    
+    int dnn_Largest = 10;
+
+    if (DeepAK8_raw_J->at(i) > DeepAK8_raw_T->at(i) && DeepAK8_raw_J->at(i) > DeepAK8_raw_H->at(i) && DeepAK8_raw_J->at(i) > DeepAK8_raw_Z->at(i) && DeepAK8_raw_J->at(i) > DeepAK8_raw_W->at(i) && DeepAK8_raw_J->at(i) > DeepAK8_raw_B->at(i)){
+      dnn_Largest = 0;
+    } else if (DeepAK8_raw_T->at(i) > DeepAK8_raw_J->at(i) && DeepAK8_raw_T->at(i) > DeepAK8_raw_H->at(i) && DeepAK8_raw_T->at(i) > DeepAK8_raw_Z->at(i) && DeepAK8_raw_T->at(i) > DeepAK8_raw_W->at(i) && DeepAK8_raw_T->at(i) > DeepAK8_raw_B->at(i)){
+      dnn_Largest = 1;
+    } else if (DeepAK8_raw_H->at(i) > DeepAK8_raw_T->at(i) && DeepAK8_raw_H->at(i) > DeepAK8_raw_J->at(i) && DeepAK8_raw_H->at(i) > DeepAK8_raw_Z->at(i) && DeepAK8_raw_H->at(i) > DeepAK8_raw_W->at(i) && DeepAK8_raw_H->at(i) > DeepAK8_raw_B->at(i)){
+      dnn_Largest = 2;
+    } else if (DeepAK8_raw_Z->at(i) > DeepAK8_raw_T->at(i) && DeepAK8_raw_Z->at(i) > DeepAK8_raw_H->at(i) && DeepAK8_raw_Z->at(i) > DeepAK8_raw_J->at(i) && DeepAK8_raw_Z->at(i) > DeepAK8_raw_W->at(i) && DeepAK8_raw_Z->at(i) > DeepAK8_raw_B->at(i)){
+      dnn_Largest = 3;
+    } else if (DeepAK8_raw_W->at(i) > DeepAK8_raw_T->at(i) && DeepAK8_raw_W->at(i) > DeepAK8_raw_H->at(i) && DeepAK8_raw_W->at(i) > DeepAK8_raw_J->at(i) && DeepAK8_raw_W->at(i) > DeepAK8_raw_Z->at(i) && DeepAK8_raw_W->at(i) > DeepAK8_raw_B->at(i)){
+      dnn_Largest = 4;
+    } else if (DeepAK8_raw_B->at(i) > DeepAK8_raw_T->at(i) && DeepAK8_raw_B->at(i) > DeepAK8_raw_H->at(i) && DeepAK8_raw_B->at(i) > DeepAK8_raw_J->at(i) && DeepAK8_raw_B->at(i) > DeepAK8_raw_Z->at(i) && DeepAK8_raw_B->at(i) > DeepAK8_raw_W->at(i)){
+      dnn_Largest = 5;
+    } else
+      dnn_Largest = 10;
+
+    int decorr_Largest = 10;
+
+    if (DeepAK8Decorr_raw_J->at(i) > DeepAK8Decorr_raw_T->at(i) && DeepAK8Decorr_raw_J->at(i) > DeepAK8Decorr_raw_H->at(i) && DeepAK8Decorr_raw_J->at(i) > DeepAK8Decorr_raw_Z->at(i) && DeepAK8Decorr_raw_J->at(i) > DeepAK8Decorr_raw_W->at(i) && DeepAK8Decorr_raw_J->at(i) > DeepAK8Decorr_raw_B->at(i)){
+      decorr_Largest = 0;
+    } else if (DeepAK8Decorr_raw_T->at(i) > DeepAK8Decorr_raw_J->at(i) && DeepAK8Decorr_raw_T->at(i) > DeepAK8Decorr_raw_H->at(i) && DeepAK8Decorr_raw_T->at(i) > DeepAK8Decorr_raw_Z->at(i) && DeepAK8Decorr_raw_T->at(i) > DeepAK8Decorr_raw_W->at(i) && DeepAK8Decorr_raw_T->at(i) > DeepAK8Decorr_raw_B->at(i)){
+      decorr_Largest = 1;
+    } else if (DeepAK8Decorr_raw_H->at(i) > DeepAK8Decorr_raw_T->at(i) && DeepAK8Decorr_raw_H->at(i) > DeepAK8Decorr_raw_J->at(i) && DeepAK8Decorr_raw_H->at(i) > DeepAK8Decorr_raw_Z->at(i) && DeepAK8Decorr_raw_H->at(i) > DeepAK8Decorr_raw_W->at(i) && DeepAK8Decorr_raw_H->at(i) > DeepAK8Decorr_raw_B->at(i)){
+      decorr_Largest = 2;
+    } else if (DeepAK8Decorr_raw_Z->at(i) > DeepAK8Decorr_raw_T->at(i) && DeepAK8Decorr_raw_Z->at(i) > DeepAK8Decorr_raw_H->at(i) && DeepAK8Decorr_raw_Z->at(i) > DeepAK8Decorr_raw_J->at(i) && DeepAK8Decorr_raw_Z->at(i) > DeepAK8Decorr_raw_W->at(i) && DeepAK8Decorr_raw_Z->at(i) > DeepAK8Decorr_raw_B->at(i)){
+      decorr_Largest = 3;
+    } else if (DeepAK8Decorr_raw_W->at(i) > DeepAK8Decorr_raw_T->at(i) && DeepAK8Decorr_raw_W->at(i) > DeepAK8Decorr_raw_H->at(i) && DeepAK8Decorr_raw_W->at(i) > DeepAK8Decorr_raw_J->at(i) && DeepAK8Decorr_raw_W->at(i) > DeepAK8Decorr_raw_Z->at(i) && DeepAK8Decorr_raw_W->at(i) > DeepAK8Decorr_raw_B->at(i)){
+      decorr_Largest = 4;
+    } else if (DeepAK8Decorr_raw_B->at(i) > DeepAK8Decorr_raw_T->at(i) && DeepAK8Decorr_raw_B->at(i) > DeepAK8Decorr_raw_H->at(i) && DeepAK8Decorr_raw_B->at(i) > DeepAK8Decorr_raw_J->at(i) && DeepAK8Decorr_raw_B->at(i) > DeepAK8Decorr_raw_Z->at(i) && DeepAK8Decorr_raw_B->at(i) > DeepAK8Decorr_raw_W->at(i)){
+      decorr_Largest = 5;
+    } else
+      decorr_Largest = 10;
+
 
     //PUSH_BACK(...)
     dnn_B.push_back(DeepAK8_raw_B->at(i));
@@ -132,6 +170,9 @@ int DeepAK8Calc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * 
     dnn_Z.push_back(DeepAK8_raw_Z->at(i));
     dnn_H.push_back(DeepAK8_raw_H->at(i));
     dnn_T.push_back(DeepAK8_raw_T->at(i));
+
+    dnn_largest.push_back(dnn_Largest);
+    decorr_largest.push_back(decorr_Largest);
 
     decorr_B.push_back(DeepAK8Decorr_raw_B->at(i));
     decorr_J.push_back(DeepAK8Decorr_raw_J->at(i));
@@ -150,6 +191,9 @@ int DeepAK8Calc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * 
   SetValue("dnn_Z",dnn_Z);
   SetValue("dnn_H",dnn_H);
   SetValue("dnn_T",dnn_T);
+
+  SetValue("dnn_largest",dnn_largest);
+  SetValue("decorr_largest",decorr_largest);
 
   SetValue("decorr_B",decorr_B);
   SetValue("decorr_J",decorr_J);
