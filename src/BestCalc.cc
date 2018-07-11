@@ -80,9 +80,11 @@ int BestCalc::BeginJob(){
 int BestCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * selector){
 
   //Get all AK8 jets (not just for W and Top)                                                                                                                                                             
-  edm::InputTag AK8JetColl = edm::InputTag("slimmedJetsAK8");
-  edm::Handle<std::vector<pat::Jet> > AK8Jets;
-  event.getByLabel(AK8JetColl, AK8Jets);
+  //edm::InputTag AK8JetColl = edm::InputTag("slimmedJetsAK8");
+  //edm::Handle<std::vector<pat::Jet> > AK8Jets;
+  //event.getByLabel(AK8JetColl, AK8Jets);
+
+  std::vector<pat::Jet> const & vSelCorrJets_AK8 = selector->GetSelectedCorrJets_AK8();
 
   //Four std::vector
                                   
@@ -189,35 +191,19 @@ int BestCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * sel
   std::vector <double> AK8JetCSV;
 
   //   std::vector <double> AK8JetRCN;                                                                                                                                                                    
-  for (std::vector<pat::Jet>::const_iterator ijet = AK8Jets->begin(); ijet != AK8Jets->end(); ijet++){
+  //for (std::vector<pat::Jet>::const_iterator ijet = AK8Jets->begin(); ijet != AK8Jets->end(); ijet++){
+  for (std::vector<pat::Jet>::const_iterator ii = vSelCorrJets_AK8.begin(); ii != vSelCorrJets_AK8.end(); ii++){
 
-    if(ijet->pt() < 200) continue; // not all info there for lower pt                                                                                                                                     
-    //PF Tight                                                                                                                                                                                            
-    bool tightJetID = false;
-    pat::Jet rawJet = ijet->correctedJet(0);
-    if(abs(rawJet.eta()) <= 2.7){
-      tightJetID = (rawJet.neutralHadronEnergyFraction() < 0.9 &&
-		    rawJet.neutralEmEnergyFraction() < 0.9 &&
-		    (rawJet.chargedMultiplicity()+rawJet.neutralMultiplicity()) > 1) &&
-	((abs(rawJet.eta()) <= 2.4 &&
-	  rawJet.chargedHadronEnergyFraction() > 0 &&
-	  //rawJet.chargedEmEnergyFraction() < 0.99 &&               
-	  rawJet.chargedMultiplicity() > 0) ||
-	 abs(rawJet.eta()) > 2.4);
-    }else{
-      tightJetID = true;
-    }
-    if(!tightJetID) continue;
-
-    TLorentzVector lvak8 = selector->correctJet(*ijet, event,true);
+    if(ii->pt() < 200) continue; // not all info there for lower pt                                                                                                                                     
+    //pat::Jet corrak8 = 	selector->correctJetReturnPatJet(*ijet, event, true);
     //Four std::vector                                                                                                                                                                                  
-    AK8JetPt     . push_back(lvak8.Pt());
-    AK8JetEta    . push_back(lvak8.Eta());
-    AK8JetPhi    . push_back(lvak8.Phi());
-    AK8JetEnergy . push_back(lvak8.Energy());
+    AK8JetPt     . push_back(ii->pt());
+    AK8JetEta    . push_back(ii->eta());
+    AK8JetPhi    . push_back(ii->phi());
+    AK8JetEnergy . push_back(ii->energy());
 
-    AK8JetCSV    . push_back(ijet->bDiscriminator( "pfCombinedInclusiveSecondaryVertexV2BJetTags" ));
-    //     AK8JetRCN    . push_back((ijet->chargedEmEnergy()+ijet->chargedHadronEnergy()) / (ijet->neutralEmEnergy()+ijet->neutralHadronEnergy()));
+    AK8JetCSV    . push_back(ii->bDiscriminator( "pfCombinedInclusiveSecondaryVertexV2BJetTags" ));
+    //     AK8JetRCN    . push_back((corrak8.chargedEmEnergy()+corrak8.chargedHadronEnergy()) / (corrak8.neutralEmEnergy()+corrak8.neutralHadronEnergy()));
 
     std::map<std::string,double> myMap;
     std::map<std::string,double> varMap;
@@ -305,12 +291,12 @@ int BestCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * sel
       {"thrustH",        -999}
     };
 
-    auto const& thisSubjets   = ijet->subjets("SoftDropPuppi");
-    unsigned int numDaughters = ijet->numberOfDaughters();
+    auto const& thisSubjets   = ii->subjets("SoftDropPuppi");
+    unsigned int numDaughters = ii->numberOfDaughters();
     int largest = 10;
 
     if (thisSubjets.size() >= m_numSubjetsMin && numDaughters >= m_numDaughtersMin){
-      varMap = BestCalc::execute(*ijet);
+      varMap = BestCalc::execute(*ii);
       myMap = m_lwtnn->compute(varMap);
 
       if (myMap["dnn_qcd"] > myMap["dnn_top"] && myMap["dnn_qcd"] > myMap["dnn_higgs"] && myMap["dnn_qcd"] > myMap["dnn_z"] && myMap["dnn_qcd"] > myMap["dnn_w"] && myMap["dnn_qcd"] > myMap["dnn_b"]){

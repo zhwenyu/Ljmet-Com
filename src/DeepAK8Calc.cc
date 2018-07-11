@@ -41,7 +41,7 @@ int DeepAK8Calc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * 
   std::vector<double> decorr_H;
   std::vector<double> decorr_T;
 
-  std::vector<pat::Jet> const & SelCorrAK8Jets = selector->GetSelectedCorrAK8Jets();
+  std::vector<pat::Jet> const & SelCorrAK8Jets = selector->GetSelectedCorrJets_AK8();
 
   edm::InputTag DeepAK8rawB = edm::InputTag("deepntuplizer:DeepAK8rawB");
   edm::Handle<std::vector<float> > DeepAK8_raw_B;

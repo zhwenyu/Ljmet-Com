@@ -137,7 +137,7 @@ public:
     std::vector<edm::Ptr<pat::Jet>> const & GetSelectedJets() const { return mvSelJets; }
     std::vector<pat::Jet> const & GetSelectedCleanedJets() const { return mvSelJetsCleaned; }
     std::vector<pat::Jet> const & GetSelectedCorrJets() const { return mvSelCorrJets; }
-    std::vector<pat::Jet> const & GetSelectedCorrAK8Jets() const { return mvSelCorrJets_AK8; }
+    std::vector<pat::Jet> const & GetSelectedCorrJets_AK8() const { return mvSelCorrJets_AK8; }
     std::vector<TLorentzVector> const & GetSelectedCorrJets_jesup() const { return mvCorrJets_jesup; }
     std::vector<TLorentzVector> const & GetSelectedCorrJets_jesdn() const { return mvCorrJets_jesdn; }
     std::vector<TLorentzVector> const & GetSelectedCorrJets_jerup() const { return mvCorrJets_jerup; }
