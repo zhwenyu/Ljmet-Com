@@ -108,6 +108,7 @@ process.event_selector = cms.PSet(
         'HLT_IsoMu27',
         'HLT_IsoMu30',
         'HLT_Mu50',
+        'HLT_TkMu50',
         'HLT_Mu55',
         'HLT_Mu15_IsoVVVL_PFHT450_CaloBTagCSV_4p5',
         'HLT_Mu15_IsoVVVL_PFHT450_PFMET50',
@@ -128,6 +129,8 @@ process.event_selector = cms.PSet(
     jet_cuts                 = cms.bool(True),
     jet_minpt                = cms.double(15.0),
     jet_maxeta               = cms.double(3.0),
+    jet_minpt_AK8            = cms.double(200.0),
+    jet_maxeta_AK8           = cms.double(2.4),
     min_jet                  = cms.int32(1),
     max_jet                  = cms.int32(4000),
     leading_jet_pt           = cms.double(15.0),
@@ -135,7 +138,7 @@ process.event_selector = cms.PSet(
     # muon cuts
     muon_cuts                = cms.bool(True),
     min_muon                 = cms.int32(0),
-    muon_minpt               = cms.double(50.0),
+    muon_minpt               = cms.double(30.0),
     muon_maxeta              = cms.double(2.4),
     muon_useMiniIso          = cms.bool(True),
     muon_miniIso             = cms.double(999.9),
@@ -151,11 +154,11 @@ process.event_selector = cms.PSet(
     # electron cuts
     electron_cuts            = cms.bool(True),
     min_electron             = cms.int32(0),
-    electron_minpt           = cms.double(50.0),
+    electron_minpt           = cms.double(30.0),
     electron_maxeta          = cms.double(2.5),
     electron_useMiniIso      = cms.bool(True),
-    electron_miniIso         = cms.double(999.9),
-    loose_electron_miniIso   = cms.double(999.9),
+    electron_miniIso         = cms.double(0.1),
+    loose_electron_miniIso   = cms.double(0.4),
     loose_electron_minpt     = cms.double(10.0),
     loose_electron_maxeta    = cms.double(2.5),
     UseElMVA                 = cms.bool(True),
@@ -186,7 +189,7 @@ process.event_selector = cms.PSet(
     
     # MET cuts
     met_cuts                 = cms.bool(True),
-    min_met                  = cms.double(0.0),
+    min_met                  = cms.double(30.0),
     max_met                  = cms.double(99999999999.0),
     
     # Btagging cuts
@@ -201,6 +204,7 @@ process.event_selector = cms.PSet(
     trigger_collection       = cms.InputTag('TriggerResults::HLT'),
     pv_collection            = cms.InputTag('offlineSlimmedPrimaryVertices'),
     jet_collection           = cms.InputTag('slimmedJets'),
+    slimmedJetsAK8           = cms.InputTag('slimmedJetsAK8'),
     muon_collection          = cms.InputTag('slimmedMuons'),
     electron_collection      = cms.InputTag('slimmedElectrons'),
     tau_collection	     = cms.InputTag('slimmedTaus'),
@@ -263,7 +267,7 @@ process.inputs = cms.PSet (
     nEvents    = cms.int32(-1),
     skipEvents = cms.int32(0),
     lumisToProcess = CfgTypes.untracked(CfgTypes.VLuminosityBlockRange()),
-    fileNames  = cms.vstring(CONDOR_FILELIST)
+    fileNames  = cms.vstring('CONDOR_MEDIATOR')
     )
 
 
@@ -279,7 +283,7 @@ if (not process.ljmet.isMc==cms.bool(True)):
 # Output
 #
 process.outputs = cms.PSet (
-    outputName = cms.string('CONDOR_MEDIATOR'),
+    outputName = cms.string('CONDOR_OUTFILE'),
     treeName   = cms.string('ljmet'),
     )
 
