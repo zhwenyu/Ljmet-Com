@@ -279,7 +279,7 @@ if (not process.ljmet.isMc==cms.bool(True)):
 # Output
 #
 process.outputs = cms.PSet (
-    outputName = cms.string('CONDOR_OUTFILE'),
+    outputName = cms.string('CONDOR_MEDIATOR'),
     treeName   = cms.string('ljmet'),
     )
 
