@@ -306,6 +306,8 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * s
     std::vector<int> theJetBTag_bSFdn;
     std::vector<int> theJetBTag_lSFup;
     std::vector<int> theJetBTag_lSFdn;
+
+    std::vector<int> maxProb;
     
     double thePileupJetId;
 
@@ -386,8 +388,9 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * s
     SetValue("theJetnDaughters", theJetnDaughters);
 
     // Load in AK8 jets (no selection performed on these)
-    edm::Handle<std::vector<pat::Jet> > theAK8Jets;
-    event.getByLabel(slimmedJetsAK8Coll_it, theAK8Jets);
+    //edm::Handle<std::vector<pat::Jet> > theAK8Jets;
+    //event.getByLabel(slimmedJetsAK8Coll_it, theAK8Jets);
+    std::vector<pat::Jet> const & theAK8Jets = selector->GetSelectedCorrJets_AK8();
 
     // Four std::vector
     std::vector<double> theJetAK8Pt;
@@ -526,32 +529,14 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * s
       }
     }
 
-    for (std::vector<pat::Jet>::const_iterator ijet = theAK8Jets->begin(); ijet != theAK8Jets->end(); ijet++) {
-      int index = (int)(ijet-theAK8Jets->begin());
+    //for (std::vector<pat::Jet>::const_iterator ijet = theAK8Jets->begin(); ijet != theAK8Jets->end(); ijet++) {
+    for (std::vector<pat::Jet>::const_iterator ii = theAK8Jets.begin(); ii != theAK8Jets.end(); ii++){
+      int index = (int)(ii-theAK8Jets.begin());
 
-      if (ijet->pt() < 200) continue;
-      bool tightJetID = false;
-      pat::Jet rawJet = ijet->correctedJet(0);
-      if(abs(rawJet.eta()) <= 2.7){
-	tightJetID = (rawJet.neutralHadronEnergyFraction() < 0.9 && 
-		      rawJet.neutralEmEnergyFraction() < 0.9 && 
-		      (rawJet.chargedMultiplicity()+rawJet.neutralMultiplicity()) > 1) && 
-	  ((abs(rawJet.eta()) <= 2.4 && 
-	    rawJet.chargedHadronEnergyFraction() > 0 && 
-	    //rawJet.chargedEmEnergyFraction() < 0.99 && 
-	    rawJet.chargedMultiplicity() > 0) || 
-	   abs(rawJet.eta()) > 2.4);
-      }else{ 
-	tightJetID = true;
-      }
-      if(!tightJetID) continue;	
+      if (ii->pt() < 200) continue;
 
       pat::Jet corrak8;
-      if(doNewJEC){
-	corrak8 = selector->correctJetReturnPatJet(*ijet, event, true);
-      }else{
-	corrak8 = *ijet;
-      }      
+      corrak8 = *ii;
 
       if(killHF && fabs(corrak8.eta()) > 2.4) continue;
 
@@ -786,6 +771,18 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * s
 	unc_sd_up = 1.0094; // + sqrt(unc*unc + 0.023*0.023);
 	unc_sd_dn = 0.9906; //1 - sqrt(unc*unc + 0.023*0.023);
       }
+      
+      int MaxProb = 10;
+      double doubleB = corrak8.bDiscriminator("pfBoostedDoubleSecondaryVertexAK8BJetTags");
+
+      if (theSoftDropCorrected < 105 && theSoftDropCorrected > 65 && theNjettinessTau2/theNjettinessTau1 < 0.55) MaxProb = 3;
+      else if (theSoftDropCorrected > 135 && theSoftDropCorrected < 135 && doubleB > 0.6) MaxProb = 2;
+      else if (theSoftDropCorrected > 105 && theSoftDropCorrected < 210 && theNjettinessTau3/theNjettinessTau2 < 0.65) MaxProb = 1;
+      else if (nSDSubsDeepCSVMSF > 0) MaxProb = 4;
+      else if (nSDSubsDeepCSVMSF == 0) MaxProb = 0;
+      else MaxProb = 10;
+
+      maxProb.push_back(MaxProb);
 
       theJetAK8SJIndex.push_back(SDSubJetIndex);
       theJetAK8SJSize.push_back(nSubJets);
@@ -800,6 +797,7 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * s
 
     }
 
+    SetValue("maxProb", maxProb);
     SetValue("theJetAK8Pt",     theJetAK8Pt);
     SetValue("theJetAK8Eta",    theJetAK8Eta);
     SetValue("theJetAK8Phi",    theJetAK8Phi);
