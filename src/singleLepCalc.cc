@@ -227,6 +227,7 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
 {     // ----- Get objects from the selector -----
     std::vector<edm::Ptr<pat::Jet> >            const & vSelJets = selector->GetSelectedJets();
     std::vector<pat::Jet>                       const & vSelCorrJets = selector->GetSelectedCorrJets();
+    std::vector<pat::Jet>                       const & vSelCorrJets_AK8 = selector->GetSelectedCorrJets_AK8();
     std::vector<TLorentzVector>                 const & vSelCorrJets_jesup = selector->GetSelectedCorrJets_jesup();
     std::vector<TLorentzVector>                 const & vSelCorrJets_jesdn = selector->GetSelectedCorrJets_jesdn();
     std::vector<TLorentzVector>                 const & vSelCorrJets_jerup = selector->GetSelectedCorrJets_jerup();
@@ -1119,50 +1120,35 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
 
     std::vector <double> AK8JetCSV;
     //   std::vector <double> AK8JetRCN;       
-    for (std::vector<pat::Jet>::const_iterator ijet = AK8Jets->begin(); ijet != AK8Jets->end(); ijet++){
+    
+    for (std::vector<pat::Jet>::const_iterator ii = vSelCorrJets_AK8.begin(); ii != vSelCorrJets_AK8.end(); ii++){
+      int index = (int)(ii-vSelCorrJets_AK8.begin());
+      
+      if(ii->pt() < 200) continue; // not all info there for lower pt
 
-      if(ijet->pt() < 200) continue; // not all info there for lower pt
-      //PF Tight
-	bool tightJetID = false;
-	pat::Jet rawJet = ijet->correctedJet(0);
-	if(abs(rawJet.eta()) <= 2.7){
-	  tightJetID = (rawJet.neutralHadronEnergyFraction() < 0.9 && 
-			rawJet.neutralEmEnergyFraction() < 0.9 && 
-			(rawJet.chargedMultiplicity()+rawJet.neutralMultiplicity()) > 1) && 
-	    ((abs(rawJet.eta()) <= 2.4 && 
-	      rawJet.chargedHadronEnergyFraction() > 0 && 
-	      //rawJet.chargedEmEnergyFraction() < 0.99 && 
-	      rawJet.chargedMultiplicity() > 0) || 
-	     abs(rawJet.eta()) > 2.4);
-	}else{ 
-	  tightJetID = true;
-	}
-	if(!tightJetID) continue;	
-
-        if (doAllJetSyst) {
-            TLorentzVector lvak8_jesup = selector->correctJet(*ijet, event,true,false,1);
-            TLorentzVector lvak8_jesdn = selector->correctJet(*ijet, event,true,false,2);
-            TLorentzVector lvak8_jerup = selector->correctJet(*ijet, event,true,false,3);
-            TLorentzVector lvak8_jerdn = selector->correctJet(*ijet, event,true,false,4);
-            AK8JetPt_jesup     . push_back(lvak8_jesup.Pt());
-            AK8JetPt_jesdn     . push_back(lvak8_jesdn.Pt());
-            AK8JetPt_jerup     . push_back(lvak8_jerup.Pt());
-            AK8JetPt_jerdn     . push_back(lvak8_jerdn.Pt());
-            AK8JetEnergy_jesup     . push_back(lvak8_jesup.Energy());
-            AK8JetEnergy_jesdn     . push_back(lvak8_jesdn.Energy());
-            AK8JetEnergy_jerup     . push_back(lvak8_jerup.Energy());
-            AK8JetEnergy_jerdn     . push_back(lvak8_jerdn.Energy());
-        }
-
-        TLorentzVector lvak8 = selector->correctJet(*ijet, event,true);
-        //Four std::vector
-        AK8JetPt     . push_back(lvak8.Pt());
-        AK8JetEta    . push_back(lvak8.Eta());
-        AK8JetPhi    . push_back(lvak8.Phi());
-        AK8JetEnergy . push_back(lvak8.Energy());
-
-        AK8JetCSV    . push_back(ijet->bDiscriminator( "pfCombinedInclusiveSecondaryVertexV2BJetTags" ));
-        //     AK8JetRCN    . push_back((ijet->chargedEmEnergy()+ijet->chargedHadronEnergy()) / (ijet->neutralEmEnergy()+ijet->neutralHadronEnergy()));
+      if (doAllJetSyst) {
+	TLorentzVector lvak8_jesup = selector->correctJet(*ii, event,true,false,1);
+	TLorentzVector lvak8_jesdn = selector->correctJet(*ii, event,true,false,2);
+	TLorentzVector lvak8_jerup = selector->correctJet(*ii, event,true,false,3);
+	TLorentzVector lvak8_jerdn = selector->correctJet(*ii, event,true,false,4);
+	AK8JetPt_jesup     . push_back(lvak8_jesup.Pt());
+	AK8JetPt_jesdn     . push_back(lvak8_jesdn.Pt());
+	AK8JetPt_jerup     . push_back(lvak8_jerup.Pt());
+	AK8JetPt_jerdn     . push_back(lvak8_jerdn.Pt());
+	AK8JetEnergy_jesup     . push_back(lvak8_jesup.Energy());
+	AK8JetEnergy_jesdn     . push_back(lvak8_jesdn.Energy());
+	AK8JetEnergy_jerup     . push_back(lvak8_jerup.Energy());
+	AK8JetEnergy_jerdn     . push_back(lvak8_jerdn.Energy());
+      }
+      
+      //Four std::vector
+      AK8JetPt     . push_back(ii->pt());
+      AK8JetEta    . push_back(ii->eta());
+      AK8JetPhi    . push_back(ii->phi());
+      AK8JetEnergy . push_back(ii->energy());
+      
+      AK8JetCSV    . push_back(ii->bDiscriminator( "pfCombinedInclusiveSecondaryVertexV2BJetTags" ));
+      //     AK8JetRCN    . push_back((ijet->chargedEmEnergy()+ijet->chargedHadronEnergy()) / (ijet->neutralEmEnergy()+ijet->neutralHadronEnergy()));
     }
  
     //Four std::vector
