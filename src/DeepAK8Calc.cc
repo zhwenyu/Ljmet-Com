@@ -41,10 +41,7 @@ int DeepAK8Calc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * 
   std::vector<double> decorr_H;
   std::vector<double> decorr_T;
 
-  //getByLabel
-  edm::InputTag AK8JetColl = edm::InputTag("slimmedJetsAK8");
-  edm::Handle<std::vector<pat::Jet> > AK8Jets;
-  event.getByLabel(AK8JetColl, AK8Jets);
+  std::vector<pat::Jet> const & SelCorrAK8Jets = selector->GetSelectedCorrAK8Jets();
 
   edm::InputTag DeepAK8rawB = edm::InputTag("deepntuplizer:DeepAK8rawB");
   edm::Handle<std::vector<float> > DeepAK8_raw_B;
@@ -94,39 +91,8 @@ int DeepAK8Calc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * 
   edm::Handle<std::vector<float> > DeepAK8Decorr_raw_T;
   event.getByLabel(DeepAK8DecorrrawT, DeepAK8Decorr_raw_T);
 
-  //Size Check to make sure AK8Jets and the b, j, W... vectors are the same length
-  if(DeepAK8_raw_B->size() != AK8Jets->size()) {
-    cout << "WARNING: THE DeepAK8Jets VECTOR IS SIZE " << AK8Jets->size() << ", AND THE OTHER VECTORS ARE SIZE " << DeepAK8_raw_B->size() << endl;
-  }
-
   int i = 0; //i is an iterator
-  for (std::vector<pat::Jet>::const_iterator ijet = AK8Jets->begin(); ijet != AK8Jets->end(); ijet++){
-    
-    if(ijet->pt() < 200) { // not all info there for lower pt
-      i++;
-      continue;
-    }
-
-    //PF Tight    
-    bool tightJetID = false;
-    pat::Jet rawJet = ijet->correctedJet(0);
-    if(abs(rawJet.eta()) <= 2.7){
-      tightJetID = (rawJet.neutralHadronEnergyFraction() < 0.9 &&
-                    rawJet.neutralEmEnergyFraction() < 0.9 &&
-                    (rawJet.chargedMultiplicity()+rawJet.neutralMultiplicity()) > 1) &&
-        ((abs(rawJet.eta()) <= 2.4 &&
-          rawJet.chargedHadronEnergyFraction() > 0 &&
-          //rawJet.chargedEmEnergyFraction() < 0.99 &&                                                                                                                                           
-          rawJet.chargedMultiplicity() > 0) ||
-         abs(rawJet.eta()) > 2.4);
-    }else{
-      tightJetID = true;
-    }
-
-    if(!tightJetID) {
-      i++;
-      continue;
-    }
+  for (std::vector<pat::Jet>::const_iterator ijet = SelCorrAK8Jets.begin(); ijet != SelCorrAK8Jets.end(); ijet++){
     
     int dnn_Largest = 10;
 

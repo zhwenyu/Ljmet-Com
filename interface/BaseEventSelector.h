@@ -137,6 +137,7 @@ public:
     std::vector<edm::Ptr<pat::Jet>> const & GetSelectedJets() const { return mvSelJets; }
     std::vector<pat::Jet> const & GetSelectedCleanedJets() const { return mvSelJetsCleaned; }
     std::vector<pat::Jet> const & GetSelectedCorrJets() const { return mvSelCorrJets; }
+    std::vector<pat::Jet> const & GetSelectedCorrAK8Jets() const { return mvSelCorrJets_AK8; }
     std::vector<TLorentzVector> const & GetSelectedCorrJets_jesup() const { return mvCorrJets_jesup; }
     std::vector<TLorentzVector> const & GetSelectedCorrJets_jesdn() const { return mvCorrJets_jesdn; }
     std::vector<TLorentzVector> const & GetSelectedCorrJets_jerup() const { return mvCorrJets_jerup; }
@@ -188,12 +189,13 @@ public:
 protected:
     std::vector<edm::Ptr<pat::Jet>> mvAllJets;
     std::vector<edm::Ptr<pat::Jet>> mvSelJets;
-    std::vector<pat::Jet> mvSelJetsCleaned;
-    std::vector<pat::Jet> mvSelCorrJets;
     std::vector<TLorentzVector> mvCorrJets_jesup;
     std::vector<TLorentzVector> mvCorrJets_jesdn;
     std::vector<TLorentzVector> mvCorrJets_jerup;
     std::vector<TLorentzVector> mvCorrJets_jerdn;
+    std::vector<pat::Jet> mvSelJetsCleaned;
+    std::vector<pat::Jet> mvSelCorrJets;
+    std::vector<pat::Jet> mvSelCorrJets_AK8;
     std::vector<edm::Ptr<pat::Jet>> mvLooseJets;
     std::vector<std::pair<TLorentzVector, bool>> mvCorrJetsWithBTags;
     std::vector<edm::Ptr<pat::Jet>> mvSelBtagJets;
