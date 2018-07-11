@@ -209,15 +209,15 @@ int BestCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * sel
     }
     if(!tightJetID) continue;
 
-    TLorentzVector lvak8 = selector->correctJet(*ijet, event,true);
+    pat::Jet corrak8 = 	selector->correctJetReturnPatJet(*ijet, event, true);
     //Four std::vector                                                                                                                                                                                  
-    AK8JetPt     . push_back(lvak8.Pt());
-    AK8JetEta    . push_back(lvak8.Eta());
-    AK8JetPhi    . push_back(lvak8.Phi());
-    AK8JetEnergy . push_back(lvak8.Energy());
+    AK8JetPt     . push_back(corrak8.pt());
+    AK8JetEta    . push_back(corrak8.eta());
+    AK8JetPhi    . push_back(corrak8.phi());
+    AK8JetEnergy . push_back(corrak8.energy());
 
-    AK8JetCSV    . push_back(ijet->bDiscriminator( "pfCombinedInclusiveSecondaryVertexV2BJetTags" ));
-    //     AK8JetRCN    . push_back((ijet->chargedEmEnergy()+ijet->chargedHadronEnergy()) / (ijet->neutralEmEnergy()+ijet->neutralHadronEnergy()));
+    AK8JetCSV    . push_back(corrak8.bDiscriminator( "pfCombinedInclusiveSecondaryVertexV2BJetTags" ));
+    //     AK8JetRCN    . push_back((corrak8.chargedEmEnergy()+corrak8.chargedHadronEnergy()) / (corrak8.neutralEmEnergy()+corrak8.neutralHadronEnergy()));
 
     std::map<std::string,double> myMap;
     std::map<std::string,double> varMap;
@@ -305,12 +305,12 @@ int BestCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * sel
       {"thrustH",        -999}
     };
 
-    auto const& thisSubjets   = ijet->subjets("SoftDropPuppi");
-    unsigned int numDaughters = ijet->numberOfDaughters();
+    auto const& thisSubjets   = corrak8.subjets("SoftDropPuppi");
+    unsigned int numDaughters = corrak8.numberOfDaughters();
     int largest = 10;
 
     if (thisSubjets.size() >= m_numSubjetsMin && numDaughters >= m_numDaughtersMin){
-      varMap = BestCalc::execute(*ijet);
+      varMap = BestCalc::execute(corrak8);
       myMap = m_lwtnn->compute(varMap);
 
       if (myMap["dnn_qcd"] > myMap["dnn_top"] && myMap["dnn_qcd"] > myMap["dnn_higgs"] && myMap["dnn_qcd"] > myMap["dnn_z"] && myMap["dnn_qcd"] > myMap["dnn_w"] && myMap["dnn_qcd"] > myMap["dnn_b"]){
