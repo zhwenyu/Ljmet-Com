@@ -293,9 +293,10 @@ int BestCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * sel
 
     auto const& thisSubjets   = ii->subjets("SoftDropPuppi");
     unsigned int numDaughters = ii->numberOfDaughters();
+    float softdropmass = ii->userFloat("ak8PFJetsPuppiSoftDropMass");
     int largest = 10;
 
-    if (thisSubjets.size() >= m_numSubjetsMin && numDaughters >= m_numDaughtersMin){
+    if (thisSubjets.size() >= m_numSubjetsMin && numDaughters >= m_numDaughtersMin && softdropmass >= m_jetSoftDropMassMin){
       varMap = BestCalc::execute(*ii);
       myMap = m_lwtnn->compute(varMap);
 
