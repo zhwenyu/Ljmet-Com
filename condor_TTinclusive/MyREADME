@@ -1,3 +1,0 @@
-
-## To check the status and resubmit the fines"
-CheckErrors.py /uscms_data/d3/path/to/logs/nominal/ --verbose 1 (prints) --resubmit 1 (if you want to resubmit) --resub_num -1 (resubmits all the fails it looks for)
