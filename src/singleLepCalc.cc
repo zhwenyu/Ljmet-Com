@@ -1121,7 +1121,7 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
     for (std::vector<pat::Jet>::const_iterator ii = vSelCorrJets_AK8.begin(); ii != vSelCorrJets_AK8.end(); ii++){
       int index = (int)(ii-vSelCorrJets_AK8.begin());
       
-      if(ii->pt() < 200) continue; // not all info there for lower pt
+      if(ii->pt() < 170) continue; // not all info there for lower pt
 
       if (doAllJetSyst) {
 	TLorentzVector lvak8_jesup = selector->correctJet(*ii, event,true,false,1);

@@ -194,7 +194,7 @@ int BestCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * sel
   //for (std::vector<pat::Jet>::const_iterator ijet = AK8Jets->begin(); ijet != AK8Jets->end(); ijet++){
   for (std::vector<pat::Jet>::const_iterator ii = vSelCorrJets_AK8.begin(); ii != vSelCorrJets_AK8.end(); ii++){
 
-    if(ii->pt() < 200) continue; // not all info there for lower pt                                                                                                                                     
+    if(ii->pt() < 170) continue; // not all info there for lower pt                                                                                                                                     
     //pat::Jet corrak8 = 	selector->correctJetReturnPatJet(*ijet, event, true);
     //Four std::vector                                                                                                                                                                                  
     AK8JetPt     . push_back(ii->pt());
