@@ -319,6 +319,8 @@ void singleLepEventSelector::BeginJob( std::map<std::string, edm::ParameterSet c
 	else                                       mbPar["CleanLooseLeptons"] = false;
 	if (par[_key].exists("LepJetDR")) mdPar["LepJetDR"] = par[_key].getParameter<double> ("LepJetDR");
 	else                              mdPar["LepJetDR"] = 0.6;
+	if (par[_key].exists("LepJetDRAK8")) mdPar["LepJetDRAK8"] = par[_key].getParameter<double> ("LepJetDRAK8");
+	else                                 mdPar["LepJetDRAK8"] = 0.8;
         if (par[_key].exists("UseElMVA")) mbPar["UseElMVA"] = par[_key].getParameter<bool>         ("UseElMVA");
         else                              mbPar["UseElMVA"] = false;
       
@@ -866,9 +868,9 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
                         if ( mbPar["UseElMVA"] ) {
 			  //bool mvapass = true; // HACK FOR TESTING THE MVA EFFICIENCY
 			  bool mvapass = false;
-			  if ( fabs(_iel->superCluster()->eta())<=0.8 ) mvapass = mvaValue( *_iel, event) > mvdPar["tight_electron_mva_cuts"].at(0);
-			  else if ( fabs(_iel->superCluster()->eta())<=1.479 ) mvapass = mvaValue( *_iel, event) > mvdPar["tight_electron_mva_cuts"].at(1);
-			  else mvapass = mvaValue( *_iel, event) > mvdPar["tight_electron_mva_cuts"].at(2);
+			  if ( fabs(_iel->superCluster()->eta())<=0.8 ) mvapass = mvaValue( *_iel, event) > mvdPar["loose_electron_mva_cuts"].at(0);
+			  else if ( fabs(_iel->superCluster()->eta())<=1.479 ) mvapass = mvaValue( *_iel, event) > mvdPar["loose_electron_mva_cuts"].at(1);
+			  else mvapass = mvaValue( *_iel, event) > mvdPar["loose_electron_mva_cuts"].at(2);
 			  if (!mvapass) break;
 			  
 			  if(mbPar["electron_useMiniIso"]){
@@ -1182,6 +1184,7 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
              _ijet != mhJets_AK8->end(); ++_ijet){
       
       	    if(_ijet->pt() < 170) continue;
+	    if(_ijet->correctedJet(0).pt() < 170) continue;
 
             retJet.set(false);
 
@@ -1199,7 +1202,7 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
 	      if (mbPar["debug"]) std::cout << "Checking Overlap" << std::endl;
 
 	      for(unsigned int imu = 0; imu < cleaningMuons.size(); imu++){
-		if ( deltaR(cleaningMuons[imu]->p4(),_ijet->p4()) < mdPar["LepJetDR"]) { //0.6 ){
+		if ( deltaR(cleaningMuons[imu]->p4(),_ijet->p4()) < mdPar["LepJetDRAK8"]) { //0.8 ){
 		  std::vector<reco::CandidatePtr> muDaughters;
 		  for ( unsigned int isrc = 0; isrc < cleaningMuons[imu]->numberOfSourceCandidatePtrs(); ++isrc ){
 		    if (cleaningMuons[imu]->sourceCandidatePtr(isrc).isAvailable()) {
@@ -1230,7 +1233,7 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
 	      }
             
 	      for(unsigned int iel = 0; iel < cleaningElectrons.size(); iel++){
-		if ( deltaR(cleaningElectrons[iel]->p4(),_ijet->p4()) < mdPar["LepJetDR"]){ //0.6 ){
+		if ( deltaR(cleaningElectrons[iel]->p4(),_ijet->p4()) < mdPar["LepJetDRAK8"]){ //0.6 ){
 		  std::vector<reco::CandidatePtr> elDaughters;
 		  for ( unsigned int isrc = 0; isrc < cleaningElectrons[iel]->numberOfSourceCandidatePtrs(); ++isrc ){
 		    if (cleaningElectrons[iel]->sourceCandidatePtr(isrc).isAvailable()) {
@@ -1298,17 +1301,17 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
 	             ){ }                                                                                                                                                                    
 	      else break; // fail
 
-                _passpf = true;
+	      _passpf = true;
 
-                if ( jetP4.Pt() > mdPar["jet_minpt_AK8"] ){ }
-                else break; // fail 
+	      if ( jetP4.Pt() > mdPar["jet_minpt_AK8"] ){ }
+	      else break; // fail 
 	
 
-                if ( fabs(jetP4.Eta()) < mdPar["jet_maxeta_AK8"] ){ }
-                else break; // fail
+	      if ( fabs(jetP4.Eta()) < mdPar["jet_maxeta_AK8"] ){ }
+	      else break; // fail
 	
-                _pass = true;
-                break;
+	      _pass = true;
+	      break;
             }
 
             if ( _pass ){
