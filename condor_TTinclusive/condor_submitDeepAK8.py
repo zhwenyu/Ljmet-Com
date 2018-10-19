@@ -147,21 +147,20 @@ file_list.close()
 
 # only produce the miniAOD for nominal
 if shift == 'nominal': os.system('sed -e \'s/SETUP/'+setupString+'/g\' templateDeepAK8.sh > '+tempdir+'/'+prefix+'.sh')
-else: os.system('sed -e \'s/SETUP/'+setupString+'/g\' template.sh > '+tempdir+'/'+prefix+'.sh')
-#os.system('sed -e \'s/SETUP/'+setupString+'/g\' templateDeepAK8.sh > '+tempdir+'/'+prefix+'.sh')
+else: os.system('sed -e \'s/SETUP/'+setupString+'/g\' templateDeepAK8.sh > '+tempdir+'/'+prefix+'.sh')
 
 while ( nfiles <= count ):    
 
     # ADD YOUR CONFIG FILE HERE!!
     #Avoid calling the get_input function once per line in template
     singleFileList = get_input(nfiles, files)
-    #mediatorFile = outPath+mediatorDir+'/'+prefix+'_'+str(j)+'.root'
     mediatorFile = 'mediator_'+prefix+'_'+str(j)+'.root'
 
     genId_templ_file = open(relBase+'/src/LJMet/Com/condor_TTinclusive/produceDeepAK8_template.py')
     genId_file = open(tempdir+'/produceDeepAK8_'+prefix+'_'+str(j)+'.py','w')
     for line in genId_templ_file:
         line=line.replace('CONDOR_FILELIST', singleFileList)
+        line=line.replace('CONDOR_ISMC', useMC)
         line=line.replace('CONDOR_MEDIATOR', mediatorFile)
         genId_file.write(line)
     genId_file.close()
