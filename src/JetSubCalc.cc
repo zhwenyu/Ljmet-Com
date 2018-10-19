@@ -22,8 +22,6 @@
 #include "DataFormats/JetReco/interface/Jet.h"
 #include "DataFormats/PatCandidates/interface/PackedCandidate.h"
 #include "DataFormats/PatCandidates/interface/PATObject.h"
-#include "DataFormats/BTauReco/interface/CATopJetTagInfo.h"
-#include "LJMet/Com/interface/HTTTopJetTagInfo.h"
 #include "CondFormats/JetMETObjects/interface/JetCorrectionUncertainty.h"
 #include "JetMETCorrections/Objects/interface/JetCorrector.h"
 #include "JetMETCorrections/Objects/interface/JetCorrectionsRecord.h"
@@ -49,23 +47,12 @@ public:
 private:
   edm::InputTag slimmedJetColl_it;
   edm::InputTag slimmedJetsAK8Coll_it;
-  edm::InputTag slimmedJetsAK8SDColl_it;
-  edm::InputTag slimmedJetsAK8CTTColl_it;
-  edm::InputTag selectedPatJetsCA15Coll_it;
   edm::InputTag genParticles_it;
-  edm::InputTag httTagInfo_it;
   std::string bDiscriminant;
-  std::string tagInfo;
   double kappa;
   bool killHF;
   bool isMc;
   std::string puppiCorrPath;
-  std::string MCL3;
-  std::string MCL2;
-  std::string MCSF;
-  std::string DataL3;
-  std::string DataL2;
-  std::string DataL2L3;
   TRandom3 JERrand;
   TF1 *puppisd_corrGEN;
   TF1 *puppisd_corrRECO_cen;
@@ -104,9 +91,6 @@ int JetSubCalc::BeginJob()
     
     std::cout << " JetSubCalc Bdisc = " << bDiscriminant << std::endl;
     
-    if (mPset.exists("tagInfo")) tagInfo = mPset.getParameter<std::string>("tagInfo");
-    else tagInfo = "CATop";
-
     if(mPset.exists("kappa")) kappa = mPset.getParameter<double>("kappa");
     else kappa = 0.5;
 
@@ -387,7 +371,7 @@ int JetSubCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * s
     for (std::vector<pat::Jet>::const_iterator ii = theAK8Jets.begin(); ii != theAK8Jets.end(); ii++){
       int index = (int)(ii-theAK8Jets.begin());
 
-      if (ii->pt() < 200) continue;
+      if (ii->pt() < 170) continue;
 
       pat::Jet corrak8;
       corrak8 = *ii;

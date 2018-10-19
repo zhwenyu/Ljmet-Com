@@ -48,24 +48,8 @@ process.singleLepCalc.triggerCollection = cms.InputTag("TriggerResults::HLT")
 
 # Jet substructure calculator options                                                                                                                                                           
 process.load('LJMet.Com.JetSubCalc_cfi')
-process.JetSubCalc.useHTT = cms.bool(False)
 process.JetSubCalc.killHF = cms.bool(False)
-process.JetSubCalc.doNewJEC = cms.bool(True)
-process.JetSubCalc.useL2L3Mass = cms.bool(False)
 process.JetSubCalc.isMc = cms.bool(condorIsMC)
-process.JetSubCalc.JECup = cms.bool(False)
-process.JetSubCalc.JECdown = cms.bool(False)
-process.JetSubCalc.JERup = cms.bool(False)
-process.JetSubCalc.JERdown = cms.bool(False)
-process.JetSubCalc.MCL2JetParAK8 = cms.string(relBase+'/src/LJMet/Com/data/Fall17V6/Fall17_17Nov2017_V6_MC_L2Relative_AK8PFPuppi.txt')
-process.JetSubCalc.MCL3JetParAK8 = cms.string(relBase+'/src/LJMet/Com/data/Fall17V6/Fall17_17Nov2017_V6_MC_L3Absolute_AK8PFPuppi.txt')
-#process.JetSubCalc.MCPTResAK8 = cms.string(relBase+'/src/LJMet/Com/data/Spring16V10/Spring16_25nsV10_MC_PtResolution_AK8PFPuppi.txt')
-process.JetSubCalc.MCSF = cms.string(relBase+'/src/LJMet/Com/data/Spring16V10/Spring16_25nsV10_MC_SF_AK4PFchs.txt')
-process.JetSubCalc.DataL2JetParAK8 = cms.string(relBase+'/src/LJMet/Com/data/Fall17V6/Fall17_17Nov2017B_V6_DATA_L2Relative_AK8PFPuppi.txt')
-process.JetSubCalc.DataL3JetParAK8 = cms.string(relBase+'/src/LJMet/Com/data/Fall17V6/Fall17_17Nov2017B_V6_DATA_L3Absolute_AK8PFPuppi.txt')
-process.JetSubCalc.DataL2L3JetParAK8 = cms.string(relBase+'/src/LJMet/Com/data/Fall17V6/Fall17_17Nov2017B_V6_DATA_L2L3Residual_AK8PFPuppi.txt')
-process.JetSubCalc.UncertaintyAK8 = cms.string(relBase+'/src/LJMet/Com/data/Fall17V6/Fall17_17Nov2017_V6_MC_Uncertainty_AK8PFPuppi.txt')
-
 
 ############################################################
 #
@@ -127,13 +111,13 @@ process.event_selector = cms.PSet(
     
     # Jet cuts
     jet_cuts                 = cms.bool(True),
-    jet_minpt                = cms.double(15.0),
+    jet_minpt                = cms.double(20.0),
     jet_maxeta               = cms.double(3.0),
-    jet_minpt_AK8            = cms.double(200.0),
+    jet_minpt_AK8            = cms.double(170.0),
     jet_maxeta_AK8           = cms.double(2.4),
     min_jet                  = cms.int32(1),
     max_jet                  = cms.int32(4000),
-    leading_jet_pt           = cms.double(15.0),
+    leading_jet_pt           = cms.double(20.0),
 
     # muon cuts
     muon_cuts                = cms.bool(True),
@@ -224,6 +208,7 @@ process.event_selector = cms.PSet(
     doLepJetCleaning         = cms.bool(True),
     CleanLooseLeptons        = cms.bool(False),
     LepJetDR                 = cms.double(0.4),
+    LepJetDRAK8              = cms.double(0.8),
     
     MCL1JetPar               = cms.string(relBase+'/src/LJMet/Com/data/Fall17V6/Fall17_17Nov2017_V6_MC_L1FastJet_AK4PFchs.txt'),
     MCL2JetPar               = cms.string(relBase+'/src/LJMet/Com/data/Fall17V6/Fall17_17Nov2017_V6_MC_L2Relative_AK4PFchs.txt'),
