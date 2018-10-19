@@ -1099,10 +1099,7 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
     //
 
        
-    //Get all AK8 jets (not just for W and Top)
-    edm::InputTag AK8JetColl = edm::InputTag("slimmedJetsAK8");
-    edm::Handle<std::vector<pat::Jet> > AK8Jets;
-    event.getByLabel(AK8JetColl, AK8Jets);
+    //Get all AK8 jets (not just for W and Top) -- now done in selector
 
     //Four std::vector
     std::vector <double> AK8JetPt;
@@ -1119,7 +1116,7 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
     std::vector <double> AK8JetEnergy_jerdn;
 
     std::vector <double> AK8JetCSV;
-    //   std::vector <double> AK8JetRCN;       
+    std::vector <double> AK8JetDoubleB;       
     
     for (std::vector<pat::Jet>::const_iterator ii = vSelCorrJets_AK8.begin(); ii != vSelCorrJets_AK8.end(); ii++){
       int index = (int)(ii-vSelCorrJets_AK8.begin());
@@ -1148,6 +1145,7 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
       AK8JetEnergy . push_back(ii->energy());
       
       AK8JetCSV    . push_back(ii->bDiscriminator( "pfCombinedInclusiveSecondaryVertexV2BJetTags" ));
+      AK8JetDoubleB. push_back(ii->bDiscriminator("pfBoostedDoubleSecondaryVertexAK8BJetTags"));
       //     AK8JetRCN    . push_back((ijet->chargedEmEnergy()+ijet->chargedHadronEnergy()) / (ijet->neutralEmEnergy()+ijet->neutralHadronEnergy()));
     }
  
@@ -1165,8 +1163,9 @@ int singleLepCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector 
     SetValue("AK8JetEnergy_jerup"     , AK8JetEnergy_jerup);
     SetValue("AK8JetEnergy_jerdn"     , AK8JetEnergy_jerdn);
 
-    SetValue("AK8JetCSV"    , AK8JetCSV);
-    //   SetValue("AK8JetRCN"    , AK8JetRCN);
+    SetValue("AK8JetCSV"     , AK8JetCSV);
+    SetValue("AK8JetDoubleB" , AK8JetDoubleB);
+
     //Get AK4 Jets
     //Four std::vector
     std::vector <double> AK4JetPt;

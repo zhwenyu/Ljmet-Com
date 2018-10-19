@@ -93,7 +93,10 @@ int DeepAK8Calc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector * 
 
   int i = 0; //i is an iterator
   for (std::vector<pat::Jet>::const_iterator ijet = SelCorrAK8Jets.begin(); ijet != SelCorrAK8Jets.end(); ijet++){
+
+    if (ijet->pt() < 200) continue;    
     
+
     int dnn_Largest = 10;
 
     if (DeepAK8_raw_J->at(i) > DeepAK8_raw_T->at(i) && DeepAK8_raw_J->at(i) > DeepAK8_raw_H->at(i) && DeepAK8_raw_J->at(i) > DeepAK8_raw_Z->at(i) && DeepAK8_raw_J->at(i) > DeepAK8_raw_W->at(i) && DeepAK8_raw_J->at(i) > DeepAK8_raw_B->at(i)){
