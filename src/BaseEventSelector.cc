@@ -1240,41 +1240,41 @@ bool BaseEventSelector::isJetTagged(const pat::Jet & jet, edm::EventBase const &
       // WAITING FOR A FIX FROM BTV FOR THE SUBJET FILE, USE AK4 ON BOTH FOR NOW
       //      if(!subjetflag){
 
-      _heavySf = reader.eval_auto_bounds("central",BTagEntry::FLAV_B,lvjet.Eta(),lvjet.Pt());
-      if (shiftflag == 1 ||  mbPar["BTagUncertUp"] ) _heavySf = reader.eval_auto_bounds("up",BTagEntry::FLAV_B,lvjet.Eta(),lvjet.Pt());
-      else if (shiftflag == 2 ||  mbPar["BTagUncertDown"] ) _heavySf = reader.eval_auto_bounds("down",BTagEntry::FLAV_B,lvjet.Eta(),lvjet.Pt());
-      _heavyEff = mBtagCond.GetBtagEfficiency(lvjet.Et(), lvjet.Eta(), "DeepCSV"+msPar["btagOP"]);       
+      _heavySf = reader.eval_auto_bounds("central",BTagEntry::FLAV_B,fabs(lvjet.Eta()),lvjet.Pt());
+      if (shiftflag == 1 ||  mbPar["BTagUncertUp"] ) _heavySf = reader.eval_auto_bounds("up",BTagEntry::FLAV_B,fabs(lvjet.Eta()),lvjet.Pt());
+      else if (shiftflag == 2 ||  mbPar["BTagUncertDown"] ) _heavySf = reader.eval_auto_bounds("down",BTagEntry::FLAV_B,fabs(lvjet.Eta()),lvjet.Pt());
+      _heavyEff = mBtagCond.GetBtagEfficiency(lvjet.Et(), fabs(lvjet.Eta()), "DeepCSV"+msPar["btagOP"]);       
       
       if(_jetFlavor == 4){
-	_heavySf = reader.eval_auto_bounds("central",BTagEntry::FLAV_C,lvjet.Eta(),lvjet.Pt());
-	if (shiftflag == 1 ||  mbPar["BTagUncertUp"] ) _heavySf = reader.eval_auto_bounds("up",BTagEntry::FLAV_C,lvjet.Eta(),lvjet.Pt());
-	else if (shiftflag == 2 ||  mbPar["BTagUncertDown"] ) _heavySf = reader.eval_auto_bounds("down",BTagEntry::FLAV_C,lvjet.Eta(),lvjet.Pt());
-	_heavyEff = mBtagCond.GetBtagEfficiency(lvjet.Et(), lvjet.Eta(), "DeepCSV"+msPar["btagOP"]);       
+	_heavySf = reader.eval_auto_bounds("central",BTagEntry::FLAV_C,fabs(lvjet.Eta()),lvjet.Pt());
+	if (shiftflag == 1 ||  mbPar["BTagUncertUp"] ) _heavySf = reader.eval_auto_bounds("up",BTagEntry::FLAV_C,fabs(lvjet.Eta()),lvjet.Pt());
+	else if (shiftflag == 2 ||  mbPar["BTagUncertDown"] ) _heavySf = reader.eval_auto_bounds("down",BTagEntry::FLAV_C,fabs(lvjet.Eta()),lvjet.Pt());
+	_heavyEff = mBtagCond.GetBtagEfficiency(lvjet.Et(), fabs(lvjet.Eta()), "DeepCSV"+msPar["btagOP"]);       
       }
       
-      _lightSf = reader.eval_auto_bounds("central",BTagEntry::FLAV_UDSG,lvjet.Eta(),lvjet.Pt());
-      if (shiftflag == 3 || mbPar["MistagUncertUp"] ) _lightSf = reader.eval_auto_bounds("up",BTagEntry::FLAV_UDSG,lvjet.Eta(),lvjet.Pt());
-      else if (shiftflag == 4 ||  mbPar["MistagUncertDown"] ) _lightSf = reader.eval_auto_bounds("down",BTagEntry::FLAV_UDSG,lvjet.Eta(),lvjet.Pt());
-      _lightEff = mBtagCond.GetMistagRate(lvjet.Et(), lvjet.Eta(), "DeepCSV"+msPar["btagOP"]);
+      _lightSf = reader.eval_auto_bounds("central",BTagEntry::FLAV_UDSG,fabs(lvjet.Eta()),lvjet.Pt());
+      if (shiftflag == 3 || mbPar["MistagUncertUp"] ) _lightSf = reader.eval_auto_bounds("up",BTagEntry::FLAV_UDSG,fabs(lvjet.Eta()),lvjet.Pt());
+      else if (shiftflag == 4 ||  mbPar["MistagUncertDown"] ) _lightSf = reader.eval_auto_bounds("down",BTagEntry::FLAV_UDSG,fabs(lvjet.Eta()),lvjet.Pt());
+      _lightEff = mBtagCond.GetMistagRate(lvjet.Et(), fabs(lvjet.Eta()), "DeepCSV"+msPar["btagOP"]);
             
       // }else{
 
-      // 	_heavySf = readerSJ.eval_auto_bounds("central",BTagEntry::FLAV_B,lvjet.Eta(),lvjet.Pt());
-      // 	if (shiftflag == 1 ||  mbPar["BTagUncertUp"] ) _heavySf = readerSJ.eval_auto_bounds("up",BTagEntry::FLAV_B,lvjet.Eta(),lvjet.Pt());
-      // 	else if (shiftflag == 2 ||  mbPar["BTagUncertDown"] ) _heavySf = readerSJ.eval_auto_bounds("down",BTagEntry::FLAV_B,lvjet.Eta(),lvjet.Pt());
-      // 	_heavyEff = mBtagCond.GetBtagEfficiency(lvjet.Et(), lvjet.Eta(), "SJDeepCSV"+msPar["btagOP"]);       
+      // 	_heavySf = readerSJ.eval_auto_bounds("central",BTagEntry::FLAV_B,fabs(lvjet.Eta()),lvjet.Pt());
+      // 	if (shiftflag == 1 ||  mbPar["BTagUncertUp"] ) _heavySf = readerSJ.eval_auto_bounds("up",BTagEntry::FLAV_B,fabs(lvjet.Eta()),lvjet.Pt());
+      // 	else if (shiftflag == 2 ||  mbPar["BTagUncertDown"] ) _heavySf = readerSJ.eval_auto_bounds("down",BTagEntry::FLAV_B,fabs(lvjet.Eta()),lvjet.Pt());
+      // 	_heavyEff = mBtagCond.GetBtagEfficiency(lvjet.Et(), fabs(lvjet.Eta()), "SJDeepCSV"+msPar["btagOP"]);       
 
       // 	if(_jetFlavor == 4){
-      // 	  _heavySf = readerSJ.eval_auto_bounds("central",BTagEntry::FLAV_C,lvjet.Eta(),lvjet.Pt());
-      // 	  if (shiftflag == 1 ||  mbPar["BTagUncertUp"] ) _heavySf = readerSJ.eval_auto_bounds("up",BTagEntry::FLAV_C,lvjet.Eta(),lvjet.Pt());
-      // 	  else if (shiftflag == 2 ||  mbPar["BTagUncertDown"] ) _heavySf = readerSJ.eval_auto_bounds("down",BTagEntry::FLAV_C,lvjet.Eta(),lvjet.Pt());
-      // 	  _heavyEff = mBtagCond.GetBtagEfficiency(lvjet.Et(), lvjet.Eta(), "SJDeepCSV"+msPar["btagOP"]);       
+      // 	  _heavySf = readerSJ.eval_auto_bounds("central",BTagEntry::FLAV_C,fabs(lvjet.Eta()),lvjet.Pt());
+      // 	  if (shiftflag == 1 ||  mbPar["BTagUncertUp"] ) _heavySf = readerSJ.eval_auto_bounds("up",BTagEntry::FLAV_C,fabs(lvjet.Eta()),lvjet.Pt());
+      // 	  else if (shiftflag == 2 ||  mbPar["BTagUncertDown"] ) _heavySf = readerSJ.eval_auto_bounds("down",BTagEntry::FLAV_C,fabs(lvjet.Eta()),lvjet.Pt());
+      // 	  _heavyEff = mBtagCond.GetBtagEfficiency(lvjet.Et(), fabs(lvjet.Eta()), "SJDeepCSV"+msPar["btagOP"]);       
       // 	}
 	
-      // 	_lightSf = readerSJ.eval_auto_bounds("central",BTagEntry::FLAV_UDSG,lvjet.Eta(),lvjet.Pt());
-      // 	if (shiftflag == 3 || mbPar["MistagUncertUp"] ) _lightSf = readerSJ.eval_auto_bounds("up",BTagEntry::FLAV_UDSG,lvjet.Eta(),lvjet.Pt());
-      // 	else if (shiftflag == 4 ||  mbPar["MistagUncertDown"] ) _lightSf = readerSJ.eval_auto_bounds("down",BTagEntry::FLAV_UDSG,lvjet.Eta(),lvjet.Pt());
-      // 	_lightEff = mBtagCond.GetMistagRate(lvjet.Et(), lvjet.Eta(), "SJDeepCSV"+msPar["btagOP"]);
+      // 	_lightSf = readerSJ.eval_auto_bounds("central",BTagEntry::FLAV_UDSG,fabs(lvjet.Eta()),lvjet.Pt());
+      // 	if (shiftflag == 3 || mbPar["MistagUncertUp"] ) _lightSf = readerSJ.eval_auto_bounds("up",BTagEntry::FLAV_UDSG,fabs(lvjet.Eta()),lvjet.Pt());
+      // 	else if (shiftflag == 4 ||  mbPar["MistagUncertDown"] ) _lightSf = readerSJ.eval_auto_bounds("down",BTagEntry::FLAV_UDSG,fabs(lvjet.Eta()),lvjet.Pt());
+      // 	_lightEff = mBtagCond.GetMistagRate(lvjet.Et(), fabs(lvjet.Eta()), "SJDeepCSV"+msPar["btagOP"]);
       // }
 
       mBtagSfUtil.SetSeed(abs(static_cast<int>(sin(jet.phi())*1e5)));
