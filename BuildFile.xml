@@ -36,6 +36,8 @@
 <use name="fastjet-contrib"/>
 <use name="PhysicsTools/CandUtils"/>
 <use name="lwtnn/lwtnn"/>
+<use name="CondFormats/BTauObjects"/>
+<use name="CondTools/BTau"/>
 
 <export>
     <lib name="1"/>

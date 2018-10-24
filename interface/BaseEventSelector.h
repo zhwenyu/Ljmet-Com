@@ -33,6 +33,9 @@
 #include "JetMETCorrections/Objects/interface/JetCorrector.h"
 #include "CondFormats/JetMETObjects/interface/JetCorrectorParameters.h"
 #include "JetMETCorrections/Modules/interface/JetResolution.h"
+#include "CondFormats/BTauObjects/interface/BTagCalibration.h"
+#include "CondTools/BTau/interface/BTagCalibrationReader.h"
+#include "CondFormats/BTauObjects/interface/BTagEntry.h"
 
 #include "RecoEgamma/EgammaTools/interface/ConversionTools.h"
 #include "TMath.h"
@@ -307,6 +310,11 @@ private:
     MVAElectronVars allMVAVars_iso;
     TMVA::Reader tmpTMVAReader_EB_iso;
     TMVA::Reader tmpTMVAReader_EE_iso;
+
+    BTagCalibration calib;
+    BTagCalibration calibsj;
+    BTagCalibrationReader reader;
+    BTagCalibrationReader readerSJ;
     
     TRandom3 JERrand;
     
