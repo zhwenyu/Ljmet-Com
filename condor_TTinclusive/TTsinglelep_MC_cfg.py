@@ -177,8 +177,10 @@ process.event_selector = cms.PSet(
     max_met                  = cms.double(99999999999.0),
     
     # Btagging cuts
-    btagOP                   = cms.string('CSVM'),
-    btag_min_discr           = cms.double(0.8484),
+    btagOP                   = cms.string('MEDIUM'),
+    bdisc_min                = cms.double(0.4941),
+    DeepCSVfile              = cms.string(relBase+'/src/LJMet/Com/data/DeepCSV_94XSF_V3_B_F.csv'),
+    DeepCSVSubjetfile        = cms.string(relBase+'/src/LJMet/Com/data/subjet_DeepCSV_94XSF_V3_B_F.csv'),
     btag_cuts                = cms.bool(False),
     btag_1                   = cms.bool(False),
     btag_2                   = cms.bool(False),
