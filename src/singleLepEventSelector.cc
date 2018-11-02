@@ -30,11 +30,9 @@
 #include "DataFormats/PatCandidates/interface/Tau.h"
 #include "DataFormats/PatCandidates/interface/TriggerObject.h"
 #include "FWCore/Common/interface/TriggerNames.h"
-//#include "PhysicsTools/SelectorUtils/interface/PFElectronSelector.h"
 #include "LJMet/Com/interface/TopElectronSelector.h"
 #include "PhysicsTools/SelectorUtils/interface/PFJetIDSelectionFunctor.h"
 #include "LJMet/Com/interface/PFMuonSelector.h"
-//#include "PhysicsTools/SelectorUtils/interface/PFMuonSelector.h"
 
 #include "PhysicsTools/SelectorUtils/interface/PVSelector.h"
 #include "PhysicsTools/SelectorUtils/interface/PVObjectSelector.h"
@@ -58,7 +56,6 @@
 
 using trigger::TriggerObject;
 using namespace std;
-
 
 class singleLepEventSelector : public BaseEventSelector {
 
@@ -108,6 +105,7 @@ protected:
 
     edm::Handle<edm::TriggerResults >           mhEdmTriggerResults;
     edm::Handle<std::vector<pat::Jet> >         mhJets;
+    edm::Handle<std::vector<pat::Jet> >         mhJets_AK8;
     edm::Handle<std::vector<pat::Muon> >        mhMuons;
     edm::Handle<std::vector<pat::Electron> >    mhElectrons;
     edm::Handle<std::vector<pat::Tau> >			mhTaus;
@@ -144,16 +142,16 @@ void singleLepEventSelector::BeginJob( std::map<std::string, edm::ParameterSet c
 
     std::string _key;
 
-        _key = "pfJetIDSelector";
+    _key = "pfJetIDSelector";
     if ( par.find(_key)!=par.end() ){
-        jetSel_ = boost::shared_ptr<PFJetIDSelectionFunctor>( new PFJetIDSelectionFunctor(par[_key]) );
-        std::cout << mLegend << "jet ID selector configured!"
-                  << std::endl;
+      jetSel_ = boost::shared_ptr<PFJetIDSelectionFunctor>( new PFJetIDSelectionFunctor(par[_key]) );
+      std::cout << mLegend << "jet ID selector configured!"
+		<< std::endl;
     }
     else {
-        std::cout << mLegend << "jet ID selector not configured, exiting"
-                  << std::endl;
-        std::exit(-1);
+      std::cout << mLegend << "jet ID selector not configured, exiting"
+		<< std::endl;
+      std::exit(-1);
     }
     
     _key = "pvSelector";
@@ -234,6 +232,8 @@ void singleLepEventSelector::BeginJob( std::map<std::string, edm::ParameterSet c
         mbPar["jet_cuts"]                 = par[_key].getParameter<bool>         ("jet_cuts");
         mdPar["jet_minpt"]                = par[_key].getParameter<double>       ("jet_minpt");
         mdPar["jet_maxeta"]               = par[_key].getParameter<double>       ("jet_maxeta");
+        mdPar["jet_minpt_AK8"]            = par[_key].getParameter<double>       ("jet_minpt_AK8");
+        mdPar["jet_maxeta_AK8"]           = par[_key].getParameter<double>       ("jet_maxeta_AK8");
         miPar["min_jet"]                  = par[_key].getParameter<int>          ("min_jet");
         miPar["max_jet"]                  = par[_key].getParameter<int>          ("max_jet");
         mdPar["leading_jet_pt"]           = par[_key].getParameter<double>       ("leading_jet_pt");
@@ -305,6 +305,7 @@ void singleLepEventSelector::BeginJob( std::map<std::string, edm::ParameterSet c
         mtPar["trigger_collection"]       = par[_key].getParameter<edm::InputTag>("trigger_collection");
         mtPar["pv_collection"]            = par[_key].getParameter<edm::InputTag>("pv_collection");
         mtPar["jet_collection"]           = par[_key].getParameter<edm::InputTag>("jet_collection");
+        mtPar["slimmedJetsAK8"]           = par[_key].getParameter<edm::InputTag>("slimmedJetsAK8");	
         mtPar["muon_collection"]          = par[_key].getParameter<edm::InputTag>("muon_collection");
         mtPar["electron_collection"]      = par[_key].getParameter<edm::InputTag>("electron_collection");
         mtPar["tau_collection"]           = par[_key].getParameter<edm::InputTag>("tau_collection");
@@ -318,6 +319,8 @@ void singleLepEventSelector::BeginJob( std::map<std::string, edm::ParameterSet c
 	else                                       mbPar["CleanLooseLeptons"] = false;
 	if (par[_key].exists("LepJetDR")) mdPar["LepJetDR"] = par[_key].getParameter<double> ("LepJetDR");
 	else                              mdPar["LepJetDR"] = 0.6;
+	if (par[_key].exists("LepJetDRAK8")) mdPar["LepJetDRAK8"] = par[_key].getParameter<double> ("LepJetDRAK8");
+	else                                 mdPar["LepJetDRAK8"] = 0.8;
         if (par[_key].exists("UseElMVA")) mbPar["UseElMVA"] = par[_key].getParameter<bool>         ("UseElMVA");
         else                              mbPar["UseElMVA"] = false;
       
@@ -447,120 +450,106 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
         bool passTrigMuMC = false;
         bool passTrigElData = false;
         bool passTrigMuData = false;
-
+	
         if ( considerCut("Trigger") ) {
-
-        	if (mbPar["debug"]) std::cout<<" "<<std::endl;
-            if (mbPar["debug"]) std::cout<<"trigger cuts..."<<std::endl;
-
-            event.getByLabel( mtPar["trigger_collection"], mhEdmTriggerResults );
-            const edm::TriggerNames trigNames = event.triggerNames(*mhEdmTriggerResults);
-
-            bool passTrig = false;
-            unsigned int _tSize = mhEdmTriggerResults->size();
-
-
-            // dump trigger names
-            if (bFirstEntry && mbPar["dump_trigger"]){
-                for (unsigned int i=0; i<_tSize; i++){
-                    std::string trigName = trigNames.triggerName(i);
-                    std::cout << i << "   " << trigName;
-                    bool fired = mhEdmTriggerResults->accept(trigNames.triggerIndex(trigName));
-                    std::cout <<", FIRED = "<<fired<<std::endl;
-                } 
-            }
-
-            if (mbPar["debug"]) std::cout<<"The event FIRED the following registered trigger(s) in LJMet: "<<std::endl;
-
-            mvSelTriggersEl.clear();
-            mvSelMCTriggersEl.clear();
-            mvSelTriggersMu.clear();
-            mvSelMCTriggersMu.clear();
-
-            int passTrigEl = 0;
-            if (mbPar["debug"]) std::cout<<"	In MC El trig list: "<<std::endl;
-            for (unsigned int ipath = 0; ipath < mvsPar["mctrigger_path_el"].size() && mvsPar["mctrigger_path_el"].at(0)!="" ; ipath++){
-				for(unsigned int i=0; i<_tSize; i++){
-					std::string trigName = trigNames.triggerName(i);
-					if ( trigName.find(mvsPar["mctrigger_path_el"].at(ipath)) < std::string::npos){
-						if (mhEdmTriggerResults->accept(trigNames.triggerIndex(trigName))) {
-							passTrigEl = 1;
-							mvSelMCTriggersEl[mvsPar["mctrigger_path_el"].at(ipath)] = 1;
-							if (mbPar["debug"]) std::cout << "		" << trigNames.triggerName(i)  << std::endl;
-						}
-						else mvSelMCTriggersEl[mvsPar["mctrigger_path_el"].at(ipath)] = 0;
-						break;
-					}
-					else mvSelMCTriggersEl[mvsPar["mctrigger_path_el"].at(ipath)] = 0;
-				}
-            }
-            if (passTrigEl>0) passTrigElMC = true;
-
-            int passTrigMu = 0;
-            if (mbPar["debug"]) std::cout<<"	In MC Mu trig list: "<<std::endl;
-            for (unsigned int ipath = 0; ipath < mvsPar["mctrigger_path_mu"].size() && mvsPar["mctrigger_path_mu"].at(0)!="" ; ipath++){
-				for(unsigned int i=0; i<_tSize; i++){
-					std::string trigName = trigNames.triggerName(i);
-					if ( trigName.find(mvsPar["mctrigger_path_mu"].at(ipath)) < std::string::npos){
-						if (mhEdmTriggerResults->accept(trigNames.triggerIndex(trigName))){
-							passTrigMu = 1;
-							mvSelMCTriggersMu[mvsPar["mctrigger_path_mu"].at(ipath)] = 1;
-							if (mbPar["debug"]) std::cout << "		" << trigNames.triggerName(i)  << std::endl;
-					  	}
-						else mvSelMCTriggersMu[mvsPar["mctrigger_path_mu"].at(ipath)] = 0;
-						break;
-					}
-					else mvSelMCTriggersMu[mvsPar["mctrigger_path_mu"].at(ipath)] = 0;
-				}
-            }
-            if (passTrigMu>0) passTrigMuMC = true;
-
-            //Loop over each data channel separately
-            passTrigEl = 0;
-            if (mbPar["debug"]) std::cout<<"	In Data El trig list: "<<std::endl;
-            for (unsigned int ipath = 0; ipath < mvsPar["trigger_path_el"].size() && mvsPar["trigger_path_el"].at(0)!="" ; ipath++){
-				for(unsigned int i=0; i<_tSize; i++){
-					std::string trigName = trigNames.triggerName(i);
-					if ( trigName.find(mvsPar["trigger_path_el"].at(ipath)) < std::string::npos){
-						if (mhEdmTriggerResults->accept(trigNames.triggerIndex(trigName))){
-							passTrigEl = 1;
-							mvSelTriggersEl[mvsPar["trigger_path_el"].at(ipath)] = 1;
-							if (mbPar["debug"]) std::cout << "		" << trigNames.triggerName(i)  << std::endl;
-						}
-						else mvSelTriggersEl[mvsPar["trigger_path_el"].at(ipath)] = 0;
-						break;
-					}
-					else mvSelTriggersEl[mvsPar["trigger_path_el"].at(ipath)] = 0;
-				}
-            }
-            if (passTrigEl>0) passTrigElData = true;
-
-            passTrigMu = 0;
-            if (mbPar["debug"]) std::cout<<"	In Data Mu trig list: "<<std::endl;
-            for (unsigned int ipath = 0; ipath < mvsPar["trigger_path_mu"].size() && mvsPar["trigger_path_mu"].at(0)!="" ; ipath++){
-				for(unsigned int i=0; i<_tSize; i++){
-					std::string trigName = trigNames.triggerName(i);
-					if ( trigName.find(mvsPar["trigger_path_mu"].at(ipath)) < std::string::npos){
-						if (mhEdmTriggerResults->accept(trigNames.triggerIndex(trigName))){
-							passTrigMu = 1;
-							mvSelTriggersMu[mvsPar["trigger_path_mu"].at(ipath)] = 1;
-							if (mbPar["debug"]) std::cout << "		" << trigNames.triggerName(i)  << std::endl;
-						}
-						else mvSelTriggersMu[mvsPar["trigger_path_mu"].at(ipath)] = 0;
-						break;
-					}
-					else mvSelTriggersMu[mvsPar["trigger_path_mu"].at(ipath)] = 0;
-				}
-            }
-            if (passTrigMu>0) passTrigMuData = true;
-
-            if (mbPar["isMc"] && (passTrigMuMC||passTrigElMC) ) passTrig = true;
-            if (!mbPar["isMc"] && (passTrigMuData||passTrigElData) ) passTrig = true;
-
-
-            if ( ignoreCut("Trigger") || passTrig ) passCut(ret, "Trigger");
-            else break;
-
+	  
+	  if (mbPar["debug"]) std::cout<<"trigger cuts..."<<std::endl;
+	  
+	  event.getByLabel( mtPar["trigger_collection"], mhEdmTriggerResults );
+	  const edm::TriggerNames trigNames = event.triggerNames(*mhEdmTriggerResults);
+	  
+	  bool passTrig = false;
+	  unsigned int _tSize = mhEdmTriggerResults->size();
+	  
+	  
+	  // dump trigger names
+	  if (bFirstEntry && mbPar["dump_trigger"]){
+	    for (unsigned int i=0; i<_tSize; i++){
+	      std::string trigName = trigNames.triggerName(i);
+	      std::cout << i << "   " << trigName;
+	      bool fired = mhEdmTriggerResults->accept(trigNames.triggerIndex(trigName));
+	      std::cout <<", FIRED = "<<fired<<std::endl;
+	    } 
+	  }
+	  
+	  if (mbPar["debug"]) std::cout<<"The event FIRED the following registered trigger(s) in LJMet: "<<std::endl;
+	  
+	  mvSelTriggersEl.clear();
+	  mvSelMCTriggersEl.clear();
+	  mvSelTriggersMu.clear();
+	  mvSelMCTriggersMu.clear();
+	  
+	  int passTrigEl = 0;
+	  if (mbPar["debug"]) std::cout<<"	In MC El trig list: "<<std::endl;
+	  for (unsigned int ipath = 0; ipath < mvsPar["mctrigger_path_el"].size() && mvsPar["mctrigger_path_el"].at(0)!="" ; ipath++){
+	    for(unsigned int i=0; i<_tSize; i++){
+	      std::string trigName = trigNames.triggerName(i);
+	      if (trigName.find(mvsPar["mctrigger_path_el"].at(ipath)) == std::string::npos) continue;
+	      if (mhEdmTriggerResults->accept(trigNames.triggerIndex(trigName))) {
+		passTrigEl = 1;
+		mvSelMCTriggersEl[mvsPar["mctrigger_path_el"].at(ipath)] = 1;
+		if (mbPar["debug"]) std::cout << "		" << trigNames.triggerName(i)  << std::endl;
+	      }
+	      else mvSelMCTriggersEl[mvsPar["mctrigger_path_el"].at(ipath)] = 0;
+	    }
+	  }
+	  if (passTrigEl>0) passTrigElMC = true;
+	  
+	  int passTrigMu = 0;
+	  if (mbPar["debug"]) std::cout<<"	In MC Mu trig list: "<<std::endl;
+	  for (unsigned int ipath = 0; ipath < mvsPar["mctrigger_path_mu"].size() && mvsPar["mctrigger_path_mu"].at(0)!="" ; ipath++){
+	    for(unsigned int i=0; i<_tSize; i++){
+	      std::string trigName = trigNames.triggerName(i);
+	      if ( trigName.find(mvsPar["mctrigger_path_mu"].at(ipath)) == std::string::npos) continue;
+	      if (mhEdmTriggerResults->accept(trigNames.triggerIndex(trigName))){
+		passTrigMu = 1;
+		mvSelMCTriggersMu[mvsPar["mctrigger_path_mu"].at(ipath)] = 1;
+		if (mbPar["debug"]) std::cout << "		" << trigNames.triggerName(i)  << std::endl;
+	      }
+	      else mvSelMCTriggersMu[mvsPar["mctrigger_path_mu"].at(ipath)] = 0;
+	    }
+	  }
+	  if (passTrigMu>0) passTrigMuMC = true;
+	  
+	  //Loop over each data channel separately
+	  passTrigEl = 0;
+	  if (mbPar["debug"]) std::cout<<"	In Data El trig list: "<<std::endl;
+	  for (unsigned int ipath = 0; ipath < mvsPar["trigger_path_el"].size() && mvsPar["trigger_path_el"].at(0)!="" ; ipath++){
+	    for(unsigned int i=0; i<_tSize; i++){
+	      std::string trigName = trigNames.triggerName(i);
+	      if ( trigName.find(mvsPar["trigger_path_el"].at(ipath)) == std::string::npos) continue;
+	      if (mhEdmTriggerResults->accept(trigNames.triggerIndex(trigName))){
+		passTrigEl = 1;
+		mvSelTriggersEl[mvsPar["trigger_path_el"].at(ipath)] = 1;
+		if (mbPar["debug"]) std::cout << "		" << trigNames.triggerName(i)  << std::endl;
+	      }
+	      else mvSelTriggersEl[mvsPar["trigger_path_el"].at(ipath)] = 0;
+	    }
+	  }
+	  if (passTrigEl>0) passTrigElData = true;
+	  
+	  passTrigMu = 0;
+	  if (mbPar["debug"]) std::cout<<"	In Data Mu trig list: "<<std::endl;
+	  for (unsigned int ipath = 0; ipath < mvsPar["trigger_path_mu"].size() && mvsPar["trigger_path_mu"].at(0)!="" ; ipath++){
+	    for(unsigned int i=0; i<_tSize; i++){
+	      std::string trigName = trigNames.triggerName(i);
+	      if ( trigName.find(mvsPar["trigger_path_mu"].at(ipath)) == std::string::npos) continue;
+	      if (mhEdmTriggerResults->accept(trigNames.triggerIndex(trigName))){
+		passTrigMu = 1;
+		mvSelTriggersMu[mvsPar["trigger_path_mu"].at(ipath)] = 1;
+		if (mbPar["debug"]) std::cout << "		" << trigNames.triggerName(i)  << std::endl;
+	      }
+	      else mvSelTriggersMu[mvsPar["trigger_path_mu"].at(ipath)] = 0;
+	    }
+	  }
+	  if (passTrigMu>0) passTrigMuData = true;
+	  
+	  if (mbPar["isMc"] && (passTrigMuMC||passTrigElMC) ) passTrig = true;
+	  if (!mbPar["isMc"] && (passTrigMuData||passTrigElData) ) passTrig = true;  
+	  
+	  if ( ignoreCut("Trigger") || passTrig ) passCut(ret, "Trigger");
+	  else break;
+	  
         } // end of trigger cuts
     
     
@@ -597,84 +586,31 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
 	  event.getByLabel( mtPar["flag_tag"], PatTriggerResults );
 	  const edm::TriggerNames patTrigNames = event.triggerNames(*PatTriggerResults);
 	  
+          bool goodvertpass = false;
+	  bool globaltighthalopass = false;
 	  bool hbhenoisepass = false;
 	  bool hbhenoiseisopass = false;
-	  bool globaltighthalopass = false;
 	  bool ecaldeadcellpass = false;
+	  bool badpfmuonpass = false;
+	  bool badchargedcandpass = false;
 	  bool eebadscpass = false;
-          bool goodvertpass = false;
+	  bool eebadcalibpass = false;
+
 	  
 	  for (unsigned int i=0; i<PatTriggerResults->size(); i++){
+	    if (patTrigNames.triggerName(i) == "Flag_goodVertices") goodvertpass = PatTriggerResults->accept(patTrigNames.triggerIndex(patTrigNames.triggerName(i)));
+	    if (patTrigNames.triggerName(i) == "Flag_globalTightHalo2016Filter") globaltighthalopass = PatTriggerResults->accept(patTrigNames.triggerIndex(patTrigNames.triggerName(i)));
 	    if (patTrigNames.triggerName(i) == "Flag_HBHENoiseFilter") hbhenoisepass = PatTriggerResults->accept(patTrigNames.triggerIndex(patTrigNames.triggerName(i)));
 	    if (patTrigNames.triggerName(i) == "Flag_HBHENoiseIsoFilter") hbhenoiseisopass = PatTriggerResults->accept(patTrigNames.triggerIndex(patTrigNames.triggerName(i)));
-	    if (patTrigNames.triggerName(i) == "Flag_globalTightHalo2016Filter") globaltighthalopass = PatTriggerResults->accept(patTrigNames.triggerIndex(patTrigNames.triggerName(i)));
 	    if (patTrigNames.triggerName(i) == "Flag_EcalDeadCellTriggerPrimitiveFilter") ecaldeadcellpass = PatTriggerResults->accept(patTrigNames.triggerIndex(patTrigNames.triggerName(i)));
+	    if (patTrigNames.triggerName(i) == "Flag_BadPFMuonFilter") badpfmuonpass = PatTriggerResults->accept(patTrigNames.triggerIndex(patTrigNames.triggerName(i)));
+	    if (patTrigNames.triggerName(i) == "Flag_BadChargedCandidateFilter") badchargedcandpass = PatTriggerResults->accept(patTrigNames.triggerIndex(patTrigNames.triggerName(i)));
 	    if (patTrigNames.triggerName(i) == "Flag_eeBadScFilter") eebadscpass = PatTriggerResults->accept(patTrigNames.triggerIndex(patTrigNames.triggerName(i)));
-	    if (patTrigNames.triggerName(i) == "Flag_goodVertices") goodvertpass = PatTriggerResults->accept(patTrigNames.triggerIndex(patTrigNames.triggerName(i)));// this shouldn't actually be necessary since we do this manually, but I add it just for completeness
+	    if (patTrigNames.triggerName(i) == "Flag_ecalBadCalibFilter") eebadcalibpass = PatTriggerResults->accept(patTrigNames.triggerIndex(patTrigNames.triggerName(i)));
+
 	  }
-
-          //get muons and packed pfcandidates
-          event.getByLabel( mtPar["muon_collection"], mhMuons );      
-	  edm::Handle<pat::PackedCandidateCollection> packedPFCands;
-          edm::InputTag packedPFCandsLabel_("packedPFCandidates");
-          event.getByLabel(packedPFCandsLabel_, packedPFCands);
-          //___________________________Bad Muon Filter________________________________||
-          double maxDR = 0.001;
-          double minMuonTrackRelErr = 0.5;
-          int suspiciousAlgo=14;
-          double minMuPt = 100;
-          //minDz = 1;                                                                                                                                                                
-          bool badmuflag = false;
-
-          //___________________________Bad Charged Hadron Filter________________________________||
-          double minPtDiffRel = -0.5;
-
-          bool badchadflag = false;
-
-          for (std::vector<pat::Muon>::const_iterator _imu = mhMuons->begin(); _imu != mhMuons->end(); _imu++){
-              bool foundBadTrack = false;
-              if ((*_imu).innerTrack().isNonnull()) {
-                  reco::TrackRef it = (*_imu).innerTrack();
-                  if (it->pt() < minMuPt or it->quality(reco::TrackBase::TrackQuality::highPurity) or it->ptError()/it->pt() < minMuonTrackRelErr) {}
-                  else if (it->originalAlgo()==suspiciousAlgo and it->algo()==suspiciousAlgo) {
-                      foundBadTrack = true;
-                  }
-              }
-              if (foundBadTrack) {
-                  //   std::cout<<"there is suspicious muon"<<std::endl;
-                  for (std::vector<pat::PackedCandidate>::const_iterator cand = packedPFCands->begin(); cand != packedPFCands->end(); cand++){
-                      if ((*cand).pt() >= minMuPt and abs((*cand).pdgId()) == 13) {
-                          if (deltaR( (*_imu).eta(), (*_imu).phi(), (*cand).eta(), (*cand).phi() ) < maxDR) {
-                              badmuflag = true;
-                              break;
-                          }
-                      }
-                  }
-              }
-
-              //----------------
-
-              if ( (*_imu).pt() < minMuPt and (*_imu).innerTrack().isNonnull()) {
-                  reco::TrackRef it = (*_imu).innerTrack();
-                  if (it->quality(reco::TrackBase::TrackQuality::highPurity) or it->ptError()/it->pt() < minMuonTrackRelErr) {}
-                  // All events had a drastically high pt error on the inner muon track (fac. ~10). Require at least 0.5
-                  else {
-                      for (std::vector<pat::PackedCandidate>::const_iterator cand = packedPFCands->begin(); cand != packedPFCands->end(); cand++){
-                          if (abs((*cand).pdgId()) == 211) {
-                              // Require very loose similarity in pt (one-sided).
-                              double dPtRel =  ( (*cand).pt() - it->pt() )/(0.5*((*cand).pt() + it->pt()));
-                              //  Flag the event bad if dR is tiny  
-                              if (deltaR( it->eta(), it->phi(), (*cand).eta(), (*cand).phi() ) < maxDR and dPtRel > minPtDiffRel) {
-                                  badchadflag = true;
-                                  break;
-                              }
-                          }
-                      }
-                  }
-              }
-          }
 	  
-	  if(hbhenoisepass && hbhenoiseisopass && globaltighthalopass && ecaldeadcellpass && (mbPar["isMc"] || eebadscpass) && goodvertpass && !badmuflag && !badchadflag){
+	  if(hbhenoisepass && hbhenoiseisopass && globaltighthalopass && ecaldeadcellpass && (mbPar["isMc"] || eebadscpass) && goodvertpass && badpfmuonpass && badchargedcandpass && eebadcalibpass){
 	    passCut(ret, "MET filters");
 	  }
 	  else break;
@@ -685,6 +621,12 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
         //_____ Muon cuts ________________________________
         //      
         // loop over muons
+
+	//get muons and packed pfcandidates
+	event.getByLabel( mtPar["muon_collection"], mhMuons );      
+	edm::Handle<pat::PackedCandidateCollection> packedPFCands;
+	edm::InputTag packedPFCandsLabel_("packedPFCandidates");
+	event.getByLabel(packedPFCandsLabel_, packedPFCands);
 
         int _n_muons  = 0;
         int nSelMuons = 0;
@@ -715,51 +657,6 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
 				if (mbPar["debug"]) std::cout << "|eta| = " << fabs(_imu->eta()) << std::endl; //DEBUG - rizki
 				if (mbPar["debug"]) std::cout << "phi = " << _imu->phi() << std::endl; //DEBUG - rizki
     
-                /*if ((*_imu).globalTrack().isNonnull() and (*_imu).globalTrack().isAvailable()) {
-                    reco::TrackRef tunePBestTrack = (*_imu).tunePMuonBestTrack();
-                    reco::TrackRef globalTrack = (*_imu).globalTrack();
-                    reco::TrackRef combinedTrack;
-                    if ((*_imu).combinedMuon().isNonnull() and (*_imu).combinedMuon().isAvailable()) combinedTrack = (*_imu).combinedMuon();
-                    reco::TrackRef innerTrack;
-                    if ((*_imu).innerTrack().isNonnull() and (*_imu).innerTrack().isAvailable()) innerTrack = (*_imu).innerTrack();
-                    reco::TrackRef outerTrack;
-                    if ((*_imu).outerTrack().isNonnull() and (*_imu).outerTrack().isAvailable()) outerTrack = (*_imu).outerTrack();
-                    reco::TrackRef pickyTrack;
-                    if ((*_imu).pickyTrack().isNonnull() and (*_imu).pickyTrack().isAvailable()) pickyTrack = (*_imu).pickyTrack();
-        
-                    reco::Muon::MuonTrackType tunePBestTrackType = (*_imu).tunePMuonBestTrackType();
-                    std::cout<<"Best track type is ";
-                    switch (int(tunePBestTrackType)) {
-                        case 1:
-                            std::cout<<"InnerTrack"<<std::endl;
-                            break;
-                        case 2:
-                            std::cout<<"OuterTrack"<<std::endl;
-                            break;
-                        case 3:
-                            std::cout<<"CombinedTrack"<<std::endl;
-                            break;
-                        case 4:
-                            std::cout<<"TPFMS"<<std::endl;
-                            break;
-                        case 5:
-                            std::cout<<"Picky"<<std::endl;
-                            break;
-                        case 6:
-                            std::cout<<"DYT"<<std::endl;
-                            break;
-                        default:
-                            std::cout<<"Unknown("<<tunePBestTrackType<<")"<<std::endl;
-                    }
-                    std::cout<<"PF       : "<<(*_imu).pt()<<std::endl;
-                    std::cout<<"tuneP    : "<<tunePBestTrack->pt()<<" w/ quality "<<tunePBestTrack->qualityMask()<<std::endl;
-                    std::cout<<"global   : "<<globalTrack->pt()<<" w/ quality "<<globalTrack->qualityMask()<<std::endl;
-                    if ((*_imu).combinedMuon().isNonnull() and (*_imu).combinedMuon().isAvailable()) std::cout<<"combined : "<<combinedTrack->pt()<<" w/ quality "<<combinedTrack->qualityMask()<<std::endl;
-                    if ((*_imu).innerTrack().isNonnull() and (*_imu).innerTrack().isAvailable()) std::cout<<"inner    : "<<innerTrack->pt()<<" w/ quality "<<innerTrack->qualityMask()<<std::endl;
-                    if ((*_imu).outerTrack().isNonnull() and (*_imu).outerTrack().isAvailable()) std::cout<<"outer    : "<<outerTrack->pt()<<" w/ quality "<<outerTrack->qualityMask()<<std::endl;
-                    if ((*_imu).pickyTrack().isNonnull() and (*_imu).pickyTrack().isAvailable()) std::cout<<"picky    : "<<pickyTrack->pt()<<" w/ quality "<<pickyTrack->qualityMask()<<std::endl;
-                }*/
-
                 //muon cuts
                 while(1){
 
@@ -768,24 +665,12 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
                         else break; // fail
 		    }
 		    else {
-                        //if ( mbPar["muon_selector_medium"] && (*_imu).isMediumMuon() ){ }
-                        // *!*!*! TEMPORARY FOR ICHEP, RESULT OF DECREASED EFFICIENCY FROM HIP !*!*!*
-                        bool ismediummuon = false;
-                        if ( mbPar["muon_selector_medium"] ){ 
-                            bool goodGlob = (*_imu).isGlobalMuon() && 
-                                (*_imu).globalTrack()->normalizedChi2() < 3 && 
-                                (*_imu).combinedQuality().chi2LocalPosition < 12 && 
-                                (*_imu).combinedQuality().trkKink < 20; 
-                            ismediummuon = (*_imu).isLooseMuon() &&
-                                (*_imu).innerTrack()->validFraction() > 0.49 && 
-                                (*_imu).segmentCompatibility() > (goodGlob ? 0.303 : 0.451); 
-                        }
-                        if ( mbPar["muon_selector_medium"] && ismediummuon ) { }
-                        else if ( !mbPar["muon_selector_medium"] && (*_imu).isTightMuon(*mvSelPVs[0]) ){ }
+		      if ( mbPar["muon_selector_medium"] && (*_imu).passed(reco::Muon::CutBasedIdMedium) ){ }
+                        else if ( !mbPar["muon_selector_medium"] && (*_imu).passed(reco::Muon::CutBasedIdTight) ){ }
 		        else break; // fail
 
-			pat::Muon* muptr = new pat::Muon(*_imu);
-			float miniIso = getPFMiniIsolation_EffectiveArea(packedPFCands, dynamic_cast<const reco::Candidate* > (muptr), 0.05, 0.2, 10., false, false,myRhoJetsNC);
+		        //pat::Muon* muptr = new pat::Muon(*_imu);
+			//float miniIso = getPFMiniIsolation_EffectiveArea(packedPFCands, dynamic_cast<const reco::Candidate* > (muptr), 0.05, 0.2, 10., false, false,myRhoJetsNC);
 
                         double chIso = (*_imu).pfIsolationR04().sumChargedHadronPt;
                         double nhIso = (*_imu).pfIsolationR04().sumNeutralHadronEt;
@@ -796,9 +681,9 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
 
 		        double pfIso = (chIso + std::max(0.,nhIso + gIso - 0.5*puIso))/pt;
 
-		        if (!mbPar["muon_useMiniIso"] && pfIso<mdPar["muon_reliso"] ) {delete muptr;}
-			else if (mbPar["muon_useMiniIso"] && miniIso<mdPar["muon_miniIso"] ) {delete muptr;}
-			else{delete muptr;  break;}
+		        if (!mbPar["muon_useMiniIso"] && pfIso<mdPar["muon_reliso"] ) {}
+			else if (mbPar["muon_useMiniIso"] && (*_imu).passed(reco::Muon::MiniIsoTight) ) {}
+			else{ break;}
 		    }
 
                     if (mvSelPVs.size() > 0){
@@ -838,16 +723,16 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
     		        }
     		        else {
     		            if (mbPar["loose_muon_selector_tight"]) {
-                                if ( (*_imu).isTightMuon(*mvSelPVs[0]) ){ }
+			      if ( (*_imu).passed(reco::Muon::CutBasedIdTight) ){ } 
     		                else break; // fail
                             }
     		            else {
-                                if ( (*_imu).isLooseMuon() ){ }
+			      if ( (*_imu).passed(reco::Muon::CutBasedIdLoose) ){ } 
     		                else break; // fail
                             }
 
-			    pat::Muon* muptr = new pat::Muon(*_imu);
-			    float miniIso = getPFMiniIsolation_EffectiveArea(packedPFCands, dynamic_cast<const reco::Candidate* > (muptr), 0.05, 0.2, 10., false, false,myRhoJetsNC);
+			    //			    pat::Muon* muptr = new pat::Muon(*_imu);
+			    //float miniIso = getPFMiniIsolation_EffectiveArea(packedPFCands, dynamic_cast<const reco::Candidate* > (muptr), 0.05, 0.2, 10., false, false,myRhoJetsNC);
 
                             double chIso = (*_imu).pfIsolationR04().sumChargedHadronPt;
                             double nhIso = (*_imu).pfIsolationR04().sumNeutralHadronEt;
@@ -857,9 +742,10 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
     
     		            double pfIso = (chIso + std::max(0.,nhIso + gIso - 0.5*puIso))/pt;
     
-			    if (!mbPar["muon_useMiniIso"] && pfIso<mdPar["loose_muon_reliso"] ) {delete muptr;}
-			    else if (mbPar["muon_useMiniIso"] && miniIso<mdPar["loose_muon_miniIso"] ) {delete muptr;}
-			    else{ delete muptr;  break;}
+			    if (!mbPar["muon_useMiniIso"] && pfIso<mdPar["loose_muon_reliso"] ) {}
+			    else if (mbPar["muon_useMiniIso"] && (*_imu).passed(reco::Muon::MiniIsoLoose) ) {}
+			    else{ break;}
+			  
     		        }
 
                         if (mvSelPVs.size() > 0){
@@ -948,9 +834,15 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
 
 		      //bool mvapass = true;  // HACK FOR TESTING THE MVA EFFICIENCY
 		      bool mvapass = false;
-		      if ( fabs(_iel->superCluster()->eta())<=0.8) mvapass = mvaValue_alt( *_iel, event) > mvdPar["tight_electron_mva_cuts"].at(0);
-		      else if ( fabs(_iel->superCluster()->eta())<=1.479 && fabs(_iel->superCluster()->eta())>0.8) mvapass = mvaValue_alt( *_iel, event) > mvdPar["tight_electron_mva_cuts"].at(1);
-		      else mvapass = mvaValue_alt( *_iel, event) > mvdPar["tight_electron_mva_cuts"].at(2);
+		      if ( fabs(_iel->superCluster()->eta())<=0.8){
+			mvapass = mvaValue( *_iel, event) > (mvdPar["tight_electron_mva_cuts"].at(0) - mvdPar["tight_electron_mva_cuts"].at(2)*exp(-1*_iel->pt()/mvdPar["tight_electron_mva_cuts"].at(1)));
+		      }
+		      else if ( fabs(_iel->superCluster()->eta())<=1.479 && fabs(_iel->superCluster()->eta())>0.8){
+			mvapass = mvaValue( *_iel, event) > (mvdPar["tight_electron_mva_cuts"].at(3) - mvdPar["tight_electron_mva_cuts"].at(5)*exp(-1*_iel->pt()/mvdPar["tight_electron_mva_cuts"].at(4)));
+		      }
+		      else{
+			mvapass = mvaValue( *_iel, event) > (mvdPar["tight_electron_mva_cuts"].at(6) - mvdPar["tight_electron_mva_cuts"].at(8)*exp(-1*_iel->pt()/mvdPar["tight_electron_mva_cuts"].at(7)));
+		      }
 		      if (!mvapass) break;
 		      
 		      if(mbPar["electron_useMiniIso"]){
@@ -1002,9 +894,9 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
                         if ( mbPar["UseElMVA"] ) {
 			  //bool mvapass = true; // HACK FOR TESTING THE MVA EFFICIENCY
 			  bool mvapass = false;
-			  if ( fabs(_iel->superCluster()->eta())<=0.8) mvapass = mvaValue_alt( *_iel, event) > mvdPar["loose_electron_mva_cuts"].at(0);
-			  else if ( fabs(_iel->superCluster()->eta())<=1.479 && fabs(_iel->superCluster()->eta())>0.8) mvapass = mvaValue_alt( *_iel, event) > mvdPar["loose_electron_mva_cuts"].at(1);
-			  else if ( fabs(_iel->superCluster()->eta())>1.479) mvapass = mvaValue_alt( *_iel, event) > mvdPar["loose_electron_mva_cuts"].at(2);
+			  if ( fabs(_iel->superCluster()->eta())<=0.8 ) mvapass = mvaValue( *_iel, event) > mvdPar["loose_electron_mva_cuts"].at(0);
+			  else if ( fabs(_iel->superCluster()->eta())<=1.479 ) mvapass = mvaValue( *_iel, event) > mvdPar["loose_electron_mva_cuts"].at(1);
+			  else mvapass = mvaValue( *_iel, event) > mvdPar["loose_electron_mva_cuts"].at(2);
 			  if (!mvapass) break;
 			  
 			  if(mbPar["electron_useMiniIso"]){
@@ -1067,13 +959,7 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
 
 	    if(_itau->tauID("byLooseCombinedIsolationDeltaBetaCorr3Hits")){}
 	    else break;
-		
-	    //if(_itau->tauID("againstElectronTightMVA6")){}
-	    //else break;
-		
-	    //if(_itau->tauID("againstMuonLoose3")){}
-	    //else break;
-		
+
 	    if(_itau->pt() > 20 && fabs(_itau->eta()) < 2.4 ){}
 	    else break;
 		
@@ -1122,7 +1008,7 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
 
         for (std::vector<pat::Jet>::const_iterator _ijet = mhJets->begin();
              _ijet != mhJets->end(); ++_ijet){
-      
+
             retJet.set(false);
 
             bool _pass = false;
@@ -1157,12 +1043,6 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
 
 		  const std::vector<edm::Ptr<reco::Candidate> > _ijet_consts = _ijet->daughterPtrVector();
 		  for ( std::vector<edm::Ptr<reco::Candidate> >::const_iterator _i_const = _ijet_consts.begin(); _i_const != _ijet_consts.end(); ++_i_const){
-		    /*if ( (*_i_const).key() == cleaningMuons[0]->originalObjectRef().key() ) {
-		      tmpJet.setP4( _ijet->p4() - cleaningMuons[0]->p4() );
-		      jetP4 = correctJet(tmpJet, event);
-		      if (mbPar["debug"]) std::cout << "Corrected Jet : pT = " << jetP4.Pt() << " eta = " << jetP4.Eta() << " phi = " << jetP4.Phi() << std::endl;
-		      _cleaned = true;
-		      }*////old ref mathcing method, appears to be depreciated in CMSSW_7_4_X(?) 
 		    for (unsigned int muI = 0; muI < muDaughters.size(); muI++) {
 		      if ( (*_i_const).key() == muDaughters[muI].key() ) {
 			tmpJet.setP4( tmpJet.p4() - muDaughters[muI]->p4() );
@@ -1184,29 +1064,6 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
 		  }
 		}
 	      }
-	      // zprime method (gives same results as far as i can tell)
-	      /*if (_ijet->muonMultiplicity() > 0) {
-		double muEchk = (_ijet->correctedJet(0).energy()*_ijet->muonEnergyFraction()-cleaningMuons[0]->energy())/cleaningMuons[0]->energy();
-		if ( !(muEchk < -0.1 || (muEchk > 0.1 && _ijet->muonMultiplicity()==1)) ) {
-		tmpJet.setP4( _ijet->correctedJet(0).p4()-cleaningMuons[0]->p4() );
-		if (tmpJet.pt() > 5 && deltaR(_ijet->correctedJet(0).p4(),tmpJet.p4()) > 1.57) std::cout << "Lepton-Jet cleaning flipped direction, not cleaning!" << std::endl;
-		else {
-		jetP4 = correctJet(tmpJet, event);
-		if (mbPar["debug"]) std::cout << "Corrected Jet : pT = " << jetP4.Pt() << " eta = " << jetP4.Eta() << " phi = " << jetP4.Phi() << std::endl;
-		_cleaned = true;
-		}
-		}
-		}*/
-	      //old deltaR matching method
-	      /*for (unsigned int id = 0, nd = (*_ijet).numberOfDaughters(); id < nd; ++id) {
-		const pat::PackedCandidate &_ijet_const = dynamic_cast<const pat::PackedCandidate &>(*(*_ijet).daughter(id));
-		if ( deltaR(cleaningMuons[0]->p4(),_ijet_const.p4()) < 0.001 ) {
-		tmpJet.setP4( _ijet->p4()-cleaningMuons[0]->p4() );
-		jetP4 = correctJet(tmpJet, event);
-		if (mbPar["debug"]) std::cout << "Corrected Jet : pT = " << jetP4.Pt() << " eta = " << jetP4.Eta() << " phi = " << jetP4.Phi() << std::endl;
-		_cleaned = true;
-		}
-		}*/
             
 	      for(unsigned int iel = 0; iel < cleaningElectrons.size(); iel++){
 		if ( deltaR(cleaningElectrons[iel]->p4(),_ijet->p4()) < mdPar["LepJetDR"]){ //0.6 ){
@@ -1243,19 +1100,6 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
 		  }
 		}
 	      }
-	      /*if (_ijet->electronMultiplicity() > 0) {
-		  double elEchk = (_ijet->correctedJet(0).energy()*_ijet->chargedEmEnergyFraction()-cleaningElectrons[0]->energy())/cleaningElectrons[0]->energy();
-		  if (mbPar["debug"]) std::cout<<"Non-zero electron multiplicity in jet, jet_chEm_Energy = "<<_ijet->correctedJet(0).energy()*_ijet->chargedEmEnergyFraction()<<std::endl;
-		  if ( !(elEchk < -0.1 || (elEchk > 0.1 && _ijet->electronMultiplicity()==1)) ) {
-		  //tmpJet.setP4( _ijet->correctedJet(0).p4()-cleaningElectrons[0]->p4() );
-		  if (tmpJet.pt() > 5 && deltaR(_ijet->correctedJet(0).p4(),tmpJet.p4()) > 1.57) std::cout << "Lepton-Jet cleaning flipped direction, not cleaning!" << std::endl;
-		  else {
-		  //jetP4 = correctJet(tmpJet, event);
-		  if (mbPar["debug"]) std::cout << "Corrected Jet : pT = " << jetP4.Pt() << " eta = " << jetP4.Eta() << " phi = " << jetP4.Phi() << std::endl;
-		  //_cleaned = true;
-		  }
-		  }
-		  }*/
 	    }
 
 	    if (!_cleaned) {
@@ -1274,16 +1118,29 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
             // jet cuts
             while(1){ 
 
-	        // quality cuts
-	        if (fabs(_ijet->correctedJet(0).eta()) < 2.7 && (*jetSel_)( *_ijet, retJet ) ){ } 
+	        // PF Jet ID
+	        if (fabs(_ijet->correctedJet(0).eta()) < 2.4 &&
+		    _ijet->correctedJet(0).neutralHadronEnergyFraction() < 0.90 &&
+		    _ijet->correctedJet(0).neutralEmEnergyFraction() < 0.90 &&
+		    _ijet->correctedJet(0).chargedMultiplicity()+_ijet->correctedJet(0).neutralMultiplicity() > 1 &&
+		    _ijet->correctedJet(0).chargedHadronEnergyFraction() > 0 &&
+		    _ijet->correctedJet(0).chargedMultiplicity() > 0
+		    ){ } 
+	        else if (fabs(_ijet->correctedJet(0).eta()) >= 2.4 && 
+			 fabs(_ijet->correctedJet(0).eta()) < 2.7 &&
+			 _ijet->correctedJet(0).neutralHadronEnergyFraction() < 0.90 &&
+			 _ijet->correctedJet(0).neutralEmEnergyFraction() < 0.90 &&
+			 _ijet->correctedJet(0).chargedMultiplicity()+_ijet->correctedJet(0).neutralMultiplicity() > 1
+			 ){ } 
 	        else if (fabs(_ijet->correctedJet(0).eta()) >= 2.7 && 
 			 fabs(_ijet->correctedJet(0).eta()) < 3.0 && 
-			 _ijet->correctedJet(0).neutralEmEnergyFraction() > 0.01 && 
-			 _ijet->correctedJet(0).neutralHadronEnergyFraction() < 0.98 &&
+			 _ijet->correctedJet(0).neutralEmEnergyFraction() > 0.02 && 
+			 _ijet->correctedJet(0).neutralEmEnergyFraction() < 0.99 &&
 			 _ijet->correctedJet(0).neutralMultiplicity() > 2
 			 ){ }
 		else if (fabs(_ijet->correctedJet(0).eta()) >= 3.0 && 
-			 _ijet->correctedJet(0).neutralEmEnergyFraction() < 0.9 && 
+			 _ijet->correctedJet(0).neutralEmEnergyFraction() < 0.9 &&
+			 _ijet->correctedJet(0).neutralHadronEnergyFraction() > 0.02 &&
 			 _ijet->correctedJet(0).neutralMultiplicity() > 10
 			 ){ }
 	        else break; // fail 
@@ -1342,6 +1199,164 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
             ++_n_jets; 
       
         } // end of loop over jets
+
+	////////////////////////////////////////////////////////////////////////////////////////
+	// AK8 jets
+	////////////////////////////////////////////////////////////////////////////////////////
+
+        event.getByLabel( mtPar["slimmedJetsAK8"], mhJets_AK8 );
+
+        int _n_good_jets_AK8 = 0;
+        int _n_jets_AK8 = 0;
+
+        mvSelCorrJets_AK8.clear();
+
+        for (std::vector<pat::Jet>::const_iterator _ijet = mhJets_AK8->begin();
+             _ijet != mhJets_AK8->end(); ++_ijet){
+      
+      	    if(_ijet->pt() < 170) continue;
+	    if(_ijet->correctedJet(0).pt() < 170) continue;
+
+            retJet.set(false);
+
+            bool _pass = false;
+            bool _passpf = false;
+            bool _isTagged = false;
+	    bool _cleaned = false;
+
+	    TLorentzVector jetP4;
+
+	    pat::Jet tmpJet = _ijet->correctedJet(0);
+	    pat::Jet corrJet = *_ijet;
+
+	    if ( mbPar["doLepJetCleaning"] ){
+	      if (mbPar["debug"]) std::cout << "Checking Overlap" << std::endl;
+
+	      for(unsigned int imu = 0; imu < cleaningMuons.size(); imu++){
+		if ( deltaR(cleaningMuons[imu]->p4(),_ijet->p4()) < mdPar["LepJetDRAK8"]) { //0.8 ){
+		  std::vector<reco::CandidatePtr> muDaughters;
+		  for ( unsigned int isrc = 0; isrc < cleaningMuons[imu]->numberOfSourceCandidatePtrs(); ++isrc ){
+		    if (cleaningMuons[imu]->sourceCandidatePtr(isrc).isAvailable()) {
+		      muDaughters.push_back( cleaningMuons[imu]->sourceCandidatePtr(isrc) );
+		    }
+		  }
+		  if (mbPar["debug"]) {		    
+		    std::cout << "         Muon : pT = " << cleaningMuons[imu]->pt() << " eta = " << cleaningMuons[imu]->eta() << " phi = " << cleaningMuons[imu]->phi() << std::endl;
+		    std::cout << "      Raw Jet : pT = " << _ijet->pt() << " eta = " << _ijet->eta() << " phi = " << _ijet->phi() << std::endl;
+		  }
+
+		  const std::vector<edm::Ptr<reco::Candidate> > _ijet_consts = _ijet->daughterPtrVector();
+		  for ( std::vector<edm::Ptr<reco::Candidate> >::const_iterator _i_const = _ijet_consts.begin(); _i_const != _ijet_consts.end(); ++_i_const){
+		    for (unsigned int muI = 0; muI < muDaughters.size(); muI++) {
+		      if ( (*_i_const).key() == muDaughters[muI].key() ) {
+			tmpJet.setP4( tmpJet.p4() - muDaughters[muI]->p4() );
+			if (mbPar["debug"]) std::cout << "  Cleaned Jet : pT = " << tmpJet.pt() << " eta = " << tmpJet.eta() << " phi = " << tmpJet.phi() << std::endl;
+			jetP4 = correctJet(tmpJet, event, true, true);
+			corrJet = correctJetReturnPatJet(tmpJet, event, true, true);
+			if (mbPar["debug"]) std::cout << "Corrected Jet : pT = " << jetP4.Pt() << " eta = " << jetP4.Eta() << " phi = " << jetP4.Phi() << std::endl;
+			_cleaned = true;
+			muDaughters.erase( muDaughters.begin()+muI );
+			break;
+		      }
+		    }
+		  }
+		}
+	      }
+            
+	      for(unsigned int iel = 0; iel < cleaningElectrons.size(); iel++){
+		if ( deltaR(cleaningElectrons[iel]->p4(),_ijet->p4()) < mdPar["LepJetDRAK8"]){ //0.6 ){
+		  std::vector<reco::CandidatePtr> elDaughters;
+		  for ( unsigned int isrc = 0; isrc < cleaningElectrons[iel]->numberOfSourceCandidatePtrs(); ++isrc ){
+		    if (cleaningElectrons[iel]->sourceCandidatePtr(isrc).isAvailable()) {
+		      elDaughters.push_back( cleaningElectrons[iel]->sourceCandidatePtr(isrc) );
+		    }
+		  }
+		  if (mbPar["debug"]) {
+		    std::cout << "     Electron : pT = " << cleaningElectrons[iel]->pt() << " eta = " << cleaningElectrons[iel]->eta() << " phi = " << cleaningElectrons[iel]->phi() << std::endl;
+		    std::cout << "      Raw Jet : pT = " << _ijet->correctedJet(0).pt() << " eta = " << _ijet->correctedJet(0).eta() << " phi = " << _ijet->correctedJet(0).phi() << std::endl;
+		  }
+		  const std::vector<edm::Ptr<reco::Candidate> > _ijet_consts = _ijet->daughterPtrVector();
+		  for ( std::vector<edm::Ptr<reco::Candidate> >::const_iterator _i_const = _ijet_consts.begin(); _i_const != _ijet_consts.end(); ++_i_const){
+		    for (unsigned int elI = 0; elI < elDaughters.size(); elI++) {
+		      if ( (*_i_const).key() == elDaughters[elI].key() ) {
+			tmpJet.setP4( tmpJet.p4() - elDaughters[elI]->p4() );
+			if (mbPar["debug"]) std::cout << "  Cleaned Jet : pT = " << tmpJet.pt() << " eta = " << tmpJet.eta() << " phi = " << tmpJet.phi() << std::endl;
+			jetP4 = correctJet(tmpJet, event, true, true);
+			corrJet = correctJetReturnPatJet(tmpJet, event, true, true);
+			if (mbPar["debug"]) std::cout << "Corrected Jet : pT = " << jetP4.Pt() << " eta = " << jetP4.Eta() << " phi = " << jetP4.Phi() << std::endl;
+			_cleaned = true;
+			elDaughters.erase( elDaughters.begin()+elI );
+			break;
+		      }
+		    }
+		  }
+		}
+	      }
+	    }
+
+	    if (!_cleaned) {
+                jetP4 = correctJet(*_ijet, event);
+		corrJet = correctJetReturnPatJet(*_ijet, event);
+            }
+
+            // jet cuts
+            while(1){ 
+
+	      // PF Jet ID                                                                                                                                                                     
+	      if (fabs(_ijet->correctedJet(0).eta()) < 2.4 &&
+		  _ijet->correctedJet(0).neutralHadronEnergyFraction() < 0.90 &&
+		  _ijet->correctedJet(0).neutralEmEnergyFraction() < 0.90 &&
+		  //_ijet->userFloat("patPuppiJetSpecificProducer:puppiMultiplicity") > 1 &&
+		  _ijet->correctedJet(0).chargedMultiplicity()+_ijet->correctedJet(0).neutralMultiplicity() > 1 &&
+		  _ijet->correctedJet(0).chargedHadronEnergyFraction() > 0 &&
+		  _ijet->correctedJet(0).chargedMultiplicity() > 0
+		  ){ }
+	      else if (fabs(_ijet->correctedJet(0).eta()) >= 2.4 &&
+		       fabs(_ijet->correctedJet(0).eta()) < 2.7 &&
+		       _ijet->correctedJet(0).neutralHadronEnergyFraction() < 0.90 &&
+		       _ijet->correctedJet(0).neutralEmEnergyFraction() < 0.90 &&
+		       //_ijet->userFloat("patPuppiJetSpecificProducer:puppiMultiplicity") > 1
+		       _ijet->correctedJet(0).chargedMultiplicity()+_ijet->correctedJet(0).neutralMultiplicity() > 1
+		       ){ }
+	      else if (fabs(_ijet->correctedJet(0).eta()) >= 2.7 &&
+		       fabs(_ijet->correctedJet(0).eta()) < 3.0 &&
+		       _ijet->correctedJet(0).neutralHadronEnergyFraction() < 0.99
+		       ){ }
+	      else if (fabs(_ijet->correctedJet(0).eta()) >= 3.0 &&                                                                                                                         
+		       _ijet->correctedJet(0).neutralEmEnergyFraction() < 0.9 &&                                                                                                               
+		       _ijet->correctedJet(0).neutralHadronEnergyFraction() > 0.02 &&                                                                                                          
+		       //_ijet->userFloat("patPuppiJetSpecificProducer:neutralPuppiMultiplicity") > 2 &&
+		       //_ijet->userFloat("patPuppiJetSpecificProducer:neutralPuppiMultiplicity") < 15                                                                                        
+		       _ijet->correctedJet(0).neutralMultiplicity() > 2 &&
+		       _ijet->correctedJet(0).neutralMultiplicity() < 15
+	             ){ }                                                                                                                                                                    
+	      else break; // fail
+
+	      _passpf = true;
+
+	      if ( jetP4.Pt() > mdPar["jet_minpt_AK8"] ){ }
+	      else break; // fail 
+	
+
+	      if ( fabs(jetP4.Eta()) < mdPar["jet_maxeta_AK8"] ){ }
+	      else break; // fail
+	
+	      _pass = true;
+	      break;
+            }
+
+            if ( _pass ){
+
+                // save all the good jets
+                ++_n_good_jets_AK8;
+		mvSelCorrJets_AK8.push_back(corrJet);
+
+	    }
+      
+            ++_n_jets_AK8; 
+      
+        } // end of loop over AK8 jets
+
 
         //
         if ( mbPar["jet_cuts"] ) {

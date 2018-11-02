@@ -43,6 +43,7 @@
 #include "LJMet/Com/interface/LjmetFactory.h"
 #include "DataFormats/METReco/interface/HcalNoiseSummary.h"
 
+//#include "PhysicsTools/SelectorUtils/interface/EventSelector.h"
 
 using trigger::TriggerObject;
 
@@ -150,6 +151,7 @@ void DileptonEventSelector::BeginJob( std::map<std::string, edm::ParameterSet co
         
         mbPar["pv_cut"]                   = par[_key].getParameter<bool>         ("pv_cut");
         mbPar["hbhe_cut"]                 = par[_key].getParameter<bool>         ("hbhe_cut");
+	mbPar["metfilters"]		  = par[_key].getParameter<bool>	 ("metfilters");
         msPar["hbhe_cut_value"]           = par[_key].getParameter<std::string>  ("hbhe_cut_value");
         mbPar["hbheiso_cut"]              = par[_key].getParameter<bool>         ("hbheiso_cut");
 	mbPar["cscHalo_cut"]              = par[_key].getParameter<bool>         ("cscHalo_cut");
@@ -213,6 +215,7 @@ void DileptonEventSelector::BeginJob( std::map<std::string, edm::ParameterSet co
     
     push_back("Trigger");
     push_back("Primary vertex");
+    push_back("MET filters");
     push_back("HBHE noise and scraping filter");
     push_back("HBHE Iso noise filter");
     push_back("CSC Tight Halo filter");
@@ -240,6 +243,8 @@ void DileptonEventSelector::BeginJob( std::map<std::string, edm::ParameterSet co
     
     set("Trigger", mbPar["trigger_cut"]);
     set("Primary vertex", mbPar["pv_cut"]);
+    set("MET filters", mbPar["metfilters"]);
+
     set("HBHE noise and scraping filter", mbPar["hbhe_cut"]);
     set("HBHE Iso noise filter", mbPar["hbheiso_cut"]); 
     set("CSC Tight Halo filter", mbPar["cscHalo_cut"]);
@@ -476,30 +481,50 @@ bool DileptonEventSelector::operator()( edm::EventBase const & event, pat::strbi
 
 
 	  } // end of hbhe cuts*/
+passCut(ret, "HBHE noise and scraping filter");
+passCut(ret, "HBHE Iso noise filter");
 
 	//_________MET Filters available in miniAOD_________
 
-        if ( considerCut("CSC Tight Halo filter") || considerCut("EE Bad SC filter") || considerCut("HBHE noise and scraping filter") || considerCut("HBHE Iso noise filter") || considerCut("Ecal Dead TP") || considerCut("Good Vtx")) {
+ //       if ( considerCut("CSC Tight Halo filter") || considerCut("EE Bad SC filter") || considerCut("HBHE noise and scraping filter") || considerCut("HBHE Iso noise filter") || considerCut("Ecal Dead TP") || considerCut("Good Vtx")) {
+	  if (considerCut("MET filters")) {
 	  edm::Handle<edm::TriggerResults > PatTriggerResults;
 	  event.getByLabel( mtPar["flag_tag"], PatTriggerResults );
 	  const edm::TriggerNames patTrigNames = event.triggerNames(*PatTriggerResults);
 
-	  
+          bool goodvertpass = false;
+	  bool globaltighthalopass = false;
 	  bool hbhenoisepass = false;
 	  bool hbhenoiseisopass = false;
-	  bool globaltighthalopass = false;
 	  bool ecaldeadcellpass = false;
+	  bool badpfmuonpass = false;
+	  bool badchargedcandpass = false;
 	  bool eebadscpass = false;
-          bool goodvertpass = false;
-	    
+	  bool eebadcalibpass = false;
+// if block of commented code in this section is restored, need to remove these 4 lines
+passCut(ret, "CSC Tight Halo filter");
+passCut(ret, "EE Bad SC filter");
+passCut(ret,"Ecal Dead TP");
+passCut(ret,"Good Vtx");
+
+	  // Moriond 2018    
 	  for (unsigned int i=0; i<PatTriggerResults->size(); i++){
-	    if (patTrigNames.triggerName(i) == "Flag_HBHENoiseFilter") hbhenoisepass = PatTriggerResults->accept(patTrigNames.triggerIndex(patTrigNames.triggerName(i)));
-	    if (patTrigNames.triggerName(i) == "Flag_HBHENoiseIsoFilter") hbhenoiseisopass = PatTriggerResults->accept(patTrigNames.triggerIndex(patTrigNames.triggerName(i)));
-	    if (patTrigNames.triggerName(i) == "Flag_globalTightHalo2016Filter") globaltighthalopass = PatTriggerResults->accept(patTrigNames.triggerIndex(patTrigNames.triggerName(i)));
-	    if (patTrigNames.triggerName(i) == "Flag_EcalDeadCellTriggerPrimitiveFilter") ecaldeadcellpass = PatTriggerResults->accept(patTrigNames.triggerIndex(patTrigNames.triggerName(i)));
-	    if (patTrigNames.triggerName(i) == "Flag_eeBadScFilter") eebadscpass = PatTriggerResults->accept(patTrigNames.triggerIndex(patTrigNames.triggerName(i)));
-	    if (patTrigNames.triggerName(i) == "Flag_goodVertices") goodvertpass = PatTriggerResults->accept(patTrigNames.triggerIndex(patTrigNames.triggerName(i)));// this shouldn't actually be necessary since we do this manually, but I add it just for completeness
+	    if (patTrigNames.triggerName(i) == "Flag_goodVertices") goodvertpass = PatTriggerResults->accept(patTrigNames.triggerIndex(patTrigNames.triggerName(i)));  //primary vertext filter
+	    if (patTrigNames.triggerName(i) == "Flag_globalSuperTightHalo2016Filter") globaltighthalopass = PatTriggerResults->accept(patTrigNames.triggerIndex(patTrigNames.triggerName(i))); //beam halo filter
+	    if (patTrigNames.triggerName(i) == "Flag_HBHENoiseFilter") hbhenoisepass = PatTriggerResults->accept(patTrigNames.triggerIndex(patTrigNames.triggerName(i))); //HBHE noise filter
+	    if (patTrigNames.triggerName(i) == "Flag_HBHENoiseIsoFilter") hbhenoiseisopass = PatTriggerResults->accept(patTrigNames.triggerIndex(patTrigNames.triggerName(i))); //HBHEiso noise filter
+	    if (patTrigNames.triggerName(i) == "Flag_EcalDeadCellTriggerPrimitiveFilter") ecaldeadcellpass = PatTriggerResults->accept(patTrigNames.triggerIndex(patTrigNames.triggerName(i))); //ECAL TP filter
+	    if (patTrigNames.triggerName(i) == "Flag_BadPFMuonFilter") badpfmuonpass = PatTriggerResults->accept(patTrigNames.triggerIndex(patTrigNames.triggerName(i))); //Bad PF muon filter
+	    if (patTrigNames.triggerName(i) == "Flag_BadChargedCandidateFilter") badchargedcandpass = PatTriggerResults->accept(patTrigNames.triggerIndex(patTrigNames.triggerName(i))); //bad charged hadron cand filter
+	    if (patTrigNames.triggerName(i) == "Flag_eeBadScFilter") eebadscpass = PatTriggerResults->accept(patTrigNames.triggerIndex(patTrigNames.triggerName(i))); //ee badSC noise filter
+	    if (patTrigNames.triggerName(i) == "Flag_ecalBadCalibFilter") eebadcalibpass = PatTriggerResults->accept(patTrigNames.triggerIndex(patTrigNames.triggerName(i))); //ECAL bad calibration filter
 	  }
+
+	  if(hbhenoisepass && hbhenoiseisopass && globaltighthalopass && ecaldeadcellpass && (mbPar["isMc"] || eebadscpass) && goodvertpass && badpfmuonpass && badchargedcandpass && eebadcalibpass){
+	    passCut(ret, "MET filters");
+	  }
+	  else break;
+/*
 	  if ( considerCut("CSC Tight Halo filter") ) {    
 	    if (globaltighthalopass) passCut(ret, "CSC Tight Halo filter"); // CSC cut
 	    else break;
@@ -529,9 +554,9 @@ bool DileptonEventSelector::operator()( edm::EventBase const & event, pat::strbi
 	    if(goodvertpass) passCut(ret,"Good Vtx");
 	    else break;
 	  }
-
+*/
         }
-
+/*
 
 	//bad muons and bad charged hadrons
 	//get muons and packed pfcandidates
@@ -598,7 +623,9 @@ bool DileptonEventSelector::operator()( edm::EventBase const & event, pat::strbi
 	if(!badchadflag) passCut(ret,"Bad Charged Hadron");
 	else break;
 
-
+*/
+passCut(ret,"Bad Muon");
+passCut(ret,"Bad Charged Hadron");
         //
         //_____ Muon cuts ________________________________
         //
@@ -620,9 +647,12 @@ bool DileptonEventSelector::operator()( edm::EventBase const & event, pat::strbi
                 
                 //muon cuts
                 while(1){
+		    if ( (*_imu).passed(reco::Muon::CutBasedIdLoose) ){ } 
+    			else break; // fail
+/* julie told me delete
                     if (not _imu->globalTrack().isNonnull() or not _imu->globalTrack().isAvailable()) break;
                     if (not _imu->innerTrack().isNonnull()  or not _imu->innerTrack().isAvailable())  break;
-                    
+*/                    
                     if (_imu->pt()>mdPar["muon_minpt"]){ }
                     else break;
                     
@@ -694,24 +724,48 @@ bool DileptonEventSelector::operator()( edm::EventBase const & event, pat::strbi
 	      //if (_iel->isEBEEGap()) break;
 
 	      //mva loose for cleaning
-	      float mvaVal = mvaValue( *_iel,event);
 	      pat::Electron* elptr = new pat::Electron(*_iel);
 	      float miniIso = getPFMiniIsolation_EffectiveArea(packedPFCands, dynamic_cast<const reco::Candidate* > (elptr), 0.05, 0.2, 10., false, false,myRhoJetsNC);
 	      
 
-	      if(_iel->pt() < 10) passLoose=false;
-	      else if(miniIso > 0.4) passLoose=false;
-	      else{
+	      if(_iel->pt() > 10) {
+	     	float mvaVal = mvaValue( *_iel,event);
 		if(fabs(_iel->ecalDrivenMomentum().eta()) <0.8){
-		  if(mvaVal>0.913286) passLoose = true;
+		  if(mvaVal>-0.86) passLoose = true;
 		}
 		else if(fabs(_iel->ecalDrivenMomentum().eta()) < 1.479){
-		  if(mvaVal>0.805013) passLoose = true;
+		  if(mvaVal>-0.81) passLoose = true;
 		}
 		else if(fabs(_iel->ecalDrivenMomentum().eta())<2.4){
-		  if(mvaVal > 0.358969) passLoose=true;
+		  if(mvaVal > -0.72) passLoose=true;
 		}
+		if (miniIso > 0.4) passLoose = false;
 	      }
+/*
+	      if ( mbPar["UseElMVA"] ) {
+	      //bool mvapass = True; HACK FOR TESTING MVA EFFICIENCY
+	      bool mvapass = false;
+	      if ( fabs(_iel->superCluster()->eta())<=0.8){
+		mvapass = mvaValue( *_iel, event) > (mvdPar["tight_electron_mva_cuts"].at(0) - mvdPar["tight_electron_mva_cuts"].at(2)*exp(-1*_iel->pt()/mvdPar["tight_electron_mva_cuts"].at(1)));
+	      }
+	      else if ( fabs(_iel->superCluster()->eta())<=1.479 && fabs(_iel->superCluster()->eta())>0.8){
+		mvapass = mvaValue( *_iel, event) > (mvdPar["tight_electron_mva_cuts"].at(3) - mvdPar["tight_electron_mva_cuts"].at(5)*exp(-1*_iel->pt()/mvdPar["tight_electron_mva_cuts"].at(4)));
+	      }
+	      else{
+		mvapass = mvaValue( *_iel, event) > (mvdPar["tight_electron_mva_cuts"].at(6) - mvdPar["tight_electron_mva_cuts"].at(8)*exp(-1*_iel->pt()/mvdPar["tight_electron_mva_cuts"].at(7)));
+	      }
+	      if (!mvapass) break;
+		      
+	      if(mbPar["electron_useMiniIso"]){
+		bool passIso = false;
+		pat::Electron* elptr = new pat::Electron(*_iel);
+		float miniIso = getPFMiniIsolation_EffectiveArea(packedPFCands, dynamic_cast<const reco::Candidate* > (elptr), 0.05, 0.2, 10., false, false,myRhoJetsNC);
+			
+		if(miniIso < mdPar["electron_miniIso"]) passIso = true;                      
+		if(!passIso){delete elptr;  break;}
+		delete elptr;
+	      }
+*/
 	      /* NOT USING CUT BASED LOOSE ANYMORE
 	      //get effective area to do pu correction for iso
 	      double AEff;
@@ -752,7 +806,7 @@ bool DileptonEventSelector::operator()( edm::EventBase const & event, pat::strbi
 		  else if(ooEmooP >= 0.102) {passLoose= false; }
 		  else if(fabs(d0) >= 0.0261)      {passLoose= false; }
 		  else if(fabs(dZ) >= 0.41)     {passLoose= false; }
-		  else if(_iel->gsfTrack()->hitPattern().numberOfHits(reco::HitPattern::MISSING_INNER_HITS) > 2)              {passLoose= false; }
+		  else if(_iel->gsfTrack()->hitPattern().numberOfAllHits(reco::HitPattern::MISSING_INNER_HITS) > 2)              {passLoose= false; }
 		  else if(_iel->isGsfCtfScPixChargeConsistent() < 1)  {passLoose= false; }
 		  else if(!_iel->passConversionVeto())        {passLoose= false; }
 		  else passLoose=true;
@@ -768,7 +822,7 @@ bool DileptonEventSelector::operator()( edm::EventBase const & event, pat::strbi
 		  else if(ooEmooP >= 0.126) {passLoose= false; }
 		  else if(fabs(d0) >= 0.118)       {passLoose= false; }
 		  else if(fabs(dZ) >= 0.822)      {passLoose= false; }
-		  else if(_iel->gsfTrack()->hitPattern().numberOfHits(reco::HitPattern::MISSING_INNER_HITS) > 1)              {passLoose= false; }
+		  else if(_iel->gsfTrack()->hitPattern().numberOfAllHits(reco::HitPattern::MISSING_INNER_HITS) > 1)              {passLoose= false; }
 		  else if(_iel->isGsfCtfScPixChargeConsistent() < 1)  {passLoose= false; }
 		  else if(!_iel->passConversionVeto())        {passLoose= false; }
 		  else passLoose=true;
@@ -1043,19 +1097,19 @@ bool DileptonEventSelector::operator()( edm::EventBase const & event, pat::strbi
             
             if (_isTagged) mvSelBtagJets.push_back(*_ijet); 
         }
-        
+
         passCut(ret, "All cuts");
+
         break;
         
     } // end of while loop
     
     bFirstEntry = false;
     
-    
     return (bool)ret;
     
     setIgnored(ret);
-    
+
     return false;
 }// end of operator()
 

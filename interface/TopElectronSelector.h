@@ -311,7 +311,7 @@ public: // interface
 	    Double_t heepIsoEmHadDepth1 = electron.dr03EcalRecHitSumEt() + electron.dr03HcalDepth1TowerSumEt();
 	    Double_t heepEt = electron.et();
 	    Double_t heepDxy = ( PVsize ? electron.gsfTrack()->dxy(PVtx) : electron.gsfTrack()->dxy() );
-            Int_t heepMHits   =  electron.gsfTrack()->hitPattern().numberOfHits(reco::HitPattern::MISSING_INNER_HITS);
+            Int_t heepMHits   =  electron.gsfTrack()->hitPattern().numberOfAllHits(reco::HitPattern::MISSING_INNER_HITS);
 	    bool heepPass = false;
 
             if ( heepPt > 35. && fabs(heepEta) < 1.4442 ) {
@@ -392,7 +392,7 @@ public: // interface
             if (electron.ecalEnergy()==0) Ooemoop = 999.;
             else if (!std::isfinite(electron.ecalEnergy())) Ooemoop = 998.;
             else Ooemoop = (1.0/electron.ecalEnergy() - electron.eSuperClusterOverP()/electron.ecalEnergy());
-            Int_t mHits   =  electron.gsfTrack()->hitPattern().numberOfHits(reco::HitPattern::MISSING_INNER_HITS);
+            Int_t mHits   =  electron.gsfTrack()->hitPattern().numberOfAllHits(reco::HitPattern::MISSING_INNER_HITS);
             //Bool_t vtxFitConv = electron.passConversionVeto();
             const reco::BeamSpot &beamspot = *bsHandle.product();
             Bool_t vtxFitConv = ConversionTools::hasMatchedConversion(electron, conversions, beamspot.position());

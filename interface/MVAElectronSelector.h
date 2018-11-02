@@ -229,7 +229,7 @@ public: // interface
         fbrem           = electron.fbrem();
       
         gsfhits         = electron.gsfTrack()->found();
-        expectedMissingInnerHits = electron.gsfTrack()->hitPattern().numberOfHits(reco::HitPattern::MISSING_INNER_HITS);
+        expectedMissingInnerHits = electron.gsfTrack()->hitPattern().numberOfAllHits(reco::HitPattern::MISSING_INNER_HITS);
       
         reco::ConversionRef conv_ref = ConversionTools::matchedConversion(electron, conversions, beamspot.position());
         double vertexFitProbability = -1.; 

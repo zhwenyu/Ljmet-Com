@@ -128,12 +128,15 @@ int TTbarMassCalc::AnalyzeEvent(edm::EventBase const & event,
 	    const reco::Candidate *W = p.daughter(1);
 	    if(abs(d2Id)==5) W = p.daughter(0);
 
-	    while(W->numberOfDaughters() == 1) W = W->daughter(0);
-	    
+	    while(W->numberOfDaughters() == 1) W = W->daughter(0);	    
+	    if(W->daughter(1)->pdgId() == 22) W = W->daughter(0);	    
+	    while(W->numberOfDaughters() == 1) W = W->daughter(0);	    
+
 	    size_t nWDs = W->numberOfDaughters();
 	    if(nWDs > 2) cout << "W daughters: " << nWDs << endl;
 	    int Wd1Id = abs(W->daughter(0)->pdgId());
 	    int Wd2Id = abs(W->daughter(1)->pdgId());
+
 	    if((Wd1Id > 10 && Wd1Id < 17 && Wd2Id > 10 && Wd2Id < 17) || (Wd1Id < 6 && Wd2Id < 6)){
 	      topWID.push_back(W->daughter(0)->pdgId());
 	      topWID.push_back(W->daughter(1)->pdgId());
@@ -145,7 +148,7 @@ int TTbarMassCalc::AnalyzeEvent(edm::EventBase const & event,
 	      topWPhi.push_back(W->daughter(1)->phi());
 	      topWEnergy.push_back(W->daughter(0)->energy());
 	      topWEnergy.push_back(W->daughter(1)->energy());
-	    }else{
+	    }else{	      
 	      cout << "Weird W decay: " << Wd1Id << ", " << Wd2Id << endl;
 	    }
 	  }else{

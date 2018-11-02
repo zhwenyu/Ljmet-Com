@@ -27,10 +27,11 @@ void BaseEventSelector::JECbyIOV(edm::EventBase const & event) {
 
   int iRun   = event.id().run();
 
-  if(iRun <= 276811){ JetCorrector = JetCorrector_BCD; JetCorrectorAK8 = JetCorrectorAK8_BCD;}
-  else if(iRun <= 278801){ JetCorrector = JetCorrector_EF; JetCorrectorAK8 = JetCorrectorAK8_EF;}
-  else if(iRun <= 280385){ JetCorrector = JetCorrector_G; JetCorrectorAK8 = JetCorrectorAK8_G;}
-  else{ JetCorrector = JetCorrector_H; JetCorrectorAK8 = JetCorrectorAK8_H;}
+  if(iRun <= 299330){ JetCorrector = JetCorrector_B; JetCorrectorAK8 = JetCorrectorAK8_B;}
+  else if(iRun <= 302029){ JetCorrector = JetCorrector_C; JetCorrectorAK8 = JetCorrectorAK8_C;}
+  else if(iRun <= 303434){ JetCorrector = JetCorrector_D; JetCorrectorAK8 = JetCorrectorAK8_D;}
+  else if(iRun <= 304827){ JetCorrector = JetCorrector_E; JetCorrectorAK8 = JetCorrectorAK8_E;}
+  else{ JetCorrector = JetCorrector_F; JetCorrectorAK8 = JetCorrectorAK8_F;}
   
 }
 
@@ -44,7 +45,9 @@ void BaseEventSelector::BeginJob(std::map<std::string, edm::ParameterSet const >
         else mbPar["isMc"] = false;
         
         if (par[_key].exists("btagOP")) msPar["btagOP"] = par[_key].getParameter<std::string> ("btagOP");
-        else msPar["btagOP"] = "CSVM";
+        else msPar["btagOP"] = "MEDIUM";
+        if (par[_key].exists("bdisc_min")) mdPar["bdisc_min"] = par[_key].getParameter<double> ("bdisc_min");
+        else mdPar["bdisc_min"] = 0.4941;
         
         if (par[_key].exists("JECup")) mbPar["JECup"] = par[_key].getParameter<bool> ("JECup");
         else mbPar["JECup"] = false;
@@ -166,6 +169,11 @@ void BaseEventSelector::BeginJob(std::map<std::string, edm::ParameterSet const >
 	msPar["DataL3JetParByIOVAK8"] = msPar["DataL3JetParAK8"];
 	msPar["DataResJetParByIOVAK8"] = msPar["DataResJetParAK8"];
 
+	if (par[_key].exists("DeepCSVfile")) msPar["DeepCSVfile"] = par[_key].getParameter<std::string> ("DeepCSVfile");
+	else msPar["DeepCSVfile"] = "data/DeepCSV_94XSF_v3_B_F.csv";
+	if (par[_key].exists("DeepCSVSubjetfile")) msPar["DeepCSVSubjetfile"] = par[_key].getParameter<std::string> ("DeepCSVSubjetfile");
+	else msPar["DeepCSVSubjetfile"] = "data/subjet_DeepCSV_94XSF_v3_B_F.csv";
+
         if (par[_key].exists("doNewJEC")) mbPar["doNewJEC"] = par[_key].getParameter<bool> ("doNewJEC");
         else mbPar["doNewJEC"] = false;
         
@@ -187,13 +195,13 @@ void BaseEventSelector::BeginJob(std::map<std::string, edm::ParameterSet const >
                 mvsPar["ElMVAweightFiles"].push_back("../weights/EIDmva_EB2_10_oldNonTrigSpring15_ConvVarCwoBoolean_TMVA412_FullStatLowPt_PairNegWeightsGlobal_BDT.weights.xml");
                 mvsPar["ElMVAweightFiles"].push_back("../weights/EIDmva_EE_10_oldNonTrigSpring15_ConvVarCwoBoolean_TMVA412_FullStatLowPt_PairNegWeightsGlobal_BDT.weights.xml");
             }
-            if ( par[_key].exists("ElMVAweightFiles_alt") )
-                mvsPar["ElMVAweightFiles_alt"] = par[_key].getParameter<std::vector<std::string> >("ElMVAweightFiles_alt");
-            if (mvsPar["ElMVAweightFiles_alt"].size()!=3) {
-                mvsPar["ElMVAweightFiles_alt"].clear();
-                mvsPar["ElMVAweightFiles_alt"].push_back("../weights/electronID_mva_Spring16_GeneralPurpose_V1_EB1_10.weights.xml");
-                mvsPar["ElMVAweightFiles_alt"].push_back("../weights/electronID_mva_Spring16_GeneralPurpose_V1_EB2_10.weights.xml");
-                mvsPar["ElMVAweightFiles_alt"].push_back("../weights/electronID_mva_Spring16_GeneralPurpose_V1_EE_10.weights.xml");
+            if ( par[_key].exists("ElMVAweightFiles_iso") )
+                mvsPar["ElMVAweightFiles_iso"] = par[_key].getParameter<std::vector<std::string> >("ElMVAweightFiles_iso");
+            if (mvsPar["ElMVAweightFiles_iso"].size()!=3) {
+                mvsPar["ElMVAweightFiles_iso"].clear();
+                mvsPar["ElMVAweightFiles_iso"].push_back("../weights/electronID_mva_Spring16_GeneralPurpose_V1_EB1_10.weights.xml");
+                mvsPar["ElMVAweightFiles_iso"].push_back("../weights/electronID_mva_Spring16_GeneralPurpose_V1_EB2_10.weights.xml");
+                mvsPar["ElMVAweightFiles_iso"].push_back("../weights/electronID_mva_Spring16_GeneralPurpose_V1_EE_10.weights.xml");
             }
             // these are for 25ns, and are up-to-date as of Sep 24 2015
             // this needs to be checked periodically, as well as the list of variables for the MVA
@@ -203,13 +211,34 @@ void BaseEventSelector::BeginJob(std::map<std::string, edm::ParameterSet const >
         }
         else mbPar["UseElMVA"] = false;
     }
-    
-    msPar["btagger"] = mBtagCond.getAlgoName(msPar["btagOP"]);
-    mdPar["btag_min_discr"] = mBtagCond.getDiscriminant(msPar["btagOP"]);
-    
-    bTagCut = mdPar["btag_min_discr"];
-    std::cout << "b-tag check "<<msPar["btagOP"]<<" "<< msPar["btagger"]<<" "<<mdPar["btag_min_discr"]<<std::endl;
- 
+        
+    bTagCut = mdPar["bdisc_min"];
+    std::cout << "b-tag check: DeepCSV "<<msPar["btagOP"]<<" > "<<mdPar["bdisc_min"]<<std::endl;
+    std::cout << "b-tag files: " << msPar["DeepCSVfile"] << ", " << msPar["DeepCSVSubjetfile"] << std::endl;
+    calib = BTagCalibration("deepcsv",msPar["DeepCSVfile"]);
+    // std::cout << "Loading subjet reader" << std::endl;
+    // calibsj = BTagCalibration("deepcsvsj",msPar["DeepCSVSubjetfile"]);
+    if(msPar["btagOP"] == "LOOSE"){
+      reader = BTagCalibrationReader(BTagEntry::OP_LOOSE, "central", {"up","down"});
+      // std::cout << "Reading subjet for LOOSE" << std::endl;
+      // readerSJ = BTagCalibrationReader(BTagEntry::OP_LOOSE, "central", {"up","down"});
+    }else if(msPar["btagOP"] == "TIGHT"){
+      reader = BTagCalibrationReader(BTagEntry::OP_TIGHT, "central", {"up","down"});
+    }else{
+      reader = BTagCalibrationReader(BTagEntry::OP_MEDIUM, "central", {"up","down"});
+      // std::cout << "Reading subjet for MEDIUM" << std::endl;
+      // readerSJ = BTagCalibrationReader(BTagEntry::OP_MEDIUM, "central", {"up","down"});
+    }
+    reader.load(calib, BTagEntry::FLAV_B, "comb");
+    reader.load(calib, BTagEntry::FLAV_C, "comb");
+    reader.load(calib, BTagEntry::FLAV_UDSG, "comb");
+    // std::cout << "Loading lt for FLAV_B" << std::endl;
+    // readerSJ.load(calibsj, BTagEntry::FLAV_B, "lt");
+    // std::cout << "Loading lt for FLAV_C" << std::endl;
+    // readerSJ.load(calibsj, BTagEntry::FLAV_C, "lt");
+    // std::cout << "Loading lt for FLAV_UDSG" << std::endl;
+    // readerSJ.load(calibsj, BTagEntry::FLAV_UDSG, "lt");
+
     if ( mbPar["isMc"] )
       jecUnc = new JetCorrectionUncertainty(msPar["JEC_txtfile"]);
 
@@ -219,14 +248,16 @@ void BaseEventSelector::BeginJob(std::map<std::string, edm::ParameterSet const >
 
     std::vector<JetCorrectorParameters> vPar;
     std::vector<JetCorrectorParameters> vParAK8;
-    std::vector<JetCorrectorParameters> vPar_BCD;
-    std::vector<JetCorrectorParameters> vParAK8_BCD;
-    std::vector<JetCorrectorParameters> vPar_EF;
-    std::vector<JetCorrectorParameters> vParAK8_EF;
-    std::vector<JetCorrectorParameters> vPar_G;
-    std::vector<JetCorrectorParameters> vParAK8_G;
-    std::vector<JetCorrectorParameters> vPar_H;
-    std::vector<JetCorrectorParameters> vParAK8_H;
+    std::vector<JetCorrectorParameters> vPar_B;
+    std::vector<JetCorrectorParameters> vParAK8_B;
+    std::vector<JetCorrectorParameters> vPar_C;
+    std::vector<JetCorrectorParameters> vParAK8_C;
+    std::vector<JetCorrectorParameters> vPar_D;
+    std::vector<JetCorrectorParameters> vParAK8_D;
+    std::vector<JetCorrectorParameters> vPar_E;
+    std::vector<JetCorrectorParameters> vParAK8_E;
+    std::vector<JetCorrectorParameters> vPar_F;
+    std::vector<JetCorrectorParameters> vParAK8_F;
 
     if ( mbPar["isMc"] ) {
       // Create the JetCorrectorParameter objects, the order does not matter.
@@ -261,169 +292,207 @@ void BaseEventSelector::BeginJob(std::map<std::string, edm::ParameterSet const >
     else if ( !mbPar["isMc"] ) {
       // Create the JetCorrectorParameter objects, the order does not matter.
       
-      std::string strBCD = msPar["DataL1JetPar"];
-      std::string strEF = strBCD; boost::replace_first(strEF,"BCD","EF");
-      std::string strG = strBCD; boost::replace_first(strG,"BCD","G");
-      std::string strH = strBCD; boost::replace_first(strH,"BCD","H");  
-      msPar["DataL1JetParByIOV_BCD"] = strBCD;
-      msPar["DataL1JetParByIOV_EF"] = strEF;
-      msPar["DataL1JetParByIOV_G"] = strG;
-      msPar["DataL1JetParByIOV_H"] = strH;
+      std::string strB = msPar["DataL1JetPar"];
+      std::string strC = strB; boost::replace_first(strC,"B","C");
+      std::string strD = strB; boost::replace_first(strD,"B","D");
+      std::string strE = strB; boost::replace_first(strE,"B","E");  
+      std::string strF = strB; boost::replace_first(strF,"B","F");  
+      msPar["DataL1JetParByIOV_B"] = strB;
+      msPar["DataL1JetParByIOV_C"] = strC;
+      msPar["DataL1JetParByIOV_D"] = strD;
+      msPar["DataL1JetParByIOV_E"] = strE;
+      msPar["DataL1JetParByIOV_F"] = strF;
 
-      strBCD = msPar["DataL2JetPar"];
-      strEF = strBCD; boost::replace_first(strEF,"BCD","EF");
-      strG = strBCD; boost::replace_first(strG,"BCD","G");
-      strH = strBCD; boost::replace_first(strH,"BCD","H");  
-      msPar["DataL2JetParByIOV_BCD"] = strBCD;
-      msPar["DataL2JetParByIOV_EF"] = strEF;
-      msPar["DataL2JetParByIOV_G"] = strG;
-      msPar["DataL2JetParByIOV_H"] = strH;
+      strB = msPar["DataL2JetPar"];
+      strC = strB; boost::replace_first(strC,"B","C");
+      strD = strB; boost::replace_first(strD,"B","D");
+      strE = strB; boost::replace_first(strE,"B","E");  
+      strF = strB; boost::replace_first(strE,"B","F");  
+      msPar["DataL2JetParByIOV_B"] = strB;
+      msPar["DataL2JetParByIOV_C"] = strC;
+      msPar["DataL2JetParByIOV_D"] = strD;
+      msPar["DataL2JetParByIOV_E"] = strE;
+      msPar["DataL2JetParByIOV_F"] = strF;
 
-      strBCD = msPar["DataL3JetPar"];
-      strEF = strBCD; boost::replace_first(strEF,"BCD","EF");
-      strG = strBCD; boost::replace_first(strG,"BCD","G");
-      strH = strBCD; boost::replace_first(strH,"BCD","H");  
-      msPar["DataL3JetParByIOV_BCD"] = strBCD;
-      msPar["DataL3JetParByIOV_EF"] = strEF;
-      msPar["DataL3JetParByIOV_G"] = strG;
-      msPar["DataL3JetParByIOV_H"] = strH;
+      strB = msPar["DataL3JetPar"];
+      strC = strB; boost::replace_first(strC,"B","C");
+      strD = strB; boost::replace_first(strD,"B","D");
+      strE = strB; boost::replace_first(strE,"B","E");  
+      strF = strB; boost::replace_first(strE,"B","F");  
+      msPar["DataL3JetParByIOV_B"] = strB;
+      msPar["DataL3JetParByIOV_C"] = strC;
+      msPar["DataL3JetParByIOV_D"] = strD;
+      msPar["DataL3JetParByIOV_E"] = strE;
+      msPar["DataL3JetParByIOV_F"] = strF;
 
-      strBCD = msPar["DataResJetPar"];
-      strEF = strBCD; boost::replace_first(strEF,"BCD","EF");
-      strG = strBCD; boost::replace_first(strG,"BCD","G");
-      strH = strBCD; boost::replace_first(strH,"BCD","H");  
-      msPar["DataResJetParByIOV_BCD"] = strBCD;
-      msPar["DataResJetParByIOV_EF"] = strEF;
-      msPar["DataResJetParByIOV_G"] = strG;
-      msPar["DataResJetParByIOV_H"] = strH;
+      strB = msPar["DataResJetPar"];
+      strC = strB; boost::replace_first(strC,"B","C");
+      strD = strB; boost::replace_first(strD,"B","D");
+      strE = strB; boost::replace_first(strE,"B","E");  
+      strF = strB; boost::replace_first(strE,"B","F");  
+      msPar["DataResJetParByIOV_B"] = strB;
+      msPar["DataResJetParByIOV_C"] = strC;
+      msPar["DataResJetParByIOV_D"] = strD;
+      msPar["DataResJetParByIOV_E"] = strE;
+      msPar["DataResJetParByIOV_F"] = strF;
 
-      strBCD = msPar["DataL1JetParAK8"];
-      strEF = strBCD; boost::replace_first(strEF,"BCD","EF");
-      strG = strBCD; boost::replace_first(strG,"BCD","G");
-      strH = strBCD; boost::replace_first(strH,"BCD","H");  
-      msPar["DataL1JetParAK8ByIOV_BCD"] = strBCD;
-      msPar["DataL1JetParAK8ByIOV_EF"] = strEF;
-      msPar["DataL1JetParAK8ByIOV_G"] = strG;
-      msPar["DataL1JetParAK8ByIOV_H"] = strH;
+      strB = msPar["DataL1JetParAK8"];
+      strC = strB; boost::replace_first(strC,"B","C");
+      strD = strB; boost::replace_first(strD,"B","D");
+      strE = strB; boost::replace_first(strE,"B","E");  
+      strF = strB; boost::replace_first(strE,"B","F");  
+      msPar["DataL1JetParAK8ByIOV_B"] = strB;
+      msPar["DataL1JetParAK8ByIOV_C"] = strC;
+      msPar["DataL1JetParAK8ByIOV_D"] = strD;
+      msPar["DataL1JetParAK8ByIOV_E"] = strE;
+      msPar["DataL1JetParAK8ByIOV_F"] = strF;
 
-      strBCD = msPar["DataL2JetParAK8"];
-      strEF = strBCD; boost::replace_first(strEF,"BCD","EF");
-      strG = strBCD; boost::replace_first(strG,"BCD","G");
-      strH = strBCD; boost::replace_first(strH,"BCD","H");  
-      msPar["DataL2JetParAK8ByIOV_BCD"] = strBCD;
-      msPar["DataL2JetParAK8ByIOV_EF"] = strEF;
-      msPar["DataL2JetParAK8ByIOV_G"] = strG;
-      msPar["DataL2JetParAK8ByIOV_H"] = strH;
+      strB = msPar["DataL2JetParAK8"];
+      strC = strB; boost::replace_first(strC,"B","C");
+      strD = strB; boost::replace_first(strD,"B","D");
+      strE = strB; boost::replace_first(strE,"B","E");  
+      strE = strB; boost::replace_first(strE,"B","F");  
+      msPar["DataL2JetParAK8ByIOV_B"] = strB;
+      msPar["DataL2JetParAK8ByIOV_C"] = strC;
+      msPar["DataL2JetParAK8ByIOV_D"] = strD;
+      msPar["DataL2JetParAK8ByIOV_E"] = strE;
+      msPar["DataL2JetParAK8ByIOV_F"] = strF;
 
-      strBCD = msPar["DataL3JetParAK8"];
-      strEF = strBCD; boost::replace_first(strEF,"BCD","EF");
-      strG = strBCD; boost::replace_first(strG,"BCD","G");
-      strH = strBCD; boost::replace_first(strH,"BCD","H");  
-      msPar["DataL3JetParAK8ByIOV_BCD"] = strBCD;
-      msPar["DataL3JetParAK8ByIOV_EF"] = strEF;
-      msPar["DataL3JetParAK8ByIOV_G"] = strG;
-      msPar["DataL3JetParAK8ByIOV_H"] = strH;
+      strB = msPar["DataL3JetParAK8"];
+      strC = strB; boost::replace_first(strC,"B","C");
+      strD = strB; boost::replace_first(strD,"B","D");
+      strE = strB; boost::replace_first(strE,"B","E");  
+      strF = strB; boost::replace_first(strE,"B","F");  
+      msPar["DataL3JetParAK8ByIOV_B"] = strB;
+      msPar["DataL3JetParAK8ByIOV_C"] = strC;
+      msPar["DataL3JetParAK8ByIOV_D"] = strD;
+      msPar["DataL3JetParAK8ByIOV_E"] = strE;
+      msPar["DataL3JetParAK8ByIOV_F"] = strF;
 
-      strBCD = msPar["DataResJetParAK8"];
-      strEF = strBCD; boost::replace_first(strEF,"BCD","EF");
-      strG = strBCD; boost::replace_first(strG,"BCD","G");
-      strH = strBCD; boost::replace_first(strH,"BCD","H");  
-      msPar["DataResJetParAK8ByIOV_BCD"] = strBCD;
-      msPar["DataResJetParAK8ByIOV_EF"] = strEF;
-      msPar["DataResJetParAK8ByIOV_G"] = strG;
-      msPar["DataResJetParAK8ByIOV_H"] = strH;
+      strB = msPar["DataResJetParAK8"];
+      strC = strB; boost::replace_first(strC,"B","C");
+      strD = strB; boost::replace_first(strD,"B","D");
+      strE = strB; boost::replace_first(strE,"B","E");  
+      strF = strB; boost::replace_first(strE,"B","F");  
+      msPar["DataResJetParAK8ByIOV_B"] = strB;
+      msPar["DataResJetParAK8ByIOV_C"] = strC;
+      msPar["DataResJetParAK8ByIOV_D"] = strD;
+      msPar["DataResJetParAK8ByIOV_E"] = strE;
+      msPar["DataResJetParAK8ByIOV_F"] = strF;
 
-      ResJetPar_BCD = new JetCorrectorParameters(msPar["DataResJetParByIOV_BCD"]); 
-      L3JetPar_BCD  = new JetCorrectorParameters(msPar["DataL3JetParByIOV_BCD"]);
-      L2JetPar_BCD  = new JetCorrectorParameters(msPar["DataL2JetParByIOV_BCD"]);
-      L1JetPar_BCD  = new JetCorrectorParameters(msPar["DataL1JetParByIOV_BCD"]);
-      ResJetParAK8_BCD = new JetCorrectorParameters(msPar["DataResJetParAK8ByIOV_BCD"]); 
-      L3JetParAK8_BCD  = new JetCorrectorParameters(msPar["DataL3JetParAK8ByIOV_BCD"]);
-      L2JetParAK8_BCD  = new JetCorrectorParameters(msPar["DataL2JetParAK8ByIOV_BCD"]);
-      L1JetParAK8_BCD  = new JetCorrectorParameters(msPar["DataL1JetParAK8ByIOV_BCD"]);
+      ResJetPar_B = new JetCorrectorParameters(msPar["DataResJetParByIOV_B"]); 
+      L3JetPar_B  = new JetCorrectorParameters(msPar["DataL3JetParByIOV_B"]);
+      L2JetPar_B  = new JetCorrectorParameters(msPar["DataL2JetParByIOV_B"]);
+      L1JetPar_B  = new JetCorrectorParameters(msPar["DataL1JetParByIOV_B"]);
+      ResJetParAK8_B = new JetCorrectorParameters(msPar["DataResJetParAK8ByIOV_B"]); 
+      L3JetParAK8_B  = new JetCorrectorParameters(msPar["DataL3JetParAK8ByIOV_B"]);
+      L2JetParAK8_B  = new JetCorrectorParameters(msPar["DataL2JetParAK8ByIOV_B"]);
+      L1JetParAK8_B  = new JetCorrectorParameters(msPar["DataL1JetParAK8ByIOV_B"]);
 
-      ResJetPar_EF = new JetCorrectorParameters(msPar["DataResJetParByIOV_EF"]); 
-      L3JetPar_EF  = new JetCorrectorParameters(msPar["DataL3JetParByIOV_EF"]);
-      L2JetPar_EF  = new JetCorrectorParameters(msPar["DataL2JetParByIOV_EF"]);
-      L1JetPar_EF  = new JetCorrectorParameters(msPar["DataL1JetParByIOV_EF"]);
-      ResJetParAK8_EF = new JetCorrectorParameters(msPar["DataResJetParAK8ByIOV_EF"]); 
-      L3JetParAK8_EF  = new JetCorrectorParameters(msPar["DataL3JetParAK8ByIOV_EF"]);
-      L2JetParAK8_EF  = new JetCorrectorParameters(msPar["DataL2JetParAK8ByIOV_EF"]);
-      L1JetParAK8_EF  = new JetCorrectorParameters(msPar["DataL1JetParAK8ByIOV_EF"]);
+      ResJetPar_C = new JetCorrectorParameters(msPar["DataResJetParByIOV_C"]); 
+      L3JetPar_C  = new JetCorrectorParameters(msPar["DataL3JetParByIOV_C"]);
+      L2JetPar_C  = new JetCorrectorParameters(msPar["DataL2JetParByIOV_C"]);
+      L1JetPar_C  = new JetCorrectorParameters(msPar["DataL1JetParByIOV_C"]);
+      ResJetParAK8_C = new JetCorrectorParameters(msPar["DataResJetParAK8ByIOV_C"]); 
+      L3JetParAK8_C  = new JetCorrectorParameters(msPar["DataL3JetParAK8ByIOV_C"]);
+      L2JetParAK8_C  = new JetCorrectorParameters(msPar["DataL2JetParAK8ByIOV_C"]);
+      L1JetParAK8_C  = new JetCorrectorParameters(msPar["DataL1JetParAK8ByIOV_C"]);
 
-      ResJetPar_G = new JetCorrectorParameters(msPar["DataResJetParByIOV_G"]); 
-      L3JetPar_G  = new JetCorrectorParameters(msPar["DataL3JetParByIOV_G"]);
-      L2JetPar_G  = new JetCorrectorParameters(msPar["DataL2JetParByIOV_G"]);
-      L1JetPar_G  = new JetCorrectorParameters(msPar["DataL1JetParByIOV_G"]);
-      ResJetParAK8_G = new JetCorrectorParameters(msPar["DataResJetParAK8ByIOV_G"]); 
-      L3JetParAK8_G  = new JetCorrectorParameters(msPar["DataL3JetParAK8ByIOV_G"]);
-      L2JetParAK8_G  = new JetCorrectorParameters(msPar["DataL2JetParAK8ByIOV_G"]);
-      L1JetParAK8_G  = new JetCorrectorParameters(msPar["DataL1JetParAK8ByIOV_G"]);
+      ResJetPar_D = new JetCorrectorParameters(msPar["DataResJetParByIOV_D"]); 
+      L3JetPar_D  = new JetCorrectorParameters(msPar["DataL3JetParByIOV_D"]);
+      L2JetPar_D  = new JetCorrectorParameters(msPar["DataL2JetParByIOV_D"]);
+      L1JetPar_D  = new JetCorrectorParameters(msPar["DataL1JetParByIOV_D"]);
+      ResJetParAK8_D = new JetCorrectorParameters(msPar["DataResJetParAK8ByIOV_D"]); 
+      L3JetParAK8_D  = new JetCorrectorParameters(msPar["DataL3JetParAK8ByIOV_D"]);
+      L2JetParAK8_D  = new JetCorrectorParameters(msPar["DataL2JetParAK8ByIOV_D"]);
+      L1JetParAK8_D  = new JetCorrectorParameters(msPar["DataL1JetParAK8ByIOV_D"]);
 
-      ResJetPar_H = new JetCorrectorParameters(msPar["DataResJetParByIOV_H"]); 
-      L3JetPar_H  = new JetCorrectorParameters(msPar["DataL3JetParByIOV_H"]);
-      L2JetPar_H  = new JetCorrectorParameters(msPar["DataL2JetParByIOV_H"]);
-      L1JetPar_H  = new JetCorrectorParameters(msPar["DataL1JetParByIOV_H"]);
-      ResJetParAK8_H = new JetCorrectorParameters(msPar["DataResJetParAK8ByIOV_H"]); 
-      L3JetParAK8_H  = new JetCorrectorParameters(msPar["DataL3JetParAK8ByIOV_H"]);
-      L2JetParAK8_H  = new JetCorrectorParameters(msPar["DataL2JetParAK8ByIOV_H"]);
-      L1JetParAK8_H  = new JetCorrectorParameters(msPar["DataL1JetParAK8ByIOV_H"]);
+      ResJetPar_E = new JetCorrectorParameters(msPar["DataResJetParByIOV_E"]); 
+      L3JetPar_E  = new JetCorrectorParameters(msPar["DataL3JetParByIOV_E"]);
+      L2JetPar_E  = new JetCorrectorParameters(msPar["DataL2JetParByIOV_E"]);
+      L1JetPar_E  = new JetCorrectorParameters(msPar["DataL1JetParByIOV_E"]);
+      ResJetParAK8_E = new JetCorrectorParameters(msPar["DataResJetParAK8ByIOV_E"]); 
+      L3JetParAK8_E  = new JetCorrectorParameters(msPar["DataL3JetParAK8ByIOV_E"]);
+      L2JetParAK8_E  = new JetCorrectorParameters(msPar["DataL2JetParAK8ByIOV_E"]);
+      L1JetParAK8_E  = new JetCorrectorParameters(msPar["DataL1JetParAK8ByIOV_E"]);
+
+      ResJetPar_F = new JetCorrectorParameters(msPar["DataResJetParByIOV_F"]); 
+      L3JetPar_F  = new JetCorrectorParameters(msPar["DataL3JetParByIOV_F"]);
+      L2JetPar_F  = new JetCorrectorParameters(msPar["DataL2JetParByIOV_F"]);
+      L1JetPar_F  = new JetCorrectorParameters(msPar["DataL1JetParByIOV_F"]);
+      ResJetParAK8_F = new JetCorrectorParameters(msPar["DataResJetParAK8ByIOV_F"]); 
+      L3JetParAK8_F  = new JetCorrectorParameters(msPar["DataL3JetParAK8ByIOV_F"]);
+      L2JetParAK8_F  = new JetCorrectorParameters(msPar["DataL2JetParAK8ByIOV_F"]);
+      L1JetParAK8_F  = new JetCorrectorParameters(msPar["DataL1JetParAK8ByIOV_F"]);
 
       // Load the JetCorrectorParameter objects into a std::vector,
       // IMPORTANT: THE ORDER MATTERS HERE !!!! 
-      vPar_BCD.push_back(*L1JetPar_BCD);
-      vPar_BCD.push_back(*L2JetPar_BCD);
-      vPar_BCD.push_back(*L3JetPar_BCD);
-      vPar_BCD.push_back(*ResJetPar_BCD);      
-      vParAK8_BCD.push_back(*L1JetParAK8_BCD);
-      vParAK8_BCD.push_back(*L2JetParAK8_BCD);
-      vParAK8_BCD.push_back(*L3JetParAK8_BCD);
-      vParAK8_BCD.push_back(*ResJetParAK8_BCD);
+      vPar_B.push_back(*L1JetPar_B);
+      vPar_B.push_back(*L2JetPar_B);
+      vPar_B.push_back(*L3JetPar_B);
+      vPar_B.push_back(*ResJetPar_B);      
+      vParAK8_B.push_back(*L1JetParAK8_B);
+      vParAK8_B.push_back(*L2JetParAK8_B);
+      vParAK8_B.push_back(*L3JetParAK8_B);
+      vParAK8_B.push_back(*ResJetParAK8_B);
 
-      vPar_EF.push_back(*L1JetPar_EF);
-      vPar_EF.push_back(*L2JetPar_EF);
-      vPar_EF.push_back(*L3JetPar_EF);
-      vPar_EF.push_back(*ResJetPar_EF);      
-      vParAK8_EF.push_back(*L1JetParAK8_EF);
-      vParAK8_EF.push_back(*L2JetParAK8_EF);
-      vParAK8_EF.push_back(*L3JetParAK8_EF);
-      vParAK8_EF.push_back(*ResJetParAK8_EF);
+      vPar_C.push_back(*L1JetPar_C);
+      vPar_C.push_back(*L2JetPar_C);
+      vPar_C.push_back(*L3JetPar_C);
+      vPar_C.push_back(*ResJetPar_C);      
+      vParAK8_C.push_back(*L1JetParAK8_C);
+      vParAK8_C.push_back(*L2JetParAK8_C);
+      vParAK8_C.push_back(*L3JetParAK8_C);
+      vParAK8_C.push_back(*ResJetParAK8_C);
 
-      vPar_G.push_back(*L1JetPar_G);
-      vPar_G.push_back(*L2JetPar_G);
-      vPar_G.push_back(*L3JetPar_G);
-      vPar_G.push_back(*ResJetPar_G);      
-      vParAK8_G.push_back(*L1JetParAK8_G);
-      vParAK8_G.push_back(*L2JetParAK8_G);
-      vParAK8_G.push_back(*L3JetParAK8_G);
-      vParAK8_G.push_back(*ResJetParAK8_G);
+      vPar_D.push_back(*L1JetPar_D);
+      vPar_D.push_back(*L2JetPar_D);
+      vPar_D.push_back(*L3JetPar_D);
+      vPar_D.push_back(*ResJetPar_D);      
+      vParAK8_D.push_back(*L1JetParAK8_D);
+      vParAK8_D.push_back(*L2JetParAK8_D);
+      vParAK8_D.push_back(*L3JetParAK8_D);
+      vParAK8_D.push_back(*ResJetParAK8_D);
 
-      vPar_H.push_back(*L1JetPar_H);
-      vPar_H.push_back(*L2JetPar_H);
-      vPar_H.push_back(*L3JetPar_H);
-      vPar_H.push_back(*ResJetPar_H);      
-      vParAK8_H.push_back(*L1JetParAK8_H);
-      vParAK8_H.push_back(*L2JetParAK8_H);
-      vParAK8_H.push_back(*L3JetParAK8_H);
-      vParAK8_H.push_back(*ResJetParAK8_H);
+      vPar_E.push_back(*L1JetPar_E);
+      vPar_E.push_back(*L2JetPar_E);
+      vPar_E.push_back(*L3JetPar_E);
+      vPar_E.push_back(*ResJetPar_E);      
+      vParAK8_E.push_back(*L1JetParAK8_E);
+      vParAK8_E.push_back(*L2JetParAK8_E);
+      vParAK8_E.push_back(*L3JetParAK8_E);
+      vParAK8_E.push_back(*ResJetParAK8_E);
 
-      delete JetCorrector_BCD;
-      delete JetCorrector_EF;
-      delete JetCorrector_G;
-      delete JetCorrector_H;
-      delete JetCorrectorAK8_BCD;
-      delete JetCorrectorAK8_EF;
-      delete JetCorrectorAK8_G;
-      delete JetCorrectorAK8_H;
+      vPar_F.push_back(*L1JetPar_F);
+      vPar_F.push_back(*L2JetPar_F);
+      vPar_F.push_back(*L3JetPar_F);
+      vPar_F.push_back(*ResJetPar_F);      
+      vParAK8_F.push_back(*L1JetParAK8_F);
+      vParAK8_F.push_back(*L2JetParAK8_F);
+      vParAK8_F.push_back(*L3JetParAK8_F);
+      vParAK8_F.push_back(*ResJetParAK8_F);
+
+      delete JetCorrector_B;
+      delete JetCorrector_C;
+      delete JetCorrector_D;
+      delete JetCorrector_E;
+      delete JetCorrector_F;
+      delete JetCorrectorAK8_B;
+      delete JetCorrectorAK8_C;
+      delete JetCorrectorAK8_D;
+      delete JetCorrectorAK8_E;
+      delete JetCorrectorAK8_F;
       
-      JetCorrector_BCD = new FactorizedJetCorrector(vPar_BCD);
-      JetCorrectorAK8_BCD = new FactorizedJetCorrector(vParAK8_BCD);
-      JetCorrector_EF = new FactorizedJetCorrector(vPar_EF);
-      JetCorrectorAK8_EF = new FactorizedJetCorrector(vParAK8_EF);
-      JetCorrector_G = new FactorizedJetCorrector(vPar_G);
-      JetCorrectorAK8_G = new FactorizedJetCorrector(vParAK8_G);
-      JetCorrector_H = new FactorizedJetCorrector(vPar_H);
-      JetCorrectorAK8_H = new FactorizedJetCorrector(vParAK8_H);
+      JetCorrector_B = new FactorizedJetCorrector(vPar_B);
+      JetCorrectorAK8_B = new FactorizedJetCorrector(vParAK8_B);
+      JetCorrector_C = new FactorizedJetCorrector(vPar_C);
+      JetCorrectorAK8_C = new FactorizedJetCorrector(vParAK8_C);
+      JetCorrector_D = new FactorizedJetCorrector(vPar_D);
+      JetCorrectorAK8_D = new FactorizedJetCorrector(vParAK8_D);
+      JetCorrector_E = new FactorizedJetCorrector(vPar_E);
+      JetCorrectorAK8_E = new FactorizedJetCorrector(vParAK8_E);
+      JetCorrector_F = new FactorizedJetCorrector(vPar_F);
+      JetCorrectorAK8_F = new FactorizedJetCorrector(vParAK8_F);
 
     }
  
@@ -435,11 +504,11 @@ void BaseEventSelector::BeginJob(std::map<std::string, edm::ParameterSet const >
         // Pure ECAL -> shower shapes
         tmpTMVAReader_EB.AddVariable("ele_oldsigmaietaieta", &allMVAVars.see);
         tmpTMVAReader_EB.AddVariable("ele_oldsigmaiphiiphi", &allMVAVars.spp);
-        tmpTMVAReader_EB.AddVariable("ele_oldcircularity",   &allMVAVars.OneMinusE1x5E5x5);
+        tmpTMVAReader_EB.AddVariable("ele_oldcircularity",   &allMVAVars.circularity);
         tmpTMVAReader_EB.AddVariable("ele_oldr9",            &allMVAVars.R9);
         tmpTMVAReader_EB.AddVariable("ele_scletawidth",      &allMVAVars.etawidth);
         tmpTMVAReader_EB.AddVariable("ele_sclphiwidth",      &allMVAVars.phiwidth);
-        tmpTMVAReader_EB.AddVariable("ele_he",               &allMVAVars.HoE);
+        tmpTMVAReader_EB.AddVariable("ele_oldhe",               &allMVAVars.HoE);
         
         //Pure tracking variables
         tmpTMVAReader_EB.AddVariable("ele_kfhits",           &allMVAVars.kfhits);
@@ -462,30 +531,17 @@ void BaseEventSelector::BeginJob(std::map<std::string, edm::ParameterSet const >
         tmpTMVAReader_EB.AddVariable("ele_deltaphiin",      &allMVAVars.dphi);
         tmpTMVAReader_EB.AddVariable("ele_deltaetaseed",    &allMVAVars.detacalo);
 
-        // Spectator variables  
-        tmpTMVAReader_EB.AddSpectator("ele_pT",             &allMVAVars.pt);
-        tmpTMVAReader_EB.AddSpectator("ele_isbarrel",       &allMVAVars.isBarrel);
-        tmpTMVAReader_EB.AddSpectator("ele_isendcap",       &allMVAVars.isEndcap);
-        tmpTMVAReader_EB.AddSpectator("scl_eta",            &allMVAVars.SCeta);
-      
-        tmpTMVAReader_EB.AddSpectator("ele_eClass",                 &allMVAVars.eClass);
-        tmpTMVAReader_EB.AddSpectator("ele_pfRelIso",               &allMVAVars.pfRelIso);
-        tmpTMVAReader_EB.AddSpectator("ele_expected_inner_hits",    &allMVAVars.expectedInnerHits);
-        tmpTMVAReader_EB.AddSpectator("ele_vtxconv",                &allMVAVars.vtxconv);
-        tmpTMVAReader_EB.AddSpectator("mc_event_weight",            &allMVAVars.mcEventWeight);
-        tmpTMVAReader_EB.AddSpectator("mc_ele_CBmatching_category", &allMVAVars.mcCBmatchingCategory);
+        tmpTMVAReader_EB.AddVariable("rho",    &allMVAVars.rho);
 
         // Pure ECAL -> shower shapes
         tmpTMVAReader_EE.AddVariable("ele_oldsigmaietaieta", &allMVAVars.see);
         tmpTMVAReader_EE.AddVariable("ele_oldsigmaiphiiphi", &allMVAVars.spp);
-        tmpTMVAReader_EE.AddVariable("ele_oldcircularity",   &allMVAVars.OneMinusE1x5E5x5);
+        tmpTMVAReader_EE.AddVariable("ele_oldcircularity",   &allMVAVars.circularity);
         tmpTMVAReader_EE.AddVariable("ele_oldr9",            &allMVAVars.R9);
         tmpTMVAReader_EE.AddVariable("ele_scletawidth",      &allMVAVars.etawidth);
         tmpTMVAReader_EE.AddVariable("ele_sclphiwidth",      &allMVAVars.phiwidth);
-        tmpTMVAReader_EE.AddVariable("ele_he",               &allMVAVars.HoE);
-        // Endcap only variables
-        tmpTMVAReader_EE.AddVariable("ele_psEoverEraw",    &allMVAVars.PreShowerOverRaw);
-        
+        tmpTMVAReader_EE.AddVariable("ele_oldhe",               &allMVAVars.HoE);
+       
         //Pure tracking variables
         tmpTMVAReader_EE.AddVariable("ele_kfhits",           &allMVAVars.kfhits);
         tmpTMVAReader_EE.AddVariable("ele_kfchi2",           &allMVAVars.kfchi2);
@@ -507,102 +563,107 @@ void BaseEventSelector::BeginJob(std::map<std::string, edm::ParameterSet const >
         tmpTMVAReader_EE.AddVariable("ele_deltaphiin",      &allMVAVars.dphi);
         tmpTMVAReader_EE.AddVariable("ele_deltaetaseed",    &allMVAVars.detacalo);
 
-        // Spectator variables  
-        tmpTMVAReader_EE.AddSpectator("ele_pT",             &allMVAVars.pt);
-        tmpTMVAReader_EE.AddSpectator("ele_isbarrel",       &allMVAVars.isBarrel);
-        tmpTMVAReader_EE.AddSpectator("ele_isendcap",       &allMVAVars.isEndcap);
-        tmpTMVAReader_EE.AddSpectator("scl_eta",            &allMVAVars.SCeta);
-      
-        tmpTMVAReader_EE.AddSpectator("ele_eClass",                 &allMVAVars.eClass);
-        tmpTMVAReader_EE.AddSpectator("ele_pfRelIso",               &allMVAVars.pfRelIso);
-        tmpTMVAReader_EE.AddSpectator("ele_expected_inner_hits",    &allMVAVars.expectedInnerHits);
-        tmpTMVAReader_EE.AddSpectator("ele_vtxconv",                &allMVAVars.vtxconv);
-        tmpTMVAReader_EE.AddSpectator("mc_event_weight",            &allMVAVars.mcEventWeight);
-        tmpTMVAReader_EE.AddSpectator("mc_ele_CBmatching_category", &allMVAVars.mcCBmatchingCategory);
+        tmpTMVAReader_EE.AddVariable("rho",    &allMVAVars.rho);
 
-        tmpTMVAReader_EB.BookMVA( "Spring15_V1_EB1",  mvsPar["ElMVAweightFiles"].at(0) );
-        tmpTMVAReader_EB.BookMVA( "Spring15_V1_EB2",  mvsPar["ElMVAweightFiles"].at(1) );
-        tmpTMVAReader_EE.BookMVA(  "Spring15_V1_EE",   mvsPar["ElMVAweightFiles"].at(2) );
-
-        //----alt----
-
-        tmpTMVAReader_EB_alt.SetOptions("!Color:Silent:!Error");
-        tmpTMVAReader_EE_alt.SetOptions("!Color:Silent:!Error");
-
-        // Pure ECAL -> shower shapes
-        tmpTMVAReader_EB_alt.AddVariable("ele_oldsigmaietaieta", &allMVAVars_alt.see);
-        tmpTMVAReader_EB_alt.AddVariable("ele_oldsigmaiphiiphi", &allMVAVars_alt.spp);
-        tmpTMVAReader_EB_alt.AddVariable("ele_oldcircularity",   &allMVAVars_alt.OneMinusE1x5E5x5);
-        tmpTMVAReader_EB_alt.AddVariable("ele_oldr9",            &allMVAVars_alt.R9);
-        tmpTMVAReader_EB_alt.AddVariable("ele_scletawidth",      &allMVAVars_alt.etawidth);
-        tmpTMVAReader_EB_alt.AddVariable("ele_sclphiwidth",      &allMVAVars_alt.phiwidth);
-        tmpTMVAReader_EB_alt.AddVariable("ele_oldhe",               &allMVAVars_alt.HoE);
-        
-        //Pure tracking variables
-        tmpTMVAReader_EB_alt.AddVariable("ele_kfhits",           &allMVAVars_alt.kfhits);
-        tmpTMVAReader_EB_alt.AddVariable("ele_kfchi2",           &allMVAVars_alt.kfchi2);
-        tmpTMVAReader_EB_alt.AddVariable("ele_gsfchi2",        &allMVAVars_alt.gsfchi2);
-      
-        // Energy matching
-        tmpTMVAReader_EB_alt.AddVariable("ele_fbrem",           &allMVAVars_alt.fbrem);
-      
-        tmpTMVAReader_EB_alt.AddVariable("ele_gsfhits",         &allMVAVars_alt.gsfhits);
-        tmpTMVAReader_EB_alt.AddVariable("ele_expected_inner_hits",             &allMVAVars_alt.expectedMissingInnerHits);
-        tmpTMVAReader_EB_alt.AddVariable("ele_conversionVertexFitProbability",  &allMVAVars_alt.convVtxFitProbability);
-      
-        tmpTMVAReader_EB_alt.AddVariable("ele_ep",              &allMVAVars_alt.EoP);
-        tmpTMVAReader_EB_alt.AddVariable("ele_eelepout",        &allMVAVars_alt.eleEoPout);
-        tmpTMVAReader_EB_alt.AddVariable("ele_IoEmIop",         &allMVAVars_alt.IoEmIoP);
-        
-        // Geometrical matchings
-        tmpTMVAReader_EB_alt.AddVariable("ele_deltaetain",      &allMVAVars_alt.deta);
-        tmpTMVAReader_EB_alt.AddVariable("ele_deltaphiin",      &allMVAVars_alt.dphi);
-        tmpTMVAReader_EB_alt.AddVariable("ele_deltaetaseed",    &allMVAVars_alt.detacalo);
-
-        // Spectator variables  
-        tmpTMVAReader_EB_alt.AddVariable("ele_pt",              &allMVAVars_alt.pt);
-        tmpTMVAReader_EB_alt.AddVariable("scl_eta",             &allMVAVars_alt.SCeta);
-      
-        // Pure ECAL -> shower shapes
-        tmpTMVAReader_EE_alt.AddVariable("ele_oldsigmaietaieta", &allMVAVars_alt.see);
-        tmpTMVAReader_EE_alt.AddVariable("ele_oldsigmaiphiiphi", &allMVAVars_alt.spp);
-        tmpTMVAReader_EE_alt.AddVariable("ele_oldcircularity",   &allMVAVars_alt.OneMinusE1x5E5x5);
-        tmpTMVAReader_EE_alt.AddVariable("ele_oldr9",            &allMVAVars_alt.R9);
-        tmpTMVAReader_EE_alt.AddVariable("ele_scletawidth",      &allMVAVars_alt.etawidth);
-        tmpTMVAReader_EE_alt.AddVariable("ele_sclphiwidth",      &allMVAVars_alt.phiwidth);
-        tmpTMVAReader_EE_alt.AddVariable("ele_oldhe",            &allMVAVars_alt.HoE);
-        
-        //Pure tracking variables
-        tmpTMVAReader_EE_alt.AddVariable("ele_kfhits",           &allMVAVars_alt.kfhits);
-        tmpTMVAReader_EE_alt.AddVariable("ele_kfchi2",           &allMVAVars_alt.kfchi2);
-        tmpTMVAReader_EE_alt.AddVariable("ele_gsfchi2",        &allMVAVars_alt.gsfchi2);
-      
-        // Energy matching
-        tmpTMVAReader_EE_alt.AddVariable("ele_fbrem",           &allMVAVars_alt.fbrem);
-      
-        tmpTMVAReader_EE_alt.AddVariable("ele_gsfhits",         &allMVAVars_alt.gsfhits);
-        tmpTMVAReader_EE_alt.AddVariable("ele_expected_inner_hits",             &allMVAVars_alt.expectedMissingInnerHits);
-        tmpTMVAReader_EE_alt.AddVariable("ele_conversionVertexFitProbability",  &allMVAVars_alt.convVtxFitProbability);
-      
-        tmpTMVAReader_EE_alt.AddVariable("ele_ep",              &allMVAVars_alt.EoP);
-        tmpTMVAReader_EE_alt.AddVariable("ele_eelepout",        &allMVAVars_alt.eleEoPout);
-        tmpTMVAReader_EE_alt.AddVariable("ele_IoEmIop",         &allMVAVars_alt.IoEmIoP);
-        
-        // Geometrical matchings
-        tmpTMVAReader_EE_alt.AddVariable("ele_deltaetain",      &allMVAVars_alt.deta);
-        tmpTMVAReader_EE_alt.AddVariable("ele_deltaphiin",      &allMVAVars_alt.dphi);
-        tmpTMVAReader_EE_alt.AddVariable("ele_deltaetaseed",    &allMVAVars_alt.detacalo);
-
-        // Spectator variables  
-        tmpTMVAReader_EE_alt.AddVariable("ele_pt",              &allMVAVars_alt.pt);
-        tmpTMVAReader_EE_alt.AddVariable("scl_eta",             &allMVAVars_alt.SCeta);
-      
         // Endcap only variables
-        tmpTMVAReader_EE_alt.AddVariable("ele_psEoverEraw",    &allMVAVars_alt.PreShowerOverRaw);
+        tmpTMVAReader_EE.AddVariable("ele_psEoverEraw",    &allMVAVars.PreShowerOverRaw);
 
-        tmpTMVAReader_EB_alt.BookMVA( "Spring16_V1_EB1",  mvsPar["ElMVAweightFiles_alt"].at(0) );
-        tmpTMVAReader_EB_alt.BookMVA( "Spring16_V1_EB2",  mvsPar["ElMVAweightFiles_alt"].at(1) );
-        tmpTMVAReader_EE_alt.BookMVA(  "Spring16_V1_EE",   mvsPar["ElMVAweightFiles_alt"].at(2) );
+        tmpTMVAReader_EB.BookMVA( "Fall17_EB1",  mvsPar["ElMVAweightFiles"].at(0) );
+        tmpTMVAReader_EB.BookMVA( "Fall17_EB2",  mvsPar["ElMVAweightFiles"].at(1) );
+        tmpTMVAReader_EE.BookMVA( "Fall17_EE",   mvsPar["ElMVAweightFiles"].at(2) );
+
+        //----iso----
+
+        tmpTMVAReader_EB_iso.SetOptions("!Color:Silent:!Error");
+        tmpTMVAReader_EE_iso.SetOptions("!Color:Silent:!Error");
+
+        // Pure ECAL -> shower shapes
+        tmpTMVAReader_EB_iso.AddVariable("ele_oldsigmaietaieta", &allMVAVars_iso.see);
+        tmpTMVAReader_EB_iso.AddVariable("ele_oldsigmaiphiiphi", &allMVAVars_iso.spp);
+        tmpTMVAReader_EB_iso.AddVariable("ele_oldcircularity",   &allMVAVars_iso.circularity);
+        tmpTMVAReader_EB_iso.AddVariable("ele_oldr9",            &allMVAVars_iso.R9);
+        tmpTMVAReader_EB_iso.AddVariable("ele_scletawidth",      &allMVAVars_iso.etawidth);
+        tmpTMVAReader_EB_iso.AddVariable("ele_sclphiwidth",      &allMVAVars_iso.phiwidth);
+        tmpTMVAReader_EB_iso.AddVariable("ele_oldhe",            &allMVAVars_iso.HoE);
+        
+        //Pure tracking variables
+        tmpTMVAReader_EB_iso.AddVariable("ele_kfhits",           &allMVAVars_iso.kfhits);
+        tmpTMVAReader_EB_iso.AddVariable("ele_kfchi2",           &allMVAVars_iso.kfchi2);
+        tmpTMVAReader_EB_iso.AddVariable("ele_gsfchi2",          &allMVAVars_iso.gsfchi2);
+      
+        // Energy matching
+        tmpTMVAReader_EB_iso.AddVariable("ele_fbrem",           &allMVAVars_iso.fbrem);
+      
+        tmpTMVAReader_EB_iso.AddVariable("ele_gsfhits",         &allMVAVars_iso.gsfhits);
+        tmpTMVAReader_EB_iso.AddVariable("ele_expected_inner_hits",             &allMVAVars_iso.expectedMissingInnerHits);
+        tmpTMVAReader_EB_iso.AddVariable("ele_conversionVertexFitProbability",  &allMVAVars_iso.convVtxFitProbability);
+      
+        tmpTMVAReader_EB_iso.AddVariable("ele_ep",              &allMVAVars_iso.EoP);
+        tmpTMVAReader_EB_iso.AddVariable("ele_eelepout",        &allMVAVars_iso.eleEoPout);
+        tmpTMVAReader_EB_iso.AddVariable("ele_IoEmIop",         &allMVAVars_iso.IoEmIoP);
+        
+        // Geometrical matchings
+        tmpTMVAReader_EB_iso.AddVariable("ele_deltaetain",      &allMVAVars_iso.deta);
+        tmpTMVAReader_EB_iso.AddVariable("ele_deltaphiin",      &allMVAVars_iso.dphi);
+        tmpTMVAReader_EB_iso.AddVariable("ele_deltaetaseed",    &allMVAVars_iso.detacalo);
+
+	// Isolation
+	tmpTMVAReader_EB_iso.AddVariable("ele_pfPhotonIso",     &allMVAVars_iso.pfPhotonIso);
+	tmpTMVAReader_EB_iso.AddVariable("ele_pfChargedHadIso",     &allMVAVars_iso.pfChargedHadIso);
+	tmpTMVAReader_EB_iso.AddVariable("ele_pfNeutralHadIso",     &allMVAVars_iso.pfNeutralHadIso);
+
+        tmpTMVAReader_EB_iso.AddVariable("rho",    &allMVAVars_iso.rho);
+
+        // Spectator variables  
+        //tmpTMVAReader_EB_iso.AddVariable("ele_pt",              &allMVAVars_iso.pt);
+        //tmpTMVAReader_EB_iso.AddVariable("scl_eta",             &allMVAVars_iso.SCeta);
+      
+        // Pure ECAL -> shower shapes
+        tmpTMVAReader_EE_iso.AddVariable("ele_oldsigmaietaieta", &allMVAVars_iso.see);
+        tmpTMVAReader_EE_iso.AddVariable("ele_oldsigmaiphiiphi", &allMVAVars_iso.spp);
+        tmpTMVAReader_EE_iso.AddVariable("ele_oldcircularity",   &allMVAVars_iso.circularity);
+        tmpTMVAReader_EE_iso.AddVariable("ele_oldr9",            &allMVAVars_iso.R9);
+        tmpTMVAReader_EE_iso.AddVariable("ele_scletawidth",      &allMVAVars_iso.etawidth);
+        tmpTMVAReader_EE_iso.AddVariable("ele_sclphiwidth",      &allMVAVars_iso.phiwidth);
+        tmpTMVAReader_EE_iso.AddVariable("ele_oldhe",            &allMVAVars_iso.HoE);
+        
+        //Pure tracking variables
+        tmpTMVAReader_EE_iso.AddVariable("ele_kfhits",           &allMVAVars_iso.kfhits);
+        tmpTMVAReader_EE_iso.AddVariable("ele_kfchi2",           &allMVAVars_iso.kfchi2);
+        tmpTMVAReader_EE_iso.AddVariable("ele_gsfchi2",        &allMVAVars_iso.gsfchi2);
+      
+        // Energy matching
+        tmpTMVAReader_EE_iso.AddVariable("ele_fbrem",           &allMVAVars_iso.fbrem);
+      
+        tmpTMVAReader_EE_iso.AddVariable("ele_gsfhits",         &allMVAVars_iso.gsfhits);
+        tmpTMVAReader_EE_iso.AddVariable("ele_expected_inner_hits",             &allMVAVars_iso.expectedMissingInnerHits);
+        tmpTMVAReader_EE_iso.AddVariable("ele_conversionVertexFitProbability",  &allMVAVars_iso.convVtxFitProbability);
+      
+        tmpTMVAReader_EE_iso.AddVariable("ele_ep",              &allMVAVars_iso.EoP);
+        tmpTMVAReader_EE_iso.AddVariable("ele_eelepout",        &allMVAVars_iso.eleEoPout);
+        tmpTMVAReader_EE_iso.AddVariable("ele_IoEmIop",         &allMVAVars_iso.IoEmIoP);
+        
+        // Geometrical matchings
+        tmpTMVAReader_EE_iso.AddVariable("ele_deltaetain",      &allMVAVars_iso.deta);
+        tmpTMVAReader_EE_iso.AddVariable("ele_deltaphiin",      &allMVAVars_iso.dphi);
+        tmpTMVAReader_EE_iso.AddVariable("ele_deltaetaseed",    &allMVAVars_iso.detacalo);
+
+        // Spectator variables  
+	// tmpTMVAReader_EE_iso.AddVariable("ele_pt",              &allMVAVars_iso.pt);
+	// tmpTMVAReader_EE_iso.AddVariable("scl_eta",             &allMVAVars_iso.SCeta);
+	// Isolation
+	tmpTMVAReader_EE_iso.AddVariable("ele_pfPhotonIso",     &allMVAVars_iso.pfPhotonIso);
+	tmpTMVAReader_EE_iso.AddVariable("ele_pfChargedHadIso",     &allMVAVars_iso.pfChargedHadIso);
+	tmpTMVAReader_EE_iso.AddVariable("ele_pfNeutralHadIso",     &allMVAVars_iso.pfNeutralHadIso);
+      
+        tmpTMVAReader_EE_iso.AddVariable("rho",    &allMVAVars_iso.rho);
+
+        // Endcap only variables
+        tmpTMVAReader_EE_iso.AddVariable("ele_psEoverEraw",    &allMVAVars_iso.PreShowerOverRaw);
+
+        tmpTMVAReader_EB_iso.BookMVA( "Fall17_iso_EB1",  mvsPar["ElMVAweightFiles_iso"].at(0) );
+        tmpTMVAReader_EB_iso.BookMVA( "Fall17_iso_EB2",  mvsPar["ElMVAweightFiles_iso"].at(1) );
+        tmpTMVAReader_EE_iso.BookMVA( "Fall17_iso_EE",   mvsPar["ElMVAweightFiles_iso"].at(2) );
     }
  
 }
@@ -1163,49 +1224,68 @@ pat::Jet BaseEventSelector::correctJetReturnPatJet(const pat::Jet & jet, edm::Ev
 bool BaseEventSelector::isJetTagged(const pat::Jet & jet, edm::EventBase const & event, bool applySF, int shiftflag, bool subjetflag)
 {
     bool _isTagged = false;
-    
-    if ( jet.bDiscriminator( msPar["btagger"] ) > bTagCut ) _isTagged = true;
-    
-    string tagger = msPar["btagOP"];
-    if (subjetflag) tagger += "subjet";
 
-    if (mbPar["isMc"] && applySF) {
-        TLorentzVector lvjet = correctJet(jet, event);
+    if (jet.bDiscriminator("pfDeepCSVJetTags:probb")+jet.bDiscriminator("pfDeepCSVJetTags:probbb") > bTagCut) _isTagged = true;
+
+    if (mbPar["isMc"] && applySF){
+      
+      TLorentzVector lvjet = correctJet(jet, event);
         
-        int _jetFlavor = abs(jet.hadronFlavour());
-	double _heavySf = 1.0;
-	double _heavyEff = 1.0;
-	double _lightSf = 1.0;
-	double _lightEff = 1.0;
+      int _jetFlavor = abs(jet.hadronFlavour());
+      double _heavySf = 1.0;
+      double _heavyEff = 1.0;
+      double _lightSf = 1.0;
+      double _lightEff = 1.0;
 
-	_heavySf = mBtagCond.GetBtagScaleFactor(lvjet.Et(), lvjet.Eta(), tagger);
-	if (shiftflag == 1 ||  mbPar["BTagUncertUp"] ) _heavySf += mBtagCond.GetBtagSFUncertUp(lvjet.Et(), lvjet.Eta(), tagger);
-	else if (shiftflag == 2 ||  mbPar["BTagUncertDown"] ) _heavySf -= mBtagCond.GetBtagSFUncertDown(lvjet.Et(), lvjet.Eta(), tagger);
-	_heavyEff = mBtagCond.GetBtagEfficiency(lvjet.Et(), lvjet.Eta(), tagger);       
+      // WAITING FOR A FIX FROM BTV FOR THE SUBJET FILE, USE AK4 ON BOTH FOR NOW
+      //      if(!subjetflag){
 
-	if(_jetFlavor == 4){
-	  _heavySf = mBtagCond.GetCtagScaleFactor(lvjet.Et(), lvjet.Eta(), tagger);
-	  if (shiftflag == 1 ||  mbPar["BTagUncertUp"] ) _heavySf += mBtagCond.GetCtagSFUncertUp(lvjet.Et(), lvjet.Eta(), tagger);
-	  else if (shiftflag == 2 ||  mbPar["BTagUncertDown"] ) _heavySf -= mBtagCond.GetCtagSFUncertDown(lvjet.Et(), lvjet.Eta(), tagger);
-	  _heavyEff = mBtagCond.GetCtagEfficiency(lvjet.Et(), lvjet.Eta(), tagger);       
-	}
+      _heavySf = reader.eval_auto_bounds("central",BTagEntry::FLAV_B,fabs(lvjet.Eta()),lvjet.Pt());
+      if (shiftflag == 1 ||  mbPar["BTagUncertUp"] ) _heavySf = reader.eval_auto_bounds("up",BTagEntry::FLAV_B,fabs(lvjet.Eta()),lvjet.Pt());
+      else if (shiftflag == 2 ||  mbPar["BTagUncertDown"] ) _heavySf = reader.eval_auto_bounds("down",BTagEntry::FLAV_B,fabs(lvjet.Eta()),lvjet.Pt());
+      _heavyEff = mBtagCond.GetBtagEfficiency(lvjet.Et(), fabs(lvjet.Eta()), "DeepCSV"+msPar["btagOP"]);       
+      
+      if(_jetFlavor == 4){
+	_heavySf = reader.eval_auto_bounds("central",BTagEntry::FLAV_C,fabs(lvjet.Eta()),lvjet.Pt());
+	if (shiftflag == 1 ||  mbPar["BTagUncertUp"] ) _heavySf = reader.eval_auto_bounds("up",BTagEntry::FLAV_C,fabs(lvjet.Eta()),lvjet.Pt());
+	else if (shiftflag == 2 ||  mbPar["BTagUncertDown"] ) _heavySf = reader.eval_auto_bounds("down",BTagEntry::FLAV_C,fabs(lvjet.Eta()),lvjet.Pt());
+	_heavyEff = mBtagCond.GetBtagEfficiency(lvjet.Et(), fabs(lvjet.Eta()), "DeepCSV"+msPar["btagOP"]);       
+      }
+      
+      _lightSf = reader.eval_auto_bounds("central",BTagEntry::FLAV_UDSG,fabs(lvjet.Eta()),lvjet.Pt());
+      if (shiftflag == 3 || mbPar["MistagUncertUp"] ) _lightSf = reader.eval_auto_bounds("up",BTagEntry::FLAV_UDSG,fabs(lvjet.Eta()),lvjet.Pt());
+      else if (shiftflag == 4 ||  mbPar["MistagUncertDown"] ) _lightSf = reader.eval_auto_bounds("down",BTagEntry::FLAV_UDSG,fabs(lvjet.Eta()),lvjet.Pt());
+      _lightEff = mBtagCond.GetMistagRate(lvjet.Et(), fabs(lvjet.Eta()), "DeepCSV"+msPar["btagOP"]);
+            
+      // }else{
 
-	_lightSf = mBtagCond.GetMistagScaleFactor(lvjet.Et(), lvjet.Eta(), tagger);
-	if (shiftflag == 3 || mbPar["MistagUncertUp"] ) _lightSf += mBtagCond.GetMistagSFUncertUp(lvjet.Et(), lvjet.Eta(), tagger);
-	else if (shiftflag == 4 ||  mbPar["MistagUncertDown"] ) _lightSf -= mBtagCond.GetMistagSFUncertDown(lvjet.Et(), lvjet.Eta(), tagger);
-	_lightEff = mBtagCond.GetMistagRate(lvjet.Et(), lvjet.Eta(), tagger);
-    
-        mBtagSfUtil.SetSeed(abs(static_cast<int>(sin(jet.phi())*1e5)));
-        
-        // sanity check
-        bool _orig_tag = _isTagged;
+      // 	_heavySf = readerSJ.eval_auto_bounds("central",BTagEntry::FLAV_B,fabs(lvjet.Eta()),lvjet.Pt());
+      // 	if (shiftflag == 1 ||  mbPar["BTagUncertUp"] ) _heavySf = readerSJ.eval_auto_bounds("up",BTagEntry::FLAV_B,fabs(lvjet.Eta()),lvjet.Pt());
+      // 	else if (shiftflag == 2 ||  mbPar["BTagUncertDown"] ) _heavySf = readerSJ.eval_auto_bounds("down",BTagEntry::FLAV_B,fabs(lvjet.Eta()),lvjet.Pt());
+      // 	_heavyEff = mBtagCond.GetBtagEfficiency(lvjet.Et(), fabs(lvjet.Eta()), "SJDeepCSV"+msPar["btagOP"]);       
 
-        mBtagSfUtil.modifyBTagsWithSF(_isTagged, _jetFlavor, _heavySf, _heavyEff, _lightSf, _lightEff);
-        
-        // sanity check
-        if (_isTagged != _orig_tag) ++mNBtagSfCorrJets;
-        
+      // 	if(_jetFlavor == 4){
+      // 	  _heavySf = readerSJ.eval_auto_bounds("central",BTagEntry::FLAV_C,fabs(lvjet.Eta()),lvjet.Pt());
+      // 	  if (shiftflag == 1 ||  mbPar["BTagUncertUp"] ) _heavySf = readerSJ.eval_auto_bounds("up",BTagEntry::FLAV_C,fabs(lvjet.Eta()),lvjet.Pt());
+      // 	  else if (shiftflag == 2 ||  mbPar["BTagUncertDown"] ) _heavySf = readerSJ.eval_auto_bounds("down",BTagEntry::FLAV_C,fabs(lvjet.Eta()),lvjet.Pt());
+      // 	  _heavyEff = mBtagCond.GetBtagEfficiency(lvjet.Et(), fabs(lvjet.Eta()), "SJDeepCSV"+msPar["btagOP"]);       
+      // 	}
+	
+      // 	_lightSf = readerSJ.eval_auto_bounds("central",BTagEntry::FLAV_UDSG,fabs(lvjet.Eta()),lvjet.Pt());
+      // 	if (shiftflag == 3 || mbPar["MistagUncertUp"] ) _lightSf = readerSJ.eval_auto_bounds("up",BTagEntry::FLAV_UDSG,fabs(lvjet.Eta()),lvjet.Pt());
+      // 	else if (shiftflag == 4 ||  mbPar["MistagUncertDown"] ) _lightSf = readerSJ.eval_auto_bounds("down",BTagEntry::FLAV_UDSG,fabs(lvjet.Eta()),lvjet.Pt());
+      // 	_lightEff = mBtagCond.GetMistagRate(lvjet.Et(), fabs(lvjet.Eta()), "SJDeepCSV"+msPar["btagOP"]);
+      // }
+
+      mBtagSfUtil.SetSeed(abs(static_cast<int>(sin(jet.phi())*1e5)));
+      
+      // sanity check
+      bool _orig_tag = _isTagged;      
+      mBtagSfUtil.modifyBTagsWithSF(_isTagged, _jetFlavor, _heavySf, _heavyEff, _lightSf, _lightEff);     
+      if (_isTagged != _orig_tag) ++mNBtagSfCorrJets;
+      
     } // end of btag scale factor corrections
+
     return _isTagged;
 }
 
@@ -1298,11 +1378,15 @@ double BaseEventSelector::mvaValue(const pat::Electron & electron, edm::EventBas
     event.getByLabel(bsLabel_, bsHandle);
     const reco::BeamSpot &beamspot = *bsHandle.product();
 
+    edm::Handle<double> rhoHandle;
+    edm::InputTag rhoSrc_("fixedGridRhoFastjetAll", "");
+    event.getByLabel(rhoSrc_, rhoHandle);
+    allMVAVars.rho = std::max(*(rhoHandle.product()), 0.0);
 
     // Pure ECAL -> shower shapes
     allMVAVars.see            = electron.full5x5_sigmaIetaIeta();
     allMVAVars.spp            = electron.full5x5_sigmaIphiIphi();
-    allMVAVars.OneMinusE1x5E5x5 = 1. - electron.full5x5_e1x5() / electron.full5x5_e5x5();
+    allMVAVars.circularity = 1. - electron.full5x5_e1x5() / electron.full5x5_e5x5();
     allMVAVars.R9             = electron.full5x5_r9();
     allMVAVars.etawidth       = electron.superCluster()->etaWidth();
     allMVAVars.phiwidth       = electron.superCluster()->phiWidth();
@@ -1329,16 +1413,17 @@ double BaseEventSelector::mvaValue(const pat::Electron & electron, edm::EventBas
     allMVAVars.fbrem           = electron.fbrem();
   
     allMVAVars.gsfhits         = electron.gsfTrack()->hitPattern().trackerLayersWithMeasurement();
-    allMVAVars.expectedMissingInnerHits = electron.gsfTrack()->hitPattern().numberOfHits(reco::HitPattern::MISSING_INNER_HITS);
+    allMVAVars.expectedMissingInnerHits = electron.gsfTrack()->hitPattern().numberOfLostHits(reco::HitPattern::MISSING_INNER_HITS);
   
     reco::ConversionRef conv_ref = ConversionTools::matchedConversion(electron, conversions, beamspot.position());
-    double vertexFitProbability = -1.; 
+    double convVtxFitProbability = -1.; 
     if(!conv_ref.isNull()) {
-      const reco::Vertex &vtx = conv_ref.get()->conversionVertex(); if (vtx.isValid()) {
-        vertexFitProbability = TMath::Prob( vtx.chi2(), vtx.ndof());
+      const reco::Vertex &vtx = conv_ref.get()->conversionVertex(); 
+      if (vtx.isValid()) {
+        convVtxFitProbability = (float)TMath::Prob( vtx.chi2(), vtx.ndof());
       } 
     }
-    allMVAVars.convVtxFitProbability    = vertexFitProbability;
+    allMVAVars.convVtxFitProbability    = convVtxFitProbability;
   
     allMVAVars.EoP             = electron.eSuperClusterOverP();
     allMVAVars.eleEoPout       = electron.eEleClusterOverPout();
@@ -1370,30 +1455,31 @@ double BaseEventSelector::mvaValue(const pat::Electron & electron, edm::EventBas
 
     // Constrain values
 
+    if(allMVAVars.circularity < -1.) allMVAVars.circularity = -1;
+    if(allMVAVars.circularity > 2.) allMVAVars.circularity = 2.; 
+    if(allMVAVars.R9 > 5) allMVAVars.R9 = 5;
+    if(allMVAVars.kfchi2 > 10.) allMVAVars.kfchi2 = 10.;
+    if(allMVAVars.gsfchi2 > 200.) allMVAVars.gsfchi2 = 200;
     if(allMVAVars.fbrem < -1.) allMVAVars.fbrem = -1.;
-    allMVAVars.deta = fabs(allMVAVars.deta);
-    if(allMVAVars.deta > 0.06) allMVAVars.deta = 0.06;
-    allMVAVars.dphi = fabs(allMVAVars.dphi);
-    if(allMVAVars.dphi > 0.6) allMVAVars.dphi = 0.6;
     if(allMVAVars.EoP > 20.) allMVAVars.EoP = 20.;
     if(allMVAVars.eleEoPout > 20.) allMVAVars.eleEoPout = 20.;
-    allMVAVars.detacalo = fabs(allMVAVars.detacalo);
+    if(allMVAVars.deta < -0.06) allMVAVars.deta = -0.06;
+    if(allMVAVars.deta > 0.06) allMVAVars.deta = 0.06;
+    if(allMVAVars.dphi < -0.6) allMVAVars.dphi = -0.6;
+    if(allMVAVars.dphi > 0.6) allMVAVars.dphi = 0.6;
+    if(allMVAVars.detacalo < -0.2) allMVAVars.detacalo = -0.2;
     if(allMVAVars.detacalo > 0.2) allMVAVars.detacalo = 0.2;
-    if(allMVAVars.OneMinusE1x5E5x5 < -1.) allMVAVars.OneMinusE1x5E5x5 = -1;
-    if(allMVAVars.OneMinusE1x5E5x5 > 2.) allMVAVars.OneMinusE1x5E5x5 = 2.; 
-    if(allMVAVars.R9 > 5) allMVAVars.R9 = 5;
-    if(allMVAVars.gsfchi2 > 200.) allMVAVars.gsfchi2 = 200;
-    if(allMVAVars.kfchi2 > 10.) allMVAVars.kfchi2 = 10.;
+
 
     double cutValue;
-    if (fabs(allMVAVars.SCeta)<=0.8) cutValue = tmpTMVAReader_EB.EvaluateMVA( "Spring15_V1_EB1" );
-    else if (fabs(allMVAVars.SCeta)<=1.479) cutValue = tmpTMVAReader_EB.EvaluateMVA( "Spring15_V1_EB2" );
-    else cutValue = tmpTMVAReader_EE.EvaluateMVA( "Spring15_V1_EE" );
+    if (fabs(allMVAVars.SCeta)<=0.8) cutValue = tmpTMVAReader_EB.EvaluateMVA( "Fall17_EB1" );
+    else if (fabs(allMVAVars.SCeta)<=1.479) cutValue = tmpTMVAReader_EB.EvaluateMVA( "Fall17_EB2" );
+    else cutValue = tmpTMVAReader_EE.EvaluateMVA( "Fall17_EE" );
     //std::cout<<"cutValue = "<<cutValue<<std::endl;
 
     return cutValue;	
 }
-double BaseEventSelector::mvaValue_alt(const pat::Electron & electron, edm::EventBase const & event)
+double BaseEventSelector::mvaValue_iso(const pat::Electron & electron, edm::EventBase const & event)
 {
        
     edm::Handle<std::vector<reco::Vertex> > pvtxHandle;
@@ -1412,17 +1498,22 @@ double BaseEventSelector::mvaValue_alt(const pat::Electron & electron, edm::Even
     event.getByLabel(bsLabel_, bsHandle);
     const reco::BeamSpot &beamspot = *bsHandle.product();
 
+    edm::Handle<double> rhoHandle;
+    edm::InputTag rhoSrc_("fixedGridRhoFastjetAll", "");
+    event.getByLabel(rhoSrc_, rhoHandle);
+    allMVAVars_iso.rho = std::max(*(rhoHandle.product()), 0.0);
+
 
     // Pure ECAL -> shower shapes
-    allMVAVars_alt.see            = electron.full5x5_sigmaIetaIeta();
-    allMVAVars_alt.spp            = electron.full5x5_sigmaIphiIphi();
-    allMVAVars_alt.OneMinusE1x5E5x5 = 1. - electron.full5x5_e1x5() / electron.full5x5_e5x5();
-    allMVAVars_alt.R9             = electron.full5x5_r9();
-    allMVAVars_alt.etawidth       = electron.superCluster()->etaWidth();
-    allMVAVars_alt.phiwidth       = electron.superCluster()->phiWidth();
-    allMVAVars_alt.HoE            = electron.full5x5_hcalOverEcal();
+    allMVAVars_iso.see            = electron.full5x5_sigmaIetaIeta();
+    allMVAVars_iso.spp            = electron.full5x5_sigmaIphiIphi();
+    allMVAVars_iso.circularity = 1. - electron.full5x5_e1x5() / electron.full5x5_e5x5();
+    allMVAVars_iso.R9             = electron.full5x5_r9();
+    allMVAVars_iso.etawidth       = electron.superCluster()->etaWidth();
+    allMVAVars_iso.phiwidth       = electron.superCluster()->phiWidth();
+    allMVAVars_iso.HoE            = electron.full5x5_hcalOverEcal();
     // Endcap only variables
-    allMVAVars_alt.PreShowerOverRaw  = electron.superCluster()->preshowerEnergy() / electron.superCluster()->rawEnergy();
+    allMVAVars_iso.PreShowerOverRaw  = electron.superCluster()->preshowerEnergy() / electron.superCluster()->rawEnergy();
   
     // To get to CTF track information in pat::Electron, we have to have the pointer
     // to pat::Electron, it is not accessible from the pointer to reco::GsfElectron.
@@ -1435,63 +1526,68 @@ double BaseEventSelector::mvaValue_alt(const pat::Electron & electron, edm::Even
     bool validKF = (myTrackRef.isAvailable() && (myTrackRef.isNonnull()) );  
   
     //Pure tracking variables
-    allMVAVars_alt.kfhits         = (validKF) ? myTrackRef->hitPattern().trackerLayersWithMeasurement() : -1. ;
-    allMVAVars_alt.kfchi2          = (validKF) ? myTrackRef->normalizedChi2() : 0;
-    allMVAVars_alt.gsfchi2         = electron.gsfTrack()->normalizedChi2();
+    allMVAVars_iso.kfhits         = (validKF) ? myTrackRef->hitPattern().trackerLayersWithMeasurement() : -1. ;
+    allMVAVars_iso.kfchi2          = (validKF) ? myTrackRef->normalizedChi2() : 0;
+    allMVAVars_iso.gsfchi2         = electron.gsfTrack()->normalizedChi2();
   
     // Energy matching
-    allMVAVars_alt.fbrem           = electron.fbrem();
+    allMVAVars_iso.fbrem           = electron.fbrem();
   
-    allMVAVars_alt.gsfhits         = electron.gsfTrack()->hitPattern().trackerLayersWithMeasurement();
-    allMVAVars_alt.expectedMissingInnerHits = electron.gsfTrack()->hitPattern().numberOfHits(reco::HitPattern::MISSING_INNER_HITS);
+    allMVAVars_iso.gsfhits         = electron.gsfTrack()->hitPattern().trackerLayersWithMeasurement();
+    allMVAVars_iso.expectedMissingInnerHits = electron.gsfTrack()->hitPattern().numberOfLostHits(reco::HitPattern::MISSING_INNER_HITS);
   
     reco::ConversionRef conv_ref = ConversionTools::matchedConversion(electron, conversions, beamspot.position());
     double vertexFitProbability = -1.; 
     if(!conv_ref.isNull()) {
       const reco::Vertex &vtx = conv_ref.get()->conversionVertex(); if (vtx.isValid()) {
-        vertexFitProbability = TMath::Prob( vtx.chi2(), vtx.ndof());
+        vertexFitProbability = (float)TMath::Prob( vtx.chi2(), vtx.ndof());
       } 
     }
-    allMVAVars_alt.convVtxFitProbability    = vertexFitProbability;
+    allMVAVars_iso.convVtxFitProbability    = vertexFitProbability;
   
-    allMVAVars_alt.EoP             = electron.eSuperClusterOverP();
-    allMVAVars_alt.eleEoPout       = electron.eEleClusterOverPout();
-    allMVAVars_alt.IoEmIoP         = (1.0/electron.ecalEnergy()) - (1.0 / electron.trackMomentumAtVtx().R() );
+    allMVAVars_iso.EoP             = electron.eSuperClusterOverP();
+    allMVAVars_iso.eleEoPout       = electron.eEleClusterOverPout();
+    allMVAVars_iso.IoEmIoP         = (1.0/electron.ecalEnergy()) - (1.0 / electron.trackMomentumAtVtx().R() );
   
     // Geometrical matchings
-    allMVAVars_alt.deta            = electron.deltaEtaSuperClusterTrackAtVtx();
-    allMVAVars_alt.dphi            = electron.deltaPhiSuperClusterTrackAtVtx();
-    allMVAVars_alt.detacalo        = electron.deltaEtaSeedClusterTrackAtCalo();
+    allMVAVars_iso.deta            = electron.deltaEtaSuperClusterTrackAtVtx();
+    allMVAVars_iso.dphi            = electron.deltaPhiSuperClusterTrackAtVtx();
+    allMVAVars_iso.detacalo        = electron.deltaEtaSeedClusterTrackAtCalo();
+
+    // Isolation, new for 2017 MVA
+    allMVAVars.pfChargedHadIso = (electron.pfIsolationVariables()).sumChargedHadronPt;
+    allMVAVars.pfNeutralHadIso = (electron.pfIsolationVariables()).sumNeutralHadronEt;
+    allMVAVars.pfPhotonIso = (electron.pfIsolationVariables()).sumPhotonEt;
 
     // Spectator variables  
-    allMVAVars_alt.pt              = electron.pt();
-    allMVAVars_alt.SCeta           = electron.superCluster()->eta();
+    allMVAVars_iso.pt              = electron.pt();
+    allMVAVars_iso.SCeta           = electron.superCluster()->eta();
     constexpr float ebeeSplit = 1.479;
-    allMVAVars_alt.isBarrel        = ( fabs(allMVAVars_alt.SCeta) < ebeeSplit );
-    allMVAVars_alt.isEndcap        = ( fabs(allMVAVars_alt.SCeta) >= ebeeSplit );
+    allMVAVars_iso.isBarrel        = ( fabs(allMVAVars_iso.SCeta) < ebeeSplit );
+    allMVAVars_iso.isEndcap        = ( fabs(allMVAVars_iso.SCeta) >= ebeeSplit );
 
 
     // Constrain values
 
-    if(allMVAVars_alt.fbrem < -1.) allMVAVars_alt.fbrem = -1.;
-    allMVAVars_alt.deta = fabs(allMVAVars_alt.deta);
-    if(allMVAVars_alt.deta > 0.06) allMVAVars_alt.deta = 0.06;
-    allMVAVars_alt.dphi = fabs(allMVAVars_alt.dphi);
-    if(allMVAVars_alt.dphi > 0.6) allMVAVars_alt.dphi = 0.6;
-    if(allMVAVars_alt.EoP > 20.) allMVAVars_alt.EoP = 20.;
-    if(allMVAVars_alt.eleEoPout > 20.) allMVAVars_alt.eleEoPout = 20.;
-    allMVAVars_alt.detacalo = fabs(allMVAVars_alt.detacalo);
-    if(allMVAVars_alt.detacalo > 0.2) allMVAVars_alt.detacalo = 0.2;
-    if(allMVAVars_alt.OneMinusE1x5E5x5 < -1.) allMVAVars_alt.OneMinusE1x5E5x5 = -1;
-    if(allMVAVars_alt.OneMinusE1x5E5x5 > 2.) allMVAVars_alt.OneMinusE1x5E5x5 = 2.; 
-    if(allMVAVars_alt.R9 > 5) allMVAVars_alt.R9 = 5;
-    if(allMVAVars_alt.gsfchi2 > 200.) allMVAVars_alt.gsfchi2 = 200;
-    if(allMVAVars_alt.kfchi2 > 10.) allMVAVars_alt.kfchi2 = 10.;
+    if(allMVAVars_iso.circularity < -1.) allMVAVars_iso.circularity = -1;
+    if(allMVAVars_iso.circularity > 2.) allMVAVars_iso.circularity = 2.; 
+    if(allMVAVars_iso.R9 > 5) allMVAVars_iso.R9 = 5;
+    if(allMVAVars_iso.kfchi2 > 10.) allMVAVars_iso.kfchi2 = 10.;
+    if(allMVAVars_iso.gsfchi2 > 200.) allMVAVars_iso.gsfchi2 = 200;
+    if(allMVAVars_iso.fbrem < -1.) allMVAVars_iso.fbrem = -1.;
+    if(allMVAVars_iso.EoP > 20.) allMVAVars_iso.EoP = 20.;
+    if(allMVAVars_iso.eleEoPout > 20.) allMVAVars_iso.eleEoPout = 20.;
+    if(allMVAVars_iso.deta < -0.06) allMVAVars_iso.deta = -0.06;
+    if(allMVAVars_iso.deta > 0.06) allMVAVars_iso.deta = 0.06;
+    if(allMVAVars_iso.dphi < -0.6) allMVAVars_iso.dphi = -0.6;
+    if(allMVAVars_iso.dphi > 0.6) allMVAVars_iso.dphi = 0.6;
+    if(allMVAVars_iso.detacalo < -0.2) allMVAVars_iso.detacalo = -0.2;
+    if(allMVAVars_iso.detacalo > 0.2) allMVAVars_iso.detacalo = 0.2;
 
     double cutValue;
-    if (fabs(allMVAVars_alt.SCeta)<=0.8) cutValue = tmpTMVAReader_EB_alt.EvaluateMVA( "Spring16_V1_EB1" );
-    else if (fabs(allMVAVars_alt.SCeta)<=1.479) cutValue = tmpTMVAReader_EB_alt.EvaluateMVA( "Spring16_V1_EB2" );
-    else cutValue = tmpTMVAReader_EE_alt.EvaluateMVA( "Spring16_V1_EE" );
+    if (fabs(allMVAVars_iso.SCeta)<=0.8) cutValue = tmpTMVAReader_EB_iso.EvaluateMVA( "Fall17_iso_EB1" );
+    else if (fabs(allMVAVars_iso.SCeta)<=1.479) cutValue = tmpTMVAReader_EB_iso.EvaluateMVA( "Fall17_iso_EB2" );
+    else cutValue = tmpTMVAReader_EE_iso.EvaluateMVA( "Fall17_iso_EE" );
     //std::cout<<"cutValue = "<<cutValue<<std::endl;
 
     return cutValue;	

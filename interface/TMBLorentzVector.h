@@ -250,12 +250,14 @@ public:
    Double_t Beta() const { 
       /// get beta
       if (E()!=0) return Mag3() / E(); 
-      else Warning("Beta()", "E()==0.!"); return 0.; }
+      else Warning("Beta()", "E()==0.!"); 
+      return 0.; }
    Double_t Gamma() const {
       /// get gamma
       Double_t b = Beta();
       if (b!=1.) return 1.0/TMath::Sqrt(1- b*b);
-      else Warning("Gamma()", "Beta()==1.!"); return 0.; }
+      else Warning("Gamma()", "Beta()==1.!"); 
+      return 0.; }
 
    Double_t Dot(const TMBLorentzVector &lv) const {
       /// scalar (dot) product
@@ -296,7 +298,8 @@ public:
    TVector3 BoostVector() const {
       /// Returns the spatial components divided by the time component.
       if (E()!=0.) return 1./E()*Vect();
-      else Warning("BoostVector()","E()==0.!"); return TVector3(); }
+      else Warning("BoostVector()","E()==0.!"); 
+      return TVector3(); }
 
    void Boost(Double_t x, Double_t y, Double_t z) { 
       /// Lorentz boost by std::vector xyz
@@ -306,7 +309,8 @@ public:
    Double_t Rapidity() const { 
       /// get rapidity (i.e. NOT pseudo-rapidity!)
       if (E()!=Pz()) return .5*log( (E()+Pz()) / (E()-Pz()) );
-      else Warning("Rapidity", "E()==Pz()!"); return 0.; }
+      else Warning("Rapidity", "E()==Pz()!"); 
+      return 0.; }
 
 
    TMBLorentzVector & operator *= (const TRotation &m) {
