@@ -68,7 +68,11 @@ private:
     edm::InputTag electronsMiniAODLabel_;
     edm::InputTag eleLooseIdMapLabel_;
     edm::InputTag eleTightIdMapLabel_;
-    // MVA values and categories (optional)                                                                                                                                                                      
+    // MVA values and categories - added by bjorn
+    std::vector<double>       tightElMVA;
+    std::vector<double>       looseElMVA;
+    bool UseElMVA;
+
     edm::InputTag mvaValuesMapLabel_;
 
     bool keepFullMChistory;
@@ -155,8 +159,17 @@ int DileptonCalc::BeginJob()
         << std::endl;
         std::exit(-1);
     }
-    
 
+    //stuff for MVA - added by Bjorn
+    if (mPset.exists("UseElMVA")) UseElMVA = mPset.getParameter<bool>("UseElMVA");
+    else                          UseElMVA = false;
+
+    if (mPset.exists("tight_electron_mva_cuts")) tightElMVA = mPset.getParameter< std::vector<double> >("tight_electron_mva_cuts");
+    else tightElMVA = {0.96165,8.75794,3.13902,0.93193,8.84606,3.59851,0.88993,10.12423,4.35279};
+
+    if (mPset.exists("loose_electron_mva_cuts")) looseElMVA = mPset.getParameter< std::vector<double> >("loose_electron_mva_cuts");
+    else looseElMVA = {-0.86,-0.81,-0.72};
+    
     //get mva vid setup
     //electronsMiniAODLabel_= mPset.getParameter<edm::InputTag>("electronsMiniAOD");
     // eleLooseIdMapLabel_ = mPset.getParameter<edm::InputTag>("eleMVALooseIDMap");
@@ -380,6 +393,14 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
     std::vector <int>    elVtxFitConv;
     std::vector<double>  elMVA;
 
+    //mva stuff - added by bjorn
+    std::vector <double> elMVAValue;
+    //std::vector <double> elMVAValue_iso;
+    std::vector <double> elIsMVATight;
+    std::vector <double> elIsMVALoose;
+    //std::vector <double> elIsMVATightIso;
+    //std::vector <double> elIsMVALooseIso;
+
     //mva VID
     //std::vector<double>  elMVAValVID;
     //std::vector<bool>  elMVATightVID;
@@ -522,6 +543,7 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
 	//							       (*iel)->superCluster()->eta(), ElectronEffectiveArea::kEleEAData2012);
 
 	//implement effective area: up-to-date as of PHYS14
+/*
 	double AEff;
 	if( fabs((*iel)->ecalDrivenMomentum().eta())<1.0) AEff=0.1752;
 	else if(fabs((*iel)->ecalDrivenMomentum().eta())<1.479) AEff=0.1862;
@@ -530,7 +552,17 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
 	else if(fabs((*iel)->ecalDrivenMomentum().eta())<2.3) AEff=0.1903;
 	else if(fabs((*iel)->ecalDrivenMomentum().eta())<2.4) AEff=0.2243;
 	else if(fabs((*iel)->ecalDrivenMomentum().eta())<2.5) AEff=0.2687;
-	
+*/	
+        double scEta = (*iel)->superCluster()->eta();
+        double AEff;
+        if(fabs(scEta) >2.4) AEff = 0.1524;
+        else if(fabs(scEta) >2.3) AEff = 0.1204;
+        else if(fabs(scEta) >2.2) AEff = 0.1051;
+        else if(fabs(scEta) >2.0) AEff = 0.0854;
+        else if(fabs(scEta) >1.479) AEff = 0.1073;
+        else if(fabs(scEta) >1.0) AEff = 0.1626;
+        else AEff = 0.1566;
+
 	reco::GsfElectron::PflowIsolationVariables pfIso = (*iel)->pfIsolationVariables();
 	double chIso = pfIso.sumChargedHadronPt;
 	double nhIso = pfIso.sumNeutralHadronEt;
@@ -644,6 +676,25 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
 	  }
 	  }
 	*/
+        if (UseElMVA) {
+            elMVAValue.push_back( selector->mvaValue(iel->operator*(),event) );
+	  bool mvapass = 0;
+	  bool mvapassloose = 0;
+	  if ( fabs((*iel)->superCluster()->eta())<=0.8){
+	    mvapass = selector->mvaValue(iel->operator*(),event) > (tightElMVA.at(0) - tightElMVA.at(2)*exp(-1*(*iel)->pt()/tightElMVA.at(1)));
+	    mvapassloose = selector->mvaValue(iel->operator*(),event) > looseElMVA.at(0);
+	  }
+	  else if ( fabs((*iel)->superCluster()->eta())<=1.479){
+	    mvapass = selector->mvaValue(iel->operator*(),event) > (tightElMVA.at(3) - tightElMVA.at(5)*exp(-1*(*iel)->pt()/tightElMVA.at(4)));
+	    mvapassloose = selector->mvaValue(iel->operator*(),event) > looseElMVA.at(1);
+	  }
+	  else{
+	    mvapass = selector->mvaValue(iel->operator*(),event) > (tightElMVA.at(6) - tightElMVA.at(8)*exp(-1*(*iel)->pt()/tightElMVA.at(7)));
+	    mvapassloose = selector->mvaValue(iel->operator*(),event) > looseElMVA.at(2);
+	  }
+	  elIsMVATight.push_back(mvapass);
+	  elIsMVALoose.push_back(mvapassloose);
+        }
 
 	if(isMc && keepFullMChistory){
 	  //cout << "start\n";
@@ -740,6 +791,15 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
     //SetValue("elMVAValVID",elMVAValVID);
     //SetValue("elMVATightVID",elMVATightVID);
     //SetValue("elMVALooseVID",elMVALooseVID);
+
+
+    //MVA stuff - bjorn
+    SetValue("elMVAValue", elMVAValue);
+    //SetValue("elMVAValue_iso", elMVAValue_iso);
+    SetValue("elIsMVATight", elIsMVATight);
+    SetValue("elIsMVALoose", elIsMVALoose);
+    //SetValue("elIsMVATightIso",elIsMVATightIso);
+    //SetValue("elIsMVALooseIso",elIsMVALooseIso);
 
     //Extra info about isolation
     SetValue("elChIso" , elChIso);
@@ -850,8 +910,10 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
             muEnergy . push_back((*imu)->energy());
             
 
-	    muIsTight.push_back((*imu)->isTightMuon(goodPVs.at(0)));
-	    muIsLoose.push_back((*imu)->isLooseMuon());
+	    //muIsTight.push_back((*imu)->isTightMuon(goodPVs.at(0)));
+	    //muIsLoose.push_back((*imu)->isLooseMuon());
+	    muIsTight.push_back((*imu)->passed(reco::Muon::CutBasedIdTight));
+	    muIsLoose.push_back((*imu)->passed(reco::Muon::CutBasedIdLoose));
 
             muGlobal.push_back((*imu)->isGlobalMuon());
 	    muTracker.push_back((*imu)->isTrackerMuon());
@@ -1251,15 +1313,20 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
         //Mass
         //AK8JetTrimmedMass . push_back(ijet->userFloat("ak8PFJetsCHSTrimmedMass"));
         AK8JetTrimmedMass . push_back(-999);
-        AK8JetPrunedMass . push_back(ijet->userFloat("ak8PFJetsCHSPrunedMass"));
+        //AK8JetPrunedMass . push_back(ijet->userFloat("ak8PFJetsCHSPrunedMass"));
+        AK8JetPrunedMass . push_back(-999);
         //AK8JetFilteredMass . push_back(ijet->userFloat("ak8PFJetsCHSFilteredMass"));
 	AK8JetFilteredMass . push_back(-999);
-        AK8JetSoftDropMass . push_back(ijet->userFloat("ak8PFJetsCHSSoftDropMass"));
+        //AK8JetSoftDropMass . push_back(ijet->userFloat("ak8PFJetsCHSSoftDropMass"));
+        AK8JetSoftDropMass . push_back(-999);
 	//cout<<"set w masses"<<endl;
 	//nsubjettiness
-	AK8JetTau1.push_back( ijet->userFloat("NjettinessAK8:tau1"));
-	AK8JetTau2.push_back( ijet->userFloat("NjettinessAK8:tau2"));
-	AK8JetTau3.push_back( ijet->userFloat("NjettinessAK8:tau3"));
+	//AK8JetTau1.push_back( ijet->userFloat("NjettinessAK8:tau1"));
+	//AK8JetTau2.push_back( ijet->userFloat("NjettinessAK8:tau2"));
+	//AK8JetTau3.push_back( ijet->userFloat("NjettinessAK8:tau3"));
+	AK8JetTau1.push_back(-999);
+	AK8JetTau2.push_back(-999);
+	AK8JetTau3.push_back(-999);
 	//cout<<"set n subjettiness"<<endl;
         for (size_t ui = 0; ui < ijet->numberOfDaughters(); ui++){
             AK8DaughterPt     . push_back(ijet->daughter(ui)->pt());
