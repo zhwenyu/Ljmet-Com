@@ -7,8 +7,7 @@ cernList=[
 	# SHOULD BE AT CERN, USE eoscms.cern.ch in condor_submit.py
 	# MOVE THINGS HERE TO REMIND YOURSELF WHAT IS AT CERN
 
-	#### TTbar
-
+	'QCD_Flat_Pt-15to7000_TuneCUETP8M1_14TeV_pythia8.txt',
 	]
 
 externalList = [
@@ -32,7 +31,9 @@ externalList = [
 #	'TTWJetsToLNu_TuneCP5_PSweights_13TeV-amcatnloFXFX-madspin-pythia8.txt',
 #	'TTZToLL_M-1to10_TuneCP5_13TeV-amcatnlo-pythia8.txt',
 #	'TT_Mtt-700to1000_TuneCP5_13TeV-powheg-pythia8.txt',
-	'TT_Mtt-1000toInf_TuneCP5_13TeV-powheg-pythia8.txt',
+#	'TT_Mtt-1000toInf_TuneCP5_13TeV-powheg-pythia8.txt',
+	'TT_Mtt1500toInf_TuneCUETP8M1_14TeV-powheg-pythia8.txt',
+
 ]
 	
 print '====== LJMET SUBMISSION ======'
@@ -47,23 +48,23 @@ if os.path.exists(tarfile):
 	print 'tar already exists! Will not re-tar!'
 else: 
 	os.chdir(relBase)
-	os.chdir('../')
+	# os.chdir('../')
 	# YOU NEED TO EXCLUDE ANYTHING ELSE THAT MIGHT LIVE IN THE SAME CMSSW RELEASE
-	print 'tar --exclude="src/LJMet/Com/.git" --exclude="src/NNKit/.git" --exclude="src/.git" --exclude="src/LJMet-Slimmer" --exclude="tmp" -zcf'+tarfile+' '+relBase.split('/')[-1]+'/'
-	os.system('tar --exclude="src/LJMet/Com/.git" --exclude="src/NNKit/.git" --exclude="src/.git" --exclude="src/LJMet-Slimmer" --exclude="tmp" -zcf '+tarfile+' '+relBase.split('/')[-1])
+	print 'tar --exclude=".SCRAM" --exclude="src/LJMet/Com/.git" --exclude="src/NNKit/.git" --exclude="src/.git" --exclude="src/LJMet-Slimmer" --exclude="src/LJMetClean94X" --exclude="src/plots" --exclude="src/pileup" --exclude="src/singleLepAnalyzer" --exclude="src/tptp_2017" --exclude="tmp" -zcf '+tarfile+' ./*'
+	os.system('tar --exclude=".SCRAM" --exclude="src/LJMet/Com/.git" --exclude="src/NNKit/.git" --exclude="src/.git" --exclude="src/LJMet-Slimmer" --exclude="src/LJMetClean94X" --exclude="src/plots" --exclude="src/pileup" --exclude="src/singleLepAnalyzer" --exclude="src/tptp_2017" --exclude="tmp" -zcf '+tarfile+' ./*')
 	os.chdir(thisDir)
 
 for sample in cernList:
 	GenHT = False
 	accessor = 'eoscms.cern.ch'
 	if 'HT' in sample and 'madgraphMLM' in sample: GenHT = True
-	os.system('python condor_submitDeepAK8.py --useMC True --sample '+sample.split('.')[0]+' --fileList '+thisDir+'fileListsSummer18/'+sample+' --submit True --inputTar '+tarfile+' --outDir /eos/uscms/store/user/lpcljm/2018/LJMet94X_1lepTT_081518 --shift '+shift+' --saveGenHT '+str(GenHT)+' --accessor '+accessor)
+	os.system('python condor_submitDeepAK8.py --useMC True --sample '+sample.split('.')[0]+' --fileList '+thisDir+'fileListsSummer18/'+sample+' --submit True --inputTar '+tarfile+' --outDir /eos/uscms/store/user/lpcljm/2018/LJMet94X_0lepPhaseII_110718 --shift '+shift+' --saveGenHT '+str(GenHT)+' --accessor '+accessor)
 
 for sample in externalList:
 	GenHT = False
 	accessor = 'cmsxrootd.fnal.gov'
 	if 'HT' in sample and 'madgraphMLM' in sample: GenHT = True
-        os.system('python condor_submitDeepAK8.py --useMC True --sample '+sample.split('.')[0]+' --fileList '+thisDir+'fileListsSummer18/'+sample+' --submit True --inputTar '+tarfile+' --outDir /eos/uscms/store/user/lpcljm/2018/LJMet94X_1lepTT_081518 --shift '+shift+' --saveGenHT '+str(GenHT)+' --accessor '+accessor)
+        os.system('python condor_submitDeepAK8.py --useMC True --sample '+sample.split('.')[0]+' --fileList '+thisDir+'fileListsSummer18/'+sample+' --submit True --inputTar '+tarfile+' --outDir /eos/uscms/store/user/lpcljm/2018/LJMet94X_0lepPhaseII_110718 --shift '+shift+' --saveGenHT '+str(GenHT)+' --accessor '+accessor)
 
 ## shift should be (one at a time): nominal, JECup, JECdown, JERup, JERdown
 ## If you want to use different directory names, edit lines 144 - 147 in condor_submit.py so the config is edited correctly

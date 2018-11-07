@@ -16,8 +16,17 @@ PREFIX=$4
 JOBID=$5
 
 uname -n
+export SCRAM_ARCH=slc6_amd64_gcc630
 source /cvmfs/cms.cern.ch/cmsset_default.sh
 
+echo "running scramv1 project CMSSW CMSSW_9_4_6_patch1"
+eval `scramv1 project CMSSW CMSSW_9_4_6_patch1`
+
+echo "cd to CMSSW_9_4_6_patch1"
+cd CMSSW_9_4_6_patch1
+pwd
+
+echo "coping in tarball"
 xrdcp ${TARDIR}/${INPUTTAR}.tar . 2>&1
 XRDEXIT=$?
 if [[ $XRDEXIT -ne 0 ]]; then
@@ -25,17 +34,24 @@ if [[ $XRDEXIT -ne 0 ]]; then
     exit $XRDEXIT
 fi
 
+echo "unpacking tarball"
 tar -xf ${INPUTTAR}.tar
-cd ${INPUTTAR}
-scram b ProjectRename
-
-eval `scramv1 runtime -sh`
-cd -
-
 echo "removing tar from condor"
 rm -f ${INPUTTAR}.tar
 
-echo "Running ttbar categorization producer"
+#echo "listing tar content"
+#ls -la
+echo "running cmsenv"
+eval `scramv1 runtime -sh`
+
+echo "testing which ljmet"
+which ljmet
+echo "testing ldd cmsRun"
+ldd cmsRun
+
+cd -
+
+echo "Running deepAK8 producer"
 cmsRun produceDeepAK8_${PREFIX}_${JOBID}.py
 
 echo "Sleeping for one minute..."

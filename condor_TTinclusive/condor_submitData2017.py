@@ -29,10 +29,10 @@ if os.path.exists(tarfile):
 	print 'tar already exists! Will not re-tar!'
 else: 
 	os.chdir(relBase)
-	os.chdir('../')
-	# YOU NEED TO EXCLUDE ANYTHING ELSE THAT MIGHT LIVE IN THE SAME CMSSW RELEASE
-	print 'tar --exclude="src/LJMet/Com/.git" --exclude="src/NNKit/.git" --exclude="src/.git" --exclude="src/LJMet-Slimmer" --exclude="tmp" -zcf'+tarfile+' '+relBase.split('/')[-1]+'/'
-	os.system('tar --exclude="src/LJMet/Com/.git" --exclude="src/NNKit/.git" --exclude="src/.git" --exclude="src/LJMet-Slimmer" --exclude="tmp" -zcf '+tarfile+' '+relBase.split('/')[-1])
+	# os.chdir('../')
+	# YOU NEED TO EXCLUDE ANYTHING ELSE THAT MIGHT LIVE IN THE SAME CMSSW RELEASE, MY LIST IS SUPER LONG
+	print 'tar --exclude=".SCRAM" --exclude="src/LJMet/Com/.git" --exclude="src/NNKit/.git" --exclude="src/.git" --exclude="src/LJMet-Slimmer" --exclude="src/LJMetClean94X" --exclude="src/plots" --exclude="src/pileup" --exclude="src/singleLepAnalyzer" --exclude="src/tptp_2017" --exclude="tmp" -zcf '+tarfile+' ./*'
+	os.system('tar --exclude=".SCRAM" --exclude="src/LJMet/Com/.git" --exclude="src/NNKit/.git" --exclude="src/.git" --exclude="src/LJMet-Slimmer" --exclude="src/LJMetClean94X" --exclude="src/plots" --exclude="src/pileup" --exclude="src/singleLepAnalyzer" --exclude="src/tptp_2017" --exclude="tmp" -zcf '+tarfile+' ./*')
 	os.chdir(thisDir)
 
 for sample in cernList:
