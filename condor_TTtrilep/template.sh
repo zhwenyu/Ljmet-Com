@@ -25,15 +25,32 @@ if [[ $XRDEXIT -ne 0 ]]; then
     exit $XRDEXIT
 fi
 
-tar -xf ${INPUTTAR}.tar
-cd ${INPUTTAR}
-scram b ProjectRename
+#setup scram architecture
+export SCRAM_ARCH=slc6_amd64_gcc630
 
+echo "make new scram area 'cmsrel'"
+scramv1 project CMSSW ${INPUTTAR}
+
+#move tar to newly created scram area
+mv -v ${INPUTTAR}.tar ${INPUTTAR}/src/
+
+#cd to scram area
+cd ${INPUTTAR}/src
+
+#Untar file, move, and clean. untar file: CMSSW_9_4_X/src/LJMet. (and one more folder). Right now it is quick and dirty. Probably there is a better way.
+tar -xf ${INPUTTAR}.tar 
+mv  -v ${INPUTTAR}/src/* .
+rm -rvf ${INPUTTAR}
+
+echo "compiling 'scram b'"
+scram b 
+
+#scram b ProjectRename --> not used. old recipe.
+
+echo "executing 'cmsenv'"
 eval `scramv1 runtime -sh`
+
 cd -
-# cp ${INPUTTAR}/src/LJMet/Com/src/BaseEventSelector.cc . #added by Rizki
-# cp ${INPUTTAR}/src/LJMet/Com/src/singleLepEventSelector.cc . #added by Rizki
-# cp ${INPUTTAR}/src/LJMet/Com/src/singleLepCalc.cc . #added by Rizki
 
 sed -i "s|CONDOR_RELBASE|$PWD/$INPUTTAR|" ${PREFIX}_${JOBID}.py
 ljmet ${PREFIX}_${JOBID}.py

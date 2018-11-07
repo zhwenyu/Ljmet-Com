@@ -1,5 +1,5 @@
 #!/usr/bin/python
-execfile("/uscms_data/d3/rsyarif/Fermilab2017/produceLJMetNtuple2016_FullDataset_v3/CMSSW_8_0_25/src/LJMet/Com/condor_TTtrilep/EOSSafeUtils.py")
+execfile("/uscms_data/d3/rsyarif/Brown2018/TT_BB_trilepton_LJMET_2017data/CMSSW_9_4_11/src/LJMet/Com/condor_TTtrilep/EOSSafeUtils.py")
 
 import os
 import re
@@ -11,27 +11,10 @@ import socket
 import datetime
 files_per_job = 10
 
-#Absolute path that precedes '/store...'
-# The script checks whether it is an absolute path or not
-
-if (socket.gethostname().find('fnal')>=0):
-    brux=bool(False)
-#    sePath='\'root://cmseos.fnal.gov/'         # stored on LPC, most of our samples
-#     sePath='\'root://cmsxrootd.fnal.gov/'      # stored elsewhere
-#     sePath='\'root://xrootd-cms.infn.it/'      # stored elsewhere
-    sePath='\'root://eoscms.cern.ch/'      # stored at CERN
-    storePath=''
-    setupString='source \/cvmfs\/cms.cern.ch\/cmsset_default.csh'
-    outPath='root://cmseos.fnal.gov/'          # output on LPC
-    print 'Submitting jobs at FNAL, reading files from: '+sePath+', writing files to: '+outPath
-else:
-    print "Script not done for ", socket.gethostname()
-    exit()
-
 #Configuration options parsed from arguments
 #Switching to getopt for compatibility with older python
 try:
-    opts, args = getopt.getopt(sys.argv[1:], "", ["useMC=", "sample=","fileList=", "outDir=","shift=","submit=","json=","inputTar=","saveGenHT="])
+    opts, args = getopt.getopt(sys.argv[1:], "", ["useMC=", "sample=","fileList=", "outDir=","shift=","submit=","json=","inputTar=","saveGenHT=","accessor="])
 except getopt.GetoptError as err:
     print str(err)
     sys.exit(1)
@@ -46,6 +29,7 @@ submit   = bool(False)
 changeJEC= bool(False)
 tarfile  = str('None')
 saveGHT  = bool(False)
+accessor = str('None')
 
 for o, a in opts:
     print o, a
@@ -62,10 +46,28 @@ for o, a in opts:
     elif o == "--shift":    shift    = str(a)
     elif o == "--inputTar": tarfile = str(a).split('.')[0]
     elif o == "--json":     json   = str(a)
-    elif o == "--saveGenHT":
-        if a == 'True':     saveGHT = True
+    elif o == "--saveGenHT": saveGHT = bool(a)
+    elif o == "--accessor": accessor = str(a)
     elif o == "--submit":
         if a == 'True':     submit = True
+
+#Absolute path that precedes '/store...'
+# The script checks whether it is an absolute path or not
+
+if (socket.gethostname().find('fnal')>=0):
+    brux=bool(False)
+#    sePath='\'root://cmseos.fnal.gov/'         # stored on LPC, most of our samples
+#     sePath='\'root://cmsxrootd.fnal.gov/'      # stored elsewhere
+#     sePath='\'root://xrootd-cms.infn.it/'      # stored elsewhere
+#     sePath='\'root://eoscms.cern.ch/'      # stored at CERN
+    sePath='\'root://'+accessor+'/'      # configurable
+    storePath=''
+    setupString='source \/cvmfs\/cms.cern.ch\/cmsset_default.csh'
+    outPath='root://cmseos.fnal.gov/'          # output on LPC
+    print 'Submitting jobs at FNAL, reading files from: '+sePath+', writing files to: '+outPath
+else:
+    print "Script not done for ", socket.gethostname()
+    exit()
 
 relBase = os.environ['CMSSW_BASE']
 
@@ -119,7 +121,7 @@ def get_input(num, list):
 j = 1
 nfiles = 1
 
-tempdir = '/uscms_data/d3/rsyarif/Fermilab2017/produceLJMetNtuple2016_FullDataset_v3/'+outputdir.split('/')[-1]+'_logs/'+shift+'/'+prefix
+tempdir = '/uscms_data/d3/rsyarif/Brown2018/TT_BB_trilepton_LJMET_2017data/'+outputdir.split('/')[-1]+'_logs/'+shift+'/'+prefix
 os.makedirs(tempdir)
 
 py_file = open(tempdir+"/"+prefix+"_"+str(j)+".py","w")

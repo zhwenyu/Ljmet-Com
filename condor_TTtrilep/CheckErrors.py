@@ -1,7 +1,9 @@
 import os, sys, getopt
-execfile("/uscms_data/d3/rsyarif/EOSSafeUtils.py")
+from eos_utils.EOSSafeUtils import *  # <--> file from "/uscms_data/d3/varun/EOSSafeUtils.py"
 
-## CheckErrors.py /uscms_data/d3/path/to/logs/nominal/ --verbose 1 (prints) --resubmit 1 (if you want to resubmit) --resub_num -1 (resubmits all the fails it looks for)
+###Syntax:
+#          CheckErrors.py /uscms_data/d3/path/to/logs/nominal/ --verbose 1 (prints) --resubmit 1 (if you want to resubmit) --resub_num -1 (resubmits all the fails it looks for)
+#
 
 dir = sys.argv[1]
 
@@ -24,7 +26,7 @@ for o, a in opts:
 	if o == '--resubmit': resubmit = a
 	if o == '--resub_num': resub_num = int(a)
 
-rootdir = '/eos/uscms/store/user/lpcljm/'+dir.split('/')[-3]+'/'+dir.split('/')[-2]+'/'
+rootdir = '/store/group/lpcljm/'+dir.split('/')[-3]+'/'+dir.split('/')[-2]+'/'
 rootdir = rootdir.replace('_logs','')
 print 'checking ROOT files in:',rootdir
 folders = [x for x in os.walk(dir).next()[1]]
@@ -38,6 +40,8 @@ total_roots = 0
 no_log = 0
 empty_log = 0
 copy_fail = 0
+mem_fail = 0
+kill_fail = 0
 
 for folder in folders:
 # 	if 'TT_' not in folder: continue
@@ -91,6 +95,41 @@ for folder in folders:
 				continue
 		except:
 			pass
+
+		try:
+			current = open(dir + '/'+folder+'/'+file.replace('.jdl','.condor'),'r')
+			overmem = False
+                        killed = False
+                        term = False
+                        iline = 0
+                        overmem_index = 0
+                        kill_index = 0
+                        term_index = 0
+			for line in current:
+				if 'SYSTEM_PERIODIC_REMOVE' in line: 
+                                    overmem = True
+                                    overmem_index = iline
+                                elif 'condor_rm' in line: 
+                                    killed = True
+                                    kill_index = iline
+                                elif 'Normal termination (return value 0)' in line: 
+                                    term = True
+                                    term_index = iline
+                                iline += 1
+			if overmem and overmem_index > term_index: 
+				if verbose_level > 0: 
+					print '\tMEM FAIL:',file,' and JobIndex:',index
+				mem_fail+=1
+				if resub_num == -1 or resub_num == 3:resub_index.append(index)
+				continue
+			if killed and kill_index > term_index: 
+				if verbose_level > 0: 
+					print '\tKILL_FAIL:',file,' and JobIndex:',index
+				kill_fail+=1
+				if resub_num == -1 or resub_num == 4:resub_index.append(index)
+				continue
+		except:
+			pass
 		
 		try:
 			if not os.path.isfile(dir+'/'+folder+'/'+file.replace('.jdl','.log')): 
@@ -106,21 +145,18 @@ for folder in folders:
 
 	indexind = 0
 	for index in resub_index:
-		if indexind==0: os.chdir(dir + '/' + folder)
+		os.chdir(dir + '/' + folder)
 
-                #f = open(dir + '/' + folder + '/' + folder.replace('/logfiles/','') + '_' + index + '.py', 'rU')
-                f = open(folder + '_' + index + '.py', 'rU')
+                f = open(dir + '/' + folder + '/' + folder.replace('/logfiles/','') + '_' + index + '.py', 'rU')
                 ConfigLines = f.readlines()
                 f.close()
-                #with open(dir + '/' + folder + '/' + folder.replace('/logfiles/','') + '_' + index + '.py','w') as fout:
-                with open(folder + '_' + index + '.py','w') as fout:
+                with open(dir + '/' + folder + '/' + folder.replace('/logfiles/','') + '_' + index + '.py','w') as fout:
                     for line in ConfigLines:
 			if line.startswith('relBase    = str('): fout.write('relBase    = str(\'CONDOR_RELBASE\')\n')
 			else: fout.write(line)
-		#os.system('rm ' + dir + '/' + folder + '/' + folder.replace('/logfiles/','') + '_' + index + '.log')
-		if resub_num!=1:os.system('rm ' + folder + '_' + index + '.log')
-		#os.system('condor_submit ' + dir + '/' + folder + '/' + folder.replace('/logfiles/','') + '_' + index + '.jdl')
-		os.system('condor_submit ' + folder + '_' + index + '.jdl')
+		os.system('rm ' + dir + '/' + folder + '/' + folder.replace('/logfiles/','') + '_' + index + '.log')
+		os.system('rm ' + dir + '/' + folder + '/' + folder.replace('/logfiles/','') + '_' + index + '.condor')
+		os.system('condor_submit ' + dir + '/' + folder + '/' + folder.replace('/logfiles/','') + '_' + index + '.jdl')
 		indexind+=1
 	
 	
@@ -130,5 +166,7 @@ print 'TOTAL JOBS: ', total_total
 print 'NO LOG:', no_log
 print 'EMPTY LOG:', empty_log
 print 'XRDCP FAIL:', copy_fail
+print 'MEMORY FAIL:', mem_fail
+print 'KILL_FAIL:', kill_fail
 print 'ROOT files:', total_roots
-print 'DONE:', total_total - no_log - empty_log - copy_fail
+print 'DONE:', total_total - no_log - empty_log - copy_fail - mem_fail - kill_fail
