@@ -8,7 +8,7 @@ process = cms.Process("LJMetCom")
 #Arguments from condor submit script which are used more than once
 condorIsMC = bool(False)
 relBase    = os.environ['CMSSW_BASE']
-condorJSON = str('Cert_271036-276811_13TeV_PromptReco_Collisions16_JSON.txt')
+condorJSON = str('Cert_314472-325175_13TeV_PromptReco_Collisions18_JSON.txt')
 ############################################################
 #
 # FWLite application options
@@ -17,6 +17,7 @@ process.ljmet.isMc = cms.bool(condorIsMC)
 
 # Exclude some unnecessary calculators from the process
 process.ljmet.excluded_calculators = cms.vstring(
+    'DeepAK8Calc',
     #'TpTpCalc',
     'PileUpCalc',
     'BTagSFCalc',
@@ -43,23 +44,8 @@ process.singleLepCalc.saveLooseLeps     = cms.bool(False)
 
 # Jet substructure calculator options
 process.load('LJMet.Com.JetSubCalc_cfi')
-process.JetSubCalc.useHTT = cms.bool(False)
 process.JetSubCalc.killHF = cms.bool(False)
-process.JetSubCalc.doNewJEC = cms.bool(True)
-process.JetSubCalc.useL2L3Mass = cms.bool(True)
 process.JetSubCalc.isMc = cms.bool(condorIsMC)
-process.JetSubCalc.JECup = cms.bool(False)
-process.JetSubCalc.JECdown = cms.bool(False)
-process.JetSubCalc.JERup = cms.bool(False)
-process.JetSubCalc.JERdown = cms.bool(False)
-process.JetSubCalc.MCL2JetParAK8 = cms.string(relBase+'/src/LJMet/Com/data/Spring16_25nsV6_MC_L2Relative_AK8PFchs.txt')
-process.JetSubCalc.MCL3JetParAK8 = cms.string(relBase+'/src/LJMet/Com/data/Spring16_25nsV6_MC_L3Absolute_AK8PFchs.txt')
-process.JetSubCalc.MCPTResAK8 = cms.string(relBase+'/src/LJMet/Com/data/Spring16_25nsV6_MC_PtResolution_AK8PFchs.txt')
-process.JetSubCalc.MCSF = cms.string(relBase+'/src/LJMet/Com/data/Spring16_25nsV6_MC_SF_AK4PFchs.txt')
-process.JetSubCalc.DataL2JetParAK8 = cms.string(relBase+'/src/LJMet/Com/data/Spring16_25nsV6_DATA_L2Relative_AK8PFchs.txt')
-process.JetSubCalc.DataL3JetParAK8 = cms.string(relBase+'/src/LJMet/Com/data/Spring16_25nsV6_DATA_L3Absolute_AK8PFchs.txt')
-process.JetSubCalc.DataL2L3JetParAK8 = cms.string(relBase+'/src/LJMet/Com/data/Spring16_25nsV6_DATA_L2L3Residual_AK8PFchs.txt')
-process.JetSubCalc.UncertaintyAK8 = cms.string(relBase+'/src/LJMet/Com/data/Spring16_25nsV6_DATA_Uncertainty_AK8PFchs.txt')
 
 ############################################################
 #
@@ -82,16 +68,33 @@ process.event_selector = cms.PSet(
     dump_trigger = cms.bool(False),
 
     trigger_path_el = cms.vstring(
-        'HLT_Ele27_eta2p1_WPLoose_Gsf_v1', 'HLT_Ele27_eta2p1_WPLoose_Gsf_v2', 'HLT_Ele27_eta2p1_WPLoose_Gsf_v3', 
-        'HLT_Ele27_eta2p1_WPLoose_Gsf_v4', 'HLT_Ele27_eta2p1_WPLoose_Gsf_v5', 
-        'HLT_Ele27_eta2p1_WPTight_Gsf_v1', 'HLT_Ele27_eta2p1_WPTight_Gsf_v2', 'HLT_Ele27_eta2p1_WPTight_Gsf_v3', 
-        'HLT_Ele27_eta2p1_WPTight_Gsf_v4', 'HLT_Ele27_eta2p1_WPTight_Gsf_v5', 
+        #'digitisation_step',
+        'HLT_Ele35_WPTight_Gsf',
+        'HLT_Ele38_WPTight_Gsf',
+        'HLT_Ele40_WPTight_Gsf',
+        'HLT_Ele28_eta2p1_WPTight_Gsf_HT150',
+        'HLT_Ele15_IsoVVVL_PFHT450_PFMET50',
+        'HLT_Ele15_IsoVVVL_PFHT450',
+        'HLT_Ele50_IsoVVVL_PFHT450',
+        'HLT_Ele15_IsoVVVL_PFHT600',
+        'HLT_Ele50_CaloIdVT_GsfTrkIdT_PFJet165',
+        'HLT_Ele115_CaloIdVT_GsfTrkIdT'
         ),
+
     trigger_path_mu = cms.vstring(
-        'HLT_IsoMu20_v1',   'HLT_IsoMu20_v2',   'HLT_IsoMu20_v3',   'HLT_IsoMu20_v4',   'HLT_IsoMu20_v5',   'HLT_IsoMu20_v6',
-        'HLT_IsoTkMu20_v1', 'HLT_IsoTkMu20_v2', 'HLT_IsoTkMu20_v3', 'HLT_IsoTkMu20_v4', 'HLT_IsoTkMu20_v5', 'HLT_IsoTkMu20_v6',
-        'HLT_IsoMu24_v1',   'HLT_IsoMu24_v2',   'HLT_IsoMu24_v3',   'HLT_IsoMu24_v4',   'HLT_IsoMu24_v5',   'HLT_IsoMu24_v6',
-        'HLT_IsoTkMu24_v1', 'HLT_IsoTkMu24_v2', 'HLT_IsoTkMu24_v3', 'HLT_IsoTkMu24_v4', 'HLT_IsoTkMu24_v5', 'HLT_IsoTkMu24_v6',
+        #'digitisation_step',
+        'HLT_IsoMu24',
+        'HLT_IsoMu24_eta2p1',
+        'HLT_IsoMu27',
+        'HLT_IsoMu30',
+        'HLT_Mu50',
+        'HLT_TkMu50',
+        'HLT_Mu55',
+        'HLT_Mu15_IsoVVVL_PFHT450_CaloBTagCSV_4p5',
+        'HLT_Mu15_IsoVVVL_PFHT450_PFMET50',
+        'HLT_Mu15_IsoVVVL_PFHT450',
+        'HLT_Mu50_IsoVVVL_PFHT450',
+        'HLT_Mu15_IsoVVVL_PFHT600'
         ),
     
     mctrigger_path_el = cms.vstring(''),
@@ -104,27 +107,22 @@ process.event_selector = cms.PSet(
     
     # Jet cuts
     jet_cuts                 = cms.bool(True),
-    jet_minpt                = cms.double(30.0),
-    jet_maxeta               = cms.double(5.0),
-    min_jet                  = cms.int32(2),
+    jet_minpt                = cms.double(20.0),
+    jet_maxeta               = cms.double(3.0),
+    jet_minpt_AK8            = cms.double(170.0),
+    jet_maxeta_AK8           = cms.double(2.4),
+    min_jet                  = cms.int32(1),
     max_jet                  = cms.int32(4000),
-    leading_jet_pt           = cms.double(50.0),
+    leading_jet_pt           = cms.double(20.0),
 
     # muon cuts
     muon_cuts                = cms.bool(True),
-    muon_selector            = cms.bool(False),
-    muon_selector_medium     = cms.bool(False),
-    muon_reliso              = cms.double(0.2),
-    muon_useMiniIso          = cms.bool(True),
-    muon_miniIso             = cms.double(0.2),
-    loose_muon_miniIso       = cms.double(0.4),
+    min_muon                 = cms.int32(0),
     muon_minpt               = cms.double(30.0),
     muon_maxeta              = cms.double(2.4),
-    min_muon                 = cms.int32(0),
-    loose_muon_selector      = cms.bool(False),
-    loose_muon_selector_tight = cms.bool(False),
-#    loose_muon_reliso        = cms.double(0.2),
-    loose_muon_reliso        = cms.double(0.4),
+    muon_useMiniIso          = cms.bool(True),
+    muon_miniIso             = cms.double(999.9),
+    loose_muon_miniIso       = cms.double(999.9),
     loose_muon_minpt         = cms.double(10.0),
     loose_muon_maxeta        = cms.double(2.4),
     # specify IP cuts
@@ -132,29 +130,33 @@ process.event_selector = cms.PSet(
     muon_dz                  = cms.double(0.5),
     loose_muon_dxy           = cms.double(999999.),
     loose_muon_dz            = cms.double(999999.),
- 
+
     # electron cuts
     electron_cuts            = cms.bool(True),
+    min_electron             = cms.int32(0),
     electron_minpt           = cms.double(30.0),
-    electron_maxeta          = cms.double(2.1),
+    electron_maxeta          = cms.double(2.5),
     electron_useMiniIso      = cms.bool(True),
     electron_miniIso         = cms.double(0.1),
-#    electron_miniIso         = cms.double(-1),
-    electron_CutsPlusMVA     = cms.bool(False),
-    min_electron             = cms.int32(0),
-    loose_electron_minpt     = cms.double(10.0),
-    loose_electron_maxeta    = cms.double(2.1),
     loose_electron_miniIso   = cms.double(0.4),
-#    loose_electron_miniIso   = cms.double(-1),
+    loose_electron_minpt     = cms.double(10.0),
+    loose_electron_maxeta    = cms.double(2.5),
     UseElMVA                 = cms.bool(True),
-    UseElMVA_tight           = cms.bool(True),
-    tight_electron_mva_cuts  = cms.vdouble(0.967083,0.929117,0.726311), # ~80% el efficiency WP
-    loose_electron_mva_cuts  = cms.vdouble(0.913286,0.805013,0.358969), # ~90% el efficiency WP
-
+    tight_electron_mva_cuts  = cms.vdouble(0.96165,8.75794,3.13902,0.93193,8.84606,3.59851,0.88993,10.12423,4.35279), # Fall17 noiso WP90 c, tau, A for EB1, EB2, and then EE
+    loose_electron_mva_cuts  = cms.vdouble(-0.86,-0.81,-0.72), # Fall17 noiso WP HZZ exact cuts
+    #tight_electron_mva_cuts  = cms.vdouble(0.97177,8.91285,1.97124,0.945875,8.83104,2.40850,0.89791,9.81408,4.17158), # Fall17 iso WP90 c, tau, A for EB1, EB2, and then EE
+    #loose_electron_mva_cuts  = cms.vdouble(-0.83,-0.77,-0.69), # Fall17 iso WP HZZ exact cuts
+ 
     ElMVAweightFiles = cms.vstring(
-        relBase+'/src/LJMet/Com/weights/EIDmva_EB1_10_oldNonTrigSpring15_ConvVarCwoBoolean_TMVA412_FullStatLowPt_PairNegWeightsGlobal_BDT.weights.xml',
-        relBase+'/src/LJMet/Com/weights/EIDmva_EB2_10_oldNonTrigSpring15_ConvVarCwoBoolean_TMVA412_FullStatLowPt_PairNegWeightsGlobal_BDT.weights.xml',
-        relBase+'/src/LJMet/Com/weights/EIDmva_EE_10_oldNonTrigSpring15_ConvVarCwoBoolean_TMVA412_FullStatLowPt_PairNegWeightsGlobal_BDT.weights.xml',
+        relBase+'/src/LJMet/Com/weights/EIDmva_EB1_10_2017_puinfo_BDT.weights.xml',
+        relBase+'/src/LJMet/Com/weights/EIDmva_EB2_10_2017_puinfo_BDT.weights.xml',
+        relBase+'/src/LJMet/Com/weights/EIDmva_EE_10_2017_puinfo_BDT.weights.xml', 
+        ),
+
+    ElMVAweightFiles_iso = cms.vstring(
+        relBase+'/src/LJMet/Com/weights/EIDmva_EB1_10_2017_puinfo_iso_BDT.weights.xml',
+        relBase+'/src/LJMet/Com/weights/EIDmva_EB2_10_2017_puinfo_iso_BDT.weights.xml',
+        relBase+'/src/LJMet/Com/weights/EIDmva_EE_10_2017_puinfo_iso_BDT.weights.xml',
         ),
 
     # more lepton cuts
@@ -171,8 +173,10 @@ process.event_selector = cms.PSet(
     max_met                  = cms.double(99999999999.0),
     
     # Btagging cuts
-    btagOP                   = cms.string('CSVM'),
-    btag_min_discr           = cms.double(0.800),
+    btagOP                   = cms.string('MEDIUM'),
+    bdisc_min                = cms.double(0.4941),
+    DeepCSVfile              = cms.string(relBase+'/src/LJMet/Com/data/DeepCSV_94XSF_V3_B_F.csv'),
+    DeepCSVSubjetfile        = cms.string(relBase+'/src/LJMet/Com/data/subjet_DeepCSV_94XSF_V3_B_F.csv'),
     btag_cuts                = cms.bool(False),
     btag_1                   = cms.bool(False),
     btag_2                   = cms.bool(False),
@@ -182,19 +186,18 @@ process.event_selector = cms.PSet(
     trigger_collection       = cms.InputTag('TriggerResults::HLT'),
     pv_collection            = cms.InputTag('offlineSlimmedPrimaryVertices'),
     jet_collection           = cms.InputTag('slimmedJets'),
+    slimmedJetsAK8           = cms.InputTag('slimmedJetsAK8'),
     muon_collection          = cms.InputTag('slimmedMuons'),
     electron_collection      = cms.InputTag('slimmedElectrons'),
     tau_collection	     = cms.InputTag('slimmedTaus'),
     met_collection           = cms.InputTag('slimmedMETs'),
     
     # Jet corrections are read from txt files which need updating!
-    JEC_txtfile = cms.string(relBase+'/src/LJMet/Com/data/Spring16_25nsV6_DATA_Uncertainty_AK4PFchs.txt'),
-    JERSF_txtfile = cms.string(relBase+'/src/LJMet/Com/data/Spring16_25nsV6_MC_SF_AK4PFchs.txt'),
-    JER_txtfile = cms.string(relBase+'/src/LJMet/Com/data/Spring16_25nsV6_MC_PtResolution_AK4PFchs.txt'),
-    JERAK8_txtfile = cms.string(relBase+'/src/LJMet/Com/data/Spring16_25nsV6_MC_PtResolution_AK8PFchs.txt'),
+    JEC_txtfile = cms.string(relBase+'/src/LJMet/Com/data/Fall17V6/Fall17_17Nov2017_V6_MC_Uncertainty_AK4PFchs.txt'),
+    JERSF_txtfile = cms.string(relBase+'/src/LJMet/Com/data/Spring16V10/Spring16_25nsV10_MC_SF_AK4PFchs.txt'),
+    JER_txtfile = cms.string(relBase+'/src/LJMet/Com/data/Spring16V10/Spring16_25nsV10_MC_PtResolution_AK4PFchs.txt'),
+    JERAK8_txtfile = cms.string(relBase+'/src/LJMet/Com/data/Spring16V10/Spring16_25nsV10_MC_PtResolution_AK8PFchs.txt'),
 
-    BTagUncertUp             = cms.bool(False), # no longer needed
-    BTagUncertDown           = cms.bool(False), # no longer needed
     JECup                    = cms.bool(False),
     JECdown                  = cms.bool(False),
     JERup                    = cms.bool(False),
@@ -203,24 +206,36 @@ process.event_selector = cms.PSet(
     doLepJetCleaning         = cms.bool(True),
     CleanLooseLeptons        = cms.bool(False),
     LepJetDR                 = cms.double(0.4),
+    LepJetDRAK8              = cms.double(0.8),
     
-    MCL1JetPar               = cms.string(relBase+'/src/LJMet/Com/data/Spring16_25nsV6_MC_L1FastJet_AK4PFchs.txt'),
-    MCL2JetPar               = cms.string(relBase+'/src/LJMet/Com/data/Spring16_25nsV6_MC_L2Relative_AK4PFchs.txt'),
-    MCL3JetPar               = cms.string(relBase+'/src/LJMet/Com/data/Spring16_25nsV6_MC_L3Absolute_AK4PFchs.txt'),
+    MCL1JetPar               = cms.string(relBase+'/src/LJMet/Com/data/Fall17V6/Fall17_17Nov2017_V6_MC_L1FastJet_AK4PFchs.txt'),
+    MCL2JetPar               = cms.string(relBase+'/src/LJMet/Com/data/Fall17V6/Fall17_17Nov2017_V6_MC_L2Relative_AK4PFchs.txt'),
+    MCL3JetPar               = cms.string(relBase+'/src/LJMet/Com/data/Fall17V6/Fall17_17Nov2017_V6_MC_L3Absolute_AK4PFchs.txt'),
 
-    MCL1JetParAK8            = cms.string(relBase+'/src/LJMet/Com/data/Spring16_25nsV6_MC_L1FastJet_AK8PFchs.txt'),
-    MCL2JetParAK8            = cms.string(relBase+'/src/LJMet/Com/data/Spring16_25nsV6_MC_L2Relative_AK8PFchs.txt'),
-    MCL3JetParAK8            = cms.string(relBase+'/src/LJMet/Com/data/Spring16_25nsV6_MC_L3Absolute_AK8PFchs.txt'),
+    MCL1JetParAK8            = cms.string(relBase+'/src/LJMet/Com/data/Fall17V6/Fall17_17Nov2017_V6_MC_L1FastJet_AK8PFPuppi.txt'),
+    MCL2JetParAK8            = cms.string(relBase+'/src/LJMet/Com/data/Fall17V6/Fall17_17Nov2017_V6_MC_L2Relative_AK8PFPuppi.txt'),
+    MCL3JetParAK8            = cms.string(relBase+'/src/LJMet/Com/data/Fall17V6/Fall17_17Nov2017_V6_MC_L3Absolute_AK8PFPuppi.txt'),
 
-    DataL1JetPar             = cms.string(relBase+'/src/LJMet/Com/data/Spring16_25nsV6_DATA_L1FastJet_AK4PFchs.txt'),
-    DataL2JetPar             = cms.string(relBase+'/src/LJMet/Com/data/Spring16_25nsV6_DATA_L2Relative_AK4PFchs.txt'),
-    DataL3JetPar             = cms.string(relBase+'/src/LJMet/Com/data/Spring16_25nsV6_DATA_L3Absolute_AK4PFchs.txt'),
-    DataResJetPar            = cms.string(relBase+'/src/LJMet/Com/data/Spring16_25nsV6_DATA_L2L3Residual_AK4PFchs.txt'),
+    DataL1JetPar             = cms.string(relBase+'/src/LJMet/Com/data/Fall17V6/Fall17_17Nov2017B_V6_DATA_L1FastJet_AK4PFchs.txt'),
+    DataL2JetPar             = cms.string(relBase+'/src/LJMet/Com/data/Fall17V6/Fall17_17Nov2017B_V6_DATA_L2Relative_AK4PFchs.txt'),
+    DataL3JetPar             = cms.string(relBase+'/src/LJMet/Com/data/Fall17V6/Fall17_17Nov2017B_V6_DATA_L3Absolute_AK4PFchs.txt'),
+    DataResJetPar            = cms.string(relBase+'/src/LJMet/Com/data/Fall17V6/Fall17_17Nov2017B_V6_DATA_L2L3Residual_AK4PFchs.txt'),
 
-    DataL1JetParAK8          = cms.string(relBase+'/src/LJMet/Com/data/Spring16_25nsV6_DATA_L1FastJet_AK8PFchs.txt'),
-    DataL2JetParAK8          = cms.string(relBase+'/src/LJMet/Com/data/Spring16_25nsV6_DATA_L2Relative_AK8PFchs.txt'),
-    DataL3JetParAK8          = cms.string(relBase+'/src/LJMet/Com/data/Spring16_25nsV6_DATA_L3Absolute_AK8PFchs.txt'),
-    DataResJetParAK8         = cms.string(relBase+'/src/LJMet/Com/data/Spring16_25nsV6_DATA_L2L3Residual_AK8PFchs.txt')
+    DataL1JetParAK8          = cms.string(relBase+'/src/LJMet/Com/data/Fall17V6/Fall17_17Nov2017B_V6_DATA_L1FastJet_AK8PFPuppi.txt'),
+    DataL2JetParAK8          = cms.string(relBase+'/src/LJMet/Com/data/Fall17V6/Fall17_17Nov2017B_V6_DATA_L2Relative_AK8PFPuppi.txt'),
+    DataL3JetParAK8          = cms.string(relBase+'/src/LJMet/Com/data/Fall17V6/Fall17_17Nov2017B_V6_DATA_L3Absolute_AK8PFPuppi.txt'),
+    DataResJetParAK8         = cms.string(relBase+'/src/LJMet/Com/data/Fall17V6/Fall17_17Nov2017B_V6_DATA_L2L3Residual_AK8PFPuppi.txt'),
+
+    # Unused parameters
+    muon_reliso              = cms.double(0.2),
+    muon_selector            = cms.bool(False),
+    muon_selector_medium     = cms.bool(False),
+    loose_muon_selector      = cms.bool(False),
+    loose_muon_selector_tight = cms.bool(False),
+    loose_muon_reliso        = cms.double(0.4),
+    electron_CutsPlusMVA     = cms.bool(False),
+    BTagUncertUp             = cms.bool(False), # no longer needed
+    BTagUncertDown           = cms.bool(False), # no longer needed
 
     )
 
@@ -235,7 +250,7 @@ process.inputs = cms.PSet (
     skipEvents = cms.int32(0),
     lumisToProcess = CfgTypes.untracked(CfgTypes.VLuminosityBlockRange()),
     fileNames  = cms.vstring(
-        'testdata_MINIAOD.root'
+        'root://cmsxrootd.fnal.gov//store/data/Run2018C/SingleMuon/MINIAOD/17Sep2018-v1/00000/F5C9D858-8106-774E-9DA4-23DA7B098322.root',
         )
     )
 
@@ -285,3 +300,4 @@ process.TopElectronSelector.version = cms.string('NONE') #not used
 #Loose electron for 25ns
 process.LooseTopElectronSelector = process.TopElectronSelector.clone()
 process.LooseTopElectronSelector.version = cms.string('NONE') #not used
+
