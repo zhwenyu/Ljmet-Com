@@ -1,9 +1,0 @@
-DoubleEG-Run2016E-PromptReco-v2
-DoubleEG-Run2016F-PromptReco-v1
-DoubleEG-Run2016G-PromptReco-v1
-DoubleMuon-Run2016E-PromptReco-v2
-DoubleMuon-Run2016F-PromptReco-v1
-DoubleMuon-Run2016G-PromptReco-v1
-MuonEG-Run2016E-PromptReco-v2
-MuonEG-Run2016F-PromptReco-v1
-MuonEG-Run2016G-PromptReco-v1

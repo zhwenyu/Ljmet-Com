@@ -1,4 +1,0 @@
-Samples_Run2016B/DoubleEG_Run2016B-PromptReco-v1.txt
-Samples_Run2016B/DoubleMuon_Run2016B-PromptReco-v1.txt
-Samples_Run2016B/DoubleEG_Run2016B-PromptReco-v2.txt
-Samples_Run2016B/DoubleMuon_Run2016B-PromptReco-v2.txt

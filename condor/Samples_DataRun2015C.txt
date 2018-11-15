@@ -1,3 +1,0 @@
-Samples_Run2015C/DoubleEG_Run2015C_25ns_05Oct2015-v1.txt
-Samples_Run2015C/DoubleMuon_Run2015C_25ns_05Oct2015-v1.txt
-Samples_Run2015C/MuonEG_Run2015C_25ns_05Oct2015-v1.txt
