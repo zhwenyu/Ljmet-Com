@@ -60,9 +60,10 @@ void BTagSFUtil::modifyBTagsWithSF(bool& isBTagged, int pdgIdPart,
   // b quarks and c quarks:
   if( abs( pdgIdPart ) == 5 ||  abs( pdgIdPart ) == 4) { 
 
-    double bctag_eff = Btag_eff;
-    if ( abs(pdgIdPart)==4 )  bctag_eff = Btag_eff/5.0; // take ctag eff as one 5th of Btag eff
-    newBTag = applySF(isBTagged, Btag_SF, bctag_eff);
+    // Commented out Feb 2017 -- adding exact charm effs/SFs to HardcodedConditions and passing in "Btag" arguments
+    //double bctag_eff = Btag_eff;
+    //if ( abs(pdgIdPart)==4 )  bctag_eff = Btag_eff/5.0; // take ctag eff as one 5th of Btag eff
+    newBTag = applySF(isBTagged, Btag_SF, Btag_eff);
 
   // light quarks:
   } else { // need 0's with hadronFlavor

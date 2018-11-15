@@ -254,7 +254,7 @@ int WprimeBoostedCalc::AnalyzeEvent(edm::EventBase const & event,
         
         _electron_1_Ooemoop = (1.0/vSelElectrons[0]->ecalEnergy() - vSelElectrons[0]->eSuperClusterOverP()/vSelElectrons[0]->ecalEnergy());
         _electron_1_RelIso  = ( chIso + max(0.0, nhIso + phIso - rhoIso*AEff) )/ vSelElectrons[0]->ecalDrivenMomentum().pt();
-        _electron_1_mHits   =  vSelElectrons[0]->gsfTrack()->hitPattern().numberOfHits(reco::HitPattern::MISSING_INNER_HITS);
+        _electron_1_mHits   =  vSelElectrons[0]->gsfTrack()->hitPattern().numberOfAllHits(reco::HitPattern::MISSING_INNER_HITS);
         _electron_1_vtxFitConv = vSelElectrons[0]->passConversionVeto();
         
         for (unsigned int ijet = 0; ijet<vCorrBtagJets.size(); ijet++) {
