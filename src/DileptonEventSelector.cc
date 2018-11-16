@@ -335,42 +335,100 @@ bool DileptonEventSelector::operator()( edm::EventBase const & event, pat::strbi
             if (bFirstEntry && mbPar["dump_trigger"]){
                 for (unsigned int i=0; i<_tSize; i++){
                     std::string trigName = trigNames.triggerName(i);
-                    std::cout << i << "   " << trigName << std::endl;
+                    std::cout << i << "   " << trigName;
+                    bool fired = mhEdmTriggerResults->accept(trigNames.triggerIndex(trigName));
+                    std::cout <<", FIRED = "<<fired<<std::endl;
                 }
             }
-            
+
+			if (mbPar["debug"]) std::cout << "\n Fired the following registered LJMet trigger(s):		" << std::endl;
+ 
+ 
+			mvSelTriggersEl.clear();
+			mvSelTriggersMu.clear();
+           
             //Loop over each channel separately
             int passEE = 0;
+            //loop over triggers we registered in LJMet (config)
             for (unsigned int ipath = 0; ipath < mvsPar["trigger_path_ee"].size(); ipath++){
-                unsigned int _tIndex = trigNames.triggerIndex(mvsPar["trigger_path_ee"].at(ipath));
-                if ( _tIndex<_tSize){
-                    if (mhEdmTriggerResults->accept(_tIndex)){
-                        passEE++;
-                        break;
-                    }
-                }
+            	//loop over triggers in sample
+				for (unsigned int i=0; i<_tSize;i++){
+					//compare strings
+					std::string trigName_sample = trigNames.triggerName(i);
+					std::string trigName_LJMet = mvsPar["trigger_path_ee"].at(ipath);
+					if ( trigName_sample.find(trigName_LJMet) == std::string::npos) continue;
+					unsigned int _tIndex = trigNames.triggerIndex(trigName_sample);
+					if (mhEdmTriggerResults->accept(_tIndex)){
+						if (mbPar["debug"]) std::cout << "		trigger_path_ee:" << trigNames.triggerName(i)  << std::endl;
+						passEE++;
+						mvSelTriggersEl[mvsPar["trigger_path_ee"].at(ipath)] = 1;
+						break;
+					}
+					else{
+						mvSelTriggersEl[mvsPar["trigger_path_ee"].at(ipath)] = 0;
+					}
+				
+				}
             }
             
             int passEM = 0;
+            //loop over triggers we registered in LJMet (config)
             for (unsigned int ipath = 0; ipath < mvsPar["trigger_path_em"].size(); ipath++){
-                unsigned int _tIndex = trigNames.triggerIndex(mvsPar["trigger_path_em"].at(ipath));
-                if ( _tIndex<_tSize){
-                    if (mhEdmTriggerResults->accept(_tIndex)){
-                        passEM++;
-                        break;
-                    }
-                }
+            	//loop over triggers in sample
+				for (unsigned int i=0; i<_tSize;i++){
+					//compare strings
+					std::string trigName_sample = trigNames.triggerName(i);
+					std::string trigName_LJMet = mvsPar["trigger_path_em"].at(ipath);
+					if ( trigName_sample.find(trigName_LJMet) == std::string::npos) continue;
+					unsigned int _tIndex = trigNames.triggerIndex(trigName_sample);
+					if (mhEdmTriggerResults->accept(_tIndex)){
+						if (mbPar["debug"]) std::cout << "		trigger_path_em:" << trigNames.triggerName(i)  << std::endl;
+						mvSelTriggersEl[mvsPar["trigger_path_em"].at(ipath)] = 1;
+						mvSelTriggersMu[mvsPar["trigger_path_em"].at(ipath)] = 1;
+						passEM++;
+						break;
+					}
+					else{
+						mvSelTriggersEl[mvsPar["trigger_path_em"].at(ipath)] = 0;
+						mvSelTriggersMu[mvsPar["trigger_path_em"].at(ipath)] = 0;
+					}
+				
+				}
             }
             
             int passMM = 0;
+            //loop over triggers we registered in LJMet (config)
             for (unsigned int ipath = 0; ipath < mvsPar["trigger_path_mm"].size(); ipath++){
-                unsigned int _tIndex = trigNames.triggerIndex(mvsPar["trigger_path_mm"].at(ipath));
-                if ( _tIndex<_tSize){
-                    if (mhEdmTriggerResults->accept(_tIndex)){
-                        passMM++;
-                        break;
-                    }
-                }
+            	//loop over triggers in sample
+				for (unsigned int i=0; i<_tSize;i++){
+					//compare strings
+					std::string trigName_sample = trigNames.triggerName(i);
+					std::string trigName_LJMet = mvsPar["trigger_path_mm"].at(ipath);
+					if ( trigName_sample.find(trigName_LJMet) == std::string::npos) continue;
+					unsigned int _tIndex = trigNames.triggerIndex(trigName_sample);
+					if (mhEdmTriggerResults->accept(_tIndex)){
+						if (mbPar["debug"]) std::cout << "		trigger_path_mm:" << trigNames.triggerName(i)  << std::endl;
+						passMM++;
+						mvSelTriggersMu[mvsPar["trigger_path_mm"].at(ipath)] = 1;
+						break;
+					}
+					else{
+						mvSelTriggersEl[mvsPar["trigger_path_mm"].at(ipath)] = 0;
+					}
+				
+				}
+            }
+            
+            //debug 
+            if (mbPar["debug"]){
+            	std::cout <<"\nCheck saved trig infos:"<< std::endl; 
+
+				for(const auto& x: mvSelTriggersEl){
+					std::cout << "	"<< x.first << " = " <<x.second << std::endl;
+				}
+				for(const auto& x: mvSelTriggersMu){
+					std::cout << "	"<< x.first << " = "<< x.second << std::endl;
+				}
             }
             
             mvSelTriggers.clear();
@@ -903,7 +961,7 @@ passCut(ret,"Bad Charged Hadron");
 	    if ( passPFID){
                 mvAllJets.push_back(edm::Ptr<pat::Jet>(mhJets, _n_jets)); 		
 		//cut on corrected jet quantities
-		TLorentzVector corJetP4 = correctJet(*_ijet,event,false,false,0,run,mbPar["doEraDepJEC"]);
+		TLorentzVector corJetP4 = correctJet(*_ijet,event,false,false,0);
                 if (( corJetP4.Pt()>mdPar["jet_minpt"] ) && ( fabs(corJetP4.Eta())<mdPar["jet_maxeta"] )){ 
                     ++_n_good_uncleaned_jets;
                     mvSelJets.push_back(edm::Ptr<pat::Jet>(mhJets, _n_jets)); 
@@ -969,7 +1027,7 @@ passCut(ret,"Bad Charged Hadron");
 
 			tmpJet.setP4( tmpJet.p4() - muDaughters[muI]->p4() );
 			
-			if (mbPar["debug"]) std::cout << "Corrected Jet : pT = " << jetP4.Pt() << " eta = " << jetP4.Eta() << " phi = " << jetP4.Phi() << std::endl;
+			if (mbPar["debug"]) std::cout << "Corrected Jet : pT = " << tmpJet.pt() << " eta = " << tmpJet.eta() << " phi = " << tmpJet.phi() << std::endl;
 			_cleaned = true;
 			muDaughters.erase( muDaughters.begin()+muI );
 			break; //breaks out of mu daughters loop
@@ -1011,7 +1069,7 @@ passCut(ret,"Bad Charged Hadron");
 		      if ( (*_i_const).key() == elDaughters[elI].key() ) {
 			tmpJet.setP4( tmpJet.p4() - elDaughters[elI]->p4() );
 
-			if (mbPar["debug"]) std::cout << "Corrected Jet : pT = " << jetP4.Pt() << " eta = " << jetP4.Eta() << " phi = " << jetP4.Phi() << std::endl;
+			if (mbPar["debug"]) std::cout << "Corrected Jet : pT = " << tmpJet.pt() << " eta = " << tmpJet.eta() << " phi = " << tmpJet.phi() << std::endl;
 			_cleaned = true;
 			elDaughters.erase( elDaughters.begin()+elI );
 			break;
@@ -1025,7 +1083,7 @@ passCut(ret,"Bad Charged Hadron");
 
 	      //if not cleaned just use first jet (remember if no cleaning then cleanedJet==*_ijet) to get corrected four std::vector and set the cleaned jet to have it
 	      if (!_cleaned) {
-		jetP4 = correctJet(cleanedJet, event,false,false,0,run,mbPar["doEraDepJEC"]);
+		jetP4 = correctJet(cleanedJet, event,false,false,0);
 		//annoying thing to convert our tlorentzstd::vector to root::math::lorentzstd::vector
 		ROOT::Math::LorentzVector<ROOT::Math::PtEtaPhiM4D<double > > rlv;
 		rlv.SetXYZT(jetP4.X(),jetP4.Y(),jetP4.Z(),jetP4.T());
@@ -1033,7 +1091,7 @@ passCut(ret,"Bad Charged Hadron");
 	      }
 	      else{
 		//get the correct 4std::vector
-		jetP4 = correctJet(tmpJet, event,false,false,0,run,mbPar["doEraDepJEC"]);
+		jetP4 = correctJet(tmpJet, event,false,false,0);
 		//annoying thing to convert our tlorentzstd::vector to root::math::lorentzstd::vector
 		ROOT::Math::LorentzVector<ROOT::Math::PtEtaPhiM4D<double > > rlv;
 		rlv.SetXYZT(jetP4.X(),jetP4.Y(),jetP4.Z(),jetP4.T());
