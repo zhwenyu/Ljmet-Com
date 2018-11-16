@@ -5,7 +5,7 @@ import os
 
 #Arguments from condor submit script which are used more than once
 relBase    = os.environ['CMSSW_BASE']
-condorJSON = str('none')
+condorJSON = str('Cert_294927-306462_13TeV_PromptReco_Collisions17_JSON.txt')
 
 # Define the base process
 process = cms.Process("LJMetCom")
@@ -22,7 +22,7 @@ process.subProcesses = cms.PSet()
 # FWLite application options
 #
 process.ljmet = cms.PSet(
-    isMc = cms.bool(True),
+    isMc = cms.bool(False),
     runs = cms.vint32([])
 )
 
@@ -48,7 +48,7 @@ process.JetSubCalc.killHF = cms.bool(False)
 process.JetSubCalc.isMc = cms.bool(True)
 
 process.DileptonCalc.isMc     = process.ljmet.isMc
-process.DileptonCalc.dataType = cms.string('ElMu')
+process.DileptonCalc.dataType = cms.string('All')
 
 
 # BestCalc options
@@ -62,8 +62,8 @@ process.BestCalc.dnnFile = cms.string(relBase+'/src/LJMet/Com/data/BEST_mlp.json
 process.event_selector = cms.PSet(
 
     selection = cms.string('DileptonSelector'),
-    isMc              = cms.bool(True),
-    keepFullMChistory = cms.bool(True),
+    isMc              = cms.bool(False),
+    keepFullMChistory = cms.bool(False),
     debug             = cms.bool(True),
     # cuts
     #HLT
@@ -95,8 +95,8 @@ process.event_selector = cms.PSet(
     ecalTP_cut               = cms.bool(True),
     goodVtx_cut              = cms.bool(True),
     badMuon_cut              = cms.bool(True),
-    badChargedHadron_cut     = cms.bool(True),
-    flag_tag                 = cms.InputTag('TriggerResults::PAT'),
+    badChargedHadron_cut     = cms.bool(True),    			     
+    flag_tag                 = cms.InputTag('TriggerResults::RECO'),
     cscHalo_cut              = cms.bool(True),
 
     metfilters     = cms.bool(True),
@@ -208,25 +208,25 @@ process.event_selector = cms.PSet(
 
 
 process.inputs = cms.PSet (
-   nEvents    = cms.int32(500),
+   nEvents    = cms.int32(5000),
    skipEvents = cms.int32(0),
    lumisToProcess = CfgTypes.untracked(CfgTypes.VLuminosityBlockRange()),
        fileNames  = cms.vstring(
-	                 'root://cmsxrootd.fnal.gov//store/mc/RunIIFall17MiniAODv2/TprimeTprime_M-1100_TuneCP5_13TeV-madgraph-pythia8/MINIAODSIM/PU2017_12Apr2018_94X_mc2017_realistic_v14-v2/00000/8EA8FE89-254F-E811-835E-0090FAA58BF4.root',
-
-     )
+# 		'root://cmsxrootd.fnal.gov//store/data/Run2017F/DoubleEG/MINIAOD/09May2018-v1/10000/444E03EB-B75F-E811-AFBA-F01FAFD8F16A.root',
+		'root://cmsxrootd.fnal.gov//store/data/Run2017F/MuonEG/MINIAOD/09May2018-v1/110000/BC42F7EF-B4A2-E811-9CD6-001E67F8FA06.root',
+     ) 
 )
 
 
 
 # JSON
 if (not process.ljmet.isMc==cms.bool(True)):
-    JsonFile = ''
+    JsonFile = relBase+'/src/LJMet/Com/data/json/'+condorJSON
     myList   = LumiList.LumiList(filename=JsonFile).getCMSSWString().split(',')
     process.inputs.lumisToProcess.extend(myList)
-
-
-
+       
+        
+        
 #######################################################
 #
 # Output
@@ -237,8 +237,9 @@ try: scratchDir=os.environ['_CONDOR_SCRATCH_DIR']
 except: scratchDir='.'
 if not os.path.isdir(scratchDir): os.system("mkdir -p "+scratchDir)
 process.outputs = cms.PSet (
-    #outputName = cms.string(scratchDir+'/TprimeTprime_M-1500_13'),
-    outputName = cms.string('TprimeTprime_M-1100_testMC'),
+    #outputName = cms.string(scratchDir+'/PREFIX_JOBID'),
+#     outputName = cms.string('DoubleEG_Run2017F_v2_testData'),
+    outputName = cms.string('MuonEG_Run2017F_v2_testData'),
     treeName   = cms.string('ljmet'),
 )
 
@@ -255,6 +256,6 @@ process.pvSelector.maxZ    = cms.double(24.0)
 process.pvSelector.maxRho  = cms.double(2.0)
 
 # jets
-process.load('PhysicsTools.SelectorUtils.pfJetIDSelector_cfi')
+process.load('PhysicsTools.SelectorUtils.pfJetIDSelector_cfi') 
 process.pfJetIDSelector.version = cms.string('FIRSTDATA')
 process.pfJetIDSelector.quality = cms.string('LOOSE')
