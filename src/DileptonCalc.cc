@@ -232,35 +232,16 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
     SetValue("trigMM", passMM);
 
 
+    bool HLT_Ele27_Ele37=false;
+    bool HLT_DoubleEle25=false;
+    bool HLT_DoubleEle27=false;
     bool HLT_DoubleEle33=false;
-    bool HLT_DoubleEle37_27=false;
-    bool HLT_DoubleEle33_MW=false;
-    bool HLT_DoubleEle8_Mass8_HT300 = false;
-    bool HLT_Ele17_Ele12_DZ=false;
-    bool HLT_Ele27WP85=false;
-    bool HLT_Mu27TkMu8=false;
-    bool HLT_Mu30TkMu11=false;
-    bool HLT_Mu40TkMu11=false;
-    bool HLT_Mu17_Iso_Mu8_Iso=false;
-    bool HLT_Mu17_Iso_TkMu8_Iso=false;
-    bool HLT_DoubleMu8_Mass8_HT300 = false;
-    bool HLT_Mu40=false;
-    bool HLT_IsoTkMu24=false;
-    bool HLT_DoubleMu33NoFiltersNoVtx=false;
-    bool HLT_Mu17Ele12=false;
-    bool HLT_Mu8Ele17=false;
-    bool HLT_Mu23Ele12=false;
-    bool HLT_Mu23Ele8=false;
-    bool HLT_Mu8Ele23=false;
-    bool HLT_Mu8_Ele8_Mass8_HT300 = false;
-    bool HLT_Mu30Ele30=false;
+    bool HLT_Mu37_TkMu27=false;
     bool HLT_Mu37Ele27=false;
     bool HLT_Mu27Ele37=false;
-    bool HLT_PFHT900=false;
-    bool HLT_AK8PFJet360TrimMass30=false;
-    bool HLT_Ele17Iso=false;
-    bool HLT_Ele17=false;
     bool HLT_Mu17=false;
+    bool HLT_Ele23Iso=false;
+    bool HLT_Ele23=false;
 
     if(doTriggerStudy_){
 
@@ -275,74 +256,35 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
 	const unsigned int triggerIndex(i);
 	if(triggerBits->accept(triggerIndex)){
 	  //electron paths
-	  if(Path.find("HLT_DoubleEle33_CaloIdL_GsfTrkIdVL_v") !=std::string::npos) HLT_DoubleEle33=true;
-	  if(Path.find("HLT_DoubleEle37_Ele27_CaloIdL_GsfTrkIdVL_v") !=std::string::npos) HLT_DoubleEle37_27=true;
-	  if(Path=="HLT_DoubleEle33_CaloIdL_GsfTrkIdVL_MW_v1"|| Path=="HLT_DoubleEle33_CaloIdL_GsfTrkIdVL_MW_v2" || Path=="HLT_DoubleEle33_CaloIdL_GsfTrkIdVL_MW_v3") HLT_DoubleEle33_MW=true;
-	  if(Path=="HLT_Ele27_eta2p1_WP85_Gsf_v1" || Path=="HLT_Ele27_eta2p1_WP85_Gsf_v2" || Path=="HLT_Ele27_eta2p1_WP85_Gsf_v3") HLT_Ele27WP85=true;
-	  if(Path.find("HLT_Ele17_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v")!=std::string::npos) HLT_Ele17_Ele12_DZ=true;
-	  if(Path=="HLT_DoubleEle8_CaloIdM_TrackIdM_Mass8_PFHT300_v1" || Path=="HLT_DoubleEle8_CaloIdM_TrackIdM_Mass8_PFHT300_v2" || Path=="HLT_DoubleEle8_CaloIdM_TrackIdM_Mass8_PFHT300_v3") HLT_DoubleEle8_Mass8_HT300 = true;
+	  if(Path.find("HLT_Ele27_Ele37_CaloIdL_MW_v") !=std::string::npos) HLT_Ele27_Ele37=true;
+	  if(Path.find("HLT_DoubleEle25_CaloIdL_MW_v") !=std::string::npos) HLT_DoubleEle25=true;
+	  if(Path.find("HLT_DoubleEle27_CaloIdL_MW_v") !=std::string::npos) HLT_DoubleEle27=true;
+	  if(Path.find("HLT_DoubleEle33_CaloIdL_MW_v") !=std::string::npos) HLT_DoubleEle33=true;
 	  //Muon paths
-	  if(Path=="HLT_Mu27_TkMu8_v1" || Path=="HLT_Mu27_TkMu8_v2" || Path=="HLT_Mu27_TkMu8_v3") HLT_Mu27TkMu8=true;
-	  if(Path.find("HLT_Mu30_TkMu11_v")!=std::string::npos) HLT_Mu30TkMu11=true;
-	  if(Path=="HLT_Mu40_TkMu11_v1" || Path=="HLT_Mu40_TkMu11_v2" || Path=="HLT_Mu40_TkMu11_v3") HLT_Mu40TkMu11=true;
-	  if(Path=="HLT_DoubleMu8_CaloIdM_TrackIdM_Mass8_PFHT300_v1" || Path=="HLT_DoubleMu8_CaloIdM_TrackIdM_Mass8_PFHT300_v2" || Path=="HLT_DoubleMu8_CaloIdM_TrackIdM_Mass8_PFHT300_v3") HLT_DoubleMu8_Mass8_HT300 = true;
-	  if(Path=="HLT_M40_v1" || Path=="HLT_M40_v2" || Path=="HLT_M40_v3") HLT_Mu40=true;
-	  if(Path=="HLT_IsoTkMu24_IterTrk02_v1" || Path=="HLT_IsoTkMu24_IterTrk02_v2" || Path=="HLT_IsoTkMu24_IterTrk02_v3") HLT_IsoTkMu24=true;
-	  if(Path=="HLT_DoubleMu33NoFiltersNoVtx_v1" || Path=="HLT_DoubleMu33NoFiltersNoVtx_v2" || Path=="HLT_DoubleMu33NoFiltersNoVtx_v3") HLT_DoubleMu33NoFiltersNoVtx=true;
-	  if(Path=="HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_v1" || Path=="HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_v2" || Path=="HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_v3") HLT_Mu17_Iso_Mu8_Iso=true;
-	  if(Path=="HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ_v1" || Path=="HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ_v2" || Path=="HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ_v3") HLT_Mu17_Iso_TkMu8_Iso=true;
-	  //cross paths
-	  if(Path=="HLT_Mu17_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v1" || Path=="HLT_Mu17_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v2" || Path=="HLT_Mu17_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v3") HLT_Mu17Ele12=true;
-	  if(Path=="HLT_Mu8_TrkIsoVVL_Ele17_CaloIdL_TrackIdL_IsoVL_v1" || Path=="HLT_Mu8_TrkIsoVVL_Ele17_CaloIdL_TrackIdL_IsoVL_v2" || Path=="HLT_Mu8_TrkIsoVVL_Ele17_CaloIdL_TrackIdL_IsoVL_v3") HLT_Mu8Ele17=true;
-	  if(Path=="HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v1" || Path=="HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v2" || Path=="HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v3") HLT_Mu23Ele12=true;
-	  if(Path.find("HLT_Mu23_TrkIsoVVL_Ele8_CaloIdL_TrackIdL_IsoVL_v")!=std::string::npos) HLT_Mu23Ele8=true;
-	  if(Path.find("HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_v")!=std::string::npos) HLT_Mu8Ele23=true;
-	      
-	  if(Path.find("HLT_Mu30_Ele30_CaloIdL_GsfTrkIdVL_v")!=std::string::npos) HLT_Mu30Ele30=true;
-	  if(Path.find("HLT_Mu37_Ele27_CaloIdL_GsfTrkIdVL_v")!=std::string::npos) HLT_Mu37Ele27=true;
-	  if(Path.find("HLT_Mu27_Ele37_CaloIdL_GsfTrkIdVL_v")!=std::string::npos) HLT_Mu27Ele37=true;
-	  if(Path=="HLT_Mu8_Ele8_CaloIdM_TrackIdM_Mass8_PFHT300_v1" || Path=="HLT_Mu8_Ele8_CaloIdM_TrackIdM_Mass8_PFHT300_v2" || Path=="HLT_Mu8_Ele8_CaloIdM_TrackIdM_Mass8_PFHT300_v3") HLT_Mu8_Ele8_Mass8_HT300 = true;
+	  if(Path.find("HLT_Mu37_TkMu27_v")!=std::string::npos) HLT_Mu37_TkMu27=true;
+	  //cross paths	      
+	  if(Path.find("HLT_Mu37_Ele27_CaloIdL_MW_v")!=std::string::npos) HLT_Mu37Ele27=true;
+	  if(Path.find("HLT_Mu27_Ele37_CaloIdL_MW_v")!=std::string::npos) HLT_Mu27Ele37=true;
 	  //control triggers
 	  if(Path.find("HLT_Mu17_v")!=std::string::npos) HLT_Mu17=true;
-	  if(Path.find("HLT_Ele17_CaloIdL_TrackIdL_IsoVL_v")!=std::string::npos) HLT_Ele17Iso=true;
-	  if(Path.find("HLT_Ele17_CaloIdL_GsfTrkIdVL_v")!=std::string::npos) HLT_Ele17=true;
+	  if(Path.find("HLT_Ele23_CaloIdL_TrackIdL_IsoVL_PFJet30_v")!=std::string::npos) HLT_Ele23Iso=true;
+	  if(Path.find("HLT_Ele23_CaloIdM_TrackIdM_PFJet30_v")!=std::string::npos) HLT_Ele23=true;
 	  //HT/Jet
-	  if(Path=="HLT_PFHT900_v1" || Path=="HLT_PFHT900_v2" || Path=="HLT_PFHT900_v3") HLT_PFHT900=true;
-	  if(Path=="HLT_AK8PFJet360TrimMod_Mass30_v1" || Path=="HLT_AK8PFJet360TrimMod_Mass30_v2" || Path=="HLT_AK8PFJet360TrimMod_Mass30_v3") HLT_AK8PFJet360TrimMass30=true;
+	  //if(Path=="HLT_AK8PFJet360TrimMod_Mass30_v1" || Path=="HLT_AK8PFJet360TrimMod_Mass30_v2" || Path=="HLT_AK8PFJet360TrimMod_Mass30_v3") HLT_AK8PFJet360TrimMass30=true;
 	}
       }
     }
 
-
+    SetValue("HLT_Ele27_Ele37",HLT_Ele27_Ele37);
+    SetValue("HLT_DoubleEle25",HLT_DoubleEle25);
+    SetValue("HLT_DoubleEle27",HLT_DoubleEle27);
     SetValue("HLT_DoubleEle33",HLT_DoubleEle33);
-    SetValue("HLT_DoubleEle37_27",HLT_DoubleEle37_27);
-    SetValue("HLT_DoubleEle33_MW",HLT_DoubleEle33_MW);
-    SetValue("HLT_DoubleEle8_Mass8_HT300",HLT_DoubleEle8_Mass8_HT300);
-    SetValue("HLT_Ele17_Ele12_DZ",HLT_Ele17_Ele12_DZ);
-    SetValue("HLT_Ele27WP85",HLT_Ele27WP85);
-    SetValue("HLT_Mu27TkMu8",HLT_Mu27TkMu8);
-    SetValue("HLT_Mu30TkMu11",HLT_Mu30TkMu11);
-    SetValue("HLT_Mu40TkMu11",HLT_Mu40TkMu11);
-    SetValue("HLT_Mu17_Iso_Mu8_Iso",HLT_Mu17_Iso_Mu8_Iso);
-    SetValue("HLT_Mu17_Iso_TkMu8_Iso",HLT_Mu17_Iso_TkMu8_Iso);
-    SetValue("HLT_DoubleMu8_Mass8_HT300",HLT_DoubleMu8_Mass8_HT300);
-    SetValue("HLT_Mu40",HLT_Mu40);
-    SetValue("HLT_IsoTkMu24",HLT_IsoTkMu24);
-    SetValue("HLT_DoubleMu33NoFiltersNoVtx",HLT_DoubleMu33NoFiltersNoVtx);
-    SetValue("HLT_Mu17Ele12",HLT_Mu17Ele12);
-    SetValue("HLT_Mu8Ele17",HLT_Mu8Ele17);
-    SetValue("HLT_Mu23Ele12",HLT_Mu23Ele12);
-    SetValue("HLT_Mu23Ele8",HLT_Mu23Ele8);
-    SetValue("HLT_Mu8Ele23",HLT_Mu8Ele23);
-    SetValue("HLT_Mu30Ele30",HLT_Mu30Ele30);
-    SetValue("HLT_Mu27Ele37",HLT_Mu27Ele37);
+    SetValue("HLT_Mu37_TkMu27",HLT_Mu37_TkMu27);
     SetValue("HLT_Mu37Ele27",HLT_Mu37Ele27);
-    SetValue("HLT_Mu8_Ele8_Mass8_HT300",HLT_Mu8_Ele8_Mass8_HT300);
-    SetValue("HLT_PFHT900",HLT_PFHT900);
-    SetValue("HLT_AK8PFJet360TrimMass30",HLT_AK8PFJet360TrimMass30);
+    SetValue("HLT_Mu27Ele37",HLT_Mu27Ele37);
     SetValue("HLT_Mu17",HLT_Mu17);
-    SetValue("HLT_Ele17Iso",HLT_Ele17Iso);
-    SetValue("HLT_Ele17",HLT_Ele17);
+    SetValue("HLT_Ele23Iso",HLT_Ele23Iso);
+    SetValue("HLT_Ele23Iso",HLT_Ele23Iso);
 
     //
     //_____ Event kinematics __________________
