@@ -392,7 +392,6 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
     std::vector <int>    elMHits;
     std::vector <int>    elVtxFitConv;
     std::vector<double>  elMVA;
-    std::vector<double>  elMVA80X;
 
     //mva stuff - added by bjorn
     std::vector <double> elMVAValue;
@@ -622,7 +621,6 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
 	elVtxFitConv.push_back((*iel)->passConversionVeto());
         //add mva
 	elMVA.push_back( selector->mvaValue( *(iel->get()), event) );
-	elMVA80X.push_back( selector->mvaValue_alt( *(iel->get()), event) );
 
 	//add miniIso
 	elMiniIsoEA.push_back(getPFMiniIsolation_EffectiveArea(packedPFCands, dynamic_cast<const reco::Candidate *>(iel->get()),0.05, 0.2, 10., false, false,myRhoJetsNC));
@@ -790,7 +788,6 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
     SetValue("elMHits", elMHits);
     SetValue("elVtxFitConv", elVtxFitConv);
     SetValue("elMVA",elMVA);
-    SetValue("elMVA80X",elMVA80X);
     //SetValue("elMVAValVID",elMVAValVID);
     //SetValue("elMVATightVID",elMVATightVID);
     //SetValue("elMVALooseVID",elMVALooseVID);
@@ -835,23 +832,6 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
     //_____ Muons _____________________________
     //
     
-    //get flag for event having bad pfmuon
-    edm::Handle<edm::TriggerResults > PatTriggerResults;
-    event.getByLabel( edm::InputTag("TriggerResults::PAT"), PatTriggerResults );
-    const edm::TriggerNames patTrigNames = event.triggerNames(*PatTriggerResults);
-
-    bool badmuon = false;
-    bool dupmuon = false;
-
-    for (unsigned int i=0; i<PatTriggerResults->size(); i++){
-      if (patTrigNames.triggerName(i) == "Flag_badMuons") badmuon = PatTriggerResults->accept(patTrigNames.triggerIndex(patTrigNames.triggerName(i)));
-      if (patTrigNames.triggerName(i) == "Flag_duplicateMuons") dupmuon = PatTriggerResults->accept(patTrigNames.triggerIndex(patTrigNames.triggerName(i)));
-    }
-   
-    SetValue("BadMuon",badmuon);
-    SetValue("DupMuon",dupmuon);
-
-    //main muon info
     std::vector <int> muCharge;
     std::vector <bool> muGlobal;
     std::vector <bool> muTracker;

@@ -176,7 +176,6 @@ void BaseEventSelector::BeginJob(std::map<std::string, edm::ParameterSet const >
 
         if (par[_key].exists("doNewJEC")) mbPar["doNewJEC"] = par[_key].getParameter<bool> ("doNewJEC");
         else mbPar["doNewJEC"] = false;
-
         
         if (_missing_config) {
             std::cout << mLegend
@@ -247,28 +246,6 @@ void BaseEventSelector::BeginJob(std::map<std::string, edm::ParameterSet const >
     resolutionAK8 = JME::JetResolution(msPar["JERAK8_txtfile"]);
     resolution_SF = JME::JetResolutionScaleFactor(msPar["JERSF_txtfile"]);    
 
-    //make runera dependent jec
-    std::vector<JetCorrectorParameters> vPar2016BCD; 
-    vPar2016BCD.push_back(JetCorrectorParameters("../data/Summer16_23Sep2016BCDV3_DATA_L1FastJet_AK4PFchs.txt"));
-    vPar2016BCD.push_back(JetCorrectorParameters("../data/Summer16_23Sep2016BCDV3_DATA_L2Relative_AK4PFchs.txt"));
-    vPar2016BCD.push_back(JetCorrectorParameters("../data/Summer16_23Sep2016BCDV3_DATA_L3Absolute_AK4PFchs.txt"));
-    vPar2016BCD.push_back(JetCorrectorParameters("../data/Summer16_23Sep2016BCDV3_DATA_L2L3Residual_AK4PFchs.txt"));
-    std::vector<JetCorrectorParameters> vPar2016EF;
-    vPar2016EF.push_back(JetCorrectorParameters("../data/Summer16_23Sep2016EFV3_DATA_L1FastJet_AK4PFchs.txt"));
-    vPar2016EF.push_back(JetCorrectorParameters("../data/Summer16_23Sep2016EFV3_DATA_L2Relative_AK4PFchs.txt"));
-    vPar2016EF.push_back(JetCorrectorParameters("../data/Summer16_23Sep2016EFV3_DATA_L3Absolute_AK4PFchs.txt"));
-    vPar2016EF.push_back(JetCorrectorParameters("../data/Summer16_23Sep2016EFV3_DATA_L2L3Residual_AK4PFchs.txt"));
-    std::vector<JetCorrectorParameters> vPar2016G;
-    vPar2016G.push_back(JetCorrectorParameters("../data/Summer16_23Sep2016GV3_DATA_L1FastJet_AK4PFchs.txt"));
-    vPar2016G.push_back(JetCorrectorParameters("../data/Summer16_23Sep2016GV3_DATA_L2Relative_AK4PFchs.txt"));
-    vPar2016G.push_back(JetCorrectorParameters("../data/Summer16_23Sep2016GV3_DATA_L3Absolute_AK4PFchs.txt"));
-    vPar2016G.push_back(JetCorrectorParameters("../data/Summer16_23Sep2016GV3_DATA_L2L3Residual_AK4PFchs.txt"));
-    std::vector<JetCorrectorParameters> vPar2016H;
-    vPar2016H.push_back(JetCorrectorParameters("../data/Summer16_23Sep2016HV3_DATA_L1FastJet_AK4PFchs.txt"));
-    vPar2016H.push_back(JetCorrectorParameters("../data/Summer16_23Sep2016HV3_DATA_L2Relative_AK4PFchs.txt"));
-    vPar2016H.push_back(JetCorrectorParameters("../data/Summer16_23Sep2016HV3_DATA_L3Absolute_AK4PFchs.txt"));
-    vPar2016H.push_back(JetCorrectorParameters("../data/Summer16_23Sep2016HV3_DATA_L2L3Residual_AK4PFchs.txt"));
-
     std::vector<JetCorrectorParameters> vPar;
     std::vector<JetCorrectorParameters> vParAK8;
     std::vector<JetCorrectorParameters> vPar_B;
@@ -316,10 +293,10 @@ void BaseEventSelector::BeginJob(std::map<std::string, edm::ParameterSet const >
       // Create the JetCorrectorParameter objects, the order does not matter.
       
       std::string strB = msPar["DataL1JetPar"];
-      std::string strC = strB; boost::replace_first(strC,"B","C");
-      std::string strD = strB; boost::replace_first(strD,"B","D");
-      std::string strE = strB; boost::replace_first(strE,"B","E");  
-      std::string strF = strB; boost::replace_first(strF,"B","F");  
+      std::string strC = strB; boost::replace_first(strC,"B_V","C_V"); // B_V in 17Nov2017B_V6 //ATTENTION: this will replace any matched string in the path! So choose wisely.
+      std::string strD = strB; boost::replace_first(strD,"B_V","D_V");
+      std::string strE = strB; boost::replace_first(strE,"B_V","E_V");  
+      std::string strF = strB; boost::replace_first(strF,"B_V","F_V");  
       msPar["DataL1JetParByIOV_B"] = strB;
       msPar["DataL1JetParByIOV_C"] = strC;
       msPar["DataL1JetParByIOV_D"] = strD;
@@ -327,10 +304,10 @@ void BaseEventSelector::BeginJob(std::map<std::string, edm::ParameterSet const >
       msPar["DataL1JetParByIOV_F"] = strF;
 
       strB = msPar["DataL2JetPar"];
-      strC = strB; boost::replace_first(strC,"B","C");
-      strD = strB; boost::replace_first(strD,"B","D");
-      strE = strB; boost::replace_first(strE,"B","E");  
-      strF = strB; boost::replace_first(strE,"B","F");  
+      strC = strB; boost::replace_first(strC,"B_V","C_V");
+      strD = strB; boost::replace_first(strD,"B_V","D_V");
+      strE = strB; boost::replace_first(strE,"B_V","E_V");  
+      strF = strB; boost::replace_first(strE,"B_V","F_V");  
       msPar["DataL2JetParByIOV_B"] = strB;
       msPar["DataL2JetParByIOV_C"] = strC;
       msPar["DataL2JetParByIOV_D"] = strD;
@@ -338,10 +315,10 @@ void BaseEventSelector::BeginJob(std::map<std::string, edm::ParameterSet const >
       msPar["DataL2JetParByIOV_F"] = strF;
 
       strB = msPar["DataL3JetPar"];
-      strC = strB; boost::replace_first(strC,"B","C");
-      strD = strB; boost::replace_first(strD,"B","D");
-      strE = strB; boost::replace_first(strE,"B","E");  
-      strF = strB; boost::replace_first(strE,"B","F");  
+      strC = strB; boost::replace_first(strC,"B_V","C_V");
+      strD = strB; boost::replace_first(strD,"B_V","D_V");
+      strE = strB; boost::replace_first(strE,"B_V","E_V");  
+      strF = strB; boost::replace_first(strE,"B_V","F_V");  
       msPar["DataL3JetParByIOV_B"] = strB;
       msPar["DataL3JetParByIOV_C"] = strC;
       msPar["DataL3JetParByIOV_D"] = strD;
@@ -349,10 +326,10 @@ void BaseEventSelector::BeginJob(std::map<std::string, edm::ParameterSet const >
       msPar["DataL3JetParByIOV_F"] = strF;
 
       strB = msPar["DataResJetPar"];
-      strC = strB; boost::replace_first(strC,"B","C");
-      strD = strB; boost::replace_first(strD,"B","D");
-      strE = strB; boost::replace_first(strE,"B","E");  
-      strF = strB; boost::replace_first(strE,"B","F");  
+      strC = strB; boost::replace_first(strC,"B_V","C_V");
+      strD = strB; boost::replace_first(strD,"B_V","D_V");
+      strE = strB; boost::replace_first(strE,"B_V","E_V");  
+      strF = strB; boost::replace_first(strE,"B_V","F_V");  
       msPar["DataResJetParByIOV_B"] = strB;
       msPar["DataResJetParByIOV_C"] = strC;
       msPar["DataResJetParByIOV_D"] = strD;
@@ -360,10 +337,10 @@ void BaseEventSelector::BeginJob(std::map<std::string, edm::ParameterSet const >
       msPar["DataResJetParByIOV_F"] = strF;
 
       strB = msPar["DataL1JetParAK8"];
-      strC = strB; boost::replace_first(strC,"B","C");
-      strD = strB; boost::replace_first(strD,"B","D");
-      strE = strB; boost::replace_first(strE,"B","E");  
-      strF = strB; boost::replace_first(strE,"B","F");  
+      strC = strB; boost::replace_first(strC,"B_V","C_V");
+      strD = strB; boost::replace_first(strD,"B_V","D_V");
+      strE = strB; boost::replace_first(strE,"B_V","E_V");  
+      strF = strB; boost::replace_first(strE,"B_V","F_V");  
       msPar["DataL1JetParAK8ByIOV_B"] = strB;
       msPar["DataL1JetParAK8ByIOV_C"] = strC;
       msPar["DataL1JetParAK8ByIOV_D"] = strD;
@@ -371,10 +348,10 @@ void BaseEventSelector::BeginJob(std::map<std::string, edm::ParameterSet const >
       msPar["DataL1JetParAK8ByIOV_F"] = strF;
 
       strB = msPar["DataL2JetParAK8"];
-      strC = strB; boost::replace_first(strC,"B","C");
-      strD = strB; boost::replace_first(strD,"B","D");
-      strE = strB; boost::replace_first(strE,"B","E");  
-      strE = strB; boost::replace_first(strE,"B","F");  
+      strC = strB; boost::replace_first(strC,"B_V","C_V");
+      strD = strB; boost::replace_first(strD,"B_V","D_V");
+      strE = strB; boost::replace_first(strE,"B_V","E_V");  
+      strE = strB; boost::replace_first(strE,"B_V","F_V");  
       msPar["DataL2JetParAK8ByIOV_B"] = strB;
       msPar["DataL2JetParAK8ByIOV_C"] = strC;
       msPar["DataL2JetParAK8ByIOV_D"] = strD;
@@ -382,10 +359,10 @@ void BaseEventSelector::BeginJob(std::map<std::string, edm::ParameterSet const >
       msPar["DataL2JetParAK8ByIOV_F"] = strF;
 
       strB = msPar["DataL3JetParAK8"];
-      strC = strB; boost::replace_first(strC,"B","C");
-      strD = strB; boost::replace_first(strD,"B","D");
-      strE = strB; boost::replace_first(strE,"B","E");  
-      strF = strB; boost::replace_first(strE,"B","F");  
+      strC = strB; boost::replace_first(strC,"B_V","C_V");
+      strD = strB; boost::replace_first(strD,"B_V","D_V");
+      strE = strB; boost::replace_first(strE,"B_V","E_V");  
+      strF = strB; boost::replace_first(strE,"B_V","F_V");  
       msPar["DataL3JetParAK8ByIOV_B"] = strB;
       msPar["DataL3JetParAK8ByIOV_C"] = strC;
       msPar["DataL3JetParAK8ByIOV_D"] = strD;
@@ -393,10 +370,10 @@ void BaseEventSelector::BeginJob(std::map<std::string, edm::ParameterSet const >
       msPar["DataL3JetParAK8ByIOV_F"] = strF;
 
       strB = msPar["DataResJetParAK8"];
-      strC = strB; boost::replace_first(strC,"B","C");
-      strD = strB; boost::replace_first(strD,"B","D");
-      strE = strB; boost::replace_first(strE,"B","E");  
-      strF = strB; boost::replace_first(strE,"B","F");  
+      strC = strB; boost::replace_first(strC,"B_V","C_V");
+      strD = strB; boost::replace_first(strD,"B_V","D_V");
+      strE = strB; boost::replace_first(strE,"B_V","E_V");  
+      strF = strB; boost::replace_first(strE,"B_V","F_V");  
       msPar["DataResJetParAK8ByIOV_B"] = strB;
       msPar["DataResJetParAK8ByIOV_C"] = strC;
       msPar["DataResJetParAK8ByIOV_D"] = strD;
@@ -940,7 +917,7 @@ TLorentzVector BaseEventSelector::correctJetForMet(const pat::Jet & jet, edm::Ev
     return offJetP4-jetP4;
 }
 
-TLorentzVector BaseEventSelector::correctJet(const pat::Jet & jet, edm::EventBase const & event, bool doAK8Corr, bool forceCorr, unsigned int syst,int run, bool doEraDepJEC)
+TLorentzVector BaseEventSelector::correctJet(const pat::Jet & jet, edm::EventBase const & event, bool doAK8Corr, bool forceCorr, unsigned int syst)
 {
 
   // JES and JES systematics
@@ -949,28 +926,6 @@ TLorentzVector BaseEventSelector::correctJet(const pat::Jet & jet, edm::EventBas
         correctedJet = jet.correctedJet(0);                 //copy original jet
     else
         correctedJet = jet;                                 //copy default corrected jet
-
-    //get corrector based on run era
-    FactorizedJetCorrector *tmpJetCorrector;
-    if(!doEraDepJEC) tmpJetCorrector = JetCorrector; //do regular if not era dependent
-    else{ //check run info
-      if(run >=1 && run <=276811) tmpJetCorrector = JetCorrector2016BCD; //bcd
-      else if( run >=276831 && run <=278801) tmpJetCorrector = JetCorrector2016EF; //e/f-early
-      else if( run >=278802 && run <=280385) tmpJetCorrector = JetCorrector2016G; //f-late/g
-      else if(run>=280919) tmpJetCorrector=JetCorrector2016H; // h - use else if so that it will hopefully crash if run is not in one of these ranges
-      
-    }
-    //get corrector based on run era - AK8
-    FactorizedJetCorrector *tmpJetCorrectorAK8;
-    if(!doEraDepJEC) tmpJetCorrectorAK8 = JetCorrectorAK8; //do regular if not era dependent
-    else{ //check run info
-      if(run >=1 && run <=276811) tmpJetCorrectorAK8 = JetCorrectorAK82016BCD; //bcd
-      else if( run >=276831 && run <=278801) tmpJetCorrectorAK8 = JetCorrectorAK82016EF; //e/f-early
-      else if( run >=278802 && run <=280385) tmpJetCorrectorAK8 = JetCorrectorAK82016G; //f-late/g
-      else if(run>=280919) tmpJetCorrectorAK8=JetCorrectorAK82016H; // h - use else if so that it will hopefully crash if run is not in one of these ranges
-      
-    }
-
 
     double ptscale = 1.0;
     double unc = 1.0;
@@ -989,13 +944,13 @@ TLorentzVector BaseEventSelector::correctJet(const pat::Jet & jet, edm::EventBas
 
       	    double pt_raw = jet.correctedJet(0).pt();
 	    if (doAK8Corr){
-                tmpJetCorrectorAK8->setJetEta(jet.eta());
-          	tmpJetCorrectorAK8->setJetPt(pt_raw);
-                tmpJetCorrectorAK8->setJetA(jet.jetArea());
-          	tmpJetCorrectorAK8->setRho(rho); 
+                JetCorrectorAK8->setJetEta(jet.eta());
+          	JetCorrectorAK8->setJetPt(pt_raw);
+                JetCorrectorAK8->setJetA(jet.jetArea());
+          	JetCorrectorAK8->setRho(rho); 
     
                 try{
-    		    correction = tmpJetCorrectorAK8->getCorrection();
+    		    correction = JetCorrectorAK8->getCorrection();
                 }
           	catch(...){
     		    std::cout << mLegend << "WARNING! Exception thrown by JetCorrectionUncertainty!" << std::endl;
@@ -1005,13 +960,13 @@ TLorentzVector BaseEventSelector::correctJet(const pat::Jet & jet, edm::EventBas
 	    }
 
 	    else{
-                tmpJetCorrector->setJetEta(jet.eta());
-          	tmpJetCorrector->setJetPt(pt_raw);
-                tmpJetCorrector->setJetA(jet.jetArea());
-          	tmpJetCorrector->setRho(rho); 
+                JetCorrector->setJetEta(jet.eta());
+          	JetCorrector->setJetPt(pt_raw);
+                JetCorrector->setJetA(jet.jetArea());
+          	JetCorrector->setRho(rho); 
     
                 try{
-    		    correction = tmpJetCorrector->getCorrection();
+    		    correction = JetCorrector->getCorrection();
                 }
           	catch(...){
     		    std::cout << mLegend << "WARNING! Exception thrown by JetCorrectionUncertainty!" << std::endl;
@@ -1101,13 +1056,13 @@ TLorentzVector BaseEventSelector::correctJet(const pat::Jet & jet, edm::EventBas
 	// We need to undo the default corrections and then apply the new ones
 	
 	if (doAK8Corr){
-	  tmpJetCorrectorAK8->setJetEta(jet.eta());
-	  tmpJetCorrectorAK8->setJetPt(pt_raw);
-	  tmpJetCorrectorAK8->setJetA(jet.jetArea());
-	  tmpJetCorrectorAK8->setRho(rho); 
+	  JetCorrectorAK8->setJetEta(jet.eta());
+	  JetCorrectorAK8->setJetPt(pt_raw);
+	  JetCorrectorAK8->setJetA(jet.jetArea());
+	  JetCorrectorAK8->setRho(rho); 
 	  
 	  try{
-	    correction = tmpJetCorrectorAK8->getCorrection();
+	    correction = JetCorrectorAK8->getCorrection();
 	  }
 	  catch(...){
 	    std::cout << mLegend << "WARNING! Exception thrown by JetCorrectionUncertainty!" << std::endl;
@@ -1117,13 +1072,13 @@ TLorentzVector BaseEventSelector::correctJet(const pat::Jet & jet, edm::EventBas
 	}
 	
 	else{
-	  tmpJetCorrector->setJetEta(jet.eta());
-	  tmpJetCorrector->setJetPt(pt_raw);
-	  tmpJetCorrector->setJetA(jet.jetArea());
-	  tmpJetCorrector->setRho(rho); 
+	  JetCorrector->setJetEta(jet.eta());
+	  JetCorrector->setJetPt(pt_raw);
+	  JetCorrector->setJetA(jet.jetArea());
+	  JetCorrector->setRho(rho); 
 	  
 	  try{
-	    correction = tmpJetCorrector->getCorrection();
+	    correction = JetCorrector->getCorrection();
 	  }
 	  catch(...){
 	    std::cout << mLegend << "WARNING! Exception thrown by JetCorrectionUncertainty!" << std::endl;
@@ -1159,7 +1114,7 @@ TLorentzVector BaseEventSelector::correctJet(const pat::Jet & jet, edm::EventBas
     return jetP4;
 }
 
-pat::Jet BaseEventSelector::correctJetReturnPatJet(const pat::Jet & jet, edm::EventBase const & event, bool doAK8Corr, bool forceCorr, unsigned int syst,int run, bool doEraDepJEC)
+pat::Jet BaseEventSelector::correctJetReturnPatJet(const pat::Jet & jet, edm::EventBase const & event, bool doAK8Corr, bool forceCorr, unsigned int syst)
 {
 
   // JES and JES systematics
@@ -1168,27 +1123,6 @@ pat::Jet BaseEventSelector::correctJetReturnPatJet(const pat::Jet & jet, edm::Ev
         correctedJet = jet.correctedJet(0);                 //copy original jet
     else
         correctedJet = jet;                                 //copy default corrected jet
-
-    //get corrector based on run era
-    FactorizedJetCorrector *tmpJetCorrector;
-    if(!doEraDepJEC) tmpJetCorrector = JetCorrector; //do regular if not era dependent
-    else{ //check run info
-      if(run >=1 && run <=276811) tmpJetCorrector = JetCorrector2016BCD; //bcd
-      else if( run >=276831 && run <=278801) tmpJetCorrector = JetCorrector2016EF; //e/f-early
-      else if( run >=278802 && run <=280385) tmpJetCorrector = JetCorrector2016G; //f-late/g
-      else if(run>=280919) tmpJetCorrector=JetCorrector2016H; // h - use else if so that it will hopefully crash if run is not in one of these ranges
-      
-    }
-    //get corrector based on run era - AK8
-    FactorizedJetCorrector *tmpJetCorrectorAK8;
-    if(!doEraDepJEC) tmpJetCorrectorAK8 = JetCorrectorAK8; //do regular if not era dependent
-    else{ //check run info
-      if(run >=1 && run <=276811) tmpJetCorrectorAK8 = JetCorrectorAK82016BCD; //bcd
-      else if( run >=276831 && run <=278801) tmpJetCorrectorAK8 = JetCorrectorAK82016EF; //e/f-early
-      else if( run >=278802 && run <=280385) tmpJetCorrectorAK8 = JetCorrectorAK82016G; //f-late/g
-      else if(run>=280919) tmpJetCorrectorAK8=JetCorrectorAK82016H; // h - use else if so that it will hopefully crash if run is not in one of these ranges
-      
-    }
 
     double ptscale = 1.0;
     double unc = 1.0;
@@ -1208,13 +1142,13 @@ pat::Jet BaseEventSelector::correctJetReturnPatJet(const pat::Jet & jet, edm::Ev
       	    double pt_raw = jet.correctedJet(0).pt();
 
 	    if (doAK8Corr){
-                tmpJetCorrectorAK8->setJetEta(jet.eta());
-          	tmpJetCorrectorAK8->setJetPt(pt_raw);
-                tmpJetCorrectorAK8->setJetA(jet.jetArea());
-          	tmpJetCorrectorAK8->setRho(rho); 
+                JetCorrectorAK8->setJetEta(jet.eta());
+          	JetCorrectorAK8->setJetPt(pt_raw);
+                JetCorrectorAK8->setJetA(jet.jetArea());
+          	JetCorrectorAK8->setRho(rho); 
     
                 try{
-    		    correction = tmpJetCorrectorAK8->getCorrection();
+    		    correction = JetCorrectorAK8->getCorrection();
                 }
           	catch(...){
     		    std::cout << mLegend << "WARNING! Exception thrown by JetCorrectionUncertainty!" << std::endl;
@@ -1224,13 +1158,13 @@ pat::Jet BaseEventSelector::correctJetReturnPatJet(const pat::Jet & jet, edm::Ev
 	    }
 
 	    else{
-                tmpJetCorrector->setJetEta(jet.eta());
-          	tmpJetCorrector->setJetPt(pt_raw);
-                tmpJetCorrector->setJetA(jet.jetArea());
-          	tmpJetCorrector->setRho(rho); 
+                JetCorrector->setJetEta(jet.eta());
+          	JetCorrector->setJetPt(pt_raw);
+                JetCorrector->setJetA(jet.jetArea());
+          	JetCorrector->setRho(rho); 
     
                 try{
-    		    correction = tmpJetCorrector->getCorrection();
+    		    correction = JetCorrector->getCorrection();
                 }
           	catch(...){
     		    std::cout << mLegend << "WARNING! Exception thrown by JetCorrectionUncertainty!" << std::endl;
@@ -1320,13 +1254,13 @@ pat::Jet BaseEventSelector::correctJetReturnPatJet(const pat::Jet & jet, edm::Ev
             // We need to undo the default corrections and then apply the new ones
 
 	  if (doAK8Corr){
-	    tmpJetCorrectorAK8->setJetEta(jet.eta());
-	    tmpJetCorrectorAK8->setJetPt(pt_raw);
-	    tmpJetCorrectorAK8->setJetA(jet.jetArea());
-	    tmpJetCorrectorAK8->setRho(rho); 
+	    JetCorrectorAK8->setJetEta(jet.eta());
+	    JetCorrectorAK8->setJetPt(pt_raw);
+	    JetCorrectorAK8->setJetA(jet.jetArea());
+	    JetCorrectorAK8->setRho(rho); 
 	    
 	    try{
-	      correction = tmpJetCorrectorAK8->getCorrection();
+	      correction = JetCorrectorAK8->getCorrection();
 	    }
 	    catch(...){
 	      std::cout << mLegend << "WARNING! Exception thrown by JetCorrectionUncertainty!" << std::endl;
@@ -1336,13 +1270,13 @@ pat::Jet BaseEventSelector::correctJetReturnPatJet(const pat::Jet & jet, edm::Ev
 	  }
 
 	  else{
-            tmpJetCorrector->setJetEta(jet.eta());
-            tmpJetCorrector->setJetPt(pt_raw);
-            tmpJetCorrector->setJetA(jet.jetArea());
-            tmpJetCorrector->setRho(rho); 
+            JetCorrector->setJetEta(jet.eta());
+            JetCorrector->setJetPt(pt_raw);
+            JetCorrector->setJetA(jet.jetArea());
+            JetCorrector->setRho(rho); 
 	    
 	    try{
-	      correction = tmpJetCorrector->getCorrection();
+	      correction = JetCorrector->getCorrection();
 	    }
 	    catch(...){
 	      std::cout << mLegend << "WARNING! Exception thrown by JetCorrectionUncertainty!" << std::endl;
@@ -1607,7 +1541,6 @@ double BaseEventSelector::mvaValue(const pat::Electron & electron, edm::EventBas
     if(allMVAVars.dphi > 0.6) allMVAVars.dphi = 0.6;
     if(allMVAVars.detacalo < -0.2) allMVAVars.detacalo = -0.2;
     if(allMVAVars.detacalo > 0.2) allMVAVars.detacalo = 0.2;
-
 
 
     double cutValue;
