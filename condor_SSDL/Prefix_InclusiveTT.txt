@@ -1,5 +1,3 @@
-TprimeTprime_M-800
-TprimeTprime_M-900
 TprimeTprime_M-1000
 TprimeTprime_M-1100
 TprimeTprime_M-1200

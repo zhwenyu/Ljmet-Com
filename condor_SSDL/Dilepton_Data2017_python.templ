@@ -1,7 +1,12 @@
 import FWCore.ParameterSet.Config as cms
 import FWCore.PythonUtilities.LumiList as LumiList
 import FWCore.ParameterSet.Types as CfgTypes
+import os
 
+#Arguments from condor submit script which are used more than once
+relBase    = os.environ['CMSSW_BASE']
+
+# Define the base process
 process = cms.Process("LJMetCom")
 
 #Common calculator options
@@ -27,35 +32,27 @@ process.ljmet.excluded_calculators = cms.vstring(
 	'PdfCalc',
 	'ChargedHiggsCalc',
 	'TprimeCalc',
-	'TpTpCalc',
+	#'TpTpCalc', #need to turn on for TT samples
 	'LjetsTopoCalc',
 	'WprimeCalc',
-        'WprimeBoostedCalc'
+        'WprimeBoostedCalc',
 	'singleLepCalc',
         'BTagSFCalc',
         'CATopoCalc',
 	) 
 
+# Jet substructure calculator options
+process.load('LJMet.Com.JetSubCalc_cfi')
+process.JetSubCalc.killHF = cms.bool(False)
+process.JetSubCalc.isMc = process.ljmet.isMc
 
 process.DileptonCalc.isMc     = process.ljmet.isMc
 process.DileptonCalc.dataType = cms.string('All')
 
-# Jet substructure calculator options -- see src/JetSubCalc.cc
-process.load('LJMet.Com.JetSubCalc_cfi')
-process.JetSubCalc.useHTT = cms.bool(False)
-process.JetSubCalc.killHF = cms.bool(False)
-process.JetSubCalc.doNewJEC = cms.bool(True)
-process.JetSubCalc.useL2L3Mass = cms.bool(True)
-process.JetSubCalc.isMc = process.ljmet.isMc
-process.JetSubCalc.JECup = cms.bool(JECUNCERTUP)
-process.JetSubCalc.JECdown = cms.bool(JECUNCERTDOWN)
-process.JetSubCalc.MCL2JetParAK8 = cms.string('../data/Summer16_23Sep2016V3_MC_L2Relative_AK8PFchs.txt')
-process.JetSubCalc.MCL3JetParAK8 = cms.string('../data/Summer16_23Sep2016V3_MC_L3Absolute_AK8PFchs.txt')
-process.JetSubCalc.DataL2JetParAK8 = cms.string('../data/Summer16_23Sep2016HV3_DATA_L2Relative_AK8PFchs.txt')
-process.JetSubCalc.DataL3JetParAK8 = cms.string('../data/Summer16_23Sep2016HV3_DATA_L3Absolute_AK8PFchs.txt')
-process.JetSubCalc.DataL2L3JetParAK8 = cms.string('../data/Summer16_23Sep2016HV3_DATA_L2L3Residual_AK8PFchs.txt')
-process.JetSubCalc.UncertaintyAK8 = cms.string('../data/Summer16_23Sep2016HV3_DATA_Uncertainty_AK8PFchs.txt')
 
+# BestCalc options
+process.load('LJMet.Com.BestCalc_cfi')
+process.BestCalc.dnnFile = cms.string(relBase+'/src/LJMet/Com/data/BEST_mlp.json')
 
 ############################################################
 #
@@ -70,78 +67,24 @@ process.event_selector = cms.PSet(
     # cuts
     #HLT
     trigger_cut              = cms.bool(True),
-    dump_trigger             = cms.bool(True),
+    dump_trigger             = cms.bool(False),
 
     #Can use same trigger paths for data and MC since MC is always one of the data versions
     trigger_path_ee          = cms.vstring(
-    'HLT_DoubleEle33_CaloIdL_GsfTrkIdVL_v1',
-    'HLT_DoubleEle33_CaloIdL_GsfTrkIdVL_v2',
-    'HLT_DoubleEle33_CaloIdL_GsfTrkIdVL_v3',
-    'HLT_DoubleEle33_CaloIdL_GsfTrkIdVL_v4',
-    'HLT_DoubleEle33_CaloIdL_GsfTrkIdVL_v5',
-    'HLT_DoubleEle33_CaloIdL_GsfTrkIdVL_v6',
-    'HLT_DoubleEle33_CaloIdL_GsfTrkIdVL_v7',
-    'HLT_DoubleEle37_Ele27_CaloIdL_GsfTrkIdVL_v1',
-    'HLT_DoubleEle37_Ele27_CaloIdL_GsfTrkIdVL_v2',
-    'HLT_DoubleEle37_Ele27_CaloIdL_GsfTrkIdVL_v3',
-    'HLT_DoubleEle37_Ele27_CaloIdL_GsfTrkIdVL_v4',
-    'HLT_DoubleEle37_Ele27_CaloIdL_GsfTrkIdVL_v5',
-    'HLT_DoubleEle37_Ele27_CaloIdL_GsfTrkIdVL_v6',
-    'HLT_DoubleEle37_Ele27_CaloIdL_GsfTrkIdVL_v7',
-    'HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v1',
-    'HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v2',
-    'HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v3',
-    'HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v4',
-    'HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v5',
-    'HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v6',
-    'HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v7',
-    'HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v8',
-    'HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v9'),
+    'HLT_DoubleEle33_CaloIdL_MW_v',
+    'HLT_DoubleEle27_CaloIdL_MW_v',
+    'HLT_DoubleEle25_CaloIdL_MW_v',
+    'HLT_Ele27_Ele37_CaloIdL_MW'
+    ),
     
     trigger_path_em          = cms.vstring(
-    'HLT_Mu37_Ele27_CaloIdL_GsfTrkIdVL_v1',
-    'HLT_Mu37_Ele27_CaloIdL_GsfTrkIdVL_v2',
-    'HLT_Mu37_Ele27_CaloIdL_GsfTrkIdVL_v3',
-    'HLT_Mu37_Ele27_CaloIdL_GsfTrkIdVL_v4',
-    'HLT_Mu37_Ele27_CaloIdL_GsfTrkIdVL_v5',
-    'HLT_Mu37_Ele27_CaloIdL_GsfTrkIdVL_v6',
-    'HLT_Mu27_Ele37_CaloIdL_GsfTrkIdVL_v1',
-    'HLT_Mu27_Ele37_CaloIdL_GsfTrkIdVL_v2',
-    'HLT_Mu27_Ele37_CaloIdL_GsfTrkIdVL_v3',
-    'HLT_Mu27_Ele37_CaloIdL_GsfTrkIdVL_v4',
-    'HLT_Mu27_Ele37_CaloIdL_GsfTrkIdVL_v5',
-    'HLT_Mu27_Ele37_CaloIdL_GsfTrkIdVL_v6',
-    'HLT_Mu30_Ele30_CaloIdL_GsfTrkIdVL_v1',
-    'HLT_Mu30_Ele30_CaloIdL_GsfTrkIdVL_v2',
-    'HLT_Mu30_Ele30_CaloIdL_GsfTrkIdVL_v3',
-    'HLT_Mu30_Ele30_CaloIdL_GsfTrkIdVL_v4',
-    'HLT_Mu30_Ele30_CaloIdL_GsfTrkIdVL_v5',
-    'HLT_Mu30_Ele30_CaloIdL_GsfTrkIdVL_v6',
-    'HLT_Mu33_Ele33_CaloIdL_GsfTrkIdVL_v1',
-    'HLT_Mu33_Ele33_CaloIdL_GsfTrkIdVL_v2',
-    'HLT_Mu33_Ele33_CaloIdL_GsfTrkIdVL_v3',
-    'HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_v1',
-    'HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_v2',
-    'HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_v3',
-    'HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_v4',
-    'HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_v5',
-    'HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_v6',
-    'HLT_Mu23_TrkIsoVVL_Ele8_CaloIdL_TrackIdL_IsoVL_v1',
-    'HLT_Mu23_TrkIsoVVL_Ele8_CaloIdL_TrackIdL_IsoVL_v2',
-    'HLT_Mu23_TrkIsoVVL_Ele8_CaloIdL_TrackIdL_IsoVL_v3',
-    'HLT_Mu23_TrkIsoVVL_Ele8_CaloIdL_TrackIdL_IsoVL_v4'),
+    'HLT_Mu37_Ele27_CaloIdL_MW_v',
+    'HLT_Mu27_Ele37_CaloIdL_MW_v',
+    ),
 
     trigger_path_mm          = cms.vstring(
-    'HLT_Mu30_TkMu11_v1',
-    'HLT_Mu30_TkMu11_v2',
-    'HLT_Mu30_TkMu11_v3',
-    'HLT_Mu30_TkMu11_v4',
-    'HLT_Mu30_TkMu11_v5',
-    'HLT_Mu40_TkMu11_v1',
-    'HLT_Mu40_TkMu11_v2',
-    'HLT_Mu40_TkMu11_v3',
-    'HLT_Mu40_TkMu11_v4',
-    'HLT_Mu40_TkMu11_v5',),
+    'HLT_Mu37_TkMu27_v',
+    ),
 
     pv_cut                   = cms.bool(True),
     hbhe_cut                 = cms.bool(True),
@@ -154,6 +97,9 @@ process.event_selector = cms.PSet(
     badChargedHadron_cut     = cms.bool(True),    			     
     flag_tag                 = cms.InputTag('FLAGTAG'),
     cscHalo_cut              = cms.bool(True),
+
+    metfilters     = cms.bool(True),
+
     jet_cuts                 = cms.bool(False),
     jet_minpt                = cms.double(30.0),
     jet_maxeta               = cms.double(5.0),
@@ -172,13 +118,34 @@ process.event_selector = cms.PSet(
     electron_maxeta          = cms.double(2.4),
     max_electron             = cms.int32(10),
     UseElMVA                 = cms.bool(True),
+    tight_electron_mva_cuts  = cms.vdouble(0.96165,8.75794,3.13902,0.93193,8.84606,3.59851,0.88993,10.12423,4.35279), # Fall17 noiso WP90 c, tau, A for EB1, EB2, and then EE
+    loose_electron_mva_cuts  = cms.vdouble(-0.86,-0.81,-0.72), # Fall17 noiso WP HZZ exact cuts
+    #tight_electron_mva_cuts  = cms.vdouble(0.97177,8.91285,1.97124,0.945875,8.83104,2.40850,0.89791,9.81408,4.17158), # Fall17 iso WP90 c, tau, A for EB1, EB2, and then EE
+    #loose_electron_mva_cuts  = cms.vdouble(-0.83,-0.77,-0.69), # Fall17 iso WP HZZ exact cuts
+
+    ElMVAweightFiles = cms.vstring(
+        relBase+'/src/LJMet/Com/weights/EIDmva_EB1_10_2017_puinfo_BDT.weights.xml',
+        relBase+'/src/LJMet/Com/weights/EIDmva_EB2_10_2017_puinfo_BDT.weights.xml',
+        relBase+'/src/LJMet/Com/weights/EIDmva_EE_10_2017_puinfo_BDT.weights.xml',
+        ),
+
+    ElMVAweightFiles_iso = cms.vstring(
+        relBase+'/src/LJMet/Com/weights/EIDmva_EB1_10_2017_puinfo_iso_BDT.weights.xml',
+        relBase+'/src/LJMet/Com/weights/EIDmva_EB2_10_2017_puinfo_iso_BDT.weights.xml',
+        relBase+'/src/LJMet/Com/weights/EIDmva_EE_10_2017_puinfo_iso_BDT.weights.xml',
+        ),
 
     min_lepton               = cms.int32(2),
 
     met_cuts                 = cms.bool(False),
     min_met                  = cms.double(0.0),
+
+    # Btagging cuts
+    btagOP                   = cms.string('MEDIUM'),
+    bdisc_min                = cms.double(0.4941),
+    DeepCSVfile              = cms.string(relBase+'/src/LJMet/Com/data/DeepCSV_94XSF_V3_B_F.csv'),
+    DeepCSVSubjetfile        = cms.string(relBase+'/src/LJMet/Com/data/subjet_DeepCSV_94XSF_V3_B_F.csv'),
     btag_cuts                = cms.bool(False),
-     btagOP                  = cms.string("CSVM"),
     btag_1                   = cms.bool(True),
     btag_2                   = cms.bool(True),
     btag_3                   = cms.bool(False),
@@ -186,45 +153,44 @@ process.event_selector = cms.PSet(
     trigger_collection       = cms.InputTag('TriggerResults::HLT'),
     pv_collection            = cms.InputTag('offlineSlimmedPrimaryVertices'),
     jet_collection           = cms.InputTag('slimmedJets'),
+    slimmedJetsAK8           = cms.InputTag('slimmedJetsAK8'),
     muon_collection          = cms.InputTag('slimmedMuons'),
     electron_collection      = cms.InputTag('slimmedElectrons'),
-    met_collection           = cms.InputTag('slimmedMETsMuEGClean'),
-    
+    met_collection           = cms.InputTag('slimmedMETs'),
+
+    # Jet corrections are read from txt files which need updating!
+    JEC_txtfile = cms.string(relBase+'/src/LJMet/Com/data/Fall17V6/Fall17_17Nov2017_V6_MC_Uncertainty_AK4PFchs.txt'),
+    JERSF_txtfile = cms.string(relBase+'/src/LJMet/Com/data/Spring16V10/Spring16_25nsV10_MC_SF_AK4PFchs.txt'),
+    JER_txtfile = cms.string(relBase+'/src/LJMet/Com/data/Spring16V10/Spring16_25nsV10_MC_PtResolution_AK4PFchs.txt'),
+    JERAK8_txtfile = cms.string(relBase+'/src/LJMet/Com/data/Spring16V10/Spring16_25nsV10_MC_PtResolution_AK8PFchs.txt'),
 
     #This is for uncertainty calculations   
     JECup      	             = cms.bool(JECUNCERTUP),
     JECdown                  = cms.bool(JECUNCERTDOWN),
     JERup                    = cms.bool(JERUNCERTUP),
     JERdown                  = cms.bool(JERUNCERTDOWN),
-    JEC_txtfile = cms.string('../data/Summer16_23Sep2016V3_MC_Uncertainty_AK4PFchs.txt'),
-    JERSF_txtfile = cms.string('../data/Spring16_25nsV6_MC_SF_AK4PFchs.txt'),	
-    JER_txtfile = cms.string('../data/Spring16_25nsV6_MC_PtResolution_AK4PFchs.txt'),
-    JERAK8_txtfile = cms.string('../data/Spring16_25nsV6_MC_PtResolution_AK8PFchs.txt'),
-
 
     #new jet energy corrections
     doNewJEC                 = cms.bool(True),
     doLepJetCleaning         = cms.bool(True),
-    #do by era
-    doEraDepJEC              = cms.bool(True),
 
-    MCL1JetPar               = cms.string("../data/Summer16_23Sep2016V3_MC_L1FastJet_AK4PFchs.txt"),
-    MCL2JetPar               = cms.string("../data/Summer16_23Sep2016V3_MC_L2Relative_AK4PFchs.txt"),
-    MCL3JetPar               = cms.string("../data/Summer16_23Sep2016V3_MC_L3Absolute_AK4PFchs.txt"),
+    MCL1JetPar               = cms.string(relBase+'/src/LJMet/Com/data/Fall17V6/Fall17_17Nov2017_V6_MC_L1FastJet_AK4PFchs.txt'),
+    MCL2JetPar               = cms.string(relBase+'/src/LJMet/Com/data/Fall17V6/Fall17_17Nov2017_V6_MC_L2Relative_AK4PFchs.txt'),
+    MCL3JetPar               = cms.string(relBase+'/src/LJMet/Com/data/Fall17V6/Fall17_17Nov2017_V6_MC_L3Absolute_AK4PFchs.txt'),
 
-    MCL1JetParAK8            = cms.string("../data/Summer16_23Sep2016V3_MC_L1FastJet_AK8PFchs.txt"),
-    MCL2JetParAK8            = cms.string("../data/Summer16_23Sep2016V3_MC_L2Relative_AK8PFchs.txt"),
-    MCL3JetParAK8            = cms.string("../data/Summer16_23Sep2016V3_MC_L3Absolute_AK8PFchs.txt"),
+    MCL1JetParAK8            = cms.string(relBase+'/src/LJMet/Com/data/Fall17V6/Fall17_17Nov2017_V6_MC_L1FastJet_AK8PFPuppi.txt'),
+    MCL2JetParAK8            = cms.string(relBase+'/src/LJMet/Com/data/Fall17V6/Fall17_17Nov2017_V6_MC_L2Relative_AK8PFPuppi.txt'),
+    MCL3JetParAK8            = cms.string(relBase+'/src/LJMet/Com/data/Fall17V6/Fall17_17Nov2017_V6_MC_L3Absolute_AK8PFPuppi.txt'),
 
-    DataL1JetPar               = cms.string("../data/Summer16_23Sep2016HV3_DATA_L1FastJet_AK4PFchs.txt"),
-    DataL2JetPar               = cms.string("../data/Summer16_23Sep2016HV3_DATA_L2Relative_AK4PFchs.txt"),
-    DataL3JetPar               = cms.string("../data/Summer16_23Sep2016HV3_DATA_L3Absolute_AK4PFchs.txt"),
-    DataResJetPar               = cms.string("../data/Summer16_23Sep2016HV3_DATA_L3Absolute_AK4PFchs.txt"),
+    DataL1JetPar             = cms.string(relBase+'/src/LJMet/Com/data/Fall17V6/Fall17_17Nov2017B_V6_DATA_L1FastJet_AK4PFchs.txt'),
+    DataL2JetPar             = cms.string(relBase+'/src/LJMet/Com/data/Fall17V6/Fall17_17Nov2017B_V6_DATA_L2Relative_AK4PFchs.txt'),
+    DataL3JetPar             = cms.string(relBase+'/src/LJMet/Com/data/Fall17V6/Fall17_17Nov2017B_V6_DATA_L3Absolute_AK4PFchs.txt'),
+    DataResJetPar            = cms.string(relBase+'/src/LJMet/Com/data/Fall17V6/Fall17_17Nov2017B_V6_DATA_L2L3Residual_AK4PFchs.txt'),
 
-    DataL1JetParAK8            = cms.string("../data/Summer16_23Sep2016HV3_DATA_L1FastJet_AK8PFchs.txt"),
-    DataL2JetParAK8            = cms.string("../data/Summer16_23Sep2016HV3_DATA_L2Relative_AK8PFchs.txt"),
-    DataL3JetParAK8            = cms.string("../data/Summer16_23Sep2016HV3_DATA_L3Absolute_AK8PFchs.txt"),
-    DataResJetParAK8           = cms.string("../data/Summer16_23Sep2016HV3_DATA_L3Absolute_AK8PFchs.txt"),
+    DataL1JetParAK8          = cms.string(relBase+'/src/LJMet/Com/data/Fall17V6/Fall17_17Nov2017B_V6_DATA_L1FastJet_AK8PFPuppi.txt'),
+    DataL2JetParAK8          = cms.string(relBase+'/src/LJMet/Com/data/Fall17V6/Fall17_17Nov2017B_V6_DATA_L2Relative_AK8PFPuppi.txt'),
+    DataL3JetParAK8          = cms.string(relBase+'/src/LJMet/Com/data/Fall17V6/Fall17_17Nov2017B_V6_DATA_L3Absolute_AK8PFPuppi.txt'),
+    DataResJetParAK8         = cms.string(relBase+'/src/LJMet/Com/data/Fall17V6/Fall17_17Nov2017B_V6_DATA_L2L3Residual_AK8PFPuppi.txt'),
 
 
     #triggerstudy info
@@ -254,7 +220,7 @@ process.inputs = cms.PSet (
 
 # JSON
 if (not process.ljmet.isMc==cms.bool(True)):
-    JsonFile = JSONFILE
+    JsonFile = relBase+'/src/LJMet/Com/data/json/'+JSONFILE
     myList   = LumiList.LumiList(filename=JsonFile).getCMSSWString().split(',')
     process.inputs.lumisToProcess.extend(myList)
        

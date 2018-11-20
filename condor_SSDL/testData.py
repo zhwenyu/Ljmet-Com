@@ -33,7 +33,7 @@ process.ljmet.excluded_calculators = cms.vstring(
 	'PdfCalc',
 	'ChargedHiggsCalc',
 	'TprimeCalc',
-	'TpTpCalc',
+	#'TpTpCalc', #need to turn on for TT samples
 	'LjetsTopoCalc',
 	'WprimeCalc',
         'WprimeBoostedCalc',
@@ -84,7 +84,7 @@ process.event_selector = cms.PSet(
     ),
 
     trigger_path_mm          = cms.vstring(
-    'HLT_Mu37_TkMu27_v2',
+    'HLT_Mu37_TkMu27_v',
     ),
 
     pv_cut                   = cms.bool(True),

@@ -7,47 +7,61 @@ import fileinput
 import commands
 
 rel_base = os.environ['CMSSW_BASE']
-cmssw = 'CMSSW_8_0_22'
+cmssw = 'CMSSW_9_4_11'
 date = 'Dec14'
-locdir = date
-basedir = '/store/user/clint/Run2016'
-indir = 'root://cmseos.fnal.gov/'+basedir+'/'+date+'/'
-outdir = 'root://cmseos.fnal.gov/'+basedir+'/'+date+'/'
-eosdir = '/store/user/lpctlbsm/clint/Run2016/'+date+'/'
+folder  = 'LJMet94x_2lepTT_2017datasets_2018_11_18_rizki'
+
+locdir = 'hadd_jobs_'+folder
+basedir = '/store/group/lpcljm/'
+indir = 'root://cmseos.fnal.gov/'+basedir+'/'+folder+'/'
+outdir = 'root://cmseos.fnal.gov/'+basedir+'/'+folder+'_hadds/'
+eosdir = '/store/group/lpcljm/'+folder+'_hadds/'
 
 #################################################
 ### Names to give to your output root files
 #################################################
 
 samples = [
-#    'Data',
-    'DoubleEG-Run2016B-23Sep2016-v3',
-    'DoubleEG-Run2016C-23Sep2016-v1',
-    'DoubleEG-Run2016D-23Sep2016-v1',
-    'DoubleEG-Run2016E-23Sep2016-v1',
-    'DoubleEG-Run2016F-23Sep2016-v1',
-    'DoubleEG-Run2016G-23Sep2016-v1',
-    'DoubleEG-Run2016H-PromptReco-v2',
-    'DoubleEG-Run2016H-PromptReco-v3',
-    'DoubleMuon-Run2016B-23Sep2016-v3',
-    'DoubleMuon-Run2016C-23Sep2016-v1',
-    'DoubleMuon-Run2016D-23Sep2016-v1',
-    'DoubleMuon-Run2016E-23Sep2016-v1',
-    'DoubleMuon-Run2016F-23Sep2016-v1',
-    'DoubleMuon-Run2016G-23Sep2016-v1',
-    'DoubleMuon-Run2016H-PromptReco-v2',
-    'DoubleMuon-Run2016H-PromptReco-v3',
-    'MuonEG-Run2016B-23Sep2016-v3',
-    'MuonEG-Run2016C-23Sep2016-v1',
-    'MuonEG-Run2016D-23Sep2016-v1',
-    'MuonEG-Run2016E-23Sep2016-v1',
-    'MuonEG-Run2016F-23Sep2016-v1',
-    'MuonEG-Run2016G-23Sep2016-v1',
-    'MuonEG-Run2016H-PromptReco-v2',
-    'MuonEG-Run2016H-PromptReco-v3',
-#    'TTW',
-#    'TTZ',
-#    'TTH',
+    'DoubleEG_RRB',
+    'DoubleEG_RRC',
+    'DoubleEG_RRD',
+    'DoubleEG_RRE',
+    'DoubleEG_RRF_v2',
+    'MuonEG_RRB',
+    'MuonEG_RRC',
+    'MuonEG_RRD',
+    'MuonEG_RRE',
+    'MuonEG_RRF_v2',
+    'DoubleMuon_RRB',
+    'DoubleMuon_RRC',
+    'DoubleMuon_RRD',
+    'DoubleMuon_RRE',
+    'DoubleMuon_RRF_v2',
+
+   'TTW',
+   'TTZ',
+   'TTH',
+   'TTTT',
+
+   'WWW',
+   'WWZ',
+   'WZZ',
+   'ZZZ',
+   
+   'WpWp',
+   'WZ',
+   'ZZ',
+   
+#    'TprimeTprime_M-1000',
+   'TprimeTprime_M-1100',
+   'TprimeTprime_M-1200',
+   'TprimeTprime_M-1300',
+   'TprimeTprime_M-1400',
+   'TprimeTprime_M-1500',
+   'TprimeTprime_M-1600',
+   'TprimeTprime_M-1700',
+   'TprimeTprime_M-1800',
+   
 ]
 
 #samples = []
@@ -57,10 +71,10 @@ datalist = [
 ]
 
 systlist = [
-'_JESDOWN',
-'_JESUP',
-'_JERUP',
-'_JERDOWN',
+# '_JESDOWN',
+# '_JESUP',
+# '_JERUP',
+# '_JERDOWN',
 'NOM'
 ]
 
@@ -69,16 +83,15 @@ systlist = [
 ### Write the files you wish to run over for each job    
 
 #make local directory
-#os.system('mkdir -p  %s' %locdir)
+os.system('mkdir -p  %s' %locdir)
 #make eos directory
-#os.system('eos root://cmseos.fnal.gov mkdir -p  %s' %eosdir)
+os.system('eos root://cmseos.fnal.gov mkdir -p  %s' %eosdir)
 
 for i in range(len(samples)):
     for sys in systlist:
-#        if (sys!='NOM' and (samples[i].startswith('QCD') or samples[i].startswith('TTbar_scale') or samples[i]=='Data')): continue
         if(sys!='NOM'): continue
-        condor_templ_file = open(rel_base+"/src/LJMet/Com/condor/PostLJMetcondor.templ")
-        csh_templ_file    = open(rel_base+"/src/LJMet/Com/condor/PostLJMetcsh.templ")
+        condor_templ_file = open(rel_base+"/src/LJMet/Com/condor_SSDL/PostLJMetcondor.templ")
+        csh_templ_file    = open(rel_base+"/src/LJMet/Com/condor_SSDL/PostLJMetcsh.templ")
     
         localcondor = locdir+'/'+samples[i]+sys+".condor"
         if (sys=='NOM'): localcondor = locdir+'/'+samples[i]+".condor"
@@ -96,47 +109,23 @@ for i in range(len(samples)):
         for line in csh_templ_file:
             line=line.replace('CMSSWVERSION',cmssw)
             if (sys=='NOM'):
-                if (samples[i] == 'ZJets_M50'):
-                    line=line.replace('HADD', '''hadd -f ZJets_tmp.root `xrdfs root://cmseos.fnal.gov ls -u '''+basedir+'''/'''+date+'''/ZJets_M50/ | grep ".root"`''')
-                    line=line.replace('XRDCP', 'xrdcp -f ZJets_tmp.root root://cmseos.fnal.gov/'+eosdir+'/ZJets.root')
-                elif (samples[i].find('2016')!=-1):
-                    ida = 0
-                    tmpstr = ''                    
-                    gooddata = 1
-                    firstrun = commands.getstatusoutput('eos root://cmseos.fnal.gov ls '+basedir+'/'+date+'/'+samples[i]+'/ | grep "_0.root"')
-                    if (firstrun[1]==''):
-                        numfile = commands.getstatusoutput('ls '+date+'/'+samples[i]+'/'+samples[i]+'*.stdout | wc -l')
-                        for j in range(1,int(numfile[1])+1):
-                            final = commands.getstatusoutput('grep -c \"All cuts          0\" '+date+'/'+samples[i]+'/'+samples[i]+'_'+str(j)+'.stdout')
-                            if (int(final[1])!=1):
-                                gooddata = j
-                                break
-                        tmpstr = tmpstr+'xrdcp -f root://cmseos.fnal.gov/'+basedir+'/'+date+'/'+samples[i]+'/'+samples[i]+'_'+str(gooddata)+'.root root://cmseos.fnal.gov/'+basedir+'/'+date+'/'+samples[i]+'/'+samples[i]+'_0.root\n'
-                        tmpstr = tmpstr+'eosrm '+basedir+'/'+date+'/'+samples[i]+'/'+samples[i]+'_'+str(gooddata)+'.root\n'
-                    tmpstr = tmpstr+'''hadd -f tmp_'''+str(ida)+'''.root `xrdfs root://cmseos.fnal.gov ls -u '''+basedir+'''/'''+date+'''/'''+samples[i]+'''/ | grep ".root"`\n'''
-                    ida+=1
-                    line=line.replace('HADD', tmpstr+'hadd -f tmp.root tmp_*.root')
-                    line=line.replace('XRDCP', 'xrdcp -f tmp.root root://cmseos.fnal.gov/'+eosdir+'ljmet_trees/ljmet_Data_'+samples[i]+'.root')
-                else:
-                    line=line.replace('HADD', '''hadd -f '''+samples[i]+'''_tmp.root `xrdfs root://cmseos.fnal.gov ls -u '''+basedir+'''/'''+date+'''/'''+samples[i]+'''/ | grep ".root"`''')
-                    line=line.replace('XRDCP', 'xrdcp -f '+samples[i]+'_tmp.root root://cmseos.fnal.gov/'+eosdir+'/'+samples[i]+'.root')
+				line=line.replace('HADD', '''hadd -f '''+samples[i]+'''_tmp.root `xrdfs root://cmseos.fnal.gov ls -u '''+basedir+'''/'''+folder+'''/'''+samples[i]+'''/ | grep ".root"`''')
+				line=line.replace('XRDCP', 'xrdcp -f '+samples[i]+'_tmp.root root://cmseos.fnal.gov/'+eosdir+'/'+samples[i]+'.root')
             else:
-                if (samples[i] == 'ZJets_M50'):
-                    line=line.replace('HADD', '''hadd -f ZJets'''+sys+'''_tmp.root `xrdfs root://cmseos.fnal.gov ls -u '''+basedir+'''/'''+date+'''/ZJets_M50'''+sys+'''/ | grep ".root"`''')
-                    line=line.replace('XRDCP', 'xrdcp -f ZJets'+sys+'_tmp.root root://cmseos.fnal.gov/'+eosdir+'/ZJets'+sys+'.root')
-                else:
-                    line=line.replace('HADD', '''hadd -f '''+samples[i]+sys+'''_tmp.root `xrdfs root://cmseos.fnal.gov ls -u '''+basedir+'''/'''+date+'''/'''+samples[i]+sys+'''/ | grep ".root"`''')
-                    line=line.replace('XRDCP', 'xrdcp -f '+samples[i]+sys+'_tmp.root root://cmseos.fnal.gov/'+eosdir+'/'+samples[i]+sys+'.root')
+				line=line.replace('HADD', '''hadd -f '''+samples[i]+sys+'''_tmp.root `xrdfs root://cmseos.fnal.gov ls -u '''+basedir+'''/'''+folder+'''/'''+samples[i]+sys+'''/ | grep ".root"`''')
+				line=line.replace('XRDCP', 'xrdcp -f '+samples[i]+sys+'_tmp.root root://cmseos.fnal.gov/'+eosdir+'/'+samples[i]+sys+'.root')
             csh_file.write(line)
         csh_file.close()
     
     
         if (sys=='NOM'): os.system('chmod u+x '+locdir+'/'+samples[i]+'.csh')
-        #else: os.system('chmod u+x '+locdir+'/'+samples[i]+sys+'.csh')
+        else: os.system('chmod u+x '+locdir+'/'+samples[i]+sys+'.csh')
         print 'condor file is: '+localcondor
         if (os.path.exists('%s.log'  % localcondor)):
             os.system('rm %s.log' % localcondor)
+        os.system('echo condor_submit %s' % localcondor)
         os.system('condor_submit %s' % localcondor)
+
     
         condor_templ_file.close()
         csh_templ_file.close()

@@ -11,14 +11,13 @@ import os
 import re
 import fileinput
 
-files_per_job = 1
+files_per_job = 5
 
 rel_base = os.environ['CMSSW_BASE']
-cmssw = 'CMSSW_8_0_26_patch1'
-# logdir = 'LJMet80x_TT_SSdilepton_2017_8_23_rizki'
-# logdir = 'LJMet80x_TT_SSdilepton_TpTpCalcOn_2017_9_1_rizki'
-logdir = 'LJMet80x_TT_SSdilepton_BkgMCGamma_2017_11_28_rizki'
-outdir = '/eos/uscms/store/user/lpcljm/'+logdir+'/'
+cmssw = 'CMSSW_9_4_11'
+# logdir = 'LJMet94x_2lepTT_2017datasets_2018_11_16_rizki' #TEST
+logdir = 'LJMet94x_2lepTT_2017datasets_2018_11_18_rizki'
+outdir = '/eos/uscms/store/group/lpcljm/'+logdir+'/'
 
 ### What is the name of your FWLite Analyzer
 FWLiteAnalyzer = 'ljmet'
@@ -78,7 +77,8 @@ for i in range(len(prefix)):
 ### Write the files you wish to run over for each job    
 def get_input(num, list):
     result = '' 
-    file_list = open(rel_base+"/src/LJMet/Com/python/"+list)
+#     file_list = open(rel_base+"/src/LJMet/Com/python/"+list)
+    file_list = open(rel_base+"/src/LJMet/Com/condor_SSDL/"+list)
     file_count = 0
     for line in file_list:
         if line.find('root')>0:
@@ -96,9 +96,19 @@ def get_input(num, list):
 
 print str(files_per_job)+' files per job...'
 
+
+#create new dir at eos
+print 'Making outputDir via eos command'
+os.system('eos root://cmseos.fnal.gov/ mkdir -p '+dir[i])
+
 #make tarball and move to eos
-#os.system('tar -cvf ljmet.tar ../bin/* ../src/* ../interface/* ../data/* ../python/* ../tools/* ../BuildFile.xml ../setup.sh ../weights/* ')
-#os.system('xrdcp -f ljmet.tar root://cmseos.fnal.gov//store/user/lpcljm/'+logdir+'/')
+if os.path.exists(rel_base+'/../ljmet.tar'):
+	print 'tar already exists! Will not re-tar!'
+else:
+	os.system('tar -zcvf '+rel_base+'/../ljmet.tar ../../../* --exclude="../../../.git" --exclude="../../../LJMet/Com/.git" ')
+# 	os.system('tar -zcvf '+rel_base+'/../ljmet.tar '+rel_base+' --exclude="src/NNKit/.git" --exclude="'+rel_base+'src/.git" --exclude="'+rel_base+'src/LJMet/Com/.git" --exclude=".SCRAM" --exclude="tmp" ')
+
+os.system('xrdcp -v '+rel_base+'/../ljmet.tar root://cmseos.fnal.gov//store/group/lpcljm/'+logdir+'/')
 
 for i in range(len(prefix)):
 
@@ -106,7 +116,8 @@ for i in range(len(prefix)):
     nfiles = 1
 
     #make local directory
-    locdir = logdir+'/'+prefix[i]
+    locdir = rel_base+'/../'+logdir+'/'+prefix[i]
+#     locdir = logdir+'/'+prefix[i]
     os.system('mkdir -p  %s' %locdir)
 
         
@@ -116,7 +127,8 @@ for i in range(len(prefix)):
     #os.system('rm -rf '+dir[i])
     #os.system('mkdir -p '+dir[i])
 
-    file_list = open(rel_base+"/src/LJMet/Com/python/"+list[i])
+#     file_list = open(rel_base+"/src/LJMet/Com/python/"+list[i])
+    file_list = open(rel_base+"/src/LJMet/Com/condor_SSDL/"+list[i])
     count = 0
     for line in file_list:
         if line.find('root')>0:
@@ -129,9 +141,9 @@ for i in range(len(prefix)):
 
     while ( nfiles <= count ):    
 
-        py_templ_file = open(rel_base+"/src/LJMet/Com/condor/Dilepton_MC_python.templ")
-        condor_templ_file = open(rel_base+"/src/LJMet/Com/condor/condor.templ")
-        csh_templ_file    = open(rel_base+"/src/LJMet/Com/condor/csh.templ")
+        py_templ_file = open(rel_base+"/src/LJMet/Com/condor_SSDL/Dilepton_MC_python.templ")
+        condor_templ_file = open(rel_base+"/src/LJMet/Com/condor_SSDL/condor.templ")
+        csh_templ_file    = open(rel_base+"/src/LJMet/Com/condor_SSDL/csh.templ")
 
         #open local version of file
         localfile=locdir+'/'+prefix[i]+"_"+str(j)+".py"
@@ -158,7 +170,7 @@ for i in range(len(prefix)):
         eosfile =   "root://cmseos.fnal.gov/"+dir[i]+"/"+prefix[i]+"_"+str(j)+".py"
         os.system("xrdcp -f %s %s"  % (localfile,eosfile))
         #remove local version
-        os.system('rm %s python_cfgs/MC/' % localfile)
+        #os.system('rm -v %s python_cfgs/MC/' % localfile)
 
         localcondor = locdir+'/'+prefix[i]+"_"+str(j)+".condor"
         eoscondor = "root://cmseos.fnal.gov/"+dir[i]+"/"+prefix[i]+"_"+str(j)+".condor"
@@ -191,6 +203,7 @@ for i in range(len(prefix)):
             line=line.replace('LOCPY',runpy)
             line=line.replace('EOSOUT',eosoutput)
             line=line.replace('LOCOUT',locoutput)
+            line=line.replace('TARDIR',logdir)
             csh_file.write(line)
         csh_file.close()
 

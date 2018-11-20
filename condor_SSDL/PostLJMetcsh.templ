@@ -17,7 +17,7 @@
 #cd CMSSWBASE/src/
 #pwd
 source /cvmfs/cms.cern.ch/cmsset_default.csh
-setenv SCRAM_ARCH slc6_amd64_gcc530
+setenv SCRAM_ARCH slc6_amd64_gcc630
 cmsrel CMSSWVERSION
 cd CMSSWVERSION/src/
 eval `scram runtime -csh`
@@ -42,7 +42,9 @@ else
 endif
 
 #do hadd
+echo HADD
 HADD
 
 #move output to eos
+echo XRDCP
 XRDCP

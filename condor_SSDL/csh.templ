@@ -17,45 +17,57 @@
 #cd CMSSWBASE/src/
 #pwd
 source /cvmfs/cms.cern.ch/cmsset_default.csh
-setenv SCRAM_ARCH slc6_amd64_gcc530
+setenv SCRAM_ARCH slc6_amd64_gcc630
 cmsrel CMSSWVERSION
 cd CMSSWVERSION/
-#xrdcp root://cmseos.fnal.gov//store/user/clint/EGM_ID_80X.tar EGM_ID_80X.tar
-#tar -xf EGM_ID_80X.tar
 cd src
-#setenv SCRAM_ARCH slc6_amd64_gcc530
-eval `scram runtime -csh`
-cmsenv
-#compile egm changes
-#scram b
-#get setup ljmet area
-mkdir -p LJMet/Com
-cd LJMet/Com
-xrdcp root://cmseos.fnal.gov//store/user/clint/ljmet_80X.tar ./ljmet_80X.tar
-tar -xf ljmet_80X.tar
+
+xrdcp root://cmseos.fnal.gov//store/group/lpcljm/TARDIR/ljmet.tar ./ljmet.tar
+tar -xf ljmet.tar
+
+echo "Where am I?"
+pwd
+
+echo "Who's there?"
+ls -lth */*
+
+#remove tar 
+rm -v ljmet.tar
+
+#compile
 scram b
+
+# cmsenv
+eval `scramv1 runtime -csh`
+
+#check ljmet
+which FWLITEANALYZER
+
 #
 #_____ check if we are running on a condor or on fbsng batch system _____
 #
-if (${?_CONDOR_SCRATCH_DIR}) then
-  set BSCRATCH=${_CONDOR_SCRATCH_DIR}
-  /bin/cat /etc/redhat-release
-  echo "Batch system: Condor"
-  echo "SCRAM_ARCH:   "${SCRAM_ARCH}
-else if (${?FBS_SCRATCH}) then
-  set BSCRATCH=$FBS_SCRATCH
-  /bin/cat /etc/redhat-release
-  echo "Batch system: FBSNG"
-  echo "SCRAM_ARCH:   "${SCRAM_ARCH}
-else
-    echo "Unknown Batch System"
-    exit
-endif
+# if (${?_CONDOR_SCRATCH_DIR}) then
+#   set BSCRATCH=${_CONDOR_SCRATCH_DIR}
+#   /bin/cat /etc/redhat-release
+#   echo "Batch system: Condor"
+#   echo "SCRAM_ARCH:   "${SCRAM_ARCH}
+# else if (${?FBS_SCRATCH}) then
+#   set BSCRATCH=$FBS_SCRATCH
+#   /bin/cat /etc/redhat-release
+#   echo "Batch system: FBSNG"
+#   echo "SCRAM_ARCH:   "${SCRAM_ARCH}
+# else
+#     echo "Unknown Batch System"
+#     exit
+# endif
 
 #cd CMSSWBASE/src/LJMet/Com/python/
-cd python
+# cd python
+
 rehash
+
 xrdcp EOSPY LOCPY
+
 FWLITEANALYZER LOCPY
 
 #move output to eos
