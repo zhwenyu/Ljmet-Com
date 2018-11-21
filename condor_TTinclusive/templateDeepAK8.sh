@@ -16,14 +16,14 @@ PREFIX=$4
 JOBID=$5
 
 uname -n
-export SCRAM_ARCH=slc6_amd64_gcc630
+export SCRAM_ARCH=slc6_amd64_gcc700
 source /cvmfs/cms.cern.ch/cmsset_default.sh
 
-echo "running scramv1 project CMSSW CMSSW_9_4_6_patch1"
-eval `scramv1 project CMSSW CMSSW_9_4_6_patch1`
+echo "running scramv1 project CMSSW CMSSW_10_2_5"
+eval `scramv1 project CMSSW CMSSW_10_2_5`
 
-echo "cd to CMSSW_9_4_6_patch1"
-cd CMSSW_9_4_6_patch1
+echo "cd to CMSSW_10_2_5"
+cd CMSSW_10_2_5
 pwd
 
 echo "coping in tarball"

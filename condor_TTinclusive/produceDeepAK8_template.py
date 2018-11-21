@@ -35,7 +35,7 @@ process.load('Configuration.StandardSequences.MagneticField_cff')
 process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
 from Configuration.AlCa.GlobalTag import GlobalTag
 process.GlobalTag = GlobalTag(process.GlobalTag, '94X_mc2017_realistic_v13', '')
-if options.isMC == False: process.GlobalTag = GlobalTag(process.GlobalTag, '94X_dataRun2_v6')
+if options.isMC == False: process.GlobalTag = GlobalTag(process.GlobalTag, '102X_dataRun2_Sep2018Rereco_v1', '')
 print 'Using global tag', process.GlobalTag.globaltag
 # ---------------------------------------------------------
 # set up TransientTrackBuilder

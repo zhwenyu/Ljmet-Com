@@ -27,11 +27,13 @@ void BaseEventSelector::JECbyIOV(edm::EventBase const & event) {
 
   int iRun   = event.id().run();
 
-  if(iRun <= 299330){ JetCorrector = JetCorrector_B; JetCorrectorAK8 = JetCorrectorAK8_B;}
-  else if(iRun <= 302029){ JetCorrector = JetCorrector_C; JetCorrectorAK8 = JetCorrectorAK8_C;}
-  else if(iRun <= 303434){ JetCorrector = JetCorrector_D; JetCorrectorAK8 = JetCorrectorAK8_D;}
-  else if(iRun <= 304827){ JetCorrector = JetCorrector_E; JetCorrectorAK8 = JetCorrectorAK8_E;}
-  else{ JetCorrector = JetCorrector_F; JetCorrectorAK8 = JetCorrectorAK8_F;}
+  JetCorrector = JetCorrector_B; 
+  JetCorrectorAK8 = JetCorrectorAK8_B;
+  // if(iRun <= 299330){JetCorrector = JetCorrector_B; JetCorrectorAK8 = JetCorrectorAK8_B;}
+  // else if(iRun <= 302029){ JetCorrector = JetCorrector_C; JetCorrectorAK8 = JetCorrectorAK8_C;}
+  // else if(iRun <= 303434){ JetCorrector = JetCorrector_D; JetCorrectorAK8 = JetCorrectorAK8_D;}
+  // else if(iRun <= 304827){ JetCorrector = JetCorrector_E; JetCorrectorAK8 = JetCorrectorAK8_E;}
+  // else{ JetCorrector = JetCorrector_F; JetCorrectorAK8 = JetCorrectorAK8_F;}
   
 }
 

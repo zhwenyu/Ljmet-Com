@@ -110,7 +110,7 @@ int JetSubCalc::BeginJob()
     puppisd_corrRECO_for = (TF1*)file->Get("puppiJECcorr_reco_1v3eta2v5");
     file->Close();
     
-
+    std::cout << "Begin Job done: JetSubCalc" << std::endl;
     return 0;
 }
 

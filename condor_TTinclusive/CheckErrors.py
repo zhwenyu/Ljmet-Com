@@ -24,8 +24,8 @@ for o, a in opts:
 	if o == '--resubmit': resubmit = a
 	if o == '--resub_num': resub_num = int(a)
 
-#rootdir = '/eos/uscms/store/user/lpcljm/2016/'+dir.split('/')[-3]+'/'+dir.split('/')[-2]+'/'
-rootdir = '/eos/uscms/store/user/lpctlbsm/jmanagan/'+dir.split('/')[-3]+'/'+dir.split('/')[-2]+'/'
+rootdir = '/eos/uscms/store/user/lpcljm/2018/'+dir.split('/')[-3]+'/'+dir.split('/')[-2]+'/'
+#rootdir = '/eos/uscms/store/user/lpctlbsm/jmanagan/'+dir.split('/')[-3]+'/'+dir.split('/')[-2]+'/'
 rootdir = rootdir.replace('_logs','')
 print 'checking ROOT files in:',rootdir
 folders = [x for x in os.walk(dir).next()[1]]
@@ -116,8 +116,12 @@ for folder in folders:
                                 iline += 1
 			if overmem and overmem_index > term_index: 
 				if verbose_level > 0: 
-					print '\tMEM FAIL:',file,' and JobIndex:',index
+					print '\tMEM FAIL:',file,' and JobIndex:',index                                        
 				mem_fail+=1
+                                #producer = file.replace('Data18','produceDeepAK8_Data18').replace('.jdl','.py')
+                                #print 'producer',producer
+                                #os.system("grep 'root://' "+dir + '/'+folder+'/'+producer)
+                                os.system('mv '+dir + '/'+folder+'/'+file+' '+dir + '/'+folder+'/'+file.replace('.jdl','.resubmittedjdl'))
 				if resub_num == -1 or resub_num == 3:resub_index.append(index)
 				continue
 			if killed and kill_index > term_index: 

@@ -1,8 +1,12 @@
 #!/bin/bash
 
 echo "SUBMITTING LJMET -- nominal"
-cp TTsinglelep_MC_cfg.py ljmet_cfg.py
-python -u condor_submitargsDeepAK8.py nominal
+cp TTsinglelep_Data_cfg.py ljmet_cfg.py
+python -u condor_submitData2018.py nominal
+
+# echo "SUBMITTING LJMET -- nominal"
+# cp TTsinglelep_MC_cfg.py ljmet_cfg.py
+# python -u condor_submitargsDeepAK8.py nominal
 
 # echo "SUBMITTING LJMET -- JECup"
 # cp TTsinglelep_MCDeepAK8_cfg.py ljmet_cfg.py

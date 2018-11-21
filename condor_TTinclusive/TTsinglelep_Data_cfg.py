@@ -78,6 +78,7 @@ process.event_selector = cms.PSet(
         'HLT_Ele38_WPTight_Gsf',
         'HLT_Ele40_WPTight_Gsf',
         'HLT_Ele28_eta2p1_WPTight_Gsf_HT150',
+        'HLT_Ele15_IsoVVVL_PFHT450_CaloBTagDeepCSV_4p5',
         'HLT_Ele15_IsoVVVL_PFHT450_PFMET50',
         'HLT_Ele15_IsoVVVL_PFHT450',
         'HLT_Ele50_IsoVVVL_PFHT450',
@@ -95,7 +96,7 @@ process.event_selector = cms.PSet(
         'HLT_Mu50',
         'HLT_TkMu50',
         'HLT_Mu55',
-        'HLT_Mu15_IsoVVVL_PFHT450_CaloBTagCSV_4p5',
+        'HLT_Mu15_IsoVVVL_PFHT450_CaloBTagDeepCSV_4p5',
         'HLT_Mu15_IsoVVVL_PFHT450_PFMET50',
         'HLT_Mu15_IsoVVVL_PFHT450',
         'HLT_Mu50_IsoVVVL_PFHT450',
@@ -107,7 +108,7 @@ process.event_selector = cms.PSet(
     
     # PV cuts
     pv_cut         = cms.bool(True),
-    flag_tag       = cms.InputTag('TriggerResults::PAT'),
+    flag_tag       = cms.InputTag('TriggerResults::RECO'),
     metfilters     = cms.bool(True),
     
     # Jet cuts
@@ -221,15 +222,15 @@ process.event_selector = cms.PSet(
     MCL2JetParAK8            = cms.string(relBase+'/src/LJMet/Com/data/Fall17V6/Fall17_17Nov2017_V6_MC_L2Relative_AK8PFPuppi.txt'),
     MCL3JetParAK8            = cms.string(relBase+'/src/LJMet/Com/data/Fall17V6/Fall17_17Nov2017_V6_MC_L3Absolute_AK8PFPuppi.txt'),
 
-    DataL1JetPar             = cms.string(relBase+'/src/LJMet/Com/data/Fall17V6/Fall17_17Nov2017B_V6_DATA_L1FastJet_AK4PFchs.txt'),
-    DataL2JetPar             = cms.string(relBase+'/src/LJMet/Com/data/Fall17V6/Fall17_17Nov2017B_V6_DATA_L2Relative_AK4PFchs.txt'),
-    DataL3JetPar             = cms.string(relBase+'/src/LJMet/Com/data/Fall17V6/Fall17_17Nov2017B_V6_DATA_L3Absolute_AK4PFchs.txt'),
-    DataResJetPar            = cms.string(relBase+'/src/LJMet/Com/data/Fall17V6/Fall17_17Nov2017B_V6_DATA_L2L3Residual_AK4PFchs.txt'),
+    DataL1JetPar             = cms.string(relBase+'/src/LJMet/Com/data/Sep2018v1/102X_dataRun2_Sep2018Rereco_v1_L1FastJet_AK4PFchs.txt'),
+    DataL2JetPar             = cms.string(relBase+'/src/LJMet/Com/data/Sep2018v1/102X_dataRun2_Sep2018Rereco_v1_L2Relative_AK4PFchs.txt'),
+    DataL3JetPar             = cms.string(relBase+'/src/LJMet/Com/data/Sep2018v1/102X_dataRun2_Sep2018Rereco_v1_L3Absolute_AK4PFchs.txt'),
+    DataResJetPar            = cms.string(relBase+'/src/LJMet/Com/data/Sep2018v1/102X_dataRun2_Sep2018Rereco_v1_L2L3Residual_AK4PFchs.txt'),
 
-    DataL1JetParAK8          = cms.string(relBase+'/src/LJMet/Com/data/Fall17V6/Fall17_17Nov2017B_V6_DATA_L1FastJet_AK8PFPuppi.txt'),
-    DataL2JetParAK8          = cms.string(relBase+'/src/LJMet/Com/data/Fall17V6/Fall17_17Nov2017B_V6_DATA_L2Relative_AK8PFPuppi.txt'),
-    DataL3JetParAK8          = cms.string(relBase+'/src/LJMet/Com/data/Fall17V6/Fall17_17Nov2017B_V6_DATA_L3Absolute_AK8PFPuppi.txt'),
-    DataResJetParAK8         = cms.string(relBase+'/src/LJMet/Com/data/Fall17V6/Fall17_17Nov2017B_V6_DATA_L2L3Residual_AK8PFPuppi.txt'),
+    DataL1JetParAK8          = cms.string(relBase+'/src/LJMet/Com/data/Sep2018v1/102X_dataRun2_Sep2018Rereco_v1_L1FastJet_AK8PFPuppi.txt'),
+    DataL2JetParAK8          = cms.string(relBase+'/src/LJMet/Com/data/Sep2018v1/102X_dataRun2_Sep2018Rereco_v1_L2Relative_AK8PFPuppi.txt'),
+    DataL3JetParAK8          = cms.string(relBase+'/src/LJMet/Com/data/Sep2018v1/102X_dataRun2_Sep2018Rereco_v1_L3Absolute_AK8PFPuppi.txt'),
+    DataResJetParAK8         = cms.string(relBase+'/src/LJMet/Com/data/Sep2018v1/102X_dataRun2_Sep2018Rereco_v1_L2L3Residual_AK8PFPuppi.txt'),
 
     # Unused parameters
     muon_reliso              = cms.double(0.2),

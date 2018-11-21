@@ -17,7 +17,7 @@ process.ljmet.isMc = cms.bool(condorIsMC)
 
 # Exclude some unnecessary calculators from the process
 process.ljmet.excluded_calculators = cms.vstring(
-    'DeepAK8Calc',
+    #'DeepAK8Calc',
     #'TpTpCalc',
     'PileUpCalc',
     'BTagSFCalc',
@@ -35,12 +35,18 @@ process.ljmet.excluded_calculators = cms.vstring(
 # common calculator options
 process.load('LJMet.Com.commonCalc_cfi')
 
+# BestCalc options
+process.load('LJMet.Com.BestCalc_cfi')
+process.BestCalc.dnnFile = cms.string(relBase+'/src/LJMet/Com/data/BEST_mlp.json')
+
 # singleLep calculator options
 process.load('LJMet.Com.singleLepCalc_cfi')
 process.singleLepCalc.isMc              = cms.bool(condorIsMC)
 process.singleLepCalc.keepFullMChistory = cms.bool(condorIsMC)
 process.singleLepCalc.UseElMVA          = cms.bool(True)
 process.singleLepCalc.saveLooseLeps     = cms.bool(False)
+process.singleLepCalc.saveGenHT     = cms.bool(True)
+process.singleLepCalc.triggerCollection = cms.InputTag("TriggerResults::HLT")
 
 # Jet substructure calculator options
 process.load('LJMet.Com.JetSubCalc_cfi')
@@ -73,6 +79,7 @@ process.event_selector = cms.PSet(
         'HLT_Ele38_WPTight_Gsf',
         'HLT_Ele40_WPTight_Gsf',
         'HLT_Ele28_eta2p1_WPTight_Gsf_HT150',
+        'HLT_Ele15_IsoVVVL_PFHT450_CaloBTagDeepCSV_4p5',
         'HLT_Ele15_IsoVVVL_PFHT450_PFMET50',
         'HLT_Ele15_IsoVVVL_PFHT450',
         'HLT_Ele50_IsoVVVL_PFHT450',
@@ -90,7 +97,7 @@ process.event_selector = cms.PSet(
         'HLT_Mu50',
         'HLT_TkMu50',
         'HLT_Mu55',
-        'HLT_Mu15_IsoVVVL_PFHT450_CaloBTagCSV_4p5',
+        'HLT_Mu15_IsoVVVL_PFHT450_CaloBTagDeepCSV_4p5',
         'HLT_Mu15_IsoVVVL_PFHT450_PFMET50',
         'HLT_Mu15_IsoVVVL_PFHT450',
         'HLT_Mu50_IsoVVVL_PFHT450',
@@ -164,12 +171,12 @@ process.event_selector = cms.PSet(
     max_lepton               = cms.int32(1),    # checks (N tight mu + N tight el) <= cut
     min_loose_lepton         = cms.int32(0),
     max_loose_lepton         = cms.int32(1000),
-    second_lepton_veto       = cms.bool(True),  #checks (N tight lep > 0) AND (N loose lep > 0), vetoes if there are loose leptons.
+    second_lepton_veto       = cms.bool(False),  #checks (N tight lep > 0) AND (N loose lep > 0), vetoes if there are loose leptons.
     tau_veto		     = cms.bool(False),
     
     # MET cuts
     met_cuts                 = cms.bool(True),
-    min_met                  = cms.double(20.0),
+    min_met                  = cms.double(30.0),
     max_met                  = cms.double(99999999999.0),
     
     # Btagging cuts
@@ -192,6 +199,7 @@ process.event_selector = cms.PSet(
     tau_collection	     = cms.InputTag('slimmedTaus'),
     met_collection           = cms.InputTag('slimmedMETs'),
     
+    # Jet corrections are read from txt files which need updating!
     # Jet corrections are read from txt files which need updating!
     JEC_txtfile = cms.string(relBase+'/src/LJMet/Com/data/Fall17V6/Fall17_17Nov2017_V6_MC_Uncertainty_AK4PFchs.txt'),
     JERSF_txtfile = cms.string(relBase+'/src/LJMet/Com/data/Spring16V10/Spring16_25nsV10_MC_SF_AK4PFchs.txt'),
@@ -216,15 +224,15 @@ process.event_selector = cms.PSet(
     MCL2JetParAK8            = cms.string(relBase+'/src/LJMet/Com/data/Fall17V6/Fall17_17Nov2017_V6_MC_L2Relative_AK8PFPuppi.txt'),
     MCL3JetParAK8            = cms.string(relBase+'/src/LJMet/Com/data/Fall17V6/Fall17_17Nov2017_V6_MC_L3Absolute_AK8PFPuppi.txt'),
 
-    DataL1JetPar             = cms.string(relBase+'/src/LJMet/Com/data/Fall17V6/Fall17_17Nov2017B_V6_DATA_L1FastJet_AK4PFchs.txt'),
-    DataL2JetPar             = cms.string(relBase+'/src/LJMet/Com/data/Fall17V6/Fall17_17Nov2017B_V6_DATA_L2Relative_AK4PFchs.txt'),
-    DataL3JetPar             = cms.string(relBase+'/src/LJMet/Com/data/Fall17V6/Fall17_17Nov2017B_V6_DATA_L3Absolute_AK4PFchs.txt'),
-    DataResJetPar            = cms.string(relBase+'/src/LJMet/Com/data/Fall17V6/Fall17_17Nov2017B_V6_DATA_L2L3Residual_AK4PFchs.txt'),
+    DataL1JetPar             = cms.string(relBase+'/src/LJMet/Com/data/Sep2018v1/102X_dataRun2_Sep2018Rereco_v1_L1FastJet_AK4PFchs.txt'),
+    DataL2JetPar             = cms.string(relBase+'/src/LJMet/Com/data/Sep2018v1/102X_dataRun2_Sep2018Rereco_v1_L2Relative_AK4PFchs.txt'),
+    DataL3JetPar             = cms.string(relBase+'/src/LJMet/Com/data/Sep2018v1/102X_dataRun2_Sep2018Rereco_v1_L3Absolute_AK4PFchs.txt'),
+    DataResJetPar            = cms.string(relBase+'/src/LJMet/Com/data/Sep2018v1/102X_dataRun2_Sep2018Rereco_v1_L2L3Residual_AK4PFchs.txt'),
 
-    DataL1JetParAK8          = cms.string(relBase+'/src/LJMet/Com/data/Fall17V6/Fall17_17Nov2017B_V6_DATA_L1FastJet_AK8PFPuppi.txt'),
-    DataL2JetParAK8          = cms.string(relBase+'/src/LJMet/Com/data/Fall17V6/Fall17_17Nov2017B_V6_DATA_L2Relative_AK8PFPuppi.txt'),
-    DataL3JetParAK8          = cms.string(relBase+'/src/LJMet/Com/data/Fall17V6/Fall17_17Nov2017B_V6_DATA_L3Absolute_AK8PFPuppi.txt'),
-    DataResJetParAK8         = cms.string(relBase+'/src/LJMet/Com/data/Fall17V6/Fall17_17Nov2017B_V6_DATA_L2L3Residual_AK8PFPuppi.txt'),
+    DataL1JetParAK8          = cms.string(relBase+'/src/LJMet/Com/data/Sep2018v1/102X_dataRun2_Sep2018Rereco_v1_L1FastJet_AK8PFPuppi.txt'),
+    DataL2JetParAK8          = cms.string(relBase+'/src/LJMet/Com/data/Sep2018v1/102X_dataRun2_Sep2018Rereco_v1_L2Relative_AK8PFPuppi.txt'),
+    DataL3JetParAK8          = cms.string(relBase+'/src/LJMet/Com/data/Sep2018v1/102X_dataRun2_Sep2018Rereco_v1_L3Absolute_AK8PFPuppi.txt'),
+    DataResJetParAK8         = cms.string(relBase+'/src/LJMet/Com/data/Sep2018v1/102X_dataRun2_Sep2018Rereco_v1_L2L3Residual_AK8PFPuppi.txt'),
 
     # Unused parameters
     muon_reliso              = cms.double(0.2),
@@ -250,7 +258,8 @@ process.inputs = cms.PSet (
     skipEvents = cms.int32(0),
     lumisToProcess = CfgTypes.untracked(CfgTypes.VLuminosityBlockRange()),
     fileNames  = cms.vstring(
-        'root://cmsxrootd.fnal.gov//store/data/Run2018C/SingleMuon/MINIAOD/17Sep2018-v1/00000/F5C9D858-8106-774E-9DA4-23DA7B098322.root',
+        '/uscms_data/d3/jmanagan/CMSSW_10_2_5/src/NNKit/FatJetNN/test/data18test_deepak8.root',
+        #'root://cmsxrootd.fnal.gov//store/data/Run2018C/SingleMuon/MINIAOD/17Sep2018-v1/00000/F5C9D858-8106-774E-9DA4-23DA7B098322.root',
         )
     )
 
