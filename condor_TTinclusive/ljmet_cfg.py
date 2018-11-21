@@ -43,6 +43,7 @@ process.singleLepCalc.isMc              = cms.bool(condorIsMC)
 process.singleLepCalc.keepFullMChistory = cms.bool(condorIsMC)
 process.singleLepCalc.UseElMVA          = cms.bool(True)
 process.singleLepCalc.saveLooseLeps     = cms.bool(False)
+<<<<<<< HEAD
 process.singleLepCalc.saveGenHT     = cms.bool(True)
 process.singleLepCalc.triggerCollection = cms.InputTag("TriggerResults::HLT")
 
@@ -51,6 +52,25 @@ process.load('LJMet.Com.JetSubCalc_cfi')
 process.JetSubCalc.killHF = cms.bool(False)
 process.JetSubCalc.isMc = cms.bool(condorIsMC)
 
+=======
+process.singleLepCalc.saveGenHT     = cms.bool(False)
+
+# Jet substructure calculator options
+process.load('LJMet.Com.JetSubCalc_cfi')
+process.JetSubCalc.killHF = cms.bool(False)
+process.JetSubCalc.doNewJEC = cms.bool(True)
+process.JetSubCalc.useL2L3Mass = cms.bool(True)
+process.JetSubCalc.isMc = cms.bool(condorIsMC)
+process.JetSubCalc.MCL2JetParAK8 = cms.string(relBase+'/src/LJMet/Com/data/Summer16RRV3/Summer16_23Sep2016V3_MC_L2Relative_AK8PFchs.txt')
+process.JetSubCalc.MCL3JetParAK8 = cms.string(relBase+'/src/LJMet/Com/data/Summer16RRV3/Summer16_23Sep2016V3_MC_L3Absolute_AK8PFchs.txt')
+process.JetSubCalc.MCPTResAK8 = cms.string(relBase+'/src/LJMet/Com/data/Spring16V10/Spring16_25nsV10_MC_PtResolution_AK8PFchs.txt')
+process.JetSubCalc.MCSF = cms.string(relBase+'/src/LJMet/Com/data/Spring16V10/Spring16_25nsV10_MC_SF_AK4PFchs.txt')
+process.JetSubCalc.DataL2JetParAK8 = cms.string(relBase+'/src/LJMet/Com/data/Summer16RRV3/Summer16_23Sep2016BCDV3_DATA_L2Relative_AK8PFchs.txt')
+process.JetSubCalc.DataL3JetParAK8 = cms.string(relBase+'/src/LJMet/Com/data/Summer16RRV3/Summer16_23Sep2016BCDV3_DATA_L3Absolute_AK8PFchs.txt')
+process.JetSubCalc.DataL2L3JetParAK8 = cms.string(relBase+'/src/LJMet/Com/data/Summer16RRV3/Summer16_23Sep2016BCDV3_DATA_L2L3Residual_AK8PFchs.txt')
+process.JetSubCalc.UncertaintyAK8 = cms.string(relBase+'/src/LJMet/Com/data/Summer16RRV3/Summer16_23Sep2016V3_MC_Uncertainty_AK8PFchs.txt')
+process.JetSubCalc.puppiCorrPath = cms.string(relBase+'/src/LJMet/Com/PuppiSoftdropMassCorr/weights/puppiCorr.root')
+>>>>>>> remotes/rizki/CMSSW_9_4_X_trilepton_11022018
 
 ############################################################
 #
@@ -170,7 +190,7 @@ process.event_selector = cms.PSet(
     max_lepton               = cms.int32(1),    # checks (N tight mu + N tight el) <= cut
     min_loose_lepton         = cms.int32(0),
     max_loose_lepton         = cms.int32(1000),
-    second_lepton_veto       = cms.bool(False),  #checks (N tight lep > 0) AND (N loose lep > 0), vetoes if there are loose leptons.
+    second_lepton_veto       = cms.bool(True),  #checks (N tight lep > 0) AND (N loose lep > 0), vetoes if there are loose leptons.
     tau_veto		     = cms.bool(False),
     
     # MET cuts
@@ -244,7 +264,6 @@ process.event_selector = cms.PSet(
     BTagUncertDown           = cms.bool(False), # no longer needed
  
     )
-
 
 
 #######################################################

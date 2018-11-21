@@ -7,7 +7,12 @@ cernList=[
 	# SHOULD BE AT CERN, USE eoscms.cern.ch in condor_submit.py
 	# MOVE THINGS HERE TO REMIND YOURSELF WHAT IS AT CERN
 
+<<<<<<< HEAD
 	'QCD_Flat_Pt-15to7000_TuneCUETP8M1_14TeV_pythia8.txt',
+=======
+	#### TTbar
+
+>>>>>>> remotes/rizki/CMSSW_9_4_X_trilepton_11022018
 	]
 
 externalList = [
@@ -48,23 +53,38 @@ if os.path.exists(tarfile):
 	print 'tar already exists! Will not re-tar!'
 else: 
 	os.chdir(relBase)
+<<<<<<< HEAD
 	# os.chdir('../')
 	# YOU NEED TO EXCLUDE ANYTHING ELSE THAT MIGHT LIVE IN THE SAME CMSSW RELEASE
 	print 'tar --exclude=".SCRAM" --exclude="src/LJMet/Com/.git" --exclude="src/NNKit/.git" --exclude="src/.git" --exclude="src/LJMet-Slimmer" --exclude="src/LJMetClean94X" --exclude="src/plots" --exclude="src/pileup" --exclude="src/singleLepAnalyzer" --exclude="src/tptp_2017" --exclude="tmp" -zcf '+tarfile+' ./*'
 	os.system('tar --exclude=".SCRAM" --exclude="src/LJMet/Com/.git" --exclude="src/NNKit/.git" --exclude="src/.git" --exclude="src/LJMet-Slimmer" --exclude="src/LJMetClean94X" --exclude="src/plots" --exclude="src/pileup" --exclude="src/singleLepAnalyzer" --exclude="src/tptp_2017" --exclude="tmp" -zcf '+tarfile+' ./*')
+=======
+	os.chdir('../')
+	# YOU NEED TO EXCLUDE ANYTHING ELSE THAT MIGHT LIVE IN THE SAME CMSSW RELEASE
+	print 'tar --exclude="src/LJMet/Com/.git" --exclude="src/NNKit/.git" --exclude="src/.git" --exclude="src/LJMet-Slimmer" --exclude="tmp" -zcf'+tarfile+' '+relBase.split('/')[-1]+'/'
+	os.system('tar --exclude="src/LJMet/Com/.git" --exclude="src/NNKit/.git" --exclude="src/.git" --exclude="src/LJMet-Slimmer" --exclude="tmp" -zcf '+tarfile+' '+relBase.split('/')[-1])
+>>>>>>> remotes/rizki/CMSSW_9_4_X_trilepton_11022018
 	os.chdir(thisDir)
 
 for sample in cernList:
 	GenHT = False
 	accessor = 'eoscms.cern.ch'
 	if 'HT' in sample and 'madgraphMLM' in sample: GenHT = True
+<<<<<<< HEAD
 	os.system('python condor_submitDeepAK8.py --useMC True --sample '+sample.split('.')[0]+' --fileList '+thisDir+'fileListsSummer18/'+sample+' --submit True --inputTar '+tarfile+' --outDir /eos/uscms/store/user/lpcljm/2018/LJMet94X_0lepPhaseII_110718 --shift '+shift+' --saveGenHT '+str(GenHT)+' --accessor '+accessor)
+=======
+	os.system('python condor_submitDeepAK8.py --useMC True --sample '+sample.split('.')[0]+' --fileList '+thisDir+'fileListsSummer18/'+sample+' --submit True --inputTar '+tarfile+' --outDir /eos/uscms/store/user/lpcljm/2018/LJMet94X_1lepTT_081518 --shift '+shift+' --saveGenHT '+str(GenHT)+' --accessor '+accessor)
+>>>>>>> remotes/rizki/CMSSW_9_4_X_trilepton_11022018
 
 for sample in externalList:
 	GenHT = False
 	accessor = 'cmsxrootd.fnal.gov'
 	if 'HT' in sample and 'madgraphMLM' in sample: GenHT = True
+<<<<<<< HEAD
         os.system('python condor_submitDeepAK8.py --useMC True --sample '+sample.split('.')[0]+' --fileList '+thisDir+'fileListsSummer18/'+sample+' --submit True --inputTar '+tarfile+' --outDir /eos/uscms/store/user/lpcljm/2018/LJMet94X_0lepPhaseII_110718 --shift '+shift+' --saveGenHT '+str(GenHT)+' --accessor '+accessor)
+=======
+        os.system('python condor_submitDeepAK8.py --useMC True --sample '+sample.split('.')[0]+' --fileList '+thisDir+'fileListsSummer18/'+sample+' --submit True --inputTar '+tarfile+' --outDir /eos/uscms/store/user/lpcljm/2018/LJMet94X_1lepTT_081518 --shift '+shift+' --saveGenHT '+str(GenHT)+' --accessor '+accessor)
+>>>>>>> remotes/rizki/CMSSW_9_4_X_trilepton_11022018
 
 ## shift should be (one at a time): nominal, JECup, JECdown, JERup, JERdown
 ## If you want to use different directory names, edit lines 144 - 147 in condor_submit.py so the config is edited correctly
