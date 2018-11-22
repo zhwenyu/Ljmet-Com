@@ -200,7 +200,6 @@ process.event_selector = cms.PSet(
     met_collection           = cms.InputTag('slimmedMETs'),
     
     # Jet corrections are read from txt files which need updating!
-    # Jet corrections are read from txt files which need updating!
     JEC_txtfile = cms.string(relBase+'/src/LJMet/Com/data/Fall17V6/Fall17_17Nov2017_V6_MC_Uncertainty_AK4PFchs.txt'),
     JERSF_txtfile = cms.string(relBase+'/src/LJMet/Com/data/Spring16V10/Spring16_25nsV10_MC_SF_AK4PFchs.txt'),
     JER_txtfile = cms.string(relBase+'/src/LJMet/Com/data/Spring16V10/Spring16_25nsV10_MC_PtResolution_AK4PFchs.txt'),

@@ -295,10 +295,10 @@ void BaseEventSelector::BeginJob(std::map<std::string, edm::ParameterSet const >
       // Create the JetCorrectorParameter objects, the order does not matter.
       
       std::string strB = msPar["DataL1JetPar"];
-      std::string strC = strB; boost::replace_first(strC,"B","C");
-      std::string strD = strB; boost::replace_first(strD,"B","D");
-      std::string strE = strB; boost::replace_first(strE,"B","E");  
-      std::string strF = strB; boost::replace_first(strF,"B","F");  
+      std::string strC = strB; boost::replace_first(strC,"B_V","C_V"); // B_V in 17Nov2017B_V6 //ATTENTION: this will replace any matched string in the path! So choose wisely.
+      std::string strD = strB; boost::replace_first(strD,"B_V","D_V");
+      std::string strE = strB; boost::replace_first(strE,"B_V","E_V");  
+      std::string strF = strB; boost::replace_first(strF,"B_V","F_V");  
       msPar["DataL1JetParByIOV_B"] = strB;
       msPar["DataL1JetParByIOV_C"] = strC;
       msPar["DataL1JetParByIOV_D"] = strD;
@@ -306,10 +306,10 @@ void BaseEventSelector::BeginJob(std::map<std::string, edm::ParameterSet const >
       msPar["DataL1JetParByIOV_F"] = strF;
 
       strB = msPar["DataL2JetPar"];
-      strC = strB; boost::replace_first(strC,"B","C");
-      strD = strB; boost::replace_first(strD,"B","D");
-      strE = strB; boost::replace_first(strE,"B","E");  
-      strF = strB; boost::replace_first(strE,"B","F");  
+      strC = strB; boost::replace_first(strC,"B_V","C_V");
+      strD = strB; boost::replace_first(strD,"B_V","D_V");
+      strE = strB; boost::replace_first(strE,"B_V","E_V");  
+      strF = strB; boost::replace_first(strE,"B_V","F_V");  
       msPar["DataL2JetParByIOV_B"] = strB;
       msPar["DataL2JetParByIOV_C"] = strC;
       msPar["DataL2JetParByIOV_D"] = strD;
@@ -317,10 +317,10 @@ void BaseEventSelector::BeginJob(std::map<std::string, edm::ParameterSet const >
       msPar["DataL2JetParByIOV_F"] = strF;
 
       strB = msPar["DataL3JetPar"];
-      strC = strB; boost::replace_first(strC,"B","C");
-      strD = strB; boost::replace_first(strD,"B","D");
-      strE = strB; boost::replace_first(strE,"B","E");  
-      strF = strB; boost::replace_first(strE,"B","F");  
+      strC = strB; boost::replace_first(strC,"B_V","C_V");
+      strD = strB; boost::replace_first(strD,"B_V","D_V");
+      strE = strB; boost::replace_first(strE,"B_V","E_V");  
+      strF = strB; boost::replace_first(strE,"B_V","F_V");  
       msPar["DataL3JetParByIOV_B"] = strB;
       msPar["DataL3JetParByIOV_C"] = strC;
       msPar["DataL3JetParByIOV_D"] = strD;
@@ -328,10 +328,10 @@ void BaseEventSelector::BeginJob(std::map<std::string, edm::ParameterSet const >
       msPar["DataL3JetParByIOV_F"] = strF;
 
       strB = msPar["DataResJetPar"];
-      strC = strB; boost::replace_first(strC,"B","C");
-      strD = strB; boost::replace_first(strD,"B","D");
-      strE = strB; boost::replace_first(strE,"B","E");  
-      strF = strB; boost::replace_first(strE,"B","F");  
+      strC = strB; boost::replace_first(strC,"B_V","C_V");
+      strD = strB; boost::replace_first(strD,"B_V","D_V");
+      strE = strB; boost::replace_first(strE,"B_V","E_V");  
+      strF = strB; boost::replace_first(strE,"B_V","F_V");  
       msPar["DataResJetParByIOV_B"] = strB;
       msPar["DataResJetParByIOV_C"] = strC;
       msPar["DataResJetParByIOV_D"] = strD;
@@ -339,10 +339,10 @@ void BaseEventSelector::BeginJob(std::map<std::string, edm::ParameterSet const >
       msPar["DataResJetParByIOV_F"] = strF;
 
       strB = msPar["DataL1JetParAK8"];
-      strC = strB; boost::replace_first(strC,"B","C");
-      strD = strB; boost::replace_first(strD,"B","D");
-      strE = strB; boost::replace_first(strE,"B","E");  
-      strF = strB; boost::replace_first(strE,"B","F");  
+      strC = strB; boost::replace_first(strC,"B_V","C_V");
+      strD = strB; boost::replace_first(strD,"B_V","D_V");
+      strE = strB; boost::replace_first(strE,"B_V","E_V");  
+      strF = strB; boost::replace_first(strE,"B_V","F_V");  
       msPar["DataL1JetParAK8ByIOV_B"] = strB;
       msPar["DataL1JetParAK8ByIOV_C"] = strC;
       msPar["DataL1JetParAK8ByIOV_D"] = strD;
@@ -350,10 +350,10 @@ void BaseEventSelector::BeginJob(std::map<std::string, edm::ParameterSet const >
       msPar["DataL1JetParAK8ByIOV_F"] = strF;
 
       strB = msPar["DataL2JetParAK8"];
-      strC = strB; boost::replace_first(strC,"B","C");
-      strD = strB; boost::replace_first(strD,"B","D");
-      strE = strB; boost::replace_first(strE,"B","E");  
-      strE = strB; boost::replace_first(strE,"B","F");  
+      strC = strB; boost::replace_first(strC,"B_V","C_V");
+      strD = strB; boost::replace_first(strD,"B_V","D_V");
+      strE = strB; boost::replace_first(strE,"B_V","E_V");  
+      strE = strB; boost::replace_first(strE,"B_V","F_V");  
       msPar["DataL2JetParAK8ByIOV_B"] = strB;
       msPar["DataL2JetParAK8ByIOV_C"] = strC;
       msPar["DataL2JetParAK8ByIOV_D"] = strD;
@@ -361,10 +361,10 @@ void BaseEventSelector::BeginJob(std::map<std::string, edm::ParameterSet const >
       msPar["DataL2JetParAK8ByIOV_F"] = strF;
 
       strB = msPar["DataL3JetParAK8"];
-      strC = strB; boost::replace_first(strC,"B","C");
-      strD = strB; boost::replace_first(strD,"B","D");
-      strE = strB; boost::replace_first(strE,"B","E");  
-      strF = strB; boost::replace_first(strE,"B","F");  
+      strC = strB; boost::replace_first(strC,"B_V","C_V");
+      strD = strB; boost::replace_first(strD,"B_V","D_V");
+      strE = strB; boost::replace_first(strE,"B_V","E_V");  
+      strF = strB; boost::replace_first(strE,"B_V","F_V");  
       msPar["DataL3JetParAK8ByIOV_B"] = strB;
       msPar["DataL3JetParAK8ByIOV_C"] = strC;
       msPar["DataL3JetParAK8ByIOV_D"] = strD;
@@ -372,10 +372,10 @@ void BaseEventSelector::BeginJob(std::map<std::string, edm::ParameterSet const >
       msPar["DataL3JetParAK8ByIOV_F"] = strF;
 
       strB = msPar["DataResJetParAK8"];
-      strC = strB; boost::replace_first(strC,"B","C");
-      strD = strB; boost::replace_first(strD,"B","D");
-      strE = strB; boost::replace_first(strE,"B","E");  
-      strF = strB; boost::replace_first(strE,"B","F");  
+      strC = strB; boost::replace_first(strC,"B_V","C_V");
+      strD = strB; boost::replace_first(strD,"B_V","D_V");
+      strE = strB; boost::replace_first(strE,"B_V","E_V");  
+      strF = strB; boost::replace_first(strE,"B_V","F_V");  
       msPar["DataResJetParAK8ByIOV_B"] = strB;
       msPar["DataResJetParAK8ByIOV_C"] = strC;
       msPar["DataResJetParAK8ByIOV_D"] = strD;

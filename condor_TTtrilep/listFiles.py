@@ -40,67 +40,44 @@ samplelist = [
 	#TT --> Julis has this
 
     ]
-# 
-# datalistRRB = [
-# '/DoubleMuon/Run2017B-31Mar2018-v1/MINIAOD',
-# '/DoubleEG/Run2017B-31Mar2018-v1/MINIAOD',
-# '/MuonEG/Run2017B-31Mar2018-v1/MINIAOD',
-# ]
-# datalistRRC = [
-# '/DoubleMuon/Run2017C-31Mar2018-v1/MINIAOD',
-# '/DoubleEG/Run2017C-31Mar2018-v1/MINIAOD',
-# '/MuonEG/Run2017C-31Mar2018-v1/MINIAOD',
-# ]
-# datalistRRD = [
-# '/DoubleMuon/Run2017D-31Mar2018-v1/MINIAOD',
-# '/DoubleEG/Run2017D-31Mar2018-v1/MINIAOD',
-# '/MuonEG/Run2017D-31Mar2018-v1/MINIAOD',
-# ]
-# datalistRRE = [
-# '/DoubleMuon/Run2017E-31Mar2018-v1/MINIAOD',
-# '/DoubleEG/Run2017E-31Mar2018-v1/MINIAOD',
-# '/MuonEG/Run2017E-31Mar2018-v1/MINIAOD',
-# ]
-# datalistRRF = [
-# '/DoubleMuon/Run2017F-31Mar2018-v1/MINIAOD',
-# '/DoubleEG/Run2017F-31Mar2018-v1/MINIAOD',
-# '/MuonEG/Run2017F-31Mar2018-v1/MINIAOD',
-# ]
-# datalistRRF_v2 = [
-# '/DoubleMuon/Run2017F-09May2018-v1/MINIAOD',
-# '/DoubleEG/Run2017F-09May2018-v1/MINIAOD',
-# '/MuonEG/Run2017F-09May2018-v1/MINIAOD',
-# ]
-# 
 
-for sample in samplelist:
+datalistRunA = [
+'/EGamma/Run2018A-22Jun2018-v1/MINIAOD',
+'/DoubleMuon/Run2018A-17Sep2018-v2/MINIAOD',
+]
+datalistRunB = [
+'/EGamma/Run2018B-26Sep2018-v1/MINIAOD',
+'/DoubleMuon/Run2018B-17Sep2018-v1/MINIAOD',
+]
+datalistRunC = [
+'/EGamma/Run2018C-17Sep2018-v1/MINIAOD',
+'/DoubleMuon/Run2018C-17Sep2018-v1/MINIAOD',
+]
+datalistRunD = [
+'/EGamma/Run2018D-PromptReco-v2/MINIAOD',
+'/DoubleMuon/Run2018D-PromptReco-v2/MINIAOD',
+]
+
+
+# for sample in samplelist:
+#     print 'listing files in',sample
+#     os.system('/cvmfs/cms.cern.ch/common/dasgoclient --limit=0 --query="file dataset = '+sample+'" &>> fileLists_Nov2-2018/'+sample.split('/')[1]+'.txt')
+#     #os.system('/cvmfs/cms.cern.ch/common/dasgoclient --limit=0 --query="site dataset = '+sample+'" | grep "T2_CH_CERN" ')
+#     #os.system('/cvmfs/cms.cern.ch/common/dasgoclient --limit=0 --query="dataset = '+sample+' | grep dataset.nevents" --key ~/.globus/userkey.pem --cert ~/.globus/usercert.pem')
+
+for sample in datalistRunA:
     print 'listing files in',sample
-    os.system('/cvmfs/cms.cern.ch/common/dasgoclient --limit=0 --query="file dataset = '+sample+'" &>> fileLists_Nov2-2018/'+sample.split('/')[1]+'.txt')
-    #os.system('/cvmfs/cms.cern.ch/common/dasgoclient --limit=0 --query="site dataset = '+sample+'" | grep "T2_CH_CERN" ')
-    #os.system('/cvmfs/cms.cern.ch/common/dasgoclient --limit=0 --query="dataset = '+sample+' | grep dataset.nevents" --key ~/.globus/userkey.pem --cert ~/.globus/usercert.pem')
+    os.system('/cvmfs/cms.cern.ch/common/dasgoclient --limit=0 --query="file dataset = '+sample+'" >& fileLists_2018dataset_Nov21-2018/'+sample.split('/')[1]+'_RunA.txt')
 
-# for sample in datalistRRB:
-#     print 'listing files in',sample
-#     os.system('/cvmfs/cms.cern.ch/common/dasgoclient --limit=0 --query="file dataset = '+sample+'" >& fileLists_Nov2-2018/'+sample.split('/')[1]+'_RRB.txt')
-# 
-# for sample in datalistRRC:
-#     print 'listing files in',sample
-#     os.system('/cvmfs/cms.cern.ch/common/dasgoclient --limit=0 --query="file dataset = '+sample+'" >& fileLists_Nov2-2018/'+sample.split('/')[1]+'_RRC.txt')
-# 
-# for sample in datalistRRD:
-#     print 'listing files in',sample
-#     os.system('/cvmfs/cms.cern.ch/common/dasgoclient --limit=0 --query="file dataset = '+sample+'" >& fileLists_Nov2-2018/'+sample.split('/')[1]+'_RRD.txt')
-# 
-# for sample in datalistRRE:
-#     print 'listing files in',sample
-#     os.system('/cvmfs/cms.cern.ch/common/dasgoclient --limit=0 --query="file dataset = '+sample+'" >& fileLists_Nov2-2018/'+sample.split('/')[1]+'_RRE.txt')
-# 
-# for sample in datalistRRF:
-#     print 'listing files in',sample
-#     os.system('/cvmfs/cms.cern.ch/common/dasgoclient --limit=0 --query="file dataset = '+sample+'" >& fileLists_Nov2-2018/'+sample.split('/')[1]+'_RRF.txt')
-# 
-# for sample in datalistRRF_v2:
-#     print 'listing files in',sample
-#     os.system('/cvmfs/cms.cern.ch/common/dasgoclient --limit=0 --query="file dataset = '+sample+'" >& fileLists_Nov2-2018/'+sample.split('/')[1]+'_RRF_v2.txt')
-# 
-# 
+for sample in datalistRunB:
+    print 'listing files in',sample
+    os.system('/cvmfs/cms.cern.ch/common/dasgoclient --limit=0 --query="file dataset = '+sample+'" >& fileLists_2018dataset_Nov21-2018/'+sample.split('/')[1]+'_RunB.txt')
+
+for sample in datalistRunC:
+    print 'listing files in',sample
+    os.system('/cvmfs/cms.cern.ch/common/dasgoclient --limit=0 --query="file dataset = '+sample+'" >& fileLists_2018dataset_Nov21-2018/'+sample.split('/')[1]+'_RunC.txt')
+
+for sample in datalistRunD:
+    print 'listing files in',sample
+    os.system('/cvmfs/cms.cern.ch/common/dasgoclient --limit=0 --query="file dataset = '+sample+'" >& fileLists_2018dataset_Nov21-2018/'+sample.split('/')[1]+'_RunD.txt')
+
