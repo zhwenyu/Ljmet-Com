@@ -1,5 +1,5 @@
 #!/usr/bin/python
-execfile("/uscms_data/d3/rsyarif/Brown2018/TT_BB_trilepton_LJMET_2017data/CMSSW_9_4_11/src/LJMet/Com/condor_TTtrilep/EOSSafeUtils.py")
+execfile("/uscms_data/d3/rsyarif/Brown2018/TT_BB_trilepton_LJMET_2018data/CMSSW_10_2_5/src/LJMet/Com/condor_TTtrilep/eos_utils/EOSSafeUtils.py")
 
 import os
 import re
@@ -9,7 +9,7 @@ import getopt
 import subprocess
 import socket
 import datetime
-files_per_job = 10
+files_per_job = 5
 
 #Configuration options parsed from arguments
 #Switching to getopt for compatibility with older python
@@ -121,7 +121,7 @@ def get_input(num, list):
 j = 1
 nfiles = 1
 
-tempdir = '/uscms_data/d3/rsyarif/Brown2018/TT_BB_trilepton_LJMET_2017data/'+outputdir.split('/')[-1]+'_logs/'+shift+'/'+prefix
+tempdir = '/uscms_data/d3/rsyarif/Brown2018/TT_BB_trilepton_LJMET_2018data/'+outputdir.split('/')[-1]+'_logs/'+shift+'/'+prefix
 os.makedirs(tempdir)
 
 py_file = open(tempdir+"/"+prefix+"_"+str(j)+".py","w")

@@ -42,20 +42,25 @@ samplelist = [
     ]
 
 datalistRunA = [
-'/EGamma/Run2018A-22Jun2018-v1/MINIAOD',
-'/DoubleMuon/Run2018A-17Sep2018-v2/MINIAOD',
+# '/EGamma/Run2018A-22Jun2018-v1/MINIAOD',
+# '/DoubleMuon/Run2018A-17Sep2018-v2/MINIAOD',
+'/MuonEG/Run2018A-PromptReco-v3/MINIAOD'
 ]
 datalistRunB = [
-'/EGamma/Run2018B-26Sep2018-v1/MINIAOD',
-'/DoubleMuon/Run2018B-17Sep2018-v1/MINIAOD',
+'/EGamma/Run2018B-17Sep2018-v1/MINIAOD',
+# '/EGamma/Run2018B-26Sep2018-v1/MINIAOD',
+# '/DoubleMuon/Run2018B-17Sep2018-v1/MINIAOD',
+'/MuonEG/Run2018B-PromptReco-v1/MINIAOD', #chose this because it had more files
 ]
 datalistRunC = [
-'/EGamma/Run2018C-17Sep2018-v1/MINIAOD',
-'/DoubleMuon/Run2018C-17Sep2018-v1/MINIAOD',
+# '/EGamma/Run2018C-17Sep2018-v1/MINIAOD',
+# '/DoubleMuon/Run2018C-17Sep2018-v1/MINIAOD',
+'/MuonEG/Run2018C-PromptReco-v3/MINIAOD',
 ]
 datalistRunD = [
-'/EGamma/Run2018D-PromptReco-v2/MINIAOD',
-'/DoubleMuon/Run2018D-PromptReco-v2/MINIAOD',
+# '/EGamma/Run2018D-PromptReco-v2/MINIAOD',
+# '/DoubleMuon/Run2018D-PromptReco-v2/MINIAOD',
+'/MuonEG/Run2018D-PromptReco-v2/MINIAOD',
 ]
 
 

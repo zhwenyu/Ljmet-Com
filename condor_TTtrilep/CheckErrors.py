@@ -54,8 +54,12 @@ for folder in folders:
 
         rootfiles = EOSlist_root_files(rootdir+folder)
         total_roots += len(rootfiles)
+        
+        print 'num of rootfiles:', len(rootfiles),' '
 
 	files = [x for x in os.listdir(dir+'/'+folder) if '.jdl' in x]
+	
+	print 'num of jdl files',len(files)
 	
 	os.listdir(dir+'/'+folder)
 	

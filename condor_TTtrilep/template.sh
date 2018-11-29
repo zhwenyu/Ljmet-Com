@@ -26,7 +26,7 @@ if [[ $XRDEXIT -ne 0 ]]; then
 fi
 
 #setup scram architecture
-export SCRAM_ARCH=slc6_amd64_gcc630
+export SCRAM_ARCH=slc6_amd64_gcc700
 
 echo "make new scram area 'cmsrel'"
 scramv1 project CMSSW ${INPUTTAR}

@@ -1,13 +1,13 @@
 #!/bin/bash
 
-rm -v /uscms_data/d3/rsyarif/Brown2018/TT_BB_trilepton_LJMET_2017data/CMSSW_9_4_11.tar 
+#rm -v /uscms_data/d3/rsyarif/Brown2018/TT_BB_trilepton_LJMET_2018data/CMSSW_10_2_5.tar 
 
 
-echo "SUBMITTING LJMET -- RR 2017Data"
+echo "SUBMITTING LJMET -- RR 2018Data"
 
 cp TTtrilep_Data_cfg.py ljmet_cfg.py
 
-python -u condor_submitData2017.py nominal | tee submit_Data2017.log 
+python -u condor_submitData2018.py nominal #| tee -a submit_Data2018.log 
 
 # echo "SUBMITTING LJMET -- nominal MC"
 # 
