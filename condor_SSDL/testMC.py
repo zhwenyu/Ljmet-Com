@@ -49,6 +49,7 @@ process.JetSubCalc.isMc = cms.bool(True)
 
 process.DileptonCalc.isMc     = process.ljmet.isMc
 process.DileptonCalc.dataType = cms.string('ElMu')
+process.DileptonCalc.UseElMVA = cms.bool(True)
 
 
 # BestCalc options

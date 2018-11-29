@@ -49,7 +49,7 @@ process.JetSubCalc.isMc = cms.bool(True)
 
 process.DileptonCalc.isMc     = process.ljmet.isMc
 process.DileptonCalc.dataType = cms.string('All')
-
+process.DileptonCalc.UseElMVA = cms.bool(True)
 
 # BestCalc options
 process.load('LJMet.Com.BestCalc_cfi')
@@ -77,7 +77,7 @@ process.event_selector = cms.PSet(
     'HLT_DoubleEle25_CaloIdL_MW_v',
     'HLT_Ele27_Ele37_CaloIdL_MW'
     ),
-    
+
     trigger_path_em          = cms.vstring(
     'HLT_Mu37_Ele27_CaloIdL_MW_v',
     'HLT_Mu27_Ele37_CaloIdL_MW_v',
@@ -95,7 +95,7 @@ process.event_selector = cms.PSet(
     ecalTP_cut               = cms.bool(True),
     goodVtx_cut              = cms.bool(True),
     badMuon_cut              = cms.bool(True),
-    badChargedHadron_cut     = cms.bool(True),    			     
+    badChargedHadron_cut     = cms.bool(True),
     flag_tag                 = cms.InputTag('TriggerResults::RECO'),
     cscHalo_cut              = cms.bool(True),
 
@@ -214,7 +214,7 @@ process.inputs = cms.PSet (
        fileNames  = cms.vstring(
 # 		'root://cmsxrootd.fnal.gov//store/data/Run2017F/DoubleEG/MINIAOD/09May2018-v1/10000/444E03EB-B75F-E811-AFBA-F01FAFD8F16A.root',
 		'root://cmsxrootd.fnal.gov//store/data/Run2017F/MuonEG/MINIAOD/09May2018-v1/110000/BC42F7EF-B4A2-E811-9CD6-001E67F8FA06.root',
-     ) 
+     )
 )
 
 
@@ -224,9 +224,9 @@ if (not process.ljmet.isMc==cms.bool(True)):
     JsonFile = relBase+'/src/LJMet/Com/data/json/'+condorJSON
     myList   = LumiList.LumiList(filename=JsonFile).getCMSSWString().split(',')
     process.inputs.lumisToProcess.extend(myList)
-       
-        
-        
+
+
+
 #######################################################
 #
 # Output
@@ -256,6 +256,6 @@ process.pvSelector.maxZ    = cms.double(24.0)
 process.pvSelector.maxRho  = cms.double(2.0)
 
 # jets
-process.load('PhysicsTools.SelectorUtils.pfJetIDSelector_cfi') 
+process.load('PhysicsTools.SelectorUtils.pfJetIDSelector_cfi')
 process.pfJetIDSelector.version = cms.string('FIRSTDATA')
 process.pfJetIDSelector.quality = cms.string('LOOSE')
