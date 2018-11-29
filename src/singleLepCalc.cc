@@ -220,6 +220,7 @@ int singleLepCalc::BeginJob()
     if (mPset.exists("loose_electron_mvaiso_cuts")) looseElMVAiso = mPset.getParameter< std::vector<double> >("loose_electron_mvaiso_cuts");
     else looseElMVAiso = {-0.83,-0.77,-0.69};
 
+    std::cout << "Begin Job done: singleLepCalc" << std::endl;
     return 0;
 }
 

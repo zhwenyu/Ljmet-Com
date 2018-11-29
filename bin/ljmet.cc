@@ -182,15 +182,16 @@ int main (int argc, char* argv[]) {
         }
         
     }
-    
+    std::cout << "Excluded all necessary calculators" << std::endl;
     
     // send config parameters to calculators
     factory->SetAllCalcConfig(mPar);
-    
+    std::cout << "Set Calc Configs" << std::endl;
     
     
     // Run BeginJob() for calculators
     factory->BeginJobAllCalc();
+    std::cout << "Ran BeginJob for Calcs" << std::endl;
     
     
     
@@ -227,6 +228,7 @@ int main (int argc, char* argv[]) {
     //
     // JSON file processing
     //
+    std::cout << "Beginning JSON processing" << std::endl;
     std::vector<edm::LuminosityBlockRange> vJson;
     if ( (!isMc) && (inputs.exists("lumisToProcess")) ) {
         std::vector<edm::LuminosityBlockRange> const & lumisTemp =
@@ -234,7 +236,7 @@ int main (int argc, char* argv[]) {
         vJson.resize( lumisTemp.size() );
         copy( lumisTemp.begin(), lumisTemp.end(), vJson.begin() );
     }
-    
+    std::cout << "Finished" << std::endl;
     
     // list of allowed runs: if not empty,
     // only events from listed runs are considered

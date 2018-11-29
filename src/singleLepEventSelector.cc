@@ -374,8 +374,8 @@ void singleLepEventSelector::BeginJob( std::map<std::string, edm::ParameterSet c
     set("MET filters", mbPar["metfilters"]); 
  
     if (mbPar["jet_cuts"]){
-        set("One jet or more", true);
-        set("Two jets or more", true);
+        set("One jet or more", false);
+        set("Two jets or more", false);
         set("Three jets or more", false);
         set("Min jet multiplicity", miPar["min_jet"]);
         set("Max jet multiplicity", miPar["max_jet"]);
@@ -426,6 +426,12 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
 
   if(!mbPar["isMc"]) BaseEventSelector::JECbyIOV(event);
 
+	if (mbPar["debug"])std::cout<< " " <<std::endl; // DEBUG - rizki
+	if (mbPar["debug"])std::cout<< "=====================================" <<std::endl; 
+	if (mbPar["debug"])std::cout << "Event = " << event.id().event() << ", Lumi Block = " << event.id().luminosityBlock() << std::endl;
+	if (mbPar["debug"])std::cout<< "=====================================" <<std::endl; 
+	if (mbPar["debug"])std::cout<< " " <<std::endl; // DEBUG - rizki
+
     pat::strbitset retJet            = jetSel_->getBitTemplate();
     pat::strbitset retMuon           = muonSel_->getBitTemplate();
     pat::strbitset retLooseMuon      = looseMuonSel_->getBitTemplate();
@@ -465,6 +471,8 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
 	      std::cout <<", FIRED = "<<fired<<std::endl;
 	    } 
 	  }
+	  
+	  if (mbPar["debug"]) std::cout<<"The event FIRED the following registered trigger(s) in LJMet: "<<std::endl;
 	  
 	  mvSelTriggersEl.clear();
 	  mvSelMCTriggersEl.clear();
@@ -551,6 +559,7 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
         //
         mvSelPVs.clear();
         if ( considerCut("Primary vertex") ) {
+        	if (mbPar["debug"]) std::cout<<" "<<std::endl;
             if (mbPar["debug"]) std::cout<<"pv cuts..."<<std::endl;
 
             if ( (*pvSel_)(event) ){
@@ -643,6 +652,10 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
             for (std::vector<pat::Muon>::const_iterator _imu = mhMuons->begin(); _imu != mhMuons->end(); _imu++){
                 retMuon.set(false);	
                 bool pass = false;
+
+				if (mbPar["debug"]) std::cout << "pt    = " << _imu->pt() << std::endl; //DEBUG - rizki
+				if (mbPar["debug"]) std::cout << "|eta| = " << fabs(_imu->eta()) << std::endl; //DEBUG - rizki
+				if (mbPar["debug"]) std::cout << "phi = " << _imu->phi() << std::endl; //DEBUG - rizki
     
                 //muon cuts
                 while(1){
@@ -762,7 +775,10 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
             } // end of the muon loop
 
         } // end of muon cuts
-        if (mbPar["debug"]) std::cout<<"finish muon cuts..."<<std::endl;
+		if (mbPar["debug"]) std::cout<< "+++++++++++++++++++++++++++++++++++++++++ " <<std::endl; // DEBUG - rizki
+		if (mbPar["debug"]) std::cout<< "nSelMuons              = " << nSelMuons << " out of "<< mhMuons->size() << std::endl; // DEBUG - rizki
+		if (mbPar["debug"]) std::cout<< "+++++++++++++++++++++++++++++++++++++++++ " <<std::endl; // DEBUG - rizki
+        if (mbPar["debug"]) std::cout<<"finish muon cuts..."<< std::endl;
 
         //
         //_____ Electron cuts __________________________________
@@ -772,7 +788,10 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
         int _n_electrons  = 0;
         int nSelElectrons = 0;
         int nLooseElectrons = 0;
-        if (mbPar["debug"]) std::cout<<"start electron cuts..."<<std::endl;
+		if (mbPar["debug"]) std::cout<<" " <<std::endl; // DEBUG - rizki
+        if (mbPar["debug"]) std::cout<<"start electron cuts..."<< std::endl;
+
+		if (mbPar["debug"]) std::cout << "" << std::endl; //DEBUG - rizki
 
         if ( mbPar["electron_cuts"] ) {
             //get electrons
@@ -793,6 +812,10 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
             for (std::vector<pat::Electron>::const_iterator _iel = mhElectrons->begin(); _iel != mhElectrons->end(); _iel++){
 	        retElectron.set(false);
                 bool pass = false;
+
+				if (mbPar["debug"]) std::cout << "pt                                          = " << _iel->pt() << std::endl; //DEBUG - rizki
+				if (mbPar["debug"]) std::cout << "|eta| ( ->superCluster()->eta(), ->eta() )  = " << fabs(_iel->superCluster()->eta()) << ", " << fabs(_iel->eta()) << std::endl; //DEBUG - rizki
+				if (mbPar["debug"]) std::cout << "phi ( ->superCluster()->phi(), ->phi() )    = " << _iel->superCluster()->phi() << ", " << _iel->phi() << std::endl; //DEBUG - rizki
 
                 //electron cuts
                 while(1){
@@ -840,6 +863,9 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
                     pass = true; // success
                     break;
                 }
+
+				if (mbPar["debug"])std::cout << " -------------------------------------------------------------------> Electron pass ? " << pass << std::endl; //DEBUG - rizki
+				if (mbPar["debug"])std::cout << " " << std::endl; //DEBUG - rizki
 
                 if ( pass ){
                      ++nSelElectrons;
@@ -902,6 +928,10 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
             } // end of the electron loop
 
         } // end of electron cuts
+
+		if (mbPar["debug"])std::cout<< "+++++++++++++++++++++++++++++++++++++++ " <<std::endl; // DEBUG - rizki
+		if (mbPar["debug"])std::cout<< "nSelElectrons              = " << nSelElectrons << " out of " << mhElectrons->size() <<std::endl; // DEBUG - rizki
+		if (mbPar["debug"])std::cout<< "+++++++++++++++++++++++++++++++++++++++ " <<std::endl; // DEBUG - rizki
         if (mbPar["debug"]) std::cout<<"finish electron cuts..."<<std::endl;
 
         //
@@ -911,6 +941,7 @@ bool singleLepEventSelector::operator()( edm::EventBase const & event, pat::strb
 
         int _n_taus  = 0;
 	mbIsTau = 0;
+        if (mbPar["debug"]) std::cout<<" "<<std::endl;
         if (mbPar["debug"]) std::cout<<"start tau cuts..."<<std::endl;
 	
 

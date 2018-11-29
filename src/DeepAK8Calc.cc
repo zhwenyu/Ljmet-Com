@@ -17,6 +17,8 @@ DeepAK8Calc::DeepAK8Calc(){
 
 int DeepAK8Calc::BeginJob(){
 
+  std::cout << "Begin Job done: DeepAK8Calc" << std::endl;
+
   return 0;
 
 }
