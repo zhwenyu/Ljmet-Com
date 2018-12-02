@@ -1,0 +1,12 @@
+DoubleMuon_RunA
+DoubleMuon_RunB
+DoubleMuon_RunC
+DoubleMuon_RunD
+EGamma_RunA
+EGamma_RunB
+EGamma_RunC
+EGamma_RunD
+MuonEG_RunA
+MuonEG_RunB
+MuonEG_RunC
+MuonEG_RunD

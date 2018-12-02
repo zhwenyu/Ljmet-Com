@@ -3,13 +3,24 @@
 import os
 import sys
 
-#print os.walk('/uscms_data/d3/rsyarif/Brown2018/TT_BB_SSDL_LJMet_2017data/LJMet94x_2lepTT_2017datasets_2018_11_18_rizki/').next()[1]
+#print os.walk('/uscms_data/d3/rsyarif/Brown2018/TT_BB_SSDL_LJMet_2018data/LJMet102x_2lepTT_2018datasets_2018_11_29_rizki/').next()[1]
 
-path = '/uscms_data/d3/rsyarif/Brown2018/TT_BB_SSDL_LJMet_2017data/LJMet94x_2lepTT_2017datasets_2018_11_18_rizki/'
-samples = [x for x in os.walk(path).next()[1]]
+path = '/uscms_data/d3/rsyarif/Brown2018/TT_BB_SSDL_LJMet_2018data/LJMet102x_2lepTT_2018datasets_2018_11_29_rizki/'
+
+try:
+	samples = [x for x in os.walk(path).next()[1]]
+except Exception as e:
+	print e
+
 
 oldMem = '8000'
 newMem = '10000'
+
+try:
+	oldMem=sys.argv[2]
+	newMem=sys.argv[3]
+except:
+	pass
 
 total_changed=0
 mem_fail_total=0

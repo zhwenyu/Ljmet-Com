@@ -14,9 +14,8 @@ import fileinput
 files_per_job = 5
 
 rel_base = os.environ['CMSSW_BASE']
-cmssw = 'CMSSW_9_4_11'
-# logdir = 'LJMet94x_2lepTT_2017datasets_2018_11_18_rizki_TESTDELETEME'
-logdir = 'LJMet94x_2lepTT_2017datasets_2018_11_18_rizki'
+cmssw = 'CMSSW_10_2_5'
+logdir = 'LJMet102x_2lepTT_2018datasets_2018_11_29_rizki'
 outdir = '/eos/uscms/store/group/lpcljm/'+logdir+'/'
 
 ### What is the name of your FWLite Analyzer
@@ -31,7 +30,7 @@ DOQCDMC = 'False'
 DOTTBARSYS = 'False'
 
 ### JSON file to use
-MYJSON = "'Cert_294927-306462_13TeV_PromptReco_Collisions17_JSON.txt'"
+MYJSON = "'Cert_314472-325175_13TeV_PromptReco_Collisions18_JSON.txt'"
 
 ### Systematics flags
 BTAGUNCERTUP = 'False'
@@ -141,7 +140,7 @@ for i in range(len(prefix)):
 
     while ( nfiles <= count ):    
 
-        py_templ_file = open(rel_base+"/src/LJMet/Com/condor_SSDL/Dilepton_Data2017_python.templ")
+        py_templ_file = open(rel_base+"/src/LJMet/Com/condor_SSDL/Dilepton_Data2018_python.templ")
         condor_templ_file = open(rel_base+"/src/LJMet/Com/condor_SSDL/condor.templ")
         csh_templ_file    = open(rel_base+"/src/LJMet/Com/condor_SSDL/csh.templ")
 

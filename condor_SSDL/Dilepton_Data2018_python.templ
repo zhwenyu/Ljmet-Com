@@ -21,7 +21,7 @@ process.subProcesses = cms.PSet()
 # FWLite application options
 #
 process.ljmet = cms.PSet(
-    isMc = cms.bool(True),
+    isMc = cms.bool(False),
     runs = cms.vint32([])
 )
 
@@ -47,7 +47,7 @@ process.JetSubCalc.killHF = cms.bool(False)
 process.JetSubCalc.isMc = process.ljmet.isMc
 
 process.DileptonCalc.isMc     = process.ljmet.isMc
-process.DileptonCalc.dataType = cms.string('ElMu')
+process.DileptonCalc.dataType = cms.string('All')
 process.DileptonCalc.UseElMVA = cms.bool(True)
 
 
@@ -62,8 +62,8 @@ process.BestCalc.dnnFile = cms.string(relBase+'/src/LJMet/Com/data/BEST_mlp.json
 process.event_selector = cms.PSet(
 
     selection = cms.string('DileptonSelector'),
-    isMc              = cms.bool(True),
-    keepFullMChistory = cms.bool(True),
+    isMc              = cms.bool(False),
+    keepFullMChistory = cms.bool(False),
     debug             = cms.bool(False),
     # cuts
     #HLT
@@ -165,7 +165,8 @@ process.event_selector = cms.PSet(
     JER_txtfile = cms.string(relBase+'/src/LJMet/Com/data/Spring16V10/Spring16_25nsV10_MC_PtResolution_AK4PFchs.txt'),
     JERAK8_txtfile = cms.string(relBase+'/src/LJMet/Com/data/Spring16V10/Spring16_25nsV10_MC_PtResolution_AK8PFchs.txt'),
 
-    JECup		             = cms.bool(JECUNCERTUP),
+    #This is for uncertainty calculations   
+    JECup      	             = cms.bool(JECUNCERTUP),
     JECdown                  = cms.bool(JECUNCERTDOWN),
     JERup                    = cms.bool(JERUNCERTUP),
     JERdown                  = cms.bool(JERUNCERTDOWN),
@@ -220,7 +221,7 @@ process.inputs = cms.PSet (
 
 # JSON
 if (not process.ljmet.isMc==cms.bool(True)):
-    JsonFile = JSONFILE
+    JsonFile = relBase+'/src/LJMet/Com/data/json/'+JSONFILE
     myList   = LumiList.LumiList(filename=JsonFile).getCMSSWString().split(',')
     process.inputs.lumisToProcess.extend(myList)
        

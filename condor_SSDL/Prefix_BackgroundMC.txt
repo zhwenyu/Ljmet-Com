@@ -2,14 +2,12 @@
 #TTZ
 #WZ
 #ZZ
-ZZ_part1
-ZZ_part2
 #WWW
 #WWZ
 #WZZ
 #ZZZ
 #TTH
-#TTTT
+TTTT
 #WpWp
 #DYJets
 #TTbar

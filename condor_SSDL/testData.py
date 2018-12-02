@@ -5,7 +5,7 @@ import os
 
 #Arguments from condor submit script which are used more than once
 relBase    = os.environ['CMSSW_BASE']
-condorJSON = str('Cert_294927-306462_13TeV_PromptReco_Collisions17_JSON.txt')
+condorJSON = str('Cert_314472-325175_13TeV_PromptReco_Collisions18_JSON.txt')
 
 # Define the base process
 process = cms.Process("LJMetCom")
@@ -182,15 +182,15 @@ process.event_selector = cms.PSet(
     MCL2JetParAK8            = cms.string(relBase+'/src/LJMet/Com/data/Fall17V6/Fall17_17Nov2017_V6_MC_L2Relative_AK8PFPuppi.txt'),
     MCL3JetParAK8            = cms.string(relBase+'/src/LJMet/Com/data/Fall17V6/Fall17_17Nov2017_V6_MC_L3Absolute_AK8PFPuppi.txt'),
 
-    DataL1JetPar             = cms.string(relBase+'/src/LJMet/Com/data/Fall17V6/Fall17_17Nov2017B_V6_DATA_L1FastJet_AK4PFchs.txt'),
-    DataL2JetPar             = cms.string(relBase+'/src/LJMet/Com/data/Fall17V6/Fall17_17Nov2017B_V6_DATA_L2Relative_AK4PFchs.txt'),
-    DataL3JetPar             = cms.string(relBase+'/src/LJMet/Com/data/Fall17V6/Fall17_17Nov2017B_V6_DATA_L3Absolute_AK4PFchs.txt'),
-    DataResJetPar            = cms.string(relBase+'/src/LJMet/Com/data/Fall17V6/Fall17_17Nov2017B_V6_DATA_L2L3Residual_AK4PFchs.txt'),
+    DataL1JetPar             = cms.string(relBase+'/src/LJMet/Com/data/Sep2018v1/102X_dataRun2_Sep2018Rereco_v1_L1FastJet_AK4PFchs.txt'),
+    DataL2JetPar             = cms.string(relBase+'/src/LJMet/Com/data/Sep2018v1/102X_dataRun2_Sep2018Rereco_v1_L2Relative_AK4PFchs.txt'),
+    DataL3JetPar             = cms.string(relBase+'/src/LJMet/Com/data/Sep2018v1/102X_dataRun2_Sep2018Rereco_v1_L3Absolute_AK4PFchs.txt'),
+    DataResJetPar            = cms.string(relBase+'/src/LJMet/Com/data/Sep2018v1/102X_dataRun2_Sep2018Rereco_v1_L2L3Residual_AK4PFchs.txt'),
 
-    DataL1JetParAK8          = cms.string(relBase+'/src/LJMet/Com/data/Fall17V6/Fall17_17Nov2017B_V6_DATA_L1FastJet_AK8PFPuppi.txt'),
-    DataL2JetParAK8          = cms.string(relBase+'/src/LJMet/Com/data/Fall17V6/Fall17_17Nov2017B_V6_DATA_L2Relative_AK8PFPuppi.txt'),
-    DataL3JetParAK8          = cms.string(relBase+'/src/LJMet/Com/data/Fall17V6/Fall17_17Nov2017B_V6_DATA_L3Absolute_AK8PFPuppi.txt'),
-    DataResJetParAK8         = cms.string(relBase+'/src/LJMet/Com/data/Fall17V6/Fall17_17Nov2017B_V6_DATA_L2L3Residual_AK8PFPuppi.txt'),
+    DataL1JetParAK8          = cms.string(relBase+'/src/LJMet/Com/data/Sep2018v1/102X_dataRun2_Sep2018Rereco_v1_L1FastJet_AK8PFPuppi.txt'),
+    DataL2JetParAK8          = cms.string(relBase+'/src/LJMet/Com/data/Sep2018v1/102X_dataRun2_Sep2018Rereco_v1_L2Relative_AK8PFPuppi.txt'),
+    DataL3JetParAK8          = cms.string(relBase+'/src/LJMet/Com/data/Sep2018v1/102X_dataRun2_Sep2018Rereco_v1_L3Absolute_AK8PFPuppi.txt'),
+    DataResJetParAK8         = cms.string(relBase+'/src/LJMet/Com/data/Sep2018v1/102X_dataRun2_Sep2018Rereco_v1_L2L3Residual_AK8PFPuppi.txt'),
 
 
     #triggerstudy info
@@ -212,8 +212,8 @@ process.inputs = cms.PSet (
    skipEvents = cms.int32(0),
    lumisToProcess = CfgTypes.untracked(CfgTypes.VLuminosityBlockRange()),
        fileNames  = cms.vstring(
-# 		'root://cmsxrootd.fnal.gov//store/data/Run2017F/DoubleEG/MINIAOD/09May2018-v1/10000/444E03EB-B75F-E811-AFBA-F01FAFD8F16A.root',
-		'root://cmsxrootd.fnal.gov//store/data/Run2017F/MuonEG/MINIAOD/09May2018-v1/110000/BC42F7EF-B4A2-E811-9CD6-001E67F8FA06.root',
+        'root://cmsxrootd.fnal.gov//store/data/Run2018A/DoubleMuon/MINIAOD/17Sep2018-v2/00000/0068887D-518C-2B47-8C29-E699E295A2CC.root',
+#         'root://cmsxrootd.fnal.gov//store/data/Run2018A/EGamma/MINIAOD/22Jun2018-v1/40000/9E8DD251-A976-E811-B636-A4BF01125718.root',
      )
 )
 
@@ -238,8 +238,8 @@ except: scratchDir='.'
 if not os.path.isdir(scratchDir): os.system("mkdir -p "+scratchDir)
 process.outputs = cms.PSet (
     #outputName = cms.string(scratchDir+'/PREFIX_JOBID'),
-#     outputName = cms.string('DoubleEG_Run2017F_v2_testData'),
-    outputName = cms.string('MuonEG_Run2017F_v2_testData'),
+#     outputName = cms.string('EGamma_Run2018A_testData'),
+    outputName = cms.string('DoubleMuon_Run2018A_testData'),
     treeName   = cms.string('ljmet'),
 )
 

@@ -14,9 +14,8 @@ import fileinput
 files_per_job = 5
 
 rel_base = os.environ['CMSSW_BASE']
-cmssw = 'CMSSW_9_4_11'
-# logdir = 'LJMet94x_2lepTT_2017datasets_2018_11_16_rizki' #TEST
-logdir = 'LJMet94x_2lepTT_2017datasets_2018_11_18_rizki'
+cmssw = 'CMSSW_10_2_5'
+logdir = 'LJMet102x_2lepTT_2018datasets_2018_11_29_rizki'
 outdir = '/eos/uscms/store/group/lpcljm/'+logdir+'/'
 
 ### What is the name of your FWLite Analyzer

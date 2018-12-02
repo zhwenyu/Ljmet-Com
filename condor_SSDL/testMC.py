@@ -183,15 +183,15 @@ process.event_selector = cms.PSet(
     MCL2JetParAK8            = cms.string(relBase+'/src/LJMet/Com/data/Fall17V6/Fall17_17Nov2017_V6_MC_L2Relative_AK8PFPuppi.txt'),
     MCL3JetParAK8            = cms.string(relBase+'/src/LJMet/Com/data/Fall17V6/Fall17_17Nov2017_V6_MC_L3Absolute_AK8PFPuppi.txt'),
 
-    DataL1JetPar             = cms.string(relBase+'/src/LJMet/Com/data/Fall17V6/Fall17_17Nov2017B_V6_DATA_L1FastJet_AK4PFchs.txt'),
-    DataL2JetPar             = cms.string(relBase+'/src/LJMet/Com/data/Fall17V6/Fall17_17Nov2017B_V6_DATA_L2Relative_AK4PFchs.txt'),
-    DataL3JetPar             = cms.string(relBase+'/src/LJMet/Com/data/Fall17V6/Fall17_17Nov2017B_V6_DATA_L3Absolute_AK4PFchs.txt'),
-    DataResJetPar            = cms.string(relBase+'/src/LJMet/Com/data/Fall17V6/Fall17_17Nov2017B_V6_DATA_L2L3Residual_AK4PFchs.txt'),
+    DataL1JetPar             = cms.string(relBase+'/src/LJMet/Com/data/Sep2018v1/102X_dataRun2_Sep2018Rereco_v1_L1FastJet_AK4PFchs.txt'),
+    DataL2JetPar             = cms.string(relBase+'/src/LJMet/Com/data/Sep2018v1/102X_dataRun2_Sep2018Rereco_v1_L2Relative_AK4PFchs.txt'),
+    DataL3JetPar             = cms.string(relBase+'/src/LJMet/Com/data/Sep2018v1/102X_dataRun2_Sep2018Rereco_v1_L3Absolute_AK4PFchs.txt'),
+    DataResJetPar            = cms.string(relBase+'/src/LJMet/Com/data/Sep2018v1/102X_dataRun2_Sep2018Rereco_v1_L2L3Residual_AK4PFchs.txt'),
 
-    DataL1JetParAK8          = cms.string(relBase+'/src/LJMet/Com/data/Fall17V6/Fall17_17Nov2017B_V6_DATA_L1FastJet_AK8PFPuppi.txt'),
-    DataL2JetParAK8          = cms.string(relBase+'/src/LJMet/Com/data/Fall17V6/Fall17_17Nov2017B_V6_DATA_L2Relative_AK8PFPuppi.txt'),
-    DataL3JetParAK8          = cms.string(relBase+'/src/LJMet/Com/data/Fall17V6/Fall17_17Nov2017B_V6_DATA_L3Absolute_AK8PFPuppi.txt'),
-    DataResJetParAK8         = cms.string(relBase+'/src/LJMet/Com/data/Fall17V6/Fall17_17Nov2017B_V6_DATA_L2L3Residual_AK8PFPuppi.txt'),
+    DataL1JetParAK8          = cms.string(relBase+'/src/LJMet/Com/data/Sep2018v1/102X_dataRun2_Sep2018Rereco_v1_L1FastJet_AK8PFPuppi.txt'),
+    DataL2JetParAK8          = cms.string(relBase+'/src/LJMet/Com/data/Sep2018v1/102X_dataRun2_Sep2018Rereco_v1_L2Relative_AK8PFPuppi.txt'),
+    DataL3JetParAK8          = cms.string(relBase+'/src/LJMet/Com/data/Sep2018v1/102X_dataRun2_Sep2018Rereco_v1_L3Absolute_AK8PFPuppi.txt'),
+    DataResJetParAK8         = cms.string(relBase+'/src/LJMet/Com/data/Sep2018v1/102X_dataRun2_Sep2018Rereco_v1_L2L3Residual_AK8PFPuppi.txt'),
 
 
     #triggerstudy info
@@ -213,7 +213,7 @@ process.inputs = cms.PSet (
    skipEvents = cms.int32(0),
    lumisToProcess = CfgTypes.untracked(CfgTypes.VLuminosityBlockRange()),
        fileNames  = cms.vstring(
-	                 'root://cmsxrootd.fnal.gov//store/mc/RunIIFall17MiniAODv2/TprimeTprime_M-1100_TuneCP5_13TeV-madgraph-pythia8/MINIAODSIM/PU2017_12Apr2018_94X_mc2017_realistic_v14-v2/00000/8EA8FE89-254F-E811-835E-0090FAA58BF4.root',
+        'root://cmsxrootd.fnal.gov//store/mc/RunIIFall18MiniAOD/WZTo3LNu_TuneCP5_13TeV-powheg-pythia8/MINIAODSIM/102X_upgrade2018_realistic_v12-v1/100000/55CC3D77-DBAE-A64A-8F47-B51CF3A40BFE.root',
 
      )
 )
@@ -239,7 +239,7 @@ except: scratchDir='.'
 if not os.path.isdir(scratchDir): os.system("mkdir -p "+scratchDir)
 process.outputs = cms.PSet (
     #outputName = cms.string(scratchDir+'/TprimeTprime_M-1500_13'),
-    outputName = cms.string('TprimeTprime_M-1100_testMC'),
+    outputName = cms.string('WZTo3LNu_TuneCP5_13TeV_testMC'),
     treeName   = cms.string('ljmet'),
 )
 

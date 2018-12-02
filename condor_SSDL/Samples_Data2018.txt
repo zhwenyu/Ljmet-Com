@@ -1,0 +1,12 @@
+fileLists_2018dataset_Nov21-2018//DoubleMuon_RunA.txt
+fileLists_2018dataset_Nov21-2018//DoubleMuon_RunB.txt
+fileLists_2018dataset_Nov21-2018//DoubleMuon_RunC.txt
+fileLists_2018dataset_Nov21-2018//DoubleMuon_RunD.txt
+fileLists_2018dataset_Nov21-2018//EGamma_RunA.txt
+fileLists_2018dataset_Nov21-2018//EGamma_RunB.txt
+fileLists_2018dataset_Nov21-2018//EGamma_RunC.txt
+fileLists_2018dataset_Nov21-2018//EGamma_RunD.txt
+fileLists_2018dataset_Nov21-2018//MuonEG_RunA.txt
+fileLists_2018dataset_Nov21-2018//MuonEG_RunB.txt
+fileLists_2018dataset_Nov21-2018//MuonEG_RunC.txt
+fileLists_2018dataset_Nov21-2018//MuonEG_RunD.txt

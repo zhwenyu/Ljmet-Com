@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # 
-# python TT_SSDL_Submit_Data.py --prefixFile Prefix_Data2017.txt --inputFile Samples_Data2017.txt
+#python TT_SSDL_Submit_Data.py --prefixFile Prefix_Data2018.txt --inputFile Samples_Data2018.txt
 # 
 python TT_SSDL_Submit_MC.py --prefixFile Prefix_BackgroundMC.txt --inputFile Samples_BackgroundMC.txt
 # # python TT_SSDL_Submit_MC_JECUP.py --prefixFile Prefix_BackgroundMC.txt --inputFile Samples_BackgroundMC.txt
