@@ -50,40 +50,40 @@ using trigger::TriggerObject;
 
 
 class DileptonEventSelector : public BaseEventSelector {
-    
+
 public:
-    
-    
+
+
     DileptonEventSelector();
     ~DileptonEventSelector();
-    
-    
+
+
     // executes before loop over events
     virtual void BeginJob(std::map<std::string, edm::ParameterSet const > par);
-    
+
     // main method where the cuts are applied
     virtual bool operator()( edm::EventBase const & event, pat::strbitset & ret);
-    
+
     // executes after loop over events
     virtual void EndJob(){}
-    
-    
+
+
     virtual void AnalyzeEvent( edm::EventBase const & event, LjmetEventContent & ec );
-    
-    
+
+
     boost::shared_ptr<PFJetIDSelectionFunctor> const & jetSel()        const { return jetSel_;}
     boost::shared_ptr<PVSelector>              const & pvSel()         const { return pvSel_;}
-    
-    
+
+
 protected:
-    
+
     std::string legend;
     bool bFirstEntry;
-    
-    
+
+
     boost::shared_ptr<PFJetIDSelectionFunctor> jetSel_;
     boost::shared_ptr<PVSelector>              pvSel_;
-    
+
     edm::Handle<edm::TriggerResults >           mhEdmTriggerResults;
     edm::Handle<std::vector<pat::Jet> >         mhJets;
     edm::Handle<std::vector<pat::Muon> >        mhMuons;
@@ -91,14 +91,14 @@ protected:
     edm::Handle<std::vector<pat::MET> >         mhMet;
     edm::Handle<double>                         h_rho;
     edm::Handle<std::vector<reco::Vertex> >     h_primVtx;
-    
+
     std::vector<edm::Ptr<reco::Vertex> >  good_pvs_;
-    
+
 private:
-    
+
     void initialize(std::map<std::string, edm::ParameterSet const> par);
-    
-    
+
+
 };
 
 
@@ -114,11 +114,11 @@ DileptonEventSelector::~DileptonEventSelector(){
 
 
 void DileptonEventSelector::BeginJob( std::map<std::string, edm::ParameterSet const> par){
-    
+
     BaseEventSelector::BeginJob(par);
-    
+
     std::string _key;
-    
+
     _key = "pfJetIDSelector";
     if ( par.find(_key)!=par.end() ){
         jetSel_ = boost::shared_ptr<PFJetIDSelectionFunctor>( new PFJetIDSelectionFunctor(par[_key]) );
@@ -128,7 +128,7 @@ void DileptonEventSelector::BeginJob( std::map<std::string, edm::ParameterSet co
         << std::endl;
         std::exit(-1);
     }
-    
+
     _key = "pvSelector";
     if ( par.find(_key)!=par.end() ){
         pvSel_ = boost::shared_ptr<PVSelector>( new PVSelector(par[_key]) );
@@ -138,8 +138,8 @@ void DileptonEventSelector::BeginJob( std::map<std::string, edm::ParameterSet co
         << std::endl;
         std::exit(-1);
     }
-    
-    
+
+
     _key = "event_selector";
     if ( par.find(_key)!=par.end() ){
         mbPar["debug"]                    = par[_key].getParameter<bool>         ("debug");
@@ -148,7 +148,7 @@ void DileptonEventSelector::BeginJob( std::map<std::string, edm::ParameterSet co
         mvsPar["trigger_path_ee"]         = par[_key].getParameter<std::vector<std::string> >  ("trigger_path_ee");
         mvsPar["trigger_path_em"]         = par[_key].getParameter<std::vector<std::string> >  ("trigger_path_em");
         mvsPar["trigger_path_mm"]         = par[_key].getParameter<std::vector<std::string> >  ("trigger_path_mm");
-        
+
         mbPar["pv_cut"]                   = par[_key].getParameter<bool>         ("pv_cut");
         mbPar["hbhe_cut"]                 = par[_key].getParameter<bool>         ("hbhe_cut");
 	mbPar["metfilters"]		  = par[_key].getParameter<bool>	 ("metfilters");
@@ -168,23 +168,23 @@ void DileptonEventSelector::BeginJob( std::map<std::string, edm::ParameterSet co
         mdPar["jet_maxeta"]               = par[_key].getParameter<double>       ("jet_maxeta");
         miPar["min_jet"]                  = par[_key].getParameter<int>          ("min_jet");
         miPar["max_jet"]                  = par[_key].getParameter<int>          ("max_jet");
-        
+
         mbPar["muon_cuts"]                = par[_key].getParameter<bool>         ("muon_cuts");
         miPar["min_muon"]                 = par[_key].getParameter<int>          ("min_muon");
         miPar["max_muon"]                 = par[_key].getParameter<int>          ("max_muon");
         mdPar["muon_minpt"]               = par[_key].getParameter<double>       ("muon_minpt");
         mdPar["muon_maxeta"]              = par[_key].getParameter<double>       ("muon_maxeta");
-        
+
         mbPar["electron_cuts"]            = par[_key].getParameter<bool>         ("electron_cuts");
         miPar["min_electron"]             = par[_key].getParameter<int>          ("min_electron");
         miPar["max_electron"]             = par[_key].getParameter<int>          ("max_electron");
         mdPar["electron_minpt"]           = par[_key].getParameter<double>       ("electron_minpt");
         mdPar["electron_maxeta"]          = par[_key].getParameter<double>       ("electron_maxeta");
-        
+
         miPar["min_lepton"]               = par[_key].getParameter<int>          ("min_lepton");
-        
+
         mbPar["met_cuts"]                 = par[_key].getParameter<bool>         ("met_cuts");
-        
+
         mtPar["trigger_collection"]       = par[_key].getParameter<edm::InputTag>("trigger_collection");
         mtPar["pv_collection"]            = par[_key].getParameter<edm::InputTag>("pv_collection");
         mtPar["jet_collection"]           = par[_key].getParameter<edm::InputTag>("jet_collection");
@@ -206,15 +206,15 @@ void DileptonEventSelector::BeginJob( std::map<std::string, edm::ParameterSet co
         << std::endl;
         std::exit(-1);
     }
-    
+
     std::cout << mLegend << "initializing dilepton selection" << std::endl;
-    
-    
+
+
     bFirstEntry = true;
-    
+
     push_back("No selection");
     set("No selection");
-    
+
     push_back("Trigger");
     push_back("Primary vertex");
     push_back("MET filters");
@@ -238,21 +238,21 @@ void DileptonEventSelector::BeginJob( std::map<std::string, edm::ParameterSet co
     push_back("Max jet multiplicity");
     push_back("Min MET");
     push_back("All cuts");          // sanity check
-    
-    
-    
+
+
+
     // TOP PAG sync selection v3
-    
+
     set("Trigger", mbPar["trigger_cut"]);
     set("Primary vertex", mbPar["pv_cut"]);
     set("MET filters", mbPar["metfilters"]);
 
     set("HBHE noise and scraping filter", mbPar["hbhe_cut"]);
-    set("HBHE Iso noise filter", mbPar["hbheiso_cut"]); 
+    set("HBHE Iso noise filter", mbPar["hbheiso_cut"]);
     set("CSC Tight Halo filter", mbPar["cscHalo_cut"]);
-    set("EE Bad SC filter", mbPar["eesc_cut"]); 
-    set("Ecal Dead TP", mbPar["ecalTP_cut"]); 
-    set("Good Vtx", mbPar["goodVtx_cut"]); 
+    set("EE Bad SC filter", mbPar["eesc_cut"]);
+    set("Ecal Dead TP", mbPar["ecalTP_cut"]);
+    set("Good Vtx", mbPar["goodVtx_cut"]);
     set("Bad Muon", mbPar["badMuon_cut"]);
     set("Bad Charged Hadron", mbPar["badChargedHadron_cut"]);
 
@@ -264,7 +264,7 @@ void DileptonEventSelector::BeginJob( std::map<std::string, edm::ParameterSet co
         set("Min muon", false);
         set("Max muon", false);
     }
-    
+
     if (mbPar["electron_cuts"]){
         set("Min electron", miPar["min_electron"]);
         set("Max electron", miPar["max_electron"]);
@@ -273,9 +273,9 @@ void DileptonEventSelector::BeginJob( std::map<std::string, edm::ParameterSet co
         set("Min electron", false);
         set("Max electron", false);
     }
-    
+
     set("Min lepton", miPar["min_lepton"]);
-    
+
     if (mbPar["jet_cuts"]){
         set("One jet or more", true);
         set("Two jets or more", true);
@@ -290,11 +290,11 @@ void DileptonEventSelector::BeginJob( std::map<std::string, edm::ParameterSet co
         set("Min jet multiplicity", false);
         set("Max jet multiplicity", false);
     }
-    
+
     if (mbPar["met_cuts"]) set("Min MET", mdPar["min_met"]);
-    
+
     set("All cuts", true);
-    
+
 } // initialize()
 
 
@@ -302,7 +302,7 @@ void DileptonEventSelector::BeginJob( std::map<std::string, edm::ParameterSet co
 
 bool DileptonEventSelector::operator()( edm::EventBase const & event, pat::strbitset & ret){
 
-    if(!mbPar["isMc"]) BaseEventSelector::JECbyIOV(event);    
+    if(!mbPar["isMc"]) BaseEventSelector::JECbyIOV(event);
     pat::strbitset retJet       = jetSel_->getBitTemplate();
 
     //packed pf candidates and rho source needed miniIso
@@ -314,23 +314,23 @@ bool DileptonEventSelector::operator()( edm::EventBase const & event, pat::strbi
     event.getByLabel(edm::InputTag("fixedGridRhoFastjetCentralNeutral","") , rhoJetsNC);
     double myRhoJetsNC = *rhoJetsNC;
 
-    
+
     while(1){ // standard infinite while loop trick to avoid nested ifs
-        
+
         passCut(ret, "No selection");
-        
+
         //
         //_____ Trigger cuts __________________________________
         //
         if ( considerCut("Trigger") ) {
-            
-            
+
+
             event.getByLabel( mtPar["trigger_collection"], mhEdmTriggerResults );
             //const edm::ParameterSetID ps = mhEdmTriggerResults->parameterSetID();
             const edm::TriggerNames trigNames = event.triggerNames(*mhEdmTriggerResults);
-            
+
             unsigned int _tSize = mhEdmTriggerResults->size();
-            
+
             // dump trigger names
             if (bFirstEntry && mbPar["dump_trigger"]){
                 for (unsigned int i=0; i<_tSize; i++){
@@ -342,11 +342,11 @@ bool DileptonEventSelector::operator()( edm::EventBase const & event, pat::strbi
             }
 
 			if (mbPar["debug"]) std::cout << "\n Fired the following registered LJMet trigger(s):		" << std::endl;
- 
- 
+
+
 			mvSelTriggersEl.clear();
 			mvSelTriggersMu.clear();
-           
+
             //Loop over each channel separately
             int passEE = 0;
             //loop over triggers we registered in LJMet (config)
@@ -367,10 +367,10 @@ bool DileptonEventSelector::operator()( edm::EventBase const & event, pat::strbi
 					else{
 						mvSelTriggersEl[mvsPar["trigger_path_ee"].at(ipath)] = 0;
 					}
-				
+
 				}
             }
-            
+
             int passEM = 0;
             //loop over triggers we registered in LJMet (config)
             for (unsigned int ipath = 0; ipath < mvsPar["trigger_path_em"].size(); ipath++){
@@ -392,10 +392,10 @@ bool DileptonEventSelector::operator()( edm::EventBase const & event, pat::strbi
 						mvSelTriggersEl[mvsPar["trigger_path_em"].at(ipath)] = 0;
 						mvSelTriggersMu[mvsPar["trigger_path_em"].at(ipath)] = 0;
 					}
-				
+
 				}
             }
-            
+
             int passMM = 0;
             //loop over triggers we registered in LJMet (config)
             for (unsigned int ipath = 0; ipath < mvsPar["trigger_path_mm"].size(); ipath++){
@@ -413,15 +413,15 @@ bool DileptonEventSelector::operator()( edm::EventBase const & event, pat::strbi
 						break;
 					}
 					else{
-						mvSelTriggersEl[mvsPar["trigger_path_mm"].at(ipath)] = 0;
+						mvSelTriggersMu[mvsPar["trigger_path_mm"].at(ipath)] = 0;
 					}
-				
+
 				}
             }
-            
-            //debug 
+
+            //debug
             if (mbPar["debug"]){
-            	std::cout <<"\nCheck saved trig infos:"<< std::endl; 
+            	std::cout <<"\nCheck saved trig infos:"<< std::endl;
 
 				for(const auto& x: mvSelTriggersEl){
 					std::cout << "	"<< x.first << " = " <<x.second << std::endl;
@@ -430,38 +430,38 @@ bool DileptonEventSelector::operator()( edm::EventBase const & event, pat::strbi
 					std::cout << "	"<< x.first << " = "<< x.second << std::endl;
 				}
             }
-            
+
             mvSelTriggers.clear();
             mvSelTriggers.push_back(passEE);
             mvSelTriggers.push_back(passEM);
             mvSelTriggers.push_back(passMM);
-            
+
             if ( ignoreCut("Trigger") || passEE + passEM + passMM > 0 ) passCut(ret, "Trigger");
             else break;
-            
+
         } // end of trigger cuts
-        
-        
-        
+
+
+
         //
         //_____ Primary vertex cuts __________________________________
         //
         if ( considerCut("Primary vertex") ) {
-            
+
             if ( (*pvSel_)(event) ){
                 passCut(ret, "Primary vertex"); // PV cuts total
             }
-            
+
         } // end of PV cuts
-        
-        
-        
-        
+
+
+
+
         //
         //_____ HBHE noise and scraping filter________________________
         //
 	/* if ( considerCut("HBHE noise and scraping filter") || considerCut("HBHE Iso noise filter") ) {
-            
+
 	  //set cut value considered
 	  bool run1Cut=false;
 	  bool run2LooseCut=false;
@@ -567,7 +567,7 @@ passCut(ret, "EE Bad SC filter");
 passCut(ret,"Ecal Dead TP");
 passCut(ret,"Good Vtx");
 
-	  // Moriond 2018    
+	  // Moriond 2018
 	  for (unsigned int i=0; i<PatTriggerResults->size(); i++){
 	    if (patTrigNames.triggerName(i) == "Flag_goodVertices") goodvertpass = PatTriggerResults->accept(patTrigNames.triggerIndex(patTrigNames.triggerName(i)));  //primary vertext filter
 	    if (patTrigNames.triggerName(i) == "Flag_globalSuperTightHalo2016Filter") globaltighthalopass = PatTriggerResults->accept(patTrigNames.triggerIndex(patTrigNames.triggerName(i))); //beam halo filter
@@ -585,12 +585,12 @@ passCut(ret,"Good Vtx");
 	  }
 	  else break;
 /*
-	  if ( considerCut("CSC Tight Halo filter") ) {    
+	  if ( considerCut("CSC Tight Halo filter") ) {
 	    if (globaltighthalopass) passCut(ret, "CSC Tight Halo filter"); // CSC cut
 	    else break;
 	  } // end of CSC cuts
-    
-	  if ( considerCut("EE Bad SC filter") ) {	        	     
+
+	  if ( considerCut("EE Bad SC filter") ) {
 	    if (eebadscpass) passCut(ret, "EE Bad SC filter"); // EE Bad SC cut
 	    else break;
 	  } // end of EE Bad SC cuts
@@ -598,9 +598,9 @@ passCut(ret,"Good Vtx");
 
 	  if( considerCut("HBHE noise and scraping filter") ) {
 	    if(hbhenoisepass) passCut(ret,"HBHE noise and scraping filter");
-	    else break;	   
+	    else break;
 	  }
-	  
+
 	  if( considerCut("HBHE Iso noise filter")){
 	    if(hbhenoiseisopass) passCut(ret,"HBHE Iso noise filter");
 	    else break;
@@ -608,7 +608,7 @@ passCut(ret,"Good Vtx");
 
 	  if(considerCut("Ecal Dead TP")){
 	    if(ecaldeadcellpass) passCut(ret,"Ecal Dead TP");
-	    else break;	  
+	    else break;
 	  }
 	  if(considerCut("Good Vtx")){
 	    if(goodvertpass) passCut(ret,"Good Vtx");
@@ -620,13 +620,13 @@ passCut(ret,"Good Vtx");
 
 	//bad muons and bad charged hadrons
 	//get muons and packed pfcandidates
-	event.getByLabel( mtPar["muon_collection"], mhMuons );      
+	event.getByLabel( mtPar["muon_collection"], mhMuons );
 	//___________________________Bad Muon Filter________________________________||
 	double maxDR = 0.001;
 	double minMuonTrackRelErr = 0.5;
 	int suspiciousAlgo=14;
 	double minMuPt = 100;
-	//minDz = 1;                                                                                                                                                                
+	//minDz = 1;
 	bool badmuflag = false;
 
 	//___________________________Bad Charged Hadron Filter________________________________||
@@ -666,7 +666,7 @@ passCut(ret,"Good Vtx");
 		if (abs((*cand).pdgId()) == 211) {
 		  // Require very loose similarity in pt (one-sided).
 		  double dPtRel =  ( (*cand).pt() - it->pt() )/(0.5*((*cand).pt() + it->pt()));
-		  //  Flag the event bad if dR is tiny  
+		  //  Flag the event bad if dR is tiny
 		  if (deltaR( it->eta(), it->phi(), (*cand).eta(), (*cand).phi() ) < maxDR and dPtRel > minPtDiffRel) {
 		    badchadflag = true;
 		    break;
@@ -690,61 +690,61 @@ passCut(ret,"Bad Charged Hadron");
         //_____ Muon cuts ________________________________
         //
         // loop over muons
-        
+
         int _n_muons  = 0;
         int nSelMuons = 0;
-        
+
         if ( mbPar["muon_cuts"] ) {
-            
+
             //get muons
             event.getByLabel( mtPar["muon_collection"], mhMuons );
-            
+
             mvSelMuons.clear();
-            
+
             for (std::vector<pat::Muon>::const_iterator _imu = mhMuons->begin(); _imu != mhMuons->end(); _imu++){
-                
+
                 bool pass = false;
-                
+
                 //muon cuts
                 while(1){
-		    if ( (*_imu).passed(reco::Muon::CutBasedIdLoose) ){ } 
+		    if ( (*_imu).passed(reco::Muon::CutBasedIdLoose) ){ }
     			else break; // fail
 /* julie told me delete
                     if (not _imu->globalTrack().isNonnull() or not _imu->globalTrack().isAvailable()) break;
                     if (not _imu->innerTrack().isNonnull()  or not _imu->innerTrack().isAvailable())  break;
-*/                    
+*/
                     if (_imu->pt()>mdPar["muon_minpt"]){ }
                     else break;
-                    
+
                     if ( fabs(_imu->eta())<mdPar["muon_maxeta"] ){ }
                     else break;
-                    
+
                     pass = true; // success
                     break;
                 }
-                
+
                 if ( pass ){
                     ++nSelMuons;
-                    
+
                     // save every good muon
                     mvSelMuons.push_back( edm::Ptr<pat::Muon>( mhMuons, _n_muons) );
                 }
                 _n_muons++;
             } // end of the muon loop
-            
+
             if( nSelMuons >= cut("Min muon", int()) || ignoreCut("Min muon") ) passCut(ret, "Min muon");
             else break;
-            
+
             if( nSelMuons <= cut("Max muon", int()) || ignoreCut("Max muon") ) passCut(ret, "Max muon");
             else break;
-            
+
         } // end of muon cuts
-        
+
         //
         //_____ Electron cuts __________________________________
         //
         // loop over electrons
-        
+
         int _n_electrons  = 0;
         int nSelElectrons = 0;
         //collection of electrons for cleaning
@@ -765,16 +765,16 @@ passCut(ret,"Bad Charged Hadron");
 	  event.getByLabel(rhoSrc_it, rhoHandle);
 	  double rhoIso = std::max(*(rhoHandle.product()), 0.0);
 
-            
+
 	  //get electrons
 	  event.getByLabel( mtPar["electron_collection"], mhElectrons );
-          
+
 	  mvSelElectrons.clear();
 
 
-          
+
 	  for ( std::vector<pat::Electron>::const_iterator _iel = mhElectrons->begin(); _iel != mhElectrons->end(); _iel++){
-	    
+
 	    bool pass = false;
 	    bool passLoose=false;
 	    while(1){
@@ -782,7 +782,7 @@ passCut(ret,"Bad Charged Hadron");
 	      // electron Et cut
 	      if (_iel->pt()>mdPar["electron_minpt"]){ }
 	      else break;
-              
+
 	      // electron eta cut
 	      if ( fabs(_iel->eta())<mdPar["electron_maxeta"] ){ }
 	      else break;
@@ -796,7 +796,7 @@ passCut(ret,"Bad Charged Hadron");
 	      //mva loose for cleaning
 	      pat::Electron* elptr = new pat::Electron(*_iel);
 	      float miniIso = getPFMiniIsolation_EffectiveArea(packedPFCands, dynamic_cast<const reco::Candidate* > (elptr), 0.05, 0.2, 10., false, false,myRhoJetsNC);
-	      
+
 
 	      if(_iel->pt() > 10) {
 	     	float mvaVal = mvaValue( *_iel,event);
@@ -825,13 +825,13 @@ passCut(ret,"Bad Charged Hadron");
 		mvapass = mvaValue( *_iel, event) > (mvdPar["tight_electron_mva_cuts"].at(6) - mvdPar["tight_electron_mva_cuts"].at(8)*exp(-1*_iel->pt()/mvdPar["tight_electron_mva_cuts"].at(7)));
 	      }
 	      if (!mvapass) break;
-		      
+
 	      if(mbPar["electron_useMiniIso"]){
 		bool passIso = false;
 		pat::Electron* elptr = new pat::Electron(*_iel);
 		float miniIso = getPFMiniIsolation_EffectiveArea(packedPFCands, dynamic_cast<const reco::Candidate* > (elptr), 0.05, 0.2, 10., false, false,myRhoJetsNC);
-			
-		if(miniIso < mdPar["electron_miniIso"]) passIso = true;                      
+
+		if(miniIso < mdPar["electron_miniIso"]) passIso = true;
 		if(!passIso){delete elptr;  break;}
 		delete elptr;
 	      }
@@ -846,7 +846,7 @@ passCut(ret,"Bad Charged Hadron");
 	      else if(fabs(_iel->ecalDrivenMomentum().eta())<2.3) AEff=0.1903;
 	      else if(fabs(_iel->ecalDrivenMomentum().eta())<2.4) AEff=0.2243;
 	      else if(fabs(_iel->ecalDrivenMomentum().eta())<2.5) AEff=0.2687;
-	      
+
 	      //calculate relIso
 	      reco::GsfElectron::PflowIsolationVariables pfIso = _iel->pfIsolationVariables();
 	      double chIso = pfIso.sumChargedHadronPt;
@@ -854,13 +854,13 @@ passCut(ret,"Bad Charged Hadron");
 	      double phIso = pfIso.sumPhotonEt;
 	      double PUIso = pfIso.sumPUPt;
 	      double relIso = ( chIso + std::max(0.0, nhIso + phIso - rhoIso*AEff) ) / _iel->pt();
-	      
+
 	      //get d0 and dZ
 	      double d0=_iel->dB();
 	      double dZ;
 	      if(goodPVs.size() > 0){
 		dZ=_iel->gsfTrack()->dz(goodPVs.at(0).position());
-	      } 
+	      }
 	      else {dZ=-999;}
 	      //get 1/e -1/1p
 	      float ooEmooP = 1.0/_iel->ecalEnergy() - _iel->eSuperClusterOverP()/_iel->ecalEnergy();
@@ -881,7 +881,7 @@ passCut(ret,"Bad Charged Hadron");
 		  else if(!_iel->passConversionVeto())        {passLoose= false; }
 		  else passLoose=true;
 		}
-		
+
 		//Endcap
 		else{
 		  if(_iel->full5x5_sigmaIetaIeta() >= 0.0301)  {passLoose= false; }
@@ -898,7 +898,7 @@ passCut(ret,"Bad Charged Hadron");
 		  else passLoose=true;
 		}
 		*/
-              
+
 	      pass = true;
 	      break;
 	    }
@@ -906,42 +906,42 @@ passCut(ret,"Bad Charged Hadron");
 	    if(passLoose){
 	      electronsForCleaning.push_back(*_iel);
 	    }
-            
+
 	    if ( pass ){
-	      ++nSelElectrons;              
+	      ++nSelElectrons;
 	      // save every good electron
 	      mvSelElectrons.push_back( edm::Ptr<pat::Electron>( mhElectrons, _n_electrons) );
-	      
+
 	    }
 	    _n_electrons++;
 	  } // end of the electron loop
-          
+
 	  if( nSelElectrons >= cut("Min electron", int()) || ignoreCut("Min electron") ) passCut(ret, "Min electron");
 	  else break;
-          
+
 	  if( nSelElectrons <= cut("Max electron", int()) || ignoreCut("Max electron") ) passCut(ret, "Max electron");
 	  else break;
-          
+
         } // end of electron cuts
-        
+
         int nSelLeptons = nSelElectrons + nSelMuons;
-        
+
         if( nSelLeptons >= cut("Min lepton", int()) || ignoreCut("Min lepton") ) passCut(ret, "Min lepton");
         else break;
-        
+
         //     if (nSelLeptons < 2) std::cout<<"Too few leptons!"<<std::endl;
-        
+
         //======================================================
         //
         // jet loop
         //
         //
-        
+
         int _n_good_jets = 0;
 	int _n_good_uncleaned_jets=0;
         int _n_jets = 0;
         //int njetsPF = 0;
-        
+
         mvSelJets.clear();
 	mvSelJetsCleaned.clear();
         mvAllJets.clear();
@@ -950,7 +950,7 @@ passCut(ret,"Bad Charged Hadron");
         event.getByLabel( mtPar["jet_collection"], mhJets );
         for (std::vector<pat::Jet>::const_iterator _ijet = mhJets->begin();
              _ijet != mhJets->end(); ++_ijet){
-            
+
             retJet.set(false);
             // jet cuts for uncleaned jets
 	    bool pfID_barrel = (fabs(_ijet->correctedJet(0).eta()) < 2.7 && (*jetSel_)( *_ijet, retJet ) );
@@ -959,17 +959,17 @@ passCut(ret,"Bad Charged Hadron");
 	    bool pfID_forward = (fabs(_ijet->correctedJet(0).eta()) >= 3.0 && (_ijet->correctedJet(0).neutralEmEnergyFraction() < 0.9 || _ijet->correctedJet(0).neutralMultiplicity() > 10));
 	    bool passPFID = pfID_barrel || pfID_endcap || pfID_forward;
 	    if ( passPFID){
-                mvAllJets.push_back(edm::Ptr<pat::Jet>(mhJets, _n_jets)); 		
+                mvAllJets.push_back(edm::Ptr<pat::Jet>(mhJets, _n_jets));
 		//cut on corrected jet quantities
 		TLorentzVector corJetP4 = correctJet(*_ijet,event,false,false,0);
-                if (( corJetP4.Pt()>mdPar["jet_minpt"] ) && ( fabs(corJetP4.Eta())<mdPar["jet_maxeta"] )){ 
+                if (( corJetP4.Pt()>mdPar["jet_minpt"] ) && ( fabs(corJetP4.Eta())<mdPar["jet_maxeta"] )){
                     ++_n_good_uncleaned_jets;
-                    mvSelJets.push_back(edm::Ptr<pat::Jet>(mhJets, _n_jets)); 
-                }	       
+                    mvSelJets.push_back(edm::Ptr<pat::Jet>(mhJets, _n_jets));
+                }
 	    }
-	    
+
 	    //lepton jet cleaning
-	    bool _cleaned = false;	    
+	    bool _cleaned = false;
 	    pat::Jet cleanedJet = *_ijet;
 	    TLorentzVector jetP4;
 	    pat::Jet tmpJet = _ijet->correctedJet(0);
@@ -1023,22 +1023,22 @@ passCut(ret,"Bad Charged Hadron");
 		      }*/ //switching to new lep-jet cleaning from dylan
 		    for (unsigned int muI = 0; muI < muDaughters.size(); muI++) {
 		      if ( (*_i_const).key() == muDaughters[muI].key() ) {
-			
+
 
 			tmpJet.setP4( tmpJet.p4() - muDaughters[muI]->p4() );
-			
+
 			if (mbPar["debug"]) std::cout << "Corrected Jet : pT = " << tmpJet.pt() << " eta = " << tmpJet.eta() << " phi = " << tmpJet.phi() << std::endl;
 			_cleaned = true;
 			muDaughters.erase( muDaughters.begin()+muI );
 			break; //breaks out of mu daughters loop
 		      }// end of if muon ref == jet ref
 		    }//end loop over mu daughters
-		   		 
+
 		  }//end loop over jet constituents
 		}//end check of muons being inside jet
 	      }// end loop over muons for cleaning
-	      	    
-	      
+
+
 	      //clean for electrons
 	      for (unsigned int ilep=0; ilep <electronsForCleaning.size();ilep++){
 		if ( deltaR(electronsForCleaning.at(ilep).p4(),_ijet->p4()) < 0.4 ){
@@ -1078,7 +1078,7 @@ passCut(ret,"Bad Charged Hadron");
 		  }
 		}
 	      }//end electron cleaning
-	      
+
 
 
 	      //if not cleaned just use first jet (remember if no cleaning then cleanedJet==*_ijet) to get corrected four std::vector and set the cleaned jet to have it
@@ -1095,88 +1095,88 @@ passCut(ret,"Bad Charged Hadron");
 		//annoying thing to convert our tlorentzstd::vector to root::math::lorentzstd::vector
 		ROOT::Math::LorentzVector<ROOT::Math::PtEtaPhiM4D<double > > rlv;
 		rlv.SetXYZT(jetP4.X(),jetP4.Y(),jetP4.Z(),jetP4.T());
-		cleanedJet.setP4(rlv);     
+		cleanedJet.setP4(rlv);
 
 	      }
-	      
-	      
+
+
 	      //now do kinematic cuts and save them, cleaning and JEC could only mess up pfID so use original jet for it (though probably do nothing)
-	      if (passPFID ){ 
-		
-                if (( cleanedJet.pt()>mdPar["jet_minpt"] ) && ( fabs(cleanedJet.eta())<mdPar["jet_maxeta"] )){ 
+	      if (passPFID ){
+
+                if (( cleanedJet.pt()>mdPar["jet_minpt"] ) && ( fabs(cleanedJet.eta())<mdPar["jet_maxeta"] )){
 		  ++_n_good_jets;
 		  mvSelJetsCleaned.push_back(cleanedJet);
-                }	       
+                }
 	      }
-	      
-	    }//end lepton jet cleaning 
+
+	    }//end lepton jet cleaning
 	    ++_n_jets;
 	} // end of loop over jets
-        
+
         if ( mbPar["jet_cuts"] ) {
-            
+
             if ( ignoreCut("One jet or more") || _n_good_jets >= 1 ) passCut(ret, "One jet or more");
-            else break; 
-            
+            else break;
+
             if ( ignoreCut("Two jets or more") || _n_good_jets >= 2 ) passCut(ret, "Two jets or more");
-            else break; 
-            
+            else break;
+
             if ( ignoreCut("Three jets or more") || _n_good_jets >= 3 ) passCut(ret, "Three jets or more");
-            else break; 
-            
+            else break;
+
             if ( ignoreCut("Min jet multiplicity") || _n_good_jets >= cut("Min jet multiplicity",int()) ) passCut(ret, "Min jet multiplicity");
-            else break; 
-            
+            else break;
+
             if ( ignoreCut("Max jet multiplicity") || _n_good_jets <= cut("Max jet multiplicity",int()) ) passCut(ret, "Max jet multiplicity");
-            else break; 
-            
+            else break;
+
         } // end of jet cuts
-        
-        
-        
-        
+
+
+
+
         //
         //_____ MET cuts __________________________________
-        //      
+        //
         event.getByLabel( mtPar["met_collection"], mhMet );
         mpMet = edm::Ptr<pat::MET>( mhMet, 0);
-        
+
         if ( mbPar["met_cuts"] ) {
-            
-            
+
+
             // pfMet
             if ( mpMet.isNonnull() && mpMet.isAvailable() ) {
-                
+
                 pat::MET const & met = mhMet->at(0);
                 if ( ignoreCut("Min MET") || met.et()>cut("Min MET", double()) ) passCut(ret, "Min MET");
             }
         } // end of MET cuts
-        
-        
+
+
         //
         //_____ Btagging selection _____________________
         //
         mvSelBtagJets.clear();
         bool _isTagged;
-        
+
         for (std::vector<edm::Ptr<pat::Jet> >::const_iterator _ijet = mvSelJets.begin();
              _ijet != mvSelJets.end(); ++_ijet){
-            
+
             _isTagged = isJetTagged(**_ijet, event);
-            
-            if (_isTagged) mvSelBtagJets.push_back(*_ijet); 
+
+            if (_isTagged) mvSelBtagJets.push_back(*_ijet);
         }
 
         passCut(ret, "All cuts");
 
         break;
-        
+
     } // end of while loop
-    
+
     bFirstEntry = false;
-    
+
     return (bool)ret;
-    
+
     setIgnored(ret);
 
     return false;
@@ -1191,10 +1191,10 @@ void DileptonEventSelector::AnalyzeEvent( edm::EventBase const & event,
     // Compute analysis-specific quantities in the event,
     // return via event content
     //
-    
+
     //   ec.SetValue("pi", 3.14);
-    
-    
+
+
     return;
 }
 
