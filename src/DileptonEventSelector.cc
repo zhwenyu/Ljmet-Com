@@ -413,7 +413,7 @@ bool DileptonEventSelector::operator()( edm::EventBase const & event, pat::strbi
 						break;
 					}
 					else{
-						mvSelTriggersEl[mvsPar["trigger_path_mm"].at(ipath)] = 0;
+						mvSelTriggersMu[mvsPar["trigger_path_mm"].at(ipath)] = 0;
 					}
 				
 				}
