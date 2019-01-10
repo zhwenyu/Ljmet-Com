@@ -1,0 +1,10 @@
+fileLists_Nov2-2018/DoubleEG_RRB.txt
+fileLists_Nov2-2018/DoubleEG_RRC.txt
+fileLists_Nov2-2018/DoubleEG_RRD.txt
+fileLists_Nov2-2018/DoubleEG_RRE.txt
+fileLists_Nov2-2018/DoubleEG_RRF.txt
+fileLists_Nov2-2018/DoubleMuon_RRB.txt
+fileLists_Nov2-2018/DoubleMuon_RRC.txt
+fileLists_Nov2-2018/DoubleMuon_RRD.txt
+fileLists_Nov2-2018/DoubleMuon_RRE.txt
+fileLists_Nov2-2018/DoubleMuon_RRF.txt

@@ -1,0 +1,10 @@
+DoubleEG_RRB
+DoubleEG_RRC
+DoubleEG_RRD
+DoubleEG_RRE
+DoubleEG_RRF
+DoubleMuon_RRB
+DoubleMuon_RRC
+DoubleMuon_RRD
+DoubleMuon_RRE
+DoubleMuon_RRF
