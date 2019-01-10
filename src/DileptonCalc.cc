@@ -232,16 +232,66 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
     SetValue("trigMM", passMM);
 
 
+	//double el
     bool HLT_Ele27_Ele37=false;
     bool HLT_DoubleEle25=false;
     bool HLT_DoubleEle27=false;
     bool HLT_DoubleEle33=false;
+
+    bool HLT_DoubleEle24_eta2p1_WPTight_Gsf_v=false;
+    bool HLT_DoubleEle8_CaloIdM_TrackIdM_Mass8_DZ_PFHT350_v=false;
+    bool HLT_DoubleEle8_CaloIdM_TrackIdM_Mass8_PFHT350_v=false;
+    bool HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v=false;
+    bool HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_v=false;
+
+	//double mu
     bool HLT_Mu37_TkMu27=false;
+
+	//cross
     bool HLT_Mu37Ele27=false;
     bool HLT_Mu27Ele37=false;
+    
+    bool HLT_Mu8_Ele8_CaloIdM_TrackIdM_Mass8_PFHT350_DZ_v=false;
+    bool HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ_v=false;
+    bool HLT_Mu8_Ele8_CaloIdM_TrackIdM_Mass8_PFHT350_v=false;
+    bool HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_v=false;
+    bool HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v=false;
+    bool HLT_Mu12_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ_v=false;
+    bool HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v=false;
+    bool HLT_Mu12_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_v=false;
+
+
+	//single mu
+    bool HLT_Mu8=false;
     bool HLT_Mu17=false;
-    bool HLT_Ele23Iso=false;
-    bool HLT_Ele23=false;
+    bool HLT_Mu19=false;
+    bool HLT_Mu20=false;
+    bool HLT_Mu27=false;
+    bool HLT_Mu8_TrkIsoVVL=false;
+    bool HLT_Mu17_TrkIsoVVL=false;
+    bool HLT_Mu19_TrkIsoVVL=false;
+
+	//single el
+    bool HLT_Ele8_CaloIdL_TrackIdL_IsoVL_PFJet30_v=false;
+    bool HLT_Ele12_CaloIdL_TrackIdL_IsoVL_PFJet30_v=false;
+    bool HLT_Ele23_CaloIdL_TrackIdL_IsoVL_PFJet30_v=false;
+
+    bool HLT_Ele20_WPLoose_Gsf_v=false;
+    bool HLT_Ele20_eta2p1_WPLoose_Gsf_v=false;
+    bool HLT_Ele27_WPTight_Gsf_v=false;
+    bool HLT_Ele32_WPTight_Gsf_v=false;
+    bool HLT_Ele35_WPTight_Gsf_v=false;
+    bool HLT_Ele35_WPTight_Gsf_L1EGMT_v=false;
+    bool HLT_Ele38_WPTight_Gsf_v=false;
+    bool HLT_Ele40_WPTight_Gsf_v=false;
+    bool HLT_Ele32_WPTight_Gsf_L1DoubleEG_v=false;
+    bool HLT_Ele30_eta2p1_WPTight_Gsf_CentralPFJet35_EleCleaned_v=false;
+    bool HLT_Ele28_eta2p1_WPTight_Gsf_HT150_v=false;
+    bool HLT_Ele28_HighEta_SC20_Mass55_v=false;
+
+    bool HLT_Ele8_CaloIdM_TrackIdM_PFJet30_v=false;
+    bool HLT_Ele17_CaloIdM_TrackIdM_PFJet30_v=false;
+    bool HLT_Ele23_CaloIdM_TrackIdM_PFJet30_v=false;
 
     if(doTriggerStudy_){
 
@@ -260,31 +310,127 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
 	  if(Path.find("HLT_DoubleEle25_CaloIdL_MW_v") !=std::string::npos) HLT_DoubleEle25=true;
 	  if(Path.find("HLT_DoubleEle27_CaloIdL_MW_v") !=std::string::npos) HLT_DoubleEle27=true;
 	  if(Path.find("HLT_DoubleEle33_CaloIdL_MW_v") !=std::string::npos) HLT_DoubleEle33=true;
+
+	  if(Path.find("HLT_DoubleEle24_eta2p1_WPTight_Gsf_v") !=std::string::npos) HLT_DoubleEle24_eta2p1_WPTight_Gsf_v=true;
+	  if(Path.find("HLT_DoubleEle8_CaloIdM_TrackIdM_Mass8_DZ_PFHT350_v") !=std::string::npos) HLT_DoubleEle8_CaloIdM_TrackIdM_Mass8_DZ_PFHT350_v=true;
+	  if(Path.find("HLT_DoubleEle8_CaloIdM_TrackIdM_Mass8_PFHT350_v") !=std::string::npos) HLT_DoubleEle8_CaloIdM_TrackIdM_Mass8_PFHT350_v=true; 
+	  if(Path.find("HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v") !=std::string::npos) HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v=true;
+	  if(Path.find("HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_v") !=std::string::npos) HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_v=true;
+
 	  //Muon paths
 	  if(Path.find("HLT_Mu37_TkMu27_v")!=std::string::npos) HLT_Mu37_TkMu27=true;
+
 	  //cross paths	      
 	  if(Path.find("HLT_Mu37_Ele27_CaloIdL_MW_v")!=std::string::npos) HLT_Mu37Ele27=true;
 	  if(Path.find("HLT_Mu27_Ele37_CaloIdL_MW_v")!=std::string::npos) HLT_Mu27Ele37=true;
-	  //control triggers
+
+	  if(Path.find("HLT_Mu8_Ele8_CaloIdM_TrackIdM_Mass8_PFHT350_DZ_v") !=std::string::npos) HLT_Mu8_Ele8_CaloIdM_TrackIdM_Mass8_PFHT350_DZ_v=true;
+	  if(Path.find("HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ_v") !=std::string::npos) HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ_v=true;
+	  if(Path.find("HLT_Mu8_Ele8_CaloIdM_TrackIdM_Mass8_PFHT350_v") !=std::string::npos) HLT_Mu8_Ele8_CaloIdM_TrackIdM_Mass8_PFHT350_v=true;
+	  if(Path.find("HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_v") !=std::string::npos) HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_v=true;
+	  if(Path.find("HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v") !=std::string::npos) HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v=true;
+	  if(Path.find("HLT_Mu12_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ_v") !=std::string::npos) HLT_Mu12_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ_v=true;
+	  if(Path.find("HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v") !=std::string::npos) HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v=true;
+	  if(Path.find("HLT_Mu12_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_v") !=std::string::npos) HLT_Mu12_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_v=true;
+
+
+	  //control triggers - mu
 	  if(Path.find("HLT_Mu17_v")!=std::string::npos) HLT_Mu17=true;
-	  if(Path.find("HLT_Ele23_CaloIdL_TrackIdL_IsoVL_PFJet30_v")!=std::string::npos) HLT_Ele23Iso=true;
-	  if(Path.find("HLT_Ele23_CaloIdM_TrackIdM_PFJet30_v")!=std::string::npos) HLT_Ele23=true;
-	  //HT/Jet
-	  //if(Path=="HLT_AK8PFJet360TrimMod_Mass30_v1" || Path=="HLT_AK8PFJet360TrimMod_Mass30_v2" || Path=="HLT_AK8PFJet360TrimMod_Mass30_v3") HLT_AK8PFJet360TrimMass30=true;
+	  if(Path.find("HLT_Mu8_v")!=std::string::npos) HLT_Mu8=true;
+	  if(Path.find("HLT_Mu17_v")!=std::string::npos) HLT_Mu17=true;
+	  if(Path.find("HLT_Mu19_v")!=std::string::npos) HLT_Mu19=true;
+	  if(Path.find("HLT_Mu20_v")!=std::string::npos) HLT_Mu20=true;
+	  if(Path.find("HLT_Mu27_v")!=std::string::npos) HLT_Mu27=true;
+	  if(Path.find("HLT_Mu8_TrkIsoVVL_v")!=std::string::npos) HLT_Mu8_TrkIsoVVL=true;
+	  if(Path.find("HLT_Mu17_TrkIsoVVL_v")!=std::string::npos) HLT_Mu17_TrkIsoVVL=true;
+	  if(Path.find("HLT_Mu19_TrkIsoVVL_v")!=std::string::npos) HLT_Mu19_TrkIsoVVL=true;
+
+
+	  //control triggers - el
+	  if(Path.find("HLT_Ele8_CaloIdL_TrackIdL_IsoVL_PFJet30_v")!=std::string::npos) HLT_Ele8_CaloIdL_TrackIdL_IsoVL_PFJet30_v=true;
+	  if(Path.find("HLT_Ele12_CaloIdL_TrackIdL_IsoVL_PFJet30_v")!=std::string::npos) HLT_Ele12_CaloIdL_TrackIdL_IsoVL_PFJet30_v=true;
+	  if(Path.find("HLT_Ele23_CaloIdL_TrackIdL_IsoVL_PFJet30_v")!=std::string::npos) HLT_Ele23_CaloIdL_TrackIdL_IsoVL_PFJet30_v=true;
+
+	  if(Path.find("HLT_Ele20_WPLoose_Gsf_v")!=std::string::npos) HLT_Ele20_WPLoose_Gsf_v=true;
+	  if(Path.find("HLT_Ele20_eta2p1_WPLoose_Gsf_v")!=std::string::npos) HLT_Ele20_eta2p1_WPLoose_Gsf_v=true;
+	  if(Path.find("HLT_Ele27_WPTight_Gsf_v")!=std::string::npos) HLT_Ele27_WPTight_Gsf_v=true;
+	  if(Path.find("HLT_Ele32_WPTight_Gsf_v")!=std::string::npos) HLT_Ele32_WPTight_Gsf_v=true;
+	  if(Path.find("HLT_Ele35_WPTight_Gsf_v")!=std::string::npos) HLT_Ele35_WPTight_Gsf_v=true;
+	  if(Path.find("HLT_Ele35_WPTight_Gsf_L1EGMT_v")!=std::string::npos) HLT_Ele35_WPTight_Gsf_L1EGMT_v=true;
+	  if(Path.find("HLT_Ele38_WPTight_Gsf_v")!=std::string::npos) HLT_Ele38_WPTight_Gsf_v=true;
+	  if(Path.find("HLT_Ele40_WPTight_Gsf_v")!=std::string::npos) HLT_Ele40_WPTight_Gsf_v=true;
+	  if(Path.find("HLT_Ele32_WPTight_Gsf_L1DoubleEG_v")!=std::string::npos) HLT_Ele32_WPTight_Gsf_L1DoubleEG_v=true;
+	  if(Path.find("HLT_Ele30_eta2p1_WPTight_Gsf_CentralPFJet35_EleCleaned_v")!=std::string::npos) HLT_Ele30_eta2p1_WPTight_Gsf_CentralPFJet35_EleCleaned_v=true;
+	  if(Path.find("HLT_Ele28_eta2p1_WPTight_Gsf_HT150_v")!=std::string::npos) HLT_Ele28_eta2p1_WPTight_Gsf_HT150_v=true;
+	  if(Path.find("HLT_Ele28_HighEta_SC20_Mass55_v")!=std::string::npos) HLT_Ele28_HighEta_SC20_Mass55_v=true;
+
+	  if(Path.find("HLT_Ele8_CaloIdM_TrackIdM_PFJet30_v")!=std::string::npos) HLT_Ele8_CaloIdM_TrackIdM_PFJet30_v=true;
+	  if(Path.find("HLT_Ele17_CaloIdM_TrackIdM_PFJet30_v")!=std::string::npos) HLT_Ele17_CaloIdM_TrackIdM_PFJet30_v=true;
+	  if(Path.find("HLT_Ele23_CaloIdM_TrackIdM_PFJet30_v")!=std::string::npos) HLT_Ele23_CaloIdM_TrackIdM_PFJet30_v=true;
 	}
       }
     }
 
+	//double el
     SetValue("HLT_Ele27_Ele37",HLT_Ele27_Ele37);
     SetValue("HLT_DoubleEle25",HLT_DoubleEle25);
     SetValue("HLT_DoubleEle27",HLT_DoubleEle27);
     SetValue("HLT_DoubleEle33",HLT_DoubleEle33);
+
+    SetValue("HLT_DoubleEle24_eta2p1_WPTight_Gsf_v",HLT_DoubleEle24_eta2p1_WPTight_Gsf_v);
+    SetValue("HLT_DoubleEle8_CaloIdM_TrackIdM_Mass8_DZ_PFHT350_v",HLT_DoubleEle8_CaloIdM_TrackIdM_Mass8_DZ_PFHT350_v);
+    SetValue("HLT_DoubleEle8_CaloIdM_TrackIdM_Mass8_PFHT350_v",HLT_DoubleEle8_CaloIdM_TrackIdM_Mass8_PFHT350_v);
+    SetValue("HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v",HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v);
+    SetValue("HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_v",HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_v);
+
+	//double mu
     SetValue("HLT_Mu37_TkMu27",HLT_Mu37_TkMu27);
+
+	//cross
     SetValue("HLT_Mu37Ele27",HLT_Mu37Ele27);
     SetValue("HLT_Mu27Ele37",HLT_Mu27Ele37);
+
+    SetValue("HLT_Mu8_Ele8_CaloIdM_TrackIdM_Mass8_PFHT350_DZ_v",HLT_Mu8_Ele8_CaloIdM_TrackIdM_Mass8_PFHT350_DZ_v);
+    SetValue("HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ_v",HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ_v);
+    SetValue("HLT_Mu8_Ele8_CaloIdM_TrackIdM_Mass8_PFHT350_v",HLT_Mu8_Ele8_CaloIdM_TrackIdM_Mass8_PFHT350_v);
+    SetValue("HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_v",HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_v);
+    SetValue("HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v",HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v);
+    SetValue("HLT_Mu12_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ_v",HLT_Mu12_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ_v);
+    SetValue("HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v",HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v);
+    SetValue("HLT_Mu12_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_v",HLT_Mu12_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_v);
+
+
+	//single mu
+    SetValue("HLT_Mu8",HLT_Mu8);
     SetValue("HLT_Mu17",HLT_Mu17);
-    SetValue("HLT_Ele23Iso",HLT_Ele23Iso);
-    SetValue("HLT_Ele23Iso",HLT_Ele23Iso);
+    SetValue("HLT_Mu19",HLT_Mu19);
+    SetValue("HLT_Mu20",HLT_Mu20);
+    SetValue("HLT_Mu27",HLT_Mu27);
+    SetValue("HLT_Mu8_TrkIsoVVL",HLT_Mu8_TrkIsoVVL);
+    SetValue("HLT_Mu17_TrkIsoVVL",HLT_Mu17_TrkIsoVVL);
+    SetValue("HLT_Mu19_TrkIsoVVL",HLT_Mu19_TrkIsoVVL);
+
+	//single el
+    SetValue("HLT_Ele8_CaloIdL_TrackIdL_IsoVL_PFJet30_v",HLT_Ele8_CaloIdL_TrackIdL_IsoVL_PFJet30_v);
+    SetValue("HLT_Ele12_CaloIdL_TrackIdL_IsoVL_PFJet30_v",HLT_Ele12_CaloIdL_TrackIdL_IsoVL_PFJet30_v);
+    SetValue("HLT_Ele23_CaloIdL_TrackIdL_IsoVL_PFJet30_v",HLT_Ele23_CaloIdL_TrackIdL_IsoVL_PFJet30_v);
+
+    SetValue("HLT_Ele20_WPLoose_Gsf_v",HLT_Ele20_WPLoose_Gsf_v);
+    SetValue("HLT_Ele20_eta2p1_WPLoose_Gsf_v",HLT_Ele20_eta2p1_WPLoose_Gsf_v);
+    SetValue("HLT_Ele27_WPTight_Gsf_v",HLT_Ele27_WPTight_Gsf_v);
+    SetValue("HLT_Ele32_WPTight_Gsf_v",HLT_Ele32_WPTight_Gsf_v);
+    SetValue("HLT_Ele35_WPTight_Gsf_v",HLT_Ele35_WPTight_Gsf_v);
+    SetValue("HLT_Ele35_WPTight_Gsf_L1EGMT_v",HLT_Ele35_WPTight_Gsf_L1EGMT_v);
+    SetValue("HLT_Ele38_WPTight_Gsf_v",HLT_Ele38_WPTight_Gsf_v);
+    SetValue("HLT_Ele40_WPTight_Gsf_v",HLT_Ele40_WPTight_Gsf_v);
+    SetValue("HLT_Ele32_WPTight_Gsf_L1DoubleEG_v",HLT_Ele32_WPTight_Gsf_L1DoubleEG_v);
+    SetValue("HLT_Ele30_eta2p1_WPTight_Gsf_CentralPFJet35_EleCleaned_v",HLT_Ele30_eta2p1_WPTight_Gsf_CentralPFJet35_EleCleaned_v);
+    SetValue("HLT_Ele28_eta2p1_WPTight_Gsf_HT150_v",HLT_Ele28_eta2p1_WPTight_Gsf_HT150_v);
+    SetValue("HLT_Ele28_HighEta_SC20_Mass55_v",HLT_Ele28_HighEta_SC20_Mass55_v);
+
+    SetValue("HLT_Ele8_CaloIdM_TrackIdM_PFJet30_v",HLT_Ele8_CaloIdM_TrackIdM_PFJet30_v);
+    SetValue("HLT_Ele17_CaloIdM_TrackIdM_PFJet30_v",HLT_Ele17_CaloIdM_TrackIdM_PFJet30_v);
+    SetValue("HLT_Ele23_CaloIdM_TrackIdM_PFJet30_v",HLT_Ele23_CaloIdM_TrackIdM_PFJet30_v);
 
     //
     //_____ Event kinematics __________________
