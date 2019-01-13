@@ -246,6 +246,7 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
 
 	//double mu
     bool HLT_Mu37_TkMu27=false;
+    bool HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_Mass3p8=false;
 
 	//cross
     bool HLT_Mu37Ele27=false;
@@ -319,6 +320,7 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
 
 	  //Muon paths
 	  if(Path.find("HLT_Mu37_TkMu27_v")!=std::string::npos) HLT_Mu37_TkMu27=true;
+	  if(Path.find("HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_Mass3p8")!=std::string::npos) HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_Mass3p8=true;
 
 	  //cross paths	      
 	  if(Path.find("HLT_Mu37_Ele27_CaloIdL_MW_v")!=std::string::npos) HLT_Mu37Ele27=true;
@@ -385,6 +387,7 @@ int DileptonCalc::AnalyzeEvent(edm::EventBase const & event, BaseEventSelector *
 
 	//double mu
     SetValue("HLT_Mu37_TkMu27",HLT_Mu37_TkMu27);
+    SetValue("HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_Mass3p8",HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_Mass3p8);
 
 	//cross
     SetValue("HLT_Mu37Ele27",HLT_Mu37Ele27);
