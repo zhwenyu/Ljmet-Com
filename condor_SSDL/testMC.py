@@ -102,6 +102,7 @@ process.event_selector = cms.PSet(
 
     trigger_path_mm          = cms.vstring(
     'HLT_Mu37_TkMu27_v',
+    'HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_Mass3p8',
     ),
 
     pv_cut                   = cms.bool(True),
